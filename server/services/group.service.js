@@ -1,23 +1,39 @@
 const httpStatus = require('http-status');
-const { User } = require('../models');
+const { Group } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 //TODO fúr Gruppen umschreiben
 //Service updated/zieht die Daten aus DB
 
 /**
- * Create a user
- * @param {Object} userBody
- * @returns {Promise<User>}
+ * Get all groups.
+ * @returns {Promise<[Group]>}
  */
-const createUser = async (userBody) => {
-    if (await User.isEmailTaken(userBody.email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
-    return User.create(userBody);
+const getGroups = async () => {
+    return Group.find({});
 };
 
 /**
+ * Get a group by ID.
+ * @param {ObjectId} id
+ * @returns {Promise<Group>}
+ */
+const getGroupById = async (id) => {
+    return Group.findById(id);
+};
+
+/**
+ * Create a Group
+ * @param {Object} groupBody
+ * @returns {Promise<Group>}
+ */
+const createGroup = async (groupBody) => {
+    return Group.create(groupBody);
+};
+
+/*
+
+/!**
  * Query for users
  * @param {Object} filter - Mongo filter
  * @param {Object} options - Query options
@@ -25,36 +41,18 @@ const createUser = async (userBody) => {
  * @param {number} [options.limit] - Maximum number of results per page (default = 10)
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
- */
+ *!/
 const queryUsers = async (filter, options) => {
     const users = await User.paginate(filter, options);
     return users;
 };
 
-/**
- * Get user by id
- * @param {ObjectId} id
- * @returns {Promise<User>}
- */
-const getUserById = async (id) => {
-    return User.findById(id);
-};
-
-/**
- * Get user by email
- * @param {string} email
- * @returns {Promise<User>}
- */
-const getUserByEmail = async (email) => {
-    return User.findOne({ email });
-};
-
-/**
+/!**
  * Update user by id
  * @param {ObjectId} userId
  * @param {Object} updateBody
  * @returns {Promise<User>}
- */
+ *!/
 const updateUserById = async (userId, updateBody) => {
     const user = await getUserById(userId);
     if (!user) {
@@ -68,11 +66,11 @@ const updateUserById = async (userId, updateBody) => {
     return user;
 };
 
-/**
+/!**
  * Delete user by id
  * @param {ObjectId} userId
  * @returns {Promise<User>}
- */
+ *!/
 const deleteUserById = async (userId) => {
     const user = await getUserById(userId);
     if (!user) {
@@ -81,12 +79,11 @@ const deleteUserById = async (userId) => {
     await user.remove();
     return user;
 };
+*/
 
+//TODO Add new Functions here
 module.exports = {
-    createUser,
-    queryUsers,
-    getUserById,
-    getUserByEmail,
-    updateUserById,
-    deleteUserById,
+    getGroupById,
+    getGroups,
+    createGroup
 };

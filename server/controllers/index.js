@@ -1,1 +1,2 @@
-module.exports.groupController = require('server/controllers/group.controller')
+module.exports.groupController = require('./group.controller')
+//module.exports.memberController = require('./member.controller')

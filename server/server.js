@@ -1,29 +1,39 @@
-// Importing required modules
-const cors = require('cors');
-const express = require('express');
+const logger = require('./config/logger');
+const mongoose = require('mongoose');
+const app = require('./app')
+const config = require('./config/config');
 
-// parse env variables
-require('dotenv').config();
+let server;
+//config.mongoose.url
+mongoose.connect('mongodb://localhost:27017/data').then(() => {
+    logger.info('Connected to MongoDB');
+    server = app.listen(config.port, () => {
+        logger.info(`Listening to port ${config.port}`);
+    });
+});
 
-// Configuring port
-const port = process.env.PORT || 9000;
+const exitHandler = () => {
+    if (server) {
+        server.close(() => {
+            logger.info('Server closed');
+            process.exit(1);
+        });
+    } else {
+        process.exit(1);
+    }
+};
 
-const app = express();
+const unexpectedErrorHandler = (error) => {
+    logger.error(error);
+    exitHandler();
+};
 
-// Configure middlewares
-app.use(cors());
-app.use(express.json());
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', unexpectedErrorHandler);
 
-app.set('view engine', 'html');
-
-// Static folder
-app.use(express.static(__dirname + '/views/'));
-
-// Defining route middleware
-app.use('/api', require('./routes/api'));
-
-// Listening to port
-app.listen(port);
-console.log(`Listening On http://localhost:${port}/api`);
-
-module.exports = app;
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM received');
+    if (server) {
+        server.close();
+    }
+});

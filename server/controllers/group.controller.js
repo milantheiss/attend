@@ -1,30 +1,53 @@
-const taskService  = require('../service/task.service');
-const logger = require('../config/logger');
+const logger = require('../config/logger')
+const {groupService} = require('../services')
+const httpStatus = require('http-status');
+const pick = require('../utils/pick');
+const ApiError = require('../utils/ApiError');
+const catchAsync = require('../utils/catchAsync');
 
-class GroupController {
-    //TODO Update Code from Boilerplate
-    //Im Controller sollen die gegebenen Daten verarbeitet werden und mit der DB ausgetauscht werden.
+//TODO Implement simple GET
+const getGroups = catchAsync(async (req, res) => {
+    const result = await groupService.getGroups();
+    res.send(result);
+});
 
-    async getTasks() {
-        logger.info('Controller: getTasks')
-        return await taskService.getTasks();
-    }
+const createGroup = catchAsync(async (req, res) => {
+    const result = await groupService.createGroup(req.body);
+    res.send(result);
+});
 
-    async createTask(task) {
-        logger.info('Controller: createTask', task);
-        return await taskService.createTask(task);
-    }
+/*
 
-    async updateTask(task) {
-        logger.info('Controller: updateTask', task);
-        return await taskService.updateTask(task);
-    }
-
-    async deleteTask(taskId) {
-        logger.info('Controller: deleteTask', taskId);
-        return await taskService.deleteTask(taskId);
-    }
+async getGroup(groupID) {
+    logger.info('Controller: getGroups', groupID)
+    return await groupService.getGroup(groupID);
 }
-module.exports = new GroupController();
 
-// TODO In Controller die
+async createGroup(group) {
+    logger.info('Controller: createGroup', group);
+    return await groupService.createGroup(group);
+}
+
+//Trigger PUT Request
+async updateGroup(updatedGroup) {
+    logger.info('Controller: updateGroup', updatedGroup);
+    return await groupService.updateGroup(updatedGroup);
+}
+
+async modifyGroup(modification) {
+    logger.info('Controller: updateGroup', modification);
+    return await groupService.modifyGroup(modification);
+}
+
+async deleteGroup(groupID) {
+    logger.info('Controller: deleteGroup', groupID);
+    return await groupService.deleteGroup(groupId);
+}
+
+ */
+
+module.exports = {
+    getGroups,
+    createGroup
+}
+

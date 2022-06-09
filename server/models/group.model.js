@@ -1,19 +1,28 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const {toJSON, paginate} = require('./plugins')
+const {Schema} = require("mongoose");
 
-const groupSchema = new mongoose.Schema({
-//TODO Update Schema to real GroupSchema
-        task: 'string',
-        assignee: 'string',
-        status: 'string',
-        createDate: 'date',
-        updatedDate: 'date',
-        createdBy: 'string',
-        updatedBy: 'string'
-    },
-    {timestamps: {createDate: 'created_at', updatedDate: 'updated_at'}});
+const groupSchema = mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        participants: {
+            type: [Schema.ObjectId],
+            required: false,
+        }
+    }
+);
 
-const GroupModel = mongoose.model('group', groupSchema);
+// add plugin that converts mongoose to json
+groupSchema.plugin(toJSON)
+groupSchema.plugin(paginate);
 
-module.exports = {
-    Group: GroupModel
-}
+/**
+ * @typedef Group
+ */
+const Group = mongoose.model('Group', groupSchema);
+
+module.exports = Group;
