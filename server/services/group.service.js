@@ -31,6 +31,16 @@ const createGroup = async (groupBody) => {
     return Group.create(groupBody);
 };
 
+/**
+ * Update a groups data
+ * @param groupID
+ * @param {Object} groupBody
+ * @returns {Promise<Group>}
+ */
+const updateGroup = async (groupID, groupBody) => {
+    return Group.findByIdAndUpdate(groupID,groupBody)
+};
+
 /*
 
 /!**
@@ -85,5 +95,6 @@ const deleteUserById = async (userId) => {
 module.exports = {
     getGroupById,
     getGroups,
-    createGroup
+    createGroup,
+    updateGroup
 };

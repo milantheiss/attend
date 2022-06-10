@@ -1,11 +1,11 @@
 const mongoose = require('mongoose')
 
-const { toJSON, paginate } = require('./plugins')
+const {toJSON, paginate} = require('./plugins')
 const {Schema} = require("mongoose");
 
 const memberSchema = mongoose.Schema(
     {
-        fristname: {
+        firstname: {
             type: String,
             required: true,
             trim: true,
@@ -15,12 +15,21 @@ const memberSchema = mongoose.Schema(
             required: true,
             trim: true,
         },
-        year: {
-            type: Number,
+        birthday: {
+            type: Date,
             required: true
         },
-        registeredGroups:{
-            type: [Schema.ObjectId],
+        groups: {
+            type: [{
+                name: {
+                    type: String,
+                    required: true
+                },
+                groupID: {
+                    type: Schema.ObjectId,
+                    required: true
+                }
+            }],
             required: false
         }
     }
@@ -33,6 +42,6 @@ memberSchema.plugin(paginate);
 /**
  * @typedef Member
  */
-const Member = mongoose.model('Participant', memberSchema);
+const Member = mongoose.model('Members', memberSchema);
 
 module.exports = Member;

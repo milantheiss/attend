@@ -10,7 +10,26 @@ const groupSchema = mongoose.Schema(
             trim: true,
         },
         participants: {
-            type: [Schema.ObjectId],
+            type: [
+                {
+                    firstname: {
+                        type: String,
+                        required: true
+                    },
+                    lastname: {
+                        type: String,
+                        required: true
+                    },
+                    birthday: {
+                        type: Date,
+                        required: false
+                    },
+                    memberID: {
+                        type: Schema.ObjectId,
+                        required: true
+                    }
+                }
+            ],
             required: false,
         }
     }
