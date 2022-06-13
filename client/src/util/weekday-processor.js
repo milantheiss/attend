@@ -2,22 +2,11 @@ function convertWeekdaytoNumber(dayString) {
     const arr = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
     let i = 0
 
-    while (dayString !== arr[i]) {
+    while ([dayString.charAt(0), dayString.charAt(1)].join('') !== arr[i]) {
         i++
     }
 
     return i
-}
-
-function getDateOfNextTraining(startdate, weekdays) {
-    const weekdayOfStartdate = startdate.getDay()
-
-    const weekdayOfNextTraining = getSoonestWeekdayInFuture(startdate, weekdays)
-
-    const result = new Date(startdate)
-    result.setDate(startdate.getDate() + (weekdayOfNextTraining - weekdayOfStartdate))
-
-    return result
 }
 
 function getSoonestWeekdayInFuture(referenceWeekday, weekdays) {
@@ -56,19 +45,6 @@ function getSoonestWeekdayInPast(referenceWeekday, weekdays) {
     return min
 }
 
-function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
-    const weekdayOfStartdate = startdate.getDay()
-
-    const weekdayOfTraining = OfNextTraining ? getSoonestWeekdayInFuture(startdate, weekdays) : getSoonestWeekdayInPast(startdate, weekdays)
-
-    const result = new Date(startdate)
-
-    if (OfNextTraining) result.setDate(startdate.getDate() + calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
-    else result.setDate(startdate.getDate() + calculateDifferenceBackwards(weekdayOfStartdate, weekdayOfTraining))
-
-    return result
-}
-
 function calculateDifferenceForwards(start, end) {
     if (start > end) {
         return 6 - start + 1 + end
@@ -83,9 +59,33 @@ function calculateDifferenceBackwards(start, end) {
     return 0 - start - (6 - end + 1)
 }
 
-const weekdays = ['So', 'Di']
+function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
+    const weekdayOfStartdate = startdate.getDay()
 
-const testDate = new Date("2022-06-18T20:04:36.202Z")
+    const weekdayOfTraining = OfNextTraining ? getSoonestWeekdayInFuture(startdate, weekdays) : getSoonestWeekdayInPast(startdate, weekdays)
 
-console.log(getDateOfTraining(testDate, weekdays, false))
+    const result = new Date(startdate)
 
+    if (OfNextTraining) result.setDate(startdate.getDate() + calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
+    else result.setDate(startdate.getDate() + calculateDifferenceBackwards(weekdayOfStartdate, weekdayOfTraining))
+
+    console.log(result)
+
+    return result
+}
+
+function getFormatedDateString(date) {
+    const arr = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+    const mm = date.getMonth() + 1; // getMonth() is zero-based
+    const dd = date.getDate();
+    const weekday = arr[date.getDay()] + '.'
+    const ddmmyyyy = [(dd>9 ? '' : '0') + dd, (mm>9 ? '' : '0') + mm, date.getFullYear()
+    ].join('.')
+
+    return [weekday, ddmmyyyy].join(' ');
+}
+
+module.exports = {
+    getDateOfTraining,
+    getFormatedDateString
+}

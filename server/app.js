@@ -1,4 +1,4 @@
-// Importing required modules
+// Importing required util
 const express = require('express');
 const cors = require('cors');
 const config = require('./config/config');

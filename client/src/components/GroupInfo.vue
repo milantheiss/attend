@@ -24,11 +24,6 @@ export default {
   props: {
     group: {
       type: Object,
-      default(){
-        return {
-
-        }
-      },
       required: true,
     }
   },

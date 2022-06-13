@@ -5,7 +5,7 @@ const config = require('./config/config');
 
 let server;
 //config.mongoose.url
-mongoose.connect('mongodb://localhost:27017/data').then(() => {
+mongoose.connect(config.url).then(() => {
     logger.info('Connected to MongoDB');
     server = app.listen(config.port, () => {
         logger.info(`Listening to port ${config.port}`);

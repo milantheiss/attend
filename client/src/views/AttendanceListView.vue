@@ -2,7 +2,8 @@
   <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Wähle eine Gruppe" :options="this.groups"/>
   <Button @btn-click="showGroups = !showGroups" text="Zeige Gruppen Info" color="lightsteelblue"/>
   <GroupInfo v-show="showGroups" :group="selectedGroup"/>
-  <DatePicker v-model="date"/>
+  <!--TODO übergebe die Trainingstag richtig-->
+  <DatePicker :weekdays="selectedGroup.times[0].day" v-model="date"/>
   <TeilnehmerItem v-for="participant in this.selectedGroup.participants" :key="participant.id" :participant="participant"/>
 </template>
 
