@@ -10,34 +10,34 @@ import {getDateOfTraining, getFormatedDateString} from "@/util/weekday-processor
 
 export default {
   name: "DatePicker",
-  components:{
+  components: {
     Button
   },
   props: {
     weekdays: {
-      type: [],
-      default(){
-        return {
-          weekdays: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
-        }
-      },
+      type: Array,
       required: true,
     }
   },
-  data(){
-    return{
+  data() {
+    return {
       date: new Date(Date.now()),
       formatedDateString: String
     }
   },
   methods: {
-    getNextDate(){
-      this.date = getDateOfTraining(this.date, this.weekdays, true)
-      this.formatedDateString = getFormatedDateString(this.date)
+    getNextDate() {
+      if (this.weekdays[0] !== ' ') {
+        console.log(this.weekdays)
+        this.date = getDateOfTraining(this.date, this.weekdays, true)
+        this.formatedDateString = getFormatedDateString(this.date)
+      }
     },
-    getLastDate(){
-      this.date = getDateOfTraining(this.date, this.weekdays, false)
-      this.formatedDateString = getFormatedDateString(this.date)
+    getLastDate() {
+      if (this.weekdays[0] !== ' ') {
+        this.date = getDateOfTraining(this.date, this.weekdays, false)
+        this.formatedDateString = getFormatedDateString(this.date)
+      }
     }
   },
   created() {

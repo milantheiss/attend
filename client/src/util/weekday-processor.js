@@ -35,9 +35,20 @@ function getSoonestWeekdayInFuture(referenceWeekday, weekdays) {
 function getSoonestWeekdayInPast(referenceWeekday, weekdays) {
 
     let min = convertWeekdaytoNumber(weekdays[0])
+    let i = 1
 
-    for (let i = 1; i < weekdays.length; i++) {
-        if ((convertWeekdaytoNumber(weekdays[i]) - referenceWeekday.getDay()) > (min - referenceWeekday.getDay())) {
+    if ((min - referenceWeekday.getDay()) === 0) {
+        try {
+            min = convertWeekdaytoNumber(weekdays[1])
+            i = 2
+        } catch (e) {
+            return convertWeekdaytoNumber(weekdays[0])
+        }
+    }
+
+    for (; i < weekdays.length; i++) {
+        if ((convertWeekdaytoNumber(weekdays[i]) - referenceWeekday.getDay()) > (min - referenceWeekday.getDay()) && (convertWeekdaytoNumber(weekdays[i]) - referenceWeekday.getDay()) > 0)
+        {
             min = convertWeekdaytoNumber(weekdays[i])
         }
     }
@@ -79,7 +90,7 @@ function getFormatedDateString(date) {
     const mm = date.getMonth() + 1; // getMonth() is zero-based
     const dd = date.getDate();
     const weekday = arr[date.getDay()] + '.'
-    const ddmmyyyy = [(dd>9 ? '' : '0') + dd, (mm>9 ? '' : '0') + mm, date.getFullYear()
+    const ddmmyyyy = [(dd > 9 ? '' : '0') + dd, (mm > 9 ? '' : '0') + mm, date.getFullYear()
     ].join('.')
 
     return [weekday, ddmmyyyy].join(' ');
