@@ -14,6 +14,7 @@ router
 
 router
     .route('/:groupID')
+    .get(groupController.getGroupById)
     .put(groupController.updateGroup)
     .patch(groupController.updateGroup)
 

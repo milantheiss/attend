@@ -4,11 +4,15 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const {getGroupById} = require("../services/group.service");
 
 //TODO Implement simple GET
 const getGroups = catchAsync(async (req, res) => {
     const result = await groupService.getGroups();
+    res.send(result);
+});
+
+const getGroupById = catchAsync(async (req, res) => {
+    const result = await groupService.getGroupById(req.params.groupID);
     res.send(result);
 });
 
@@ -54,6 +58,7 @@ async deleteGroup(groupID) {
 
 module.exports = {
     getGroups,
+    getGroupById,
     createGroup,
     updateGroup
 }
