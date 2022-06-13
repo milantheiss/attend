@@ -25,7 +25,7 @@ const memberSchema = mongoose.Schema(
                     type: String,
                     required: true
                 },
-                groupID: {
+                _id: {
                     type: Schema.ObjectId,
                     required: true
                 }

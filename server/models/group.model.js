@@ -14,23 +14,94 @@ const groupSchema = mongoose.Schema(
                 {
                     firstname: {
                         type: String,
-                        required: true
+                        required: true,
+                        trim: true
                     },
                     lastname: {
                         type: String,
-                        required: true
+                        required: true,
+                        trim: true
                     },
                     birthday: {
                         type: Date,
-                        required: false
+                        required: false,
                     },
-                    memberID: {
+                    _id: {
                         type: Schema.ObjectId,
                         required: true
                     }
                 }
             ],
             required: false,
+        },
+        trainer: {
+            type: {
+                name: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                _id: {
+                    type: Schema.ObjectId,
+                    required: true
+                }
+            },
+            required: true
+        },
+        assistent: {
+            type: [
+                {
+                    name: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    },
+                    _id: {
+                        type: Schema.ObjectId,
+                        required: true
+                    }
+                }
+            ],
+            required: false
+        },
+        times: {
+            type: [
+                {
+                    day: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    },
+                    starttime: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    },
+                    endtime: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    }
+                }
+            ]
+        },
+        venue: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        department: {
+            type: {
+                name: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                _id: {
+                    type: Schema.ObjectId,
+                    required: true
+                }
+            },
         }
     }
 );

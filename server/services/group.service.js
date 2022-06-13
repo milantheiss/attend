@@ -41,6 +41,14 @@ const updateGroup = async (groupID, groupBody) => {
     return Group.findByIdAndUpdate(groupID,groupBody)
 };
 
+/**
+ * Delete a group
+ * @param groupID
+ * @returns {Promise<Group>}
+ */
+const deleteGroup = async (groupID) => {
+    return Group.findByIdAndDelete(groupID)
+};
 /*
 
 /!**
@@ -96,5 +104,6 @@ module.exports = {
     getGroupById,
     getGroups,
     createGroup,
-    updateGroup
+    updateGroup,
+    deleteGroup
 };

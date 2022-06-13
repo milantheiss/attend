@@ -4,8 +4,8 @@
   <Button @btn-click="showGroups = !showGroups" text="Zeige Gruppen Info" color="lightsteelblue"/>
   <GroupInfo v-show="showGroups" :group="selectedGroup"/>
   <!--TODO übergebe die Trainingstag richtig-->
-  <DatePicker :weekdays="weekdays" v-model="date"/>
-  <TeilnehmerItem v-for="participant in this.selectedGroup.participants" :key="participant.id"
+  <DatePicker @change="changeAtDate" :weekdays="weekdays" v-model="date"/>
+  <TeilnehmerItem v-for="participant in this.selectedGroup.participants" :key="participant._id"
                   :participant="participant"/>
 </template>
 
@@ -43,7 +43,8 @@ export default {
         }
       },
       date: new Date(),
-      showGroups: false
+      showGroups: false,
+      selectedAttendance: Object
     }
   },
   components: {
@@ -66,18 +67,19 @@ export default {
     },
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await this.fetchGroup(groupID)
+    },
+    changeAtDate(){
+
     }
   },
   async created() {
     this.groups = await this.fetchGroups()
-
   },
   computed: {
     weekdays() {
       let temp = []
       for (const time of this.selectedGroup.times) {
         if (time.day.length >= 2){
-          console.log("here?")
           temp.push(time.day.slice(0, 2))
         }else {
           temp.push(" ")
