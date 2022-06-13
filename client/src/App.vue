@@ -1,9 +1,10 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/attendance-list">Attendance List</router-link>
+    <router-link to="/attendancelist">Attendance List</router-link> |
+    <router-link to="/about">About</router-link>
   </nav>
-  <router-view />
+  <router-view/>
 </template>
 
 <style>
@@ -28,8 +29,3 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 </style>
-<script>
-export default {
-  components: {},
-};
-</script>

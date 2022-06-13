@@ -1,43 +1,68 @@
 <template>
-  <h1>Hello</h1>
   <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Wähle eine Gruppe" :options="this.groups"/>
-  <Button text="Zeige Gruppen Info" color="lightsteelblue"/>
-  <TeilnehmerItem v-for="participant in this.groups[0].participants" :key="participant.id" :participant="participant"/>
+  <Button @btn-click="showGroups = !showGroups" text="Zeige Gruppen Info" color="lightsteelblue"/>
+  <GroupInfo v-show="showGroups" :group="selectedGroup"/>
+  <DatePicker v-model="date"/>
+  <TeilnehmerItem v-for="participant in this.selectedGroup.participants" :key="participant.id" :participant="participant"/>
 </template>
 
 <script>
 import SelectList from "@/components/SelectList";
 import Button from "@/components/Button";
 import TeilnehmerItem from "@/components/TeilnehmerItem";
+import GroupInfo from "@/components/GroupInfo";
+import DatePicker from "@/components/DatePicker";
+
+//TODO Fetch reaparieren, sodass Frontend auf Backend zugreifen kann
 
 export default {
   name: "AttendanceListView",
   data(){
     return{
       groups: [],
-      selectedGroup: Object,
-      test: {
-        firstname: "Lina",
-        lastname: "Dvornik",
-        yearofbirth: 2010,
-        id: 1
-      }
+      selectedGroup: {
+        trainer: [
+          {
+            name: ""
+          }
+        ],
+        assistent: [
+          {
+            name: ""
+          }
+        ],
+        times: [{
+          day: ""
+        }],
+        venue: "",
+        department: {
+          name: ""
+        }
+      },
+      date: new Date(),
+      showGroups: false
     }
   },
   components: {
     SelectList,
     Button,
-    TeilnehmerItem
+    TeilnehmerItem,
+    DatePicker,
+    GroupInfo
   },
   methods: {
     async fetchGroups(){
-      return (await fetch('api/groups')).json();
+      console.log("Fetching for all groups")
+      return (await fetch([process.env.VUE_APP_API_URL, "groups/"].join(''))).json();
     },
-    heyU(){
-      console.log("Btn clicked")
+
+    //TODO WARUM GIBT GROUPS EIN NORMALES OBJ ZURÜCK UND GROUP NICHT?
+    async fetchGroup(groupID){
+      console.log(`Fetching for group by ID: ${groupID}`)
+      return (await fetch([process.env.VUE_APP_API_URL, "groups/", groupID].join(''))).json();
     },
-    updateSelectedGroup(groupID){
-      console.log(groupID)
+    async updateSelectedGroup(groupID){
+      this.selectedGroup = await this.fetchGroup(groupID)
     }
   },
   async created() {
