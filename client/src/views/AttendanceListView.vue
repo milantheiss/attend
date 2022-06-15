@@ -60,11 +60,16 @@ export default {
       return (await fetch([process.env.VUE_APP_API_URL, "groups/"].join(''))).json();
     },
 
-    //TODO WARUM GIBT GROUPS EIN NORMALES OBJ ZURÜCK UND GROUP NICHT?
     async fetchGroup(groupID) {
       console.log(`Fetching for group by ID: ${groupID}`)
       return (await fetch([process.env.VUE_APP_API_URL, "groups/", groupID].join(''))).json();
     },
+
+    async fetchAttendance(groupID, date) {
+      console.log(`Fetching for group by ID: ${groupID}`)
+      return (await fetch([process.env.VUE_APP_API_URL, "groups/", groupID].join(''))).json();
+    },
+
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await this.fetchGroup(groupID)
     },

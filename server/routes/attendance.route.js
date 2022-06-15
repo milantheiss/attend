@@ -13,12 +13,17 @@ router
 router
     .route('/:attendanceID')
     .get(attendanceController.getAttendanceById)
-    .put(attendanceController.updateAttendance)
-    .patch(attendanceController.updateAttendance)
     .delete(attendanceController.deleteAttendance)
 router
-    .route('/date/:date')
+    .route('/byGroupID/:groupID')
+    .get(attendanceController.getAttendanceByGroup)
+    .post(attendanceController.addTrainingssession)
+router
+    .route('/byGroupID/:groupID/:date')
     .get(attendanceController.getAttendanceByDate)
+    .patch(attendanceController.updateTrainingssession)
+
+//TODO Add patch & post to attendancebygroup
 
 module.exports = router;
 

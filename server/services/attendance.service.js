@@ -20,25 +20,35 @@ const getAttendanceById = async (id) => {
 };
 
 /**
- * Get a attendance list by date.
- * @param {Date} date
+ * Get a attendance list by groupID & date.
+ * @param {ObjectID} groupID ID of the searched group
+ * @param {Date} date Date of the searched attendance list
  * @returns {Promise<Attendance>}
  */
-const getAttendanceByDate = async (date) => {
-    const allAttendance = await getAttendance()
-    for (const attendance of allAttendance) {
-        for (const trainings of attendance.trainingssession) {
-            //TODO Fix damit Trainings.date === date wird
-            console.log(trainings.date)
-            console.log(date)
-            console.log(trainings.date == date)
-            if(trainings.date === date){
-                console.log("Hey")
-                return attendance
-            }
+const getAttendanceByDate = async (groupID, date) => {
+    const attendance = getAttendanceByGroup(groupID)
+    for (const training of attendance.trainingssession) {
+        const dbDate = new Date(training.date)
+        if (dbDate.getDay() === date.getDay() && dbDate.getDate() === date.getDate() && dbDate.getFullYear() === date.getFullYear()) {
+            return training
         }
     }
-    return {error: "Not Found"}
+    return {error: "No entrance for given date"}
+};
+
+/**
+ * Get a attendance list by groupID & date.
+ * @param {ObjectID} groupID ID of the searched group
+ * @returns {Promise<Attendance>}
+ */
+const getAttendanceByGroup = async (groupID) => {
+    const allAttendance = await getAttendance()
+    for (const attendance of allAttendance) {
+        if (attendance.group.id === groupID) {
+            return attendance
+        }
+    }
+    return {error: "No entrance for given groupID"}
 };
 
 /**
@@ -51,13 +61,34 @@ const createAttendance = async (attendanceBody) => {
 };
 
 /**
- * Update a attendance list data
- * @param attendanceID
- * @param {Object} attendanceBody
+ * Add a trainings session to a group
+ * @param {ObjectID} groupID ID of the group where to add trainings session to
  * @returns {Promise<Attendance>}
  */
-const updateAttendance = async (attendanceID, attendanceBody) => {
-    return Attendance.findByIdAndUpdate(attendanceID, attendanceBody)
+const addTrainingssession = async (groupID, attendanceBody) => {
+    return null
+};
+
+/**
+ * Update a attendance list data
+ * @param groupID
+ * @param date
+ * @param {Object} sessionBody
+ * @returns {Promise<Attendance>}
+ */
+const updateTrainingssession = async (groupID, date, sessionBody) => {
+    let groupAttendance = getAttendanceByGroup(groupID)
+    console.log(await groupAttendance)
+    // let sessions = groupAttendance.trainingssession
+    //
+    // for (let i = 0; i < sessions.length; i++) {
+    //     if (sessions[i].date === update.date){
+    //         sessions = sessionBody
+    //     }
+    // }
+    //
+    // return Attendance.findByIdAndUpdate({'_id': groupAttendance.id}, {'$set': {'trainingssession': sessions}})
+    return groupAttendance
 };
 
 /**
@@ -74,7 +105,9 @@ module.exports = {
     getAttendanceById,
     getAttendance,
     createAttendance,
-    updateAttendance,
+    updateTrainingssession,
     deleteAttendance,
-    getAttendanceByDate
+    getAttendanceByDate,
+    addTrainingssession,
+    getAttendanceByGroup
 };

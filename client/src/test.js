@@ -1,22 +1,64 @@
-const times = [
+const sessions = [
     {
-        day: "Dienstag",
-        starttime: "18:00",
-        endtime: "19:30"
+        date: "2022-06-13T23:00:00.000Z",
+        participants: [
+            {
+                firstname: "Paula",
+                lastname: "Reichert",
+                _id: "62a20277c0176cd5bb8cfe84",
+                attended: true
+            },
+            {
+                firstname: "Lynn",
+                lastname: "Feuerbach",
+                _id: "62a20286c0176cd5bb8cfe87",
+                attended: true
+            }
+        ]
     },
     {
-        day: "Donnerstag",
-        starttime: "18:00",
-        endtime: "19:30"
+        date: "2022-06-09T23:00:00.000Z",
+        participants: [
+            {
+                firstname: "Paula",
+                lastname: "Reichert",
+                _id: "62a20277c0176cd5bb8cfe84",
+                attended: true
+            },
+            {
+                firstname: "Lynn",
+                lastname: "Feuerbach",
+                _id: "62a20286c0176cd5bb8cfe87",
+                attended: false
+            }
+        ]
     }
 ]
 
-function getWeekdays(){
-    let temp = []
-    for (const time of times) {
-        temp.push(time.day.slice(0, 2))
-    }
-    return temp
+const update = {
+    date: "2022-06-09T23:00:00.000Z",
+    participants: [
+        {
+            firstname: "Milan",
+            lastname: "Reichert",
+            _id: "62a20277c0176cd5bb8cfe84",
+            attended: true
+        },
+        {
+            firstname: "Lynn",
+            lastname: "Feuerbach",
+            _id: "62a20286c0176cd5bb8cfe87",
+            attended: false
+        }
+    ]
 }
 
-console.log(getWeekdays())
+console.log(sessions)
+
+for (let i = 0; i < sessions.length; i++) {
+    if (sessions[i].date === update.date){
+        sessions[i] = update
+    }
+}
+
+console.log(sessions[1])

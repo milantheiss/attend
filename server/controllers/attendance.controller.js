@@ -20,10 +20,10 @@ const createAttendance = catchAsync(async (req, res) => {
     res.send(result);
 });
 
-const updateAttendance = catchAsync(async (req, res) => {
-    const result = await attendanceService.updateAttendance(req.params.attendanceID, req.body);
+const updateTrainingssession = catchAsync(async (req, res) => {
+    const result = await attendanceService.updateTrainingssession(req.params.groupID, req.params.date, req.body);
     logger.debug(`Success: UPDATED - attendance list by id: ${req.params.attendanceID}`)
-    res.send(req.body);
+    res.send(result);
 });
 
 const deleteAttendance = catchAsync(async (req, res) => {
@@ -33,8 +33,20 @@ const deleteAttendance = catchAsync(async (req, res) => {
 });
 
 const getAttendanceByDate = catchAsync(async (req, res) => {
-    const result = await attendanceService.getAttendanceByDate(new Date(req.params.date));
-    logger.debug(`Success: GET - attendance list by Date: ${req.params.date}`)
+    const result = await attendanceService.getAttendanceByDate(req.params.groupID, new Date(req.params.date));
+    logger.debug(`Success: GET - attendance list of group ${req.params.groupID} for Date: ${req.params.date}`)
+    res.send(result);
+});
+
+const getAttendanceByGroup = catchAsync(async (req, res) => {
+    const result = await attendanceService.getAttendanceByGroup(req.params.groupID);
+    logger.debug(`Success: GET - attendance list of group ${req.params.groupID}`)
+    res.send(result);
+});
+
+const addTrainingssession = catchAsync(async (req, res) => {
+    const result = await attendanceService.addTrainingssession(req.params.groupID, req.body);
+    logger.debug(`Success: CREATED - new trainings session for group ${req.params.groupID}`)
     res.send(result);
 });
 
@@ -42,8 +54,10 @@ module.exports = {
     getAttendance,
     getAttendanceById,
     createAttendance,
-    updateAttendance,
+    updateTrainingssession,
     deleteAttendance,
-    getAttendanceByDate
+    getAttendanceByDate,
+    getAttendanceByGroup,
+    addTrainingssession
 }
 
