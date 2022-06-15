@@ -10,10 +10,6 @@ const attendanceSchema = mongoose.Schema(
                 name: {
                     type: String,
                     required: true
-                },
-                _id: {
-                    type: Schema.ObjectId,
-                    required: true
                 }
             },
             required: false
@@ -34,10 +30,6 @@ const attendanceSchema = mongoose.Schema(
                                 },
                                 lastname: {
                                     type: String,
-                                    required: false
-                                },
-                                _id: {
-                                    type: Schema.ObjectId,
                                     required: false
                                 },
                                 attended: {

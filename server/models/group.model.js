@@ -25,10 +25,6 @@ const groupSchema = mongoose.Schema(
                     birthday: {
                         type: Date,
                         required: false,
-                    },
-                    _id: {
-                        type: Schema.ObjectId,
-                        required: true
                     }
                 }
             ],
@@ -40,10 +36,6 @@ const groupSchema = mongoose.Schema(
                     type: String,
                     required: true,
                     trim: true
-                },
-                _id: {
-                    type: Schema.ObjectId,
-                    required: true
                 }
             },
             required: true
@@ -55,10 +47,6 @@ const groupSchema = mongoose.Schema(
                         type: String,
                         required: true,
                         trim: true
-                    },
-                    _id: {
-                        type: Schema.ObjectId,
-                        required: true
                     }
                 }
             ],
@@ -96,10 +84,6 @@ const groupSchema = mongoose.Schema(
                     type: String,
                     required: true,
                     trim: true
-                },
-                _id: {
-                    type: Schema.ObjectId,
-                    required: true
                 }
             },
         }
