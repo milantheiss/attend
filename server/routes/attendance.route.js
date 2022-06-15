@@ -17,11 +17,11 @@ router
 router
     .route('/byGroupID/:groupID')
     .get(attendanceController.getAttendanceByGroup)
-    .post(attendanceController.addTrainingssession)
+    .put(attendanceController.addTrainingssession)
 router
     .route('/byGroupID/:groupID/:date')
     .get(attendanceController.getAttendanceByDate)
-    .patch(attendanceController.updateTrainingssession)
+    .put(attendanceController.updateTrainingssession)
 
 //TODO Add patch & post to attendancebygroup
 

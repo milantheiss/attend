@@ -26,7 +26,7 @@ const getAttendanceById = async (id) => {
  * @returns {Promise<Attendance>}
  */
 const getAttendanceByDate = async (groupID, date) => {
-    const attendance = getAttendanceByGroup(groupID)
+    const attendance = await getAttendanceByGroup(groupID)
     for (const training of attendance.trainingssession) {
         const dbDate = new Date(training.date)
         if (dbDate.getDay() === date.getDay() && dbDate.getDate() === date.getDate() && dbDate.getFullYear() === date.getFullYear()) {
@@ -45,7 +45,7 @@ const getAttendanceByGroup = async (groupID) => {
     const allAttendance = await getAttendance()
     for (const attendance of allAttendance) {
         if (attendance.group.id === groupID) {
-            return attendance
+            return Attendance(attendance)
         }
     }
     return {error: "No entrance for given groupID"}
@@ -77,18 +77,19 @@ const addTrainingssession = async (groupID, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (groupID, date, sessionBody) => {
-    let groupAttendance = getAttendanceByGroup(groupID)
-    console.log(await groupAttendance)
-    // let sessions = groupAttendance.trainingssession
-    //
-    // for (let i = 0; i < sessions.length; i++) {
-    //     if (sessions[i].date === update.date){
-    //         sessions = sessionBody
-    //     }
-    // }
-    //
-    // return Attendance.findByIdAndUpdate({'_id': groupAttendance.id}, {'$set': {'trainingssession': sessions}})
-    return groupAttendance
+    //TODO Zerstört DB File --> Löscht alle Trainingssession Einträge
+    let groupAttendance = await getAttendanceByGroup(groupID)
+    let sessions = groupAttendance.group
+
+    console.log(sessionBody)
+
+    for (let i = 0; i < sessions.length; i++) {
+        if (sessions[i].date === update.date){
+            sessions = sessionBody
+        }
+    }
+
+    return Attendance.findByIdAndUpdate({'_id': groupAttendance.id}, {'$set': {'trainingssession': sessions}})
 };
 
 /**
