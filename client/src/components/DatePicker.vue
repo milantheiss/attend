@@ -1,6 +1,6 @@
 <template>
   <Button @btn-click="getLastDate" text="<" color="blue"></Button>
-  <p>{{ formatedDateString }}</p>
+  <p v-on:change="updateValue($event.target.date)">{{ formatedDateString }}</p>
   <Button @btn-click="getNextDate" text=">" color="blue"></Button>
 </template>
 
@@ -28,9 +28,9 @@ export default {
   methods: {
     getNextDate() {
       if (this.weekdays[0] !== ' ') {
-        console.log(this.weekdays)
         this.date = getDateOfTraining(this.date, this.weekdays, true)
         this.formatedDateString = getFormatedDateString(this.date)
+        this.$emit('dateChanged', this.date)
       }
     },
     getLastDate() {
@@ -38,6 +38,9 @@ export default {
         this.date = getDateOfTraining(this.date, this.weekdays, false)
         this.formatedDateString = getFormatedDateString(this.date)
       }
+    },
+    updateValue (value) {
+      this.$emit('change', value)
     }
   },
   created() {

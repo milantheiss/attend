@@ -63,37 +63,44 @@ const createAttendance = async (attendanceBody) => {
 /**
  * Add a trainings session to a group
  * @param {ObjectID} groupID ID of the group where to add trainings session to
+ * @param sessionBody The body muss include date: Date, participants: [Member]
  * @returns {Promise<Attendance>}
  */
-const addTrainingssession = async (groupID, attendanceBody) => {
-    return null
+const addTrainingssession = async (groupID, sessionBody) => {
+
+    const groupObj = await getAttendanceByGroup(groupID)
+    let sessions = groupObj.trainingssession
+    date = new Date(date)
+
+    sessions.push(...sessionBody)
+
+    return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
 };
 
 /**
- * Update a attendance list data
+ * Update a trainings session
  * @param groupID
  * @param date
- * @param {Object} sessionBody
+ * @param {Object} sessionBody The body muss include date: Date, participants: [Member]
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (groupID, date, sessionBody) => {
-    //TODO Zerstört DB File --> Löscht alle Trainingssession Einträge
-    let groupAttendance = await getAttendanceByGroup(groupID)
-    let sessions = groupAttendance.group
-
-    console.log(sessionBody)
+    const groupObj = await getAttendanceByGroup(groupID)
+    let sessions = groupObj.trainingssession
+    date = new Date(date)
 
     for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].date === update.date){
-            sessions = sessionBody
+        if (sessions[i].date.getDay() === date.getDay() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()){
+            console.log(sessionBody)
+            sessions[i] = sessionBody
         }
     }
 
-    return Attendance.findByIdAndUpdate({'_id': groupAttendance.id}, {'$set': {'trainingssession': sessions}})
+    return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
 };
 
 /**
- * Delet a attendance list
+ * Delete a attendance list
  * @param attendanceID
  * @returns {Promise<Attendance>}
  */
