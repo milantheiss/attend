@@ -1,72 +1,28 @@
-const sessions = {
-    group: {
-        name: "LA U12",
-        _id: "62a2022bc0176cd5bb8cfe80"
-    },
-    trainingssession: [
+const test = {
+    name: "test",
+    array: [
         {
-            date: "2022-06-13T23:00:00.000Z",
-            participants: [
-                {
-                    firstname: "Paula",
-                    lastname: "Reichert",
-                    _id: "62a20277c0176cd5bb8cfe84",
-                    attended: true
-                },
-                {
-                    firstname: "Lynn",
-                    lastname: "Feuerbach",
-                    _id: "62a20286c0176cd5bb8cfe87",
-                    attended: true
-                }
-            ]
+            date: new Date("2022-06-13"),
+            attended: false
         },
         {
-            date: "2022-06-09T23:00:00.000Z",
-            participants: [
-                {
-                    firstname: "Paula",
-                    lastname: "Reichert",
-                    _id: "62a20277c0176cd5bb8cfe84",
-                    attended: true
-                },
-                {
-                    firstname: "Lynn",
-                    lastname: "Feuerbach",
-                    _id: "62a20286c0176cd5bb8cfe87",
-                    attended: false
-                }
-            ]
-        }
-    ]
-}
-
-const update = {
-    date: "2022-06-09T23:00:00.000Z",
-    participants: [
-        {
-            firstname: "Milan",
-            lastname: "Reichert",
-            _id: "62a20277c0176cd5bb8cfe84",
+            date: new Date("2022-06-12"),
             attended: true
         },
         {
-            firstname: "Lynn",
-            lastname: "Feuerbach",
-            _id: "62a20286c0176cd5bb8cfe87",
+            date: new Date("2022-06-11"),
             attended: false
         }
     ]
 }
 
-console.log(sessions)
+let sessions = test.array
+const date = new Date("2022-06-12")
 
-console.log("-----------------------------------------------------------")
-
-for (let i = 0; i < sessions.trainingssession.length; i++) {
-    if (sessions.trainingssession[i].date === update.date) {
-        sessions.trainingssession[i] = update
+for (let i = 0; i < sessions.length; i++) {
+    if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()){
+        sessions.splice(i, 1)
     }
 }
 
-console.log(sessions.trainingssession[1])
+console.log(sessions)

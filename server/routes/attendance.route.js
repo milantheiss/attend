@@ -24,6 +24,7 @@ router
     .get(attendanceController.getAttendanceByDate)
     .put(attendanceController.updateTrainingssession)
     .patch(attendanceController.updateTrainingssession)
+    .delete(attendanceController.deleteTrainingssession)
 
 //TODO Add patch & post to attendancebygroup
 

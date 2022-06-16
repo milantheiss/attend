@@ -7,31 +7,31 @@ const catchAsync = require('../utils/catchAsync');
 
 const getGroups = catchAsync(async (req, res) => {
     const result = await groupService.getGroups();
-    logger.debug('Success: GET - all groups')
+    logger.debug('GET - all groups')
     res.send(result);
 });
 
 const getGroupById = catchAsync(async (req, res) => {
     const result = await groupService.getGroupById(req.params.groupID);
-    logger.debug(`Success: GET - group by id: ${req.params.groupID}`)
+    logger.debug(`GET - group by id: ${req.params.groupID}`)
     res.send(result);
 });
 
 const createGroup = catchAsync(async (req, res) => {
     const result = await groupService.createGroup(req.body);
-    logger.debug('Success: CREATED - new group')
+    logger.debug('CREATED - new group')
     res.send(result);
 });
 
 const updateGroup = catchAsync(async (req, res) => {
     const result = await groupService.updateGroup(req.params.groupID, req.body);
-    logger.debug(`Success: UPDATED - group by id: ${req.params.groupID}`)
+    logger.debug(`UPDATED - group by id: ${req.params.groupID}`)
     res.send(req.body);
 });
 
 const deleteGroup = catchAsync(async (req, res) => {
     const result = await groupService.deleteGroup(req.params.groupID);
-    logger.debug(`Success: DELETE - group by id: ${req.params.groupID}`)
+    logger.debug(`DELETE - group by id: ${req.params.groupID}`)
     res.send(result)
 });
 

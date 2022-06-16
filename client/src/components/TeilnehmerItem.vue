@@ -9,7 +9,7 @@ export default {
   name: "TeilnehmerItem",
   data(){
     return{
-      activated: false
+      activated: Boolean
     }
   },
   props: {
@@ -18,8 +18,17 @@ export default {
   methods: {
     onDBclick() {
       this.activated = !this.activated
+      this.$emit('onAttendedChange', this.activated)
     },
   },
+  watch: {
+    participant: function (newVal) {
+      this.activated = newVal.attended
+    }
+  },
+  created() {
+    this.activated = this.participant.attended
+  }
 };
 </script>
 

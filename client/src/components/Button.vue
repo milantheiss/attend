@@ -1,5 +1,5 @@
 <template>
-  <button @click="onClick()" :style="{ background: color }" class="btn">
+  <button @click="onClick()" class="btn">
     {{ text }}
   </button>
 </template>
@@ -9,8 +9,7 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Button",
   props: {
-    text: String,
-    color: String,
+    text: String
   },
   methods: {
     onClick() {
