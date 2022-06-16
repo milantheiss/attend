@@ -1,23 +1,37 @@
 <template>
-  <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Wähle eine Gruppe"
-              :options="this.groups"/>
-  <Button @btn-click="showGroups = !showGroups" text="Zeige Gruppen Info" id="group-btn"/>
-  <GroupInfo v-show="showGroups" :group="selectedGroup"/>
-  <!--TODO übergebe die Trainingstag richtig-->
-  <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"/>
-  <TeilnehmerItem v-for="participant in this.attended.participants" :key="participant._id"
-                  :participant="participant" @onAttendedChange="(value) => attendanceChange(participant, value)"/>
+  <div class="relative container mx-auto p-6 md:max-w-medium-width">
+    <div class="flex items-center justify-between mb-4">
+      <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
+                  :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl"/>
+
+      <button @click="showGroups = !showGroups" class="text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 inline-flex items-center px-3 md:px-5 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+        <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mr-2">
+        <p class="font-medium font-base md:text-lg">Gruppeninfo</p>
+      </button>
+    </div>
+
+    <div>
+      <GroupInfo v-show="showGroups" :group="selectedGroup" class="mb-4"/>
+    </div>
+
+    <div class="grid grid-cols-2 mb-4 items-center">
+      <p class="text-xl md:text-2xl font-medium text-gray-700 ml-3.5 ">Datum:</p>
+      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker" class="inline-flex items-center justify-items-center"/>
+    </div>
+
+    <div>
+      <TeilnehmerItem v-for="participant in this.attended.participants" :key="participant._id"
+                      :participant="participant" @onAttendedChange="(value) => attendanceChange(participant, value)"/>
+    </div>
+  </div>
 </template>
 
 <script>
 import SelectList from "@/components/SelectList";
-import Button from "@/components/Button";
 import TeilnehmerItem from "@/components/TeilnehmerItem";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import {getShortenedJSONDate} from "@/util/formatter";
-
-//TODO Fetch reaparieren, sodass Frontend auf Backend zugreifen kann
 
 export default {
   name: "AttendanceListView",
@@ -52,7 +66,6 @@ export default {
   },
   components: {
     SelectList,
-    Button,
     TeilnehmerItem,
     DatePicker,
     GroupInfo
@@ -180,11 +193,4 @@ export default {
 </script>
 
 <style scoped>
-#group-btn{
-  position: absolute;
-  width: 145px;
-  height: 40px;
-  left: 216px;
-  top: 140px;
-}
 </style>

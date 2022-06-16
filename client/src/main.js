@@ -4,4 +4,6 @@ import App from "./App.vue";
 //import "./registerServiceWorker";
 import router from './router'
 
-createApp(App).use(router).use(router).mount("#app");
+import './assets/tailwind.css'
+
+createApp(App).use(router).mount("#app");

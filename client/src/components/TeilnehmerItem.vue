@@ -1,5 +1,7 @@
 <template>
-  <div @dblclick="onDBclick" :class="this.activated ? 'activated':''">
+  <div @click="onClick"
+       :class="this.activated ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2':'text-black bg-gradient-to-br from-unchecked-gradient-1 to-unchecked-gradient-2'"
+       class="pl-3.5 py-2 rounded-lg drop-shadow mb-3 font-normal text-xl">
     <h3>{{ participant.firstname }} {{ participant.lastname }}</h3>
   </div>
 </template>
@@ -7,8 +9,8 @@
 <script>
 export default {
   name: "TeilnehmerItem",
-  data(){
-    return{
+  data() {
+    return {
       activated: Boolean
     }
   },
@@ -16,7 +18,7 @@ export default {
     participant: Object,
   },
   methods: {
-    onDBclick() {
+    onClick() {
       this.activated = !this.activated
       this.$emit('onAttendedChange', this.activated)
     },
@@ -33,16 +35,4 @@ export default {
 </script>
 
 <style scoped>
-div{
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  width: 50%;
-  padding: 2px;
-  text-align: center;
-  background: gainsboro;
-}
-.activated{
-  background: #42b983;
-}
 </style>

@@ -1,20 +1,49 @@
 <template>
-  <div>
-    <p class="preset_text">Abteilung:</p>
-    <p class="generated_text">{{group.department.name}}</p>
+  <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md">
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Abteilung:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" >{{group.department.name}}</p>
+      </div>
+    </div>
 
-    <p class="preset_text">Trainer:</p>
-    <p class="generated_text" v-for="trainer in group.trainer" :key="trainer.name">{{ trainer.name }}</p>
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Trainer:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :key="group.trainer.name">{{ group.trainer.name }}</p>
+      </div>
+    </div>
 
-    <p class="preset_text">Assistent:</p>
-    <p class="generated_text" v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Assistent:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
+      </div>
+    </div>
 
-    <p class="preset_text">Zeiten:</p>
-    <!--TODO IDK ob key funktioniert-->
-    <p class="generated_text" v-for="time in group.times" :key="time">{{getTime(time)}}</p>
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Zeiten:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" v-for="time in group.times" :key="time">{{getTime(time)}}</p>
+      </div>
+    </div>
 
-    <p class="preset_text">Sportstätte:</p>
-    <p class="generated_text" >{{group.department.name}}</p>
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Sportstätte:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :key="group.venue">{{ group.venue }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
