@@ -89,8 +89,6 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
     let sessions = groupObj.trainingssession
     date = new Date(date)
 
-    console.log(sessionBody)
-
     for (let i = 0; i < sessions.length; i++) {
         if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()){
             sessions[i] = sessionBody

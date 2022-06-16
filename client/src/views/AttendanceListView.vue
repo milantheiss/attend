@@ -4,8 +4,13 @@
       <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
                   :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl"/>
 
-      <button @click="showGroups = !showGroups" class="text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 inline-flex items-center px-3 md:px-5 py-1.5 md:py-2 rounded-lg drop-shadow-md">
-        <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mr-2">
+      <button @click="showGroups = !showGroups"
+              :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
+              class=" inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+        <span class="flex items-center w-6 mr-3">
+          <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mx-auto" v-show="!showGroups">
+          <img :src="'./img/x-icon.svg'" alt="x icon" class="w-3.5 mx-auto" v-show="showGroups">
+        </span>
         <p class="font-medium font-base md:text-lg">Gruppeninfo</p>
       </button>
     </div>
@@ -16,7 +21,8 @@
 
     <div class="grid grid-cols-2 mb-4 items-center">
       <p class="text-xl md:text-2xl font-medium text-gray-700 ml-3.5 ">Datum:</p>
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker" class="inline-flex items-center justify-items-center"/>
+      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"
+                  class="inline-flex items-center justify-items-center"/>
     </div>
 
     <div>
@@ -129,32 +135,32 @@ export default {
         } else {
           this.attended = await res
         }
-      }else {
+      } else {
         this.attended = {error: "No data yet"}
       }
     },
 
-    attendanceChange(participant, newVal){
+    attendanceChange(participant, newVal) {
       let newList = true
       let emptyList = true
 
       for (const db_participant of this.attended.participants) {
-        if (db_participant.attended === true){
+        if (db_participant.attended === true) {
           newList = false
         }
-        if (participant._id === db_participant._id){
+        if (participant._id === db_participant._id) {
           db_participant.attended = newVal
         }
-        if (db_participant.attended === true){
+        if (db_participant.attended === true) {
           emptyList = false
         }
       }
 
       if (newList) {
         this.addAttendance(this.selectedGroup.id, this.attended)
-      }else if(emptyList){
+      } else if (emptyList) {
         this.deleteAttendance(this.selectedGroup.id, this.date)
-      }else {
+      } else {
         this.updateAttendance(this.selectedGroup.id, this.date, this.attended)
       }
     },
@@ -166,7 +172,7 @@ export default {
       return participants
     },
 
-    getWeekdays(group){
+    getWeekdays(group) {
       let temp = []
       for (const time of group.times) {
         if (time.day.length >= 2) {
@@ -183,7 +189,7 @@ export default {
     await this.pullAttendance()
   },
   watch: {
-    selectedGroup(){
+    selectedGroup() {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
