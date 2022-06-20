@@ -28,6 +28,9 @@
     <div>
       <TeilnehmerItem v-for="participant in this.attended.participants" :key="participant._id"
                       :participant="participant" @onAttendedChange="(value) => attendanceChange(participant, value)"/>
+      <span class="grid content-center mt-6">
+          <p v-show="attended.error === 'No data yet'" class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
+      </span>
     </div>
   </div>
 </template>
