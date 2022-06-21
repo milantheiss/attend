@@ -24,6 +24,15 @@ app.options('*', cors());
 //TODO Routes wahrscheinlich richtig gesetzt
 app.use('/', routes);
 
+// Handle production
+if (config.env === 'production'){
+    // Static folder
+    app.use(express.static(__dirname + '/public/'))
+
+    // Handle SPA
+    app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'))
+}
+
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
     next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));

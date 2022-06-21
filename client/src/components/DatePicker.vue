@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {getDateOfTraining, getFormatedDateString} from "@/util/formatter";
+import {getDateOfTraining, getFormatedDateString, isClosestTrainingToday} from "@/util/formatter";
 
 export default {
   name: "DatePicker",
@@ -30,7 +30,13 @@ export default {
   methods: {
     newGroupSelected(){
       this.date = new Date(Date.now())
-      this.getLastDate()
+      if (!isClosestTrainingToday(this.weekdays)){
+        this.getLastDate()
+      }else {
+        this.formatedDateString = getFormatedDateString(this.date)
+        this.$emit('update:modelValue', this.date)
+        this.$emit('onChange')
+      }
     },
     getNextDate() {
       if (typeof this.weekdays[0] !== 'undefined' && this.weekdays.length !== 0) {

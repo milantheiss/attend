@@ -190,12 +190,14 @@ export default {
   async created() {
     this.groups = await this.fetchGroups()
     await this.pullAttendance()
+    document.title = 'Wähle eine Gruppe'
   },
   watch: {
     selectedGroup() {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
+      document.title = this.selectedGroup.name + ' - Attend'
     }
   }
 }

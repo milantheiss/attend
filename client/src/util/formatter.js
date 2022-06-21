@@ -102,8 +102,18 @@ function getShortenedJSONDate(date) {
     return date.toJSON().substring(0, 10)
 }
 
+function isClosestTrainingToday(weekdays){
+    for (const weekday of weekdays) {
+        if ((Dateprocessor.convertWeekdaytoNumber(weekday) - new Date(Date.now()).getDay()) === 0){
+            return true
+        }
+    }
+    return false
+}
+
 module.exports = {
     getDateOfTraining,
     getFormatedDateString,
-    getShortenedJSONDate
+    getShortenedJSONDate,
+    isClosestTrainingToday
 }
