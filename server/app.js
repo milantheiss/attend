@@ -6,6 +6,8 @@ const routes = require('./routes');
 const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const logger = require('./config/logger');
+const requestIp = require("request-ip");
 
 const app = express();
 
@@ -24,14 +26,6 @@ app.options('*', cors());
 //TODO Routes wahrscheinlich richtig gesetzt
 app.use('/', routes);
 
-// Handle production
-if (config.env === 'production'){
-    // Static folder
-    app.use(express.static(__dirname + '/public/'))
-
-    // Handle SPA
-    app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'))
-}
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

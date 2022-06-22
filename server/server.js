@@ -2,12 +2,18 @@ const logger = require('./config/logger');
 const mongoose = require('mongoose');
 const app = require('./app')
 const config = require('./config/config');
+const https = require('https')
+const fs = require('fs')
 
 let server;
 //config.mongoose.url
-mongoose.connect(config.url).then(() => {
+mongoose.connect(config.url, {dbName: 'data'}).then(() => {
     logger.info('Connected to MongoDB');
-    server = app.listen(config.port, () => {
+    server = https.createServer({
+        key: fs.readFileSync("key.pem"),
+        cert: fs.readFileSync("cert.pem"),
+    }, app)
+        .listen(config.port, () => {
         logger.info(`Listening to port ${config.port}`);
     });
 });
