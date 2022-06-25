@@ -16,7 +16,7 @@ const getAttendance = async () => {
  * @returns {Promise<Attendance>}
  */
 const getAttendanceById = async (id) => {
-    return Attendance.findById(id);
+   return Attendance.findById(id)
 };
 
 /**

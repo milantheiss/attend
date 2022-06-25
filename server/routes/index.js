@@ -2,6 +2,7 @@ const express = require('express');
 const groupRoute = require('./group.route');
 const memberRoute = require('./member.route');
 const attendanceRoute = require('./attendance.route')
+const loginRoute = require('./login.route')
 
 const router = express.Router();
 
@@ -18,6 +19,10 @@ const defaultRoutes = [
         path: '/attendance',
         route: attendanceRoute,
     },
+    {
+        path: '/login',
+        route: loginRoute
+    }
 ];
 
 const devRoutes = [
@@ -26,7 +31,6 @@ const devRoutes = [
 ];
 
 defaultRoutes.forEach((route) => {
-    console.log(route.route)
     router.use(route.path, route.route);
 });
 

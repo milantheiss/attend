@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
-const {toJSON, paginate} = require('./plugins')
-const {Schema} = require("mongoose");
+const { toJSON, paginate } = require('./plugins')
 
 const attendanceSchema = mongoose.Schema(
     {
@@ -14,14 +13,14 @@ const attendanceSchema = mongoose.Schema(
             },
             required: false
         },
-        trainingssession:{
+        trainingssession: {
             type: [
                 {
                     date: {
                         type: Date,
                         required: true
                     },
-                    participants:{
+                    participants: {
                         type: [
                             {
                                 firstname: {
