@@ -1,15 +1,27 @@
 const httpStatus = require('http-status');
-const { Group } = require('../models');
+const { Group, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 //TODO fúr Gruppen umschreiben
 //Service updated/zieht die Daten aus DB
 
 /**
- * Get all groups.
+ * Get all groups accessable be the user
+ * @param  {import('mongoose').ObjectId} userId
  * @returns {Promise<[Group]>}
  */
-const getGroups = async () => {
+const getGroups = async (userId) => {
+    const user = await User.findById(userId)
+
+    //Alle authorized Gruppen werden aus DB gezogen und an Client gesendet
+    let result = []
+
+    for (const access of user.access) {
+        if(access.tag === 'group'){
+            result.push(await getGroupById(access._id))
+        }
+    }
+
     return Group.find({});
 };
 

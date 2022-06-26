@@ -11,6 +11,14 @@ const getUserByEmail = async (email) => {
 };
 
 /**
+ * Find User by ID
+ * @returns {Promise<[User]>}
+ */
+ const getUserById = async (userID) => {
+    return User.findById(userID)
+};
+
+/**
  * Adds a refresh token
  * @returns {Promise<[User]>}
  */
@@ -20,5 +28,6 @@ const getUserByEmail = async (email) => {
 
 module.exports = {
     getUserByEmail,
+    getUserById,
     addRefreshToken
 };

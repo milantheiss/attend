@@ -1,12 +1,12 @@
 const logger = require('../config/logger')
-const {groupService, attendanceService} = require('../services')
+const {groupService} = require('../services')
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 
 const getGroups = catchAsync(async (req, res) => {
-    const result = await groupService.getGroups();
+    const result = await groupService.getGroups(req.userID)
     logger.debug('GET - all groups')
     res.send(result);
 });
