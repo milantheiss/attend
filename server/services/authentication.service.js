@@ -10,6 +10,15 @@ const getUserByEmail = async (email) => {
     return User.findOne({email})
 };
 
+/**
+ * Adds a refresh token
+ * @returns {Promise<[User]>}
+ */
+ const addRefreshToken = async (userID, token_credentials) => {
+    return User.findByIdAndUpdate(userID, {$addToSet: {refresh_tokens: token_credentials}})
+};
+
 module.exports = {
-    getUserByEmail
+    getUserByEmail,
+    addRefreshToken
 };

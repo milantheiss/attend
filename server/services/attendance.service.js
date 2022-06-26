@@ -77,6 +77,7 @@ const addTrainingssession = async (groupID, sessionBody) => {
     return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
 };
 
+//TODO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
 /**
  * Update a trainings session
  * @param groupID

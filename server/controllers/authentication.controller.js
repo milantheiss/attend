@@ -1,5 +1,5 @@
 const logger = require('../config/logger')
-const {authenticationService} = require('../services')
+const { authenticationService } = require('../services')
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
@@ -8,10 +8,10 @@ const config = require('../config/config');
 
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const { default: mongoose } = require('mongoose');
 
 cookieParser()
-
 
 /**
  * Nimmt Login Daten an und versucht User einzuloggen.
@@ -19,7 +19,7 @@ cookieParser()
  * @param  {} req from POST
  * @returns On Success JWT Token
  */
-const login = catchAsync(async (req, res) => {
+ const login = catchAsync(async (req, res) => {
     // Our login logic starts here
     try {
         // Get user input
@@ -34,24 +34,50 @@ const login = catchAsync(async (req, res) => {
         const user = await authenticationService.getUserByEmail(email);
 
         if (user && (await bcrypt.compare(password, user.password))) {
-            // Create token
-            const token = jwt.sign(
-                { user_id: user._id, email },
+            // Create access token
+            const access_token = jwt.sign(
+                { user_id: user._id, email: user.email},
                 config.secret,
                 {
-                    expiresIn: "2h",
+                    expiresIn: "15min",
                 }
             );
 
-            // save user token
-            user.token = token;
+            //Neues refresh secret wird in User kreiiert
+
+            const new_secret = require('crypto').randomBytes(256).toString('base64')
+            const secret_id = new mongoose.Types.ObjectId()
+
+            console.log(await authenticationService.addRefreshToken(user._id, {secret: new_secret, _id: secret_id}))
+
+            // Create refresh token
+            const refresh_token = jwt.sign(
+                { user_id: user._id, email: user.email, token_id: secret_id},
+                new_secret,
+                {
+                    expiresIn: "7d",
+                }
+            );
+            
+            const response = {
+                email: user.email,
+                access_token: access_token,
+                refresh_token: refresh_token
+            }
 
             // user
-            return res.cookie('access_token', token, {
-                expires: new Date(Date.now() + 20000),
+            return res.cookie('access_token', access_token, {
+                expires: new Date(Date.now() + 600000),
                 secure: process.env.NODE_ENV === 'production',
                 httpOnly: true
-            }).status(200).send(user)
+            })
+            .cookie('refresh_token', refresh_token, {
+                expires: new Date(Date.now() + 604800000),
+                secure: process.env.NODE_ENV === 'production',
+                httpOnly: true
+            })
+            .status(200)
+            .send(response)
         }
         return res.status(400).send("Invalid Credentials");
     } catch (err) {
@@ -59,7 +85,25 @@ const login = catchAsync(async (req, res) => {
     }
 });
 
+/**
+ * Logget User aus. Hierzu wird Cookie im Client gelöscht
+ * und Token invalidiert 
+ * @param  {} 
+ * @returns
+ */
+const logout = catchAsync(async (req, res) => {
+    // Our login logic starts here
+    try {
+
+        // user
+        return res.clearCookie('access_token').status(200).send("Successfully logged out")
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 module.exports = {
-    login
+    login,
+    logout
 }
 

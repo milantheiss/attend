@@ -21,8 +21,14 @@ const userSchema = mongoose.Schema(
             type: String,
             required: true
         },
-        token: {
-            type: String
+        refresh_tokens: {
+            type: [
+                {
+                    secret: {
+                        type: String
+                    }
+                }
+            ]
         },
         access: {
             type: [

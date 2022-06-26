@@ -3,7 +3,7 @@
     <div>
       <form @submit.prevent="submit">
         <div>
-          <label for="email">{{ $store.state.test }}</label>
+          <label for="email">Email:</label>
           <input type="text" name="email" v-model="form.email" />
         </div>
         <div>
