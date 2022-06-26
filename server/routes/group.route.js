@@ -1,7 +1,9 @@
 //Implement GROUP ROUTE
 
 const express = require('express');
-const { groupController } = require('../controllers')
+const { verify } = require('jsonwebtoken');
+const { groupController } = require('../controllers');
+const verifyToken = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -9,7 +11,7 @@ const router = express.Router();
 
 router
     .route('/')
-    .get(groupController.getGroups)
+    .get(verifyToken, groupController.getGroups)
     .post(groupController.createGroup)
 
 router

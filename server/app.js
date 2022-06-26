@@ -8,6 +8,7 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const logger = require('./config/logger');
 const requestIp = require("request-ip");
+const cookieParser = require('cookie-parser')
 
 const app = express();
 // enable cors
@@ -20,6 +21,9 @@ app.use(cors());
 app.use(express.json());
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
+
+// enable cookie parsing
+app.use(cookieParser())
 
 // Defining route middleware
 //TODO Routes wahrscheinlich richtig gesetzt
