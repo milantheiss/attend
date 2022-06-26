@@ -82,7 +82,13 @@ export default {
   methods: {
     async fetchGroups() {
       console.debug("Fetching for all groups")
-      return (await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'))).json();
+
+      //TODO Implement Axios? Cookie send wird von Cors geblockt
+
+      return (await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'), {
+        credentials: 'include',
+        mode: 'cors'
+      })).json();
     },
 
     async fetchGroup(groupID) {
