@@ -1,23 +1,24 @@
 const jwt = require("jsonwebtoken");
+const cookieParser = require('cookie-parser')
+
+cookieParser()
 
 const config = process.env;
 
 const verifyToken = (req, res, next) => {
-    let token
+    const token = req.cookies.access_token;
 
-    if (typeof req.headers['authorization'] === 'undefined') {
-        return res.status(403).send("A token is required for authentication");
-    } else {
-        token = (req.headers['authorization'].replace('Bearer ', ''));
+    if (!token) {
+      return res.status(403).send("A token is required for authentication");
     }
-
-    try {
-        const decoded = jwt.verify(token, config.TOKEN_KEY);
-        req.user = decoded;
+  
+    try { 
+      const decrypt = jwt.verify(token, config.TOKEN_KEY);
+      req.userID = decrypt.user_id
+      return next();
     } catch (err) {
-        return res.status(401).send("Invalid Token");
-    }
-    return next();
+      return res.status(500).json(err.toString());
+    }   
 };
 
 module.exports = verifyToken;

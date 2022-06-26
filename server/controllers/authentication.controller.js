@@ -8,6 +8,9 @@ const config = require('../config/config');
 
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const cookieParser = require('cookie-parser')
+
+cookieParser()
 
 
 /**
@@ -44,7 +47,11 @@ const login = catchAsync(async (req, res) => {
             user.token = token;
 
             // user
-            return res.status(200).send(user);
+            return res.cookie('access_token', token, {
+                expires: new Date(Date.now() + 20000),
+                secure: process.env.NODE_ENV === 'production',
+                httpOnly: true
+            }).status(200).send(user)
         }
         return res.status(400).send("Invalid Credentials");
     } catch (err) {
