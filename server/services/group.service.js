@@ -22,7 +22,9 @@ const getGroups = async (userId) => {
         }
     }
 
-    return Group.find({});
+    console.log(result)
+
+    return Group.find({'trainer._id': {$all: userId}});
 };
 
 /**
