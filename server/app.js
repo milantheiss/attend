@@ -11,8 +11,12 @@ const requestIp = require("request-ip");
 const cookieParser = require('cookie-parser')
 
 const app = express();
+
 // enable cors
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:8080"
+}));
 //app.options('*', cors());
 
 // Configure middlewares
