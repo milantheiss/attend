@@ -3,8 +3,8 @@
     <div>
       <form @submit.prevent="submit">
         <div>
-          <label for="email">Email:</label>
-          <input type="text" name="email" v-model="form.email" />
+          <label for="username">Username:</label>
+          <input type="text" name="username" v-model="form.username" />
         </div>
         <div>
           <label for="password">Password:</label>
@@ -12,7 +12,7 @@
         </div>
         <button type="submit">Submit</button>
       </form>
-      <p v-if="showError" id="error">Email or Password is incorrect</p>
+      <p v-if="showError" id="error">Username or Password is incorrect</p>
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       form: {
-        email: "",
+        username: "",
         password: "",
       },
       showError: false
@@ -36,7 +36,7 @@ export default {
     ...mapActions(["LogIn"]),
     async submit() {
       const user = {
-        email: this.form.email,
+        username: this.form.username,
         password: this.form.password
       }
       try {
@@ -44,6 +44,7 @@ export default {
         this.$router.push("/attendancelist");
         this.showError = false
       } catch (error) {
+        console.error(error)
         this.showError = true
       }
     },

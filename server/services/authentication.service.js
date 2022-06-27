@@ -3,11 +3,11 @@ const {User} = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
- * Find User by eMail
+ * Find User by Username
  * @returns {Promise<[User]>}
  */
-const getUserByEmail = async (email) => {
-    return User.findOne({email})
+const getUserByUsername = async (username) => {
+    return User.findOne({username})
 };
 
 /**
@@ -26,8 +26,30 @@ const getUserByEmail = async (email) => {
     return User.findByIdAndUpdate(userID, {$addToSet: {refresh_tokens: token_credentials}})
 };
 
+/**
+ * Delete a refresh token
+ * @returns {Promise<[User]>}
+ */
+ const deleteRefreshToken = async (userID, token_id) => {
+    return User.findByIdAndUpdate(userID, {$pull: {refresh_tokens: {_id: token_id}}})
+};
+
+const getRefreshTokenSecret = async (userID, token_id) => {
+    const user = await getUserById(userID)
+
+    //Muss == sein da token_credentials._id typeof ObjectId ist und token_id typeof String
+    for (const token_credentials of user.refresh_tokens) {
+        if(token_credentials._id == token_id){
+            return token_credentials.secret
+        }
+    }
+    return undefined
+}
+
 module.exports = {
-    getUserByEmail,
+    getUserByUsername,
     getUserById,
-    addRefreshToken
+    addRefreshToken,
+    deleteRefreshToken,
+    getRefreshTokenSecret
 };

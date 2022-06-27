@@ -3,6 +3,7 @@ const groupRoute = require('./group.route');
 const memberRoute = require('./member.route');
 const attendanceRoute = require('./attendance.route')
 const loginRoute = require('./login.route')
+const logoutRoute = require('./logout.route')
 
 const router = express.Router();
 
@@ -22,6 +23,10 @@ const defaultRoutes = [
     {
         path: '/login',
         route: loginRoute
+    },
+    {
+        path: '/logout',
+        route: logoutRoute
     }
 ];
 
