@@ -22,7 +22,6 @@ const verifyToken = async (req, res, next) => {
   try {
     const decrypt = jwt.verify(access_token, config.secret);
     req.userID = decrypt.user_id
-    logger.debug(req.userID)
     return next();
   } catch (err) {
     logger.error('Access token is not invalid')
