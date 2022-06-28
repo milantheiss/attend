@@ -1,25 +1,26 @@
 //Implement GROUP ROUTE
 
 const express = require('express');
-const { verify } = require('jsonwebtoken');
 const { groupController } = require('../controllers');
 const verifyToken = require('../middlewares/auth');
 
 const router = express.Router();
 
-//TODO Add was geschehen soll wenn gewisse URL mit verschiedenen CRUD Operations angesprochen werden
-
 router
     .route('/')
     .get(verifyToken, groupController.getGroups)
-    .post(groupController.createGroup)
+    .post(verifyToken, groupController.createGroup)
 
 router
     .route('/:groupID')
-    .get(groupController.getGroupById)
+    .get(verifyToken, groupController.getGroupById)
+
+    //TODO Auth adden + In Service/Controller die returnten Daten auf Permission beschränken
+    /*
     .put(groupController.updateGroup)
     .patch(groupController.updateGroup)
     .delete(groupController.deleteGroup)
+    */
 
 //TODO Add capability to update members by /:groupID/addmember
 //Backend soll Teilnehmer Liste ziehen und den neuen Teilnehmer anhängen und dann neue Liste in DB pushen

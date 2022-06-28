@@ -84,8 +84,6 @@ export default {
   methods: {
     async fetchGroups() {
       console.debug("Fetching for all groups")
-      //TODO Implement Axios? Cookie send wird von Cors geblockt
-      //return await axios.post('groups')
       return (await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'), {
         credentials: 'include',
         mode: 'cors'
@@ -94,24 +92,35 @@ export default {
 
     async fetchGroup(groupID) {
       console.debug(`Fetching for group by ID: ${groupID}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join('/'))).json();
+      return (await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join('/'), {
+        credentials: 'include',
+        mode: 'cors'
+      })).json();
     },
 
     async fetchAttendance(groupID) {
       console.debug(`Fetching for attendance by ID ${groupID}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'))).json();
+      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'),{
+        credentials: 'include',
+        mode: 'cors'
+      })).json();
     },
 
     async fetchAttendanceByDate(groupID, date) {
       console.debug(`Fetching for attendance by ID ${groupID} and date ${date}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'))).json();
+      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'),{
+        credentials: 'include',
+        mode: 'cors'
+      })).json();
     },
 
     async updateAttendance(groupID, date, body) {
       await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
         method: 'PATCH',
         body: JSON.stringify(body),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' }
+        headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        credentials: 'include',
+        mode: 'cors'
       })
     },
 
@@ -119,14 +128,18 @@ export default {
       await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
         method: 'PATCH',
         body: JSON.stringify(body),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' }
+        headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        credentials: 'include',
+        mode: 'cors'
       })
     },
 
     deleteAttendance(groupID, date) {
       fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
         method: 'DELETE',
-        headers: { 'Content-type': 'application/json; charset=UTF-8' }
+        headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        credentials: 'include',
+        mode: 'cors'
       })
     },
 

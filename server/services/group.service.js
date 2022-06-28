@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const { Group, User } = require('../models');
 const ApiError = require('../utils/ApiError');
+const mongoose = require('mongoose')
 
 //TODO fúr Gruppen umschreiben
 //Service updated/zieht die Daten aus DB
@@ -13,18 +14,27 @@ const ApiError = require('../utils/ApiError');
 const getGroups = async (userId) => {
     const user = await User.findById(userId)
 
-    //Alle authorized Gruppen werden aus DB gezogen und an Client gesendet
+    // * Alter code
+    /* 
     let result = []
 
     for (const access of user.access) {
-        if(access.tag === 'group'){
-            result.push(await getGroupById(access._id))
-        }
+         if(access.tag === 'group'){
+             result.push(await getGroupById(access._id))
+         }
+     }
+
+     console.log(result)
+    */
+
+    if (user.role === 'trainer') {
+        return Group.find({ 'trainer._id': { $all: new mongoose.Types.ObjectId(userId) } });
+    } else if (user.role == 'admin') {
+        return Group.find({})
+    } else {
+        return "The user has no access to any group"
     }
 
-    console.log(result)
-
-    return Group.find({'trainer._id': {$all: userId}});
 };
 
 /**
@@ -32,8 +42,18 @@ const getGroups = async (userId) => {
  * @param {ObjectId} id
  * @returns {Promise<Group>}
  */
-const getGroupById = async (id) => {
-    return Group.findById(id);
+const getGroupById = async (userId, id) => {
+    const user = await User.findById(userId)
+
+    if (user.role === 'trainer') {
+        const group = await Group.findById(id)
+
+        return (group.trainer._id == userId) ? group : "The user has no access to this group"
+    } else if (user.role == 'admin') {
+        return Group.findById(id)
+    } else {
+        return "The user has no access to this group"
+    }
 };
 
 /**
@@ -42,27 +62,35 @@ const getGroupById = async (id) => {
  * @returns {Promise<Group>}
  */
 const createGroup = async (groupBody) => {
-    return Group.create(groupBody);
+    const user = await User.findById(userId)
+
+    if (user.role == 'admin') { return Group.create(groupBody); }
 };
 
-/**
+//TODO No Auth implemented
+/*
+
+/!**
  * Update a groups data
  * @param groupID
  * @param {Object} groupBody
  * @returns {Promise<Group>}
- */
+ *!/
 const updateGroup = async (groupID, groupBody) => {
     return Group.findByIdAndUpdate(groupID,groupBody)
 };
 
-/**
+/!**
  * Delete a group
  * @param groupID
  * @returns {Promise<Group>}
- */
+ *!/
 const deleteGroup = async (groupID) => {
     return Group.findByIdAndDelete(groupID)
 };
+
+*/
+
 /*
 
 /!**
@@ -118,6 +146,6 @@ module.exports = {
     getGroupById,
     getGroups,
     createGroup,
-    updateGroup,
-    deleteGroup
+    //updateGroup,
+    //deleteGroup
 };

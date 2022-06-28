@@ -1,18 +1,20 @@
 const jwt = require("jsonwebtoken");
 const { authenticationService } = require("../services");
 
-const config = require('../config/config')
+const config = require('../config/config');
+const logger = require("../config/logger");
 
 const verifyToken = async (req, res, next) => {
+  
+
   let access_token = req.cookies.access_token;
   const refresh_token = req.cookies.refresh_token;
-
-  //TODO Add automatic token refresh if access token is not send but refresh is
 
   if (!access_token) {
     if (refresh_token) {
       access_token = await getNewTokens(res, refresh_token)
     } else{
+      logger.error('No access token given')
       return res.status(403).send("A token is required for authentication");
     }
   }
@@ -20,8 +22,10 @@ const verifyToken = async (req, res, next) => {
   try {
     const decrypt = jwt.verify(access_token, config.secret);
     req.userID = decrypt.user_id
+    logger.debug(req.userID)
     return next();
   } catch (err) {
+    logger.error('Access token is not invalid')
     return res.status(500).json(err.toString());
   }
 };
@@ -59,8 +63,6 @@ const getNewTokens = async (res, old_refresh_token) => {
         expiresIn: "15min",
       }
     );
-    
-    console.log("Secret: ", secret)
 
     await authenticationService.deleteRefreshToken(decrypt.user_id, decrypt.token_id)
 
@@ -76,8 +78,6 @@ const getNewTokens = async (res, old_refresh_token) => {
       }
     );
 
-    console.log('Refresh: ', refresh_token)
-
     res.cookie('access_token', access_token, {
       expires: new Date(Date.now() + 600000),
       secure: true,
@@ -89,8 +89,6 @@ const getNewTokens = async (res, old_refresh_token) => {
       httpOnly: true,
       sameSite: 'None'
     })
-
-    console.log("Access: ", access_token)
 
     return access_token
   } catch (err) {

@@ -1,13 +1,22 @@
 const httpStatus = require('http-status');
-const {Attendance} = require('../models');
+const {Attendance, User} = require('../models');
 const ApiError = require('../utils/ApiError');
+const mongoose = require('mongoose')
 
 /**
  * Get all attendance lists.
  * @returns {Promise<[Attendance]>}
  */
-const getAttendance = async () => {
-    return Attendance.find({});
+const getAttendance = async (userId) => {
+    const user = await User.findById(userId)
+
+    if (user.role === 'trainer') {
+        return await Attendance.find({ 'access': new mongoose.Types.ObjectId(userId)});
+    } else if (user.role == 'admin') {
+        return Attendance.find({})
+    } else {
+        return "The user has no access to any group"
+    }
 };
 
 /**
@@ -25,8 +34,8 @@ const getAttendanceById = async (id) => {
  * @param {Date} date Date of the searched attendance list
  * @returns {Promise<Attendance>}
  */
-const getAttendanceByDate = async (groupID, date) => {
-    const attendance = await getAttendanceByGroup(groupID)
+const getAttendanceByDate = async (userId, groupID, date) => {
+    const attendance = await getAttendanceByGroup(userId, groupID)
     for (const training of attendance.trainingssession) {
         const dbDate = new Date(training.date)
         date = new Date(date)
@@ -42,8 +51,8 @@ const getAttendanceByDate = async (groupID, date) => {
  * @param {ObjectID} groupID ID of the searched group
  * @returns {Promise<Attendance>}
  */
-const getAttendanceByGroup = async (groupID) => {
-    const allAttendance = await getAttendance()
+const getAttendanceByGroup = async (userId, groupID) => {
+    const allAttendance = await getAttendance(userId)
     for (const attendance of allAttendance) {
         if (attendance.group.id === groupID) {
             return Attendance(attendance)

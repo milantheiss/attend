@@ -12,10 +12,15 @@ const defaultRoutes = [
         path: '/groups',
         route: groupRoute,
     },
+
+    //WARNING Unused
+    //TODO Auth und Access Controll hinzufügen
+    /*
     {
         path: '/members',
         route: memberRoute,
     },
+    */
     {
         path: '/attendance',
         route: attendanceRoute,

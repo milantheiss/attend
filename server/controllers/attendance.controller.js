@@ -3,7 +3,8 @@ const {attendanceService} = require('../services')
 const catchAsync = require('../utils/catchAsync');
 
 const getAttendance = catchAsync(async (req, res) => {
-    const result = await attendanceService.getAttendance();
+    console.log(req)
+    const result = await attendanceService.getAttendance(req.userID);
     logger.debug('GET - all attendance lists')
     res.send(result);
 });
@@ -33,13 +34,13 @@ const deleteAttendance = catchAsync(async (req, res) => {
 });
 
 const getAttendanceByDate = catchAsync(async (req, res) => {
-    const result = await attendanceService.getAttendanceByDate(req.params.groupID, new Date(req.params.date));
+    const result = await attendanceService.getAttendanceByDate(req.userID, req.params.groupID, new Date(req.params.date));
     logger.debug(`GET - attendance list of group ${req.params.groupID} for Date: ${req.params.date}`)
     res.send(result);
 });
 
 const getAttendanceByGroup = catchAsync(async (req, res) => {
-    const result = await attendanceService.getAttendanceByGroup(req.params.groupID);
+    const result = await attendanceService.getAttendanceByGroup(req.userID, req.params.groupID);
     logger.debug(`GET - attendance list of group ${req.params.groupID}`)
     res.send(result);
 });

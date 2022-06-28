@@ -1,5 +1,6 @@
 const express = require('express');
 const { attendanceController } = require('../controllers')
+const verifyToken = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -7,24 +8,26 @@ const router = express.Router();
 
 router
     .route('/')
-    .get(attendanceController.getAttendance)
-    .post(attendanceController.createAttendance)
+    .get(verifyToken, attendanceController.getAttendance)
+    .post(verifyToken, attendanceController.createAttendance)
 
 router
     .route('/:attendanceID')
-    .get(attendanceController.getAttendanceById)
-    .delete(attendanceController.deleteAttendance)
+    .get(verifyToken, attendanceController.getAttendanceById)
+    .delete(verifyToken, attendanceController.deleteAttendance)
+
 router
     .route('/byGroupID/:groupID')
-    .get(attendanceController.getAttendanceByGroup)
-    .put(attendanceController.addTrainingssession)
-    .patch(attendanceController.addTrainingssession)
+    .get(verifyToken, attendanceController.getAttendanceByGroup)
+    .put(verifyToken, attendanceController.addTrainingssession)
+    .patch(verifyToken, attendanceController.addTrainingssession)
+
 router
     .route('/byGroupID/:groupID/:date')
-    .get(attendanceController.getAttendanceByDate)
-    .put(attendanceController.updateTrainingssession)
-    .patch(attendanceController.updateTrainingssession)
-    .delete(attendanceController.deleteTrainingssession)
+    .get(verifyToken, attendanceController.getAttendanceByDate)
+    .put(verifyToken, attendanceController.updateTrainingssession)
+    .patch(verifyToken, attendanceController.updateTrainingssession)
+    .delete(verifyToken, attendanceController.deleteTrainingssession)
 
 //TODO Add patch & post to attendancebygroup
 

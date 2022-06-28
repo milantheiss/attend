@@ -8,13 +8,23 @@ const catchAsync = require('../utils/catchAsync');
 const getGroups = catchAsync(async (req, res) => {
     const result = await groupService.getGroups(req.userID)
     logger.debug('GET - all groups')
-    res.send(result);
+    if(result === "The user has no access to any group"){
+        res.status(403).send(result)
+    }else{
+        res.send(result);
+    }
+    
 });
 
 const getGroupById = catchAsync(async (req, res) => {
-    const result = await groupService.getGroupById(req.params.groupID);
+    const result = await groupService.getGroupById(req.userID, req.params.groupID);
     logger.debug(`GET - group by id: ${req.params.groupID}`)
-    res.send(result);
+    
+    if(result === "The user has no access to this group"){
+        res.status(403).send(result)
+    }else{
+        res.send(result);
+    }
 });
 
 const createGroup = catchAsync(async (req, res) => {
