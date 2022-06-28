@@ -64,7 +64,11 @@ const getGroupById = async (userId, id) => {
 const createGroup = async (groupBody) => {
     const user = await User.findById(userId)
 
-    if (user.role == 'admin') { return Group.create(groupBody); }
+    if (user.role == 'admin') { 
+        return Group.create(groupBody); 
+    }else {
+        return "The user has no permission to create a new group"
+    }
 };
 
 //TODO No Auth implemented

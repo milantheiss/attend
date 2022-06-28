@@ -3,10 +3,15 @@ const {attendanceService} = require('../services')
 const catchAsync = require('../utils/catchAsync');
 
 const getAttendance = catchAsync(async (req, res) => {
-    console.log(req)
     const result = await attendanceService.getAttendance(req.userID);
-    logger.debug('GET - all attendance lists')
-    res.send(result);
+
+    if(result === "The user has no access to any attendance list"){
+        logger.warn('GET - all attendance lists: User has no access to any attendance list')
+        res.status(403).send(result)
+    }else{
+        logger.debug('GET - all attendance lists: Success')
+        res.send(result);
+    }
 });
 
 const getAttendanceById = catchAsync(async (req, res) => {

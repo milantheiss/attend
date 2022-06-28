@@ -15,7 +15,7 @@ const getAttendance = async (userId) => {
     } else if (user.role == 'admin') {
         return Attendance.find({})
     } else {
-        return "The user has no access to any group"
+        return "The user has no access to any attendance list"
     }
 };
 
