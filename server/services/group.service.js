@@ -3,7 +3,6 @@ const { Group, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose')
 
-//TODO fúr Gruppen umschreiben
 //Service updated/zieht die Daten aus DB
 
 /**
@@ -52,7 +51,7 @@ const getGroupById = async (userId, id) => {
     } else if (user.role == 'admin') {
         return Group.findById(id)
     } else {
-        return "The user has no access to this group"
+        return `The user has no access to group ${id}`
     }
 };
 
@@ -71,7 +70,7 @@ const createGroup = async (groupBody) => {
     }
 };
 
-//TODO No Auth implemented
+//WARNING No Auth implemented
 /*
 
 /!**

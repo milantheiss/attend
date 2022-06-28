@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const {Attendance, User} = require('../models');
+const { Attendance, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose')
 
@@ -11,7 +11,7 @@ const getAttendance = async (userId) => {
     const user = await User.findById(userId)
 
     if (user.role === 'trainer') {
-        return await Attendance.find({ 'access': new mongoose.Types.ObjectId(userId)});
+        return await Attendance.find({ 'access': new mongoose.Types.ObjectId(userId) });
     } else if (user.role == 'admin') {
         return Attendance.find({})
     } else {
@@ -24,8 +24,15 @@ const getAttendance = async (userId) => {
  * @param {ObjectId} id
  * @returns {Promise<Attendance>}
  */
-const getAttendanceById = async (id) => {
-   return Attendance.findById(id)
+const getAttendanceById = async (userId, id) => {
+    const user = await User.findById(userId)
+    
+    if (user.role == 'admin') {
+        return Attendance.findById(id)
+    } else {
+        const list = await Attendance.findById(id);
+        return (list.access.includes(new mongoose.Types.ObjectId(id))) ? list : `The user has no access to the attendance list ${id}`
+    }
 };
 
 /**
@@ -43,7 +50,7 @@ const getAttendanceByDate = async (userId, groupID, date) => {
             return training
         }
     }
-    return {error: "No entrance for given date"}
+    return { error: "No entrance for given date" }
 };
 
 /**
@@ -58,7 +65,7 @@ const getAttendanceByGroup = async (userId, groupID) => {
             return Attendance(attendance)
         }
     }
-    return {error: "No entrance for given groupID"}
+    return { error: "No entrance for given groupID" }
 };
 
 /**
@@ -66,8 +73,14 @@ const getAttendanceByGroup = async (userId, groupID) => {
  * @param {Object} attendanceBody
  * @returns {Promise<Attendance>}
  */
-const createAttendance = async (attendanceBody) => {
-    return Attendance.create(attendanceBody);
+const createAttendance = async (userId, attendanceBody) => {
+    const user = await User.findById(userId)
+    
+    if (user.role == 'admin') {
+        return Attendance.create(attendanceBody)
+    } else {
+        return 'The user has no permission to create a attendance list'
+    }
 };
 
 /**
@@ -83,7 +96,7 @@ const addTrainingssession = async (groupID, sessionBody) => {
 
     sessions.push(sessionBody)
 
-    return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
+    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
 };
 
 //TODO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
@@ -100,12 +113,12 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
     date = new Date(date)
 
     for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()){
+        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()) {
             sessions[i] = sessionBody
         }
     }
 
-    return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
+    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
 };
 
 /**
@@ -128,12 +141,12 @@ const deleteTrainingssession = async (groupID, date) => {
     date = new Date(date)
 
     for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()){
+        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()) {
             sessions.splice(i, 1)
         }
     }
 
-    return Attendance.findByIdAndUpdate({'_id': groupObj.id}, {'$set': {'trainingssession': sessions}})
+    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
 };
 
 //TODO Add new Functions here
