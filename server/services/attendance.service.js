@@ -8,18 +8,29 @@ const mongoose = require('mongoose')
  * @returns {Promise<[Attendance]>}
  */
 const getAttendance = async (userId) => {
+    //user ist der Benutzer, der die Daten requestet
     const user = await User.findById(userId)
 
-    if (user.role === 'trainer') {
-        return await Attendance.find({ 'access': new mongoose.Types.ObjectId(userId) });
-    } else if (user.role == 'admin') {
+    if (user.role === 'admin') {
+        //admin hat Zugriff auf alle Attendance Lists
         return Attendance.find({})
+    } else if (user.role === 'trainer') {
+        //Wenn user ein Trainer o.ä. ist, wird für alle Attendance Lists die einer Gruppe zugewiesen sind, 
+        //auf die der User Zugriff hat
+        const list = await Attendance.find({'group._id': {$in: user.accessible_groups}})
+        
+        if(!list.length){
+            throw new ApiError(httpStatus.NOT_FOUND, 'No attendance list found for groups to which the user has access')
+        } else {
+            return list
+        }
     } else {
-        return "The user has no access to any attendance list"
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to any attendance list")
     }
 };
 
-/**
+//WARNING Unused
+/*
  * Get a attendance list by ID.
  * @param {ObjectId} id
  * @returns {Promise<Attendance>}
@@ -27,13 +38,15 @@ const getAttendance = async (userId) => {
 const getAttendanceById = async (userId, id) => {
     const user = await User.findById(userId)
     
-    if (user.role == 'admin') {
+    if (user.role === 'admin') {
+        //Admin kann auf alle Attendance Lists zugreifen
         return Attendance.findById(id)
-    } else {
+    } else if (user.role === 'trainer'){
         const list = await Attendance.findById(id);
         return (list.access.includes(new mongoose.Types.ObjectId(id))) ? list : `The user has no access to the attendance list ${id}`
     }
 };
+
 
 /**
  * Get a attendance list by groupID & date.
@@ -43,6 +56,7 @@ const getAttendanceById = async (userId, id) => {
  */
 const getAttendanceByDate = async (userId, groupID, date) => {
     const attendance = await getAttendanceByGroup(userId, groupID)
+
     for (const training of attendance.trainingssession) {
         const dbDate = new Date(training.date)
         date = new Date(date)
@@ -59,13 +73,21 @@ const getAttendanceByDate = async (userId, groupID, date) => {
  * @returns {Promise<Attendance>}
  */
 const getAttendanceByGroup = async (userId, groupID) => {
-    const allAttendance = await getAttendance(userId)
-    for (const attendance of allAttendance) {
-        if (attendance.group.id === groupID) {
-            return Attendance(attendance)
+    const user = await User.findById(userId)
+
+    if(user.role === 'admin'){
+        //Admin kann auf alle Listen zugreifen
+        return Attendance.find({'group._id': groupID})
+    }else if (user.role === 'trainer'){
+        //User kann nur auf Liste zugreifen, wenn er Zugriff auf die verbundene Gruppe hat
+        if(user.accessible_groups.includes(groupID)){
+            return Attendance.find({'group._id': groupID})
+        }else{
+            throw new ApiError(httpStatus.FORBIDDEN, "The user has no access to the group associated with this attendance list")
         }
+    }else{
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
-    return { error: "No entrance for given groupID" }
 };
 
 /**
@@ -76,10 +98,10 @@ const getAttendanceByGroup = async (userId, groupID) => {
 const createAttendance = async (userId, attendanceBody) => {
     const user = await User.findById(userId)
     
-    if (user.role == 'admin') {
+    if (user.role === 'admin') {
         return Attendance.create(attendanceBody)
     } else {
-        return 'The user has no permission to create a attendance list'
+        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new attendance list")
     }
 };
 
@@ -90,13 +112,19 @@ const createAttendance = async (userId, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const addTrainingssession = async (groupID, sessionBody) => {
-
-    const groupObj = await getAttendanceByGroup(groupID)
-    let sessions = groupObj.trainingssession
-
-    sessions.push(sessionBody)
-
-    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
+    const user = await User.findById(userId)
+    
+    if (user.role === 'admin') {
+        return Attendance.findByIdAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssession: sessionBody } })
+    } else if (user.role === 'trainer') {
+        if (user.accessible_groups.includes(groupID)){
+            return Attendance.findByIdAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssession: sessionBody } })
+        } else{
+            throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add a trainingssession")
+        }
+    } else {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
+    }
 };
 
 //TODO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
@@ -117,6 +145,10 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
             sessions[i] = sessionBody
         }
     }
+
+
+    //WARNING Funktioniert nicht
+    Attendance.findOneAndUpdate({'group._id': groupID}, {'$set': {'trainingssession.$[date]': sessionBody}}, {arrayFilters: [ {'date': date}]})
 
     return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
 };

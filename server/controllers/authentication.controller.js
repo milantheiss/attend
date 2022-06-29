@@ -78,12 +78,12 @@ const { User } = require('../models');
                 httpOnly: true,
                 sameSite: 'None'
             })
-            .status(200)
+            .status(httpStatus.OK)
             .send(response)
         }
-        return res.status(400).send("Invalid Credentials");
+        return res.status(httpStatus.BAD_REQUEST).send("Invalid Credentials");
     } catch (err) {
-        console.log(err);
+        logger.error(err);
     }
 });
 
@@ -120,10 +120,10 @@ const logout = catchAsync(async (req, res) => {
             httpOnly: true,
             sameSite: 'None'
         })
-        .status(200)
+        .status(httpStatus.OK)
         .send("Successfully logged out")
     } catch (err) {
-        console.log(err);
+        logger.error(err);
     }
 });
 

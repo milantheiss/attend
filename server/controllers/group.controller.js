@@ -6,40 +6,17 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 
 const getGroups = catchAsync(async (req, res) => {
-    const result = await groupService.getGroups(req.userID)
-    
-    if(result === "The user has no access to any group"){
-        logger.warn('GET - all groups: User has no Access to any group')
-        res.status(403).send(result)
-    }else{
-        logger.debug('GET - all groups: Success')
-        res.send(result);
-    }
-    
+    res.send(await groupService.getGroups(req.userID))
 });
 
 const getGroupById = catchAsync(async (req, res) => {
-    const result = await groupService.getGroupById(req.userID, req.params.groupID);
-    
-    if(result === "The user has no access to this group"){
-        logger.warn(`GET - all groups: User has no Access to group  ${req.params.groupID}`)
-        res.status(403).send(result)
-    }else{
-        logger.debug(`GET - group by id: ${req.params.groupID}: Success`)
-        res.send(result);
-    }
+    res.send(await groupService.getGroupById(req.userID, req.params.groupID))
 });
 
 const createGroup = catchAsync(async (req, res) => {
-    const result = await groupService.createGroup(req.body);
-
-    if(result === "The user has no permission to create a new group"){
-        logger.warn('CREATED - new group: User has no permission to create a new group')
-        res.status(403).send(result)
-    }else{
-        logger.debug('CREATED - new group: Success')
-        res.send(result);
-    }
+    //WARNING Nur Admins können Gruppen erstellen
+    const result = await groupService.createGroup(req.userID, req.body);
+    res.status(httpStatus.CREATED).send(result)
 });
 
 /*
@@ -87,8 +64,6 @@ async deleteGroup(groupID) {
 module.exports = {
     getGroups,
     getGroupById,
-    createGroup,
-    //updateGroup,
-    //deleteGroup
+    createGroup
 }
 

@@ -38,12 +38,13 @@ const getRefreshTokenSecret = async (userID, token_id) => {
     const user = await getUserById(userID)
 
     //Muss == sein da token_credentials._id typeof ObjectId ist und token_id typeof String
-    for (const token_credentials of user.refresh_tokens) {
-        if(token_credentials._id == token_id){
-            return token_credentials.secret
-        }
+    const secret = user.refresh_tokens.filter(obj=> obj._id == token_id)[0].secret
+
+    if(typeof secret === 'undefined'){
+        throw new ApiError(httpStatus.NOT_FOUND, "Refresh token secret was not found")
     }
-    return undefined
+
+    return secret
 }
 
 module.exports = {

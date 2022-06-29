@@ -3,19 +3,18 @@ const { authenticationService } = require("../services");
 
 const config = require('../config/config');
 const logger = require("../config/logger");
+const httpStatus = require("http-status");
+const ApiError = require("../utils/ApiError");
 
 const verifyToken = async (req, res, next) => {
-  
-
   let access_token = req.cookies.access_token;
   const refresh_token = req.cookies.refresh_token;
 
   if (!access_token) {
     if (refresh_token) {
-      access_token = await getNewTokens(res, refresh_token)
+      access_token = await getNewToken(res, refresh_token)
     } else{
-      logger.error('No access token given')
-      return res.status(403).send("A token is required for authentication");
+      throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
     }
   }
 
@@ -24,16 +23,15 @@ const verifyToken = async (req, res, next) => {
     req.userID = decrypt.user_id
     return next();
   } catch (err) {
-    logger.error('Access token is not invalid')
-    return res.status(500).json(err.toString());
+    logger.error(err.toString())
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 };
 
-const getNewTokens = async (res, old_refresh_token) => {
+const getNewToken = async (res, old_refresh_token) => {
   const decoded = jwt.decode(old_refresh_token)
 
   const secret = await authenticationService.getRefreshTokenSecret(decoded.user_id, decoded.token_id)
-
 
   if (typeof secret === 'undefined') {
     return res.clearCookie('access_token', {
@@ -49,8 +47,6 @@ const getNewTokens = async (res, old_refresh_token) => {
       .status(403)
       .send("No a valid refresh token");
   }
-
-  
 
   try {
     const decrypt = jwt.verify(old_refresh_token, secret)
@@ -91,8 +87,8 @@ const getNewTokens = async (res, old_refresh_token) => {
 
     return access_token
   } catch (err) {
-    console.error("Hier" + err)
-    return res.status(500).json(err.toString());
+    logger.error(err.toString())
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 }
 

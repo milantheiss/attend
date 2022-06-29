@@ -35,15 +35,8 @@ const userSchema = mongoose.Schema(
                 }
             ]
         },
-        access: {
-            type: [
-                {
-                    tag: {
-                        type: String,
-                        required: true
-                    }
-                }
-            ]
+        accessible_groups: {
+            type: [mongoose.Types.ObjectId]
         },
         role: {
             type: String

@@ -13,7 +13,7 @@ router
 
 router
     .route('/:attendanceID')
-    .get(verifyToken, attendanceController.getAttendanceById)
+    //.get(verifyToken, attendanceController.getAttendanceById)
     .delete(verifyToken, attendanceController.deleteAttendance)
 
 router
