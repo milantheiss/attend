@@ -12,7 +12,7 @@ const verifyToken = async (req, res, next) => {
 
   if (!access_token) {
     if (refresh_token) {
-      access_token = await getNewToken(res, refresh_token)
+       access_token = await getNewToken(req, res, refresh_token)
     } else{
       throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
     }
@@ -28,7 +28,7 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-const getNewToken = async (res, old_refresh_token) => {
+const getNewToken = async (req, res, old_refresh_token) => {
   const decoded = jwt.decode(old_refresh_token)
 
   const secret = await authenticationService.getRefreshTokenSecret(decoded.user_id, decoded.token_id)
@@ -45,8 +45,10 @@ const getNewToken = async (res, old_refresh_token) => {
         sameSite: 'None'
       })
       .status(403)
-      .send("No a valid refresh token");
-  }
+      .redirect(req.get('origin') + '/logout')
+      //TODO Auto redirect 
+  
+    }
 
   try {
     const decrypt = jwt.verify(old_refresh_token, secret)

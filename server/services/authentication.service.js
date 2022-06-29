@@ -38,7 +38,15 @@ const getRefreshTokenSecret = async (userID, token_id) => {
     const user = await getUserById(userID)
 
     //Muss == sein da token_credentials._id typeof ObjectId ist und token_id typeof String
-    const secret = user.refresh_tokens.filter(obj=> obj._id == token_id)[0].secret
+
+    let secret
+    try{
+        secret = user.refresh_tokens.filter(obj=> obj._id == token_id)[0].secret
+    }catch(error){
+        return undefined
+        //throw new ApiError(httpStatus.BAD_REQUEST, "Bad refresh token. Server was unable to regognize the token. Please login again")
+    }
+    
 
     if(typeof secret === 'undefined'){
         throw new ApiError(httpStatus.NOT_FOUND, "Refresh token secret was not found")

@@ -148,9 +148,9 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
 
 
     //WARNING Funktioniert nicht
-    Attendance.findOneAndUpdate({'group._id': groupID}, {'$set': {'trainingssession.$[date]': sessionBody}}, {arrayFilters: [ {'date': date}]})
+   
 
-    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
+    return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssession.date': date}, {'$set': {'trainingssession.$': sessionBody}})
 };
 
 /**
