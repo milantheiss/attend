@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Your now logged out</p>
+    <p>Logging you off...</p>
   </div>
 </template>
 

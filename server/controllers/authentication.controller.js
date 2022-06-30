@@ -106,7 +106,7 @@ const logout = catchAsync(async (req, res) => {
         }catch (err){
             //WARNING Es wird ein Error geworfen wenn z.B. kein Refresh Token übergeben wird
             //TODO Aufräum Methode implementieren, mit der alle Expired Refresh Tokenes gecleared werden
-            logger.error(err)
+            logger.error("Server could not clear a refresh token because no token was send.")
         }
         
         logger.debug("Logged out")

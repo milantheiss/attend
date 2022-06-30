@@ -12,16 +12,31 @@ const verifyToken = async (req, res, next) => {
 
   if (!access_token) {
     if (refresh_token) {
-       access_token = await getNewToken(req, res, refresh_token)
-    } else{
-      throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
+      access_token = await getNewToken(req, res, refresh_token)
+    } else {
+      //TODO Hier auch auto redirect
+      return res.clearCookie('access_token', {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'None'
+      }).clearCookie('refresh_token', {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'None'
+      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
+      //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
     }
   }
 
   try {
-    const decrypt = jwt.verify(access_token, config.secret);
-    req.userID = decrypt.user_id
-    return next();
+    if (typeof access_token !== 'undefined') {
+      const decrypt = jwt.verify(access_token, config.secret);
+      req.userID = decrypt.user_id
+      return next();
+    }
+    else {
+      return res
+    }
   } catch (err) {
     logger.error(err.toString())
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
@@ -34,21 +49,18 @@ const getNewToken = async (req, res, old_refresh_token) => {
   const secret = await authenticationService.getRefreshTokenSecret(decoded.user_id, decoded.token_id)
 
   if (typeof secret === 'undefined') {
-    return res.clearCookie('access_token', {
+    res.clearCookie('access_token', {
       secure: true,
       httpOnly: true,
       sameSite: 'None'
-    })
-      .clearCookie('refresh_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'None'
-      })
-      .status(403)
-      .redirect(req.get('origin') + '/logout')
-      //TODO Auto redirect 
-  
-    }
+    }).clearCookie('refresh_token', {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'None'
+    }).status(403).send({ redirect: '/logout' })
+    //TODO Auto redirect 
+    return undefined
+  }
 
   try {
     const decrypt = jwt.verify(old_refresh_token, secret)
