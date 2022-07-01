@@ -1,42 +1,27 @@
+const httpStatus = require('http-status');
 const logger = require('../config/logger')
-const {attendanceService} = require('../services')
+const { attendanceService } = require('../services')
 const catchAsync = require('../utils/catchAsync');
 
 const getAttendance = catchAsync(async (req, res) => {
     const result = await attendanceService.getAttendance(req.userID);
+    logger.debug('GET - all attendance lists')
+    res.send(result);
 
-    if(result === "The user has no access to any attendance list"){
-        logger.warn('GET - all attendance lists: User has no access to any attendance list')
-        res.status(403).send(result)
-    }else{
-        logger.debug('GET - all attendance lists: Success')
-        res.send(result);
-    }
 });
 
 const getAttendanceById = catchAsync(async (req, res) => {
     const result = await attendanceService.getAttendanceById(req.userID, req.params.attendanceID);
+    logger.debug(`GET - attendance list by id ${req.params.attendanceID}`)
+    res.send(result);
 
-    if(result === `The user has no access to the attendance list ${req.userID}`){
-        logger.warn(`GET - attendance lists by id: User has no access to the attendance list ${req.params.attendanceID}`)
-        res.status(403).send(result)
-    }else{
-        logger.debug(`GET - attendance list by id ${req.params.attendanceID}: Success`)
-        res.send(result);
-    }
 });
 
 const createAttendance = catchAsync(async (req, res) => {
     const result = await attendanceService.createAttendance(req.userID, req.body);
-    
+    logger.debug('CREATED - new attendance list')
+    res.status(httpStatus.CREATED).send(result);
 
-    if(result === 'The user has no permission create a attendance list'){
-        logger.warn('CREATED - new attendance list: User has no permission to create a attendance list')
-        res.status(403).send(result)
-    }else{
-        logger.debug('CREATED - new attendance list: Success')
-        res.send(result);
-    }
 });
 
 const updateTrainingssession = catchAsync(async (req, res) => {

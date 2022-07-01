@@ -38,7 +38,6 @@ const getGroupById = async (userId, groupId) => {
     //user ist der Benutzer, der die Daten requestet
     const user = await User.findById(userId)
 
-
     if (user.role === 'admin'){
         //admin hat Zugriff auf alle Gruppen
         return Group.findById(groupId)
@@ -92,10 +91,7 @@ const deleteGroup = async (groupID) => {
     return Group.findByIdAndDelete(groupID)
 };
 
-*/
-
 /*
-
 /!**
  * Query for users
  * @param {Object} filter - Mongo filter

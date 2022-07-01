@@ -1,15 +1,12 @@
 const logger = require('../config/logger')
 const { authenticationService } = require('../services')
 const httpStatus = require('http-status');
-const pick = require('../utils/pick');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const config = require('../config/config');
 
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { default: mongoose } = require('mongoose');
-const { User } = require('../models');
 
 /**
  * Nimmt Login Daten an und versucht User einzuloggen.
