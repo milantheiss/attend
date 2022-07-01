@@ -42,6 +42,7 @@ import TeilnehmerItem from "@/components/TeilnehmerItem";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import { getShortenedJSONDate } from "@/util/formatter";
+import {fetchGroups, fetchGroup, fetchAttendanceByDate, updateAttendance, deleteAttendance, addAttendance} from '@/util/fetchOperations'
 //import axios from "axios";
 
 export default {
@@ -82,84 +83,15 @@ export default {
     GroupInfo
   },
   methods: {
-    async watchForRedirects(res){
-      const resp = await res
-      console.log(resp)
-      if (resp.redirect === '/logout'){
-        this.$router.push('/logout')
-        console.log(resp.body.redirect)
-      }
-      return res
-    },
-
-    async fetchGroups() {
-      console.debug("Fetching for all groups")
-      return this.watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'), {
-        credentials: 'include',
-        mode: 'cors'
-      })).json());
-    },
-
-    async fetchGroup(groupID) {
-      console.debug(`Fetching for group by ID: ${groupID}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join('/'), {
-        credentials: 'include',
-        mode: 'cors'
-      })).json();
-    },
-
-    async fetchAttendance(groupID) {
-      console.debug(`Fetching for attendance by ID ${groupID}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'),{
-        credentials: 'include',
-        mode: 'cors'
-      })).json();
-    },
-
-    async fetchAttendanceByDate(groupID, date) {
-      console.debug(`Fetching for attendance by ID ${groupID} and date ${date}`)
-      return (await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'),{
-        credentials: 'include',
-        mode: 'cors'
-      })).json();
-    },
-
-    async updateAttendance(groupID, date, body) {
-      await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-        credentials: 'include',
-        mode: 'cors'
-      })
-    },
-
-    async addAttendance(groupID, body) {
-      await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-        credentials: 'include',
-        mode: 'cors'
-      })
-    },
-
-    deleteAttendance(groupID, date) {
-      fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
-        method: 'DELETE',
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-        credentials: 'include',
-        mode: 'cors'
-      })
-    },
+    
 
     async updateSelectedGroup(groupID) {
-      this.selectedGroup = await this.fetchGroup(groupID)
+      this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
       if (this.selectedGroup.name !== "No group selected") {
-        const res = await this.fetchAttendanceByDate(this.selectedGroup.id, this.date)
+        const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         if (typeof res.error !== "undefined") {
           this.attended = {
             date: getShortenedJSONDate(this.date),
@@ -190,11 +122,11 @@ export default {
       }
 
       if (newList) {
-        this.addAttendance(this.selectedGroup.id, this.attended)
+        addAttendance(this.selectedGroup.id, this.attended)
       } else if (emptyList) {
-        this.deleteAttendance(this.selectedGroup.id, this.date)
+        deleteAttendance(this.selectedGroup.id, this.date)
       } else {
-        this.updateAttendance(this.selectedGroup.id, this.date, this.attended)
+        updateAttendance(this.selectedGroup.id, this.date, this.attended)
       }
     },
 
@@ -218,7 +150,7 @@ export default {
     }
   },
   async created() {
-    this.groups = await this.fetchGroups()
+    this.groups = await fetchGroups()
     await this.pullAttendance()
     document.title = 'Wähle eine Gruppe'
   },
