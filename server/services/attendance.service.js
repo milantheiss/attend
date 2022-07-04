@@ -55,7 +55,7 @@ const getTrainingssession = async (user, groupID, date) => {
     //INFO Access controle wird von 'getAttendanceByGroup' gehandelt
     const attendance = await getAttendanceByGroup(user, groupID)
 
-    const session = attendance.trainingssession.find(element => element.date.toJSON() === new Date(date).toJSON())
+    const session = attendance.trainingssessions.find(element => element.date.toJSON() === new Date(date).toJSON())
 
     if (typeof session !== 'undefined'){
         return session
@@ -105,12 +105,11 @@ const createAttendance = async (user, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const addTrainingssession = async (user, groupID, sessionBody) => {
-    console.log('in add')
     if (user.role === 'admin') {
-        return Attendance.findOneAndUpdate({ 'group._id': groupID}, { $addToSet: { trainingssession: sessionBody } })
+        return Attendance.findOneAndUpdate({ 'group._id': groupID}, { $addToSet: { trainingssessions: sessionBody } })
     } else if (user.role === 'trainer') {
         if (user.accessible_groups.includes(groupID)){
-            return Attendance.findOneAndUpdate({ 'group._id': groupID}, { $addToSet: { trainingssession: sessionBody } })
+            return Attendance.findOneAndUpdate({ 'group._id': groupID}, { $addToSet: { trainingssessions: sessionBody } })
         } else{
             throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add a trainingssession")
         }
@@ -128,36 +127,22 @@ const addTrainingssession = async (user, groupID, sessionBody) => {
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (user, groupID, date, sessionBody) => {
-    const trainingssession = await getTrainingssession(user, groupID, date)
+    const session = await getTrainingssession(user, groupID, date)
 
-    console.log('session'  + sessionBody)
-    
-//TODO Add Access Control hier
-
-    /*
-    let sessions = groupObj.trainingssession
-    date = new Date(date)
-
-    for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()) {
-            sessions[i] = sessionBody
+    sessionBody.participants.forEach(participant => {
+        const temp = session.participants.find(foo => foo._id == participant._id)
+        if(typeof temp === 'undefined'){
+            session.participants.push(participant)
+        }else{
+            temp.attended = participant.attended
         }
-    }
-
-    trainingssession.participants.forEach(participant => {
-        console.log(sessionBody)
-    });
-
-    */
-
-    //WARNING Funktioniert nicht
+    })
    
     if(user.role === 'admin'){
-        return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssession.date': date}, {'$set': {'trainingssession.$': sessionBody}})
+        return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssessions.date': date}, {'$set': {'trainingssessions.$': session}})
     } else if(user.role === 'trainer'){
-        console.log('durchgekommen')
         if(user.accessible_groups.includes(groupID)){
-            return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssession.date': date}, {'$set': {'trainingssession.$': sessionBody}})
+            return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssessions.date': date}, {'$set': {'trainingssessions.$': session}})
         }else{
             throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to update this trainingssession")
         }
@@ -183,7 +168,7 @@ const deleteAttendance = async (attendanceID) => {
  */
 const deleteTrainingssession = async (user, groupID, date) => {
     const groupObj = await getAttendanceByGroup(user, groupID)
-    let sessions = groupObj.trainingssession
+    let sessions = groupObj.trainingssessions
     date = new Date(date)
 
     for (let i = 0; i < sessions.length; i++) {
@@ -192,7 +177,7 @@ const deleteTrainingssession = async (user, groupID, date) => {
         }
     }
 
-    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssession': sessions } })
+    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssessions': sessions } })
 };
 
 //TODO Add new Functions here

@@ -92,7 +92,8 @@ export default {
     async pullAttendance() {
       if (this.selectedGroup.name !== "No group selected") {
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
-        if (typeof res.error !== "undefined") {
+        console.log(res)
+        if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           this.attended = {
             date: getShortenedJSONDate(this.date),
             participants: this.formatParticipantArray(this.selectedGroup.participants)

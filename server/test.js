@@ -10,5 +10,6 @@ const arr = [
 ]
 
 const session = arr.find(element => element.date.toJSON() === new Date('2022-06-09T00:00:00.000+00:00').toJSON())
+session.test = 'ui'
 
-console.log(session)
+console.log(arr[1].test)

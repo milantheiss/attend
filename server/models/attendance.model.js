@@ -13,7 +13,7 @@ const attendanceSchema = mongoose.Schema(
             },
             required: false
         },
-        trainingssession: {
+        trainingssessions: {
             type: [
                 {
                     date: {
