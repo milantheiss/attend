@@ -10,7 +10,8 @@ const envVarsSchema = Joi.object()
         PORT: Joi.number().default(3000),
         MONGODB_URL: Joi.string().required().description('Mongo DB url'),
         KEY_PATH: Joi.string().required().description('Path to SSL Key'),
-        CERT_PATH: Joi.string().required().description('Path to CERT')
+        CERT_PATH: Joi.string().required().description('Path to CERT'),
+        SECRET_KEY: Joi.string().required().description('Secret key for JWT')
     })
     .unknown();
 
@@ -25,5 +26,6 @@ module.exports = {
     port: envVars.PORT,
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     key: envVars.KEY_PATH,
-    cert: envVars.CERT_PATH
+    cert: envVars.CERT_PATH,
+    secret: envVars.SECRET_KEY
 };

@@ -1,9 +1,14 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import axios from 'axios'
 
-//import "./registerServiceWorker";
+//import "./registerServiceWorker"
 import router from './router'
 
 import './assets/tailwind.css'
+import store from './store'
 
-createApp(App).use(router).mount("#app");
+axios.defaults.baseURL = process.env.VUE_APP_API_URL
+axios.defaults.withCredentials = true
+
+createApp(App).use(router).use(store).mount("#app");

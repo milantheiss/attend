@@ -1,27 +1,23 @@
 const logger = require('../config/logger')
-const {groupService, attendanceService} = require('../services')
+const {groupService} = require('../services')
 const httpStatus = require('http-status');
-const pick = require('../utils/pick');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 
 const getGroups = catchAsync(async (req, res) => {
-    const result = await groupService.getGroups();
-    logger.debug('GET - all groups')
-    res.send(result);
+    res.send(await groupService.getGroups(req.user))
 });
 
 const getGroupById = catchAsync(async (req, res) => {
-    const result = await groupService.getGroupById(req.params.groupID);
-    logger.debug(`GET - group by id: ${req.params.groupID}`)
-    res.send(result);
+    res.send(await groupService.getGroupById(req.user, req.params.groupID))
 });
 
 const createGroup = catchAsync(async (req, res) => {
-    const result = await groupService.createGroup(req.body);
-    logger.debug('CREATED - new group')
-    res.send(result);
+    //WARNING Nur Admins können Gruppen erstellen
+    const result = await groupService.createGroup(req.user, req.body);
+    res.status(httpStatus.CREATED).send(result)
 });
+
+/*
 
 const updateGroup = catchAsync(async (req, res) => {
     const result = await groupService.updateGroup(req.params.groupID, req.body);
@@ -34,8 +30,6 @@ const deleteGroup = catchAsync(async (req, res) => {
     logger.debug(`DELETE - group by id: ${req.params.groupID}`)
     res.send(result)
 });
-
-/*
 
 async getGroup(groupID) {
     logger.info('Controller: getGroups', groupID)
@@ -68,8 +62,6 @@ async deleteGroup(groupID) {
 module.exports = {
     getGroups,
     getGroupById,
-    createGroup,
-    updateGroup,
-    deleteGroup
+    createGroup
 }
 
