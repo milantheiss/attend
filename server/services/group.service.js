@@ -7,10 +7,7 @@ const ApiError = require('../utils/ApiError');
  * @param  {import('mongoose').ObjectId} userId
  * @returns {Promise<[Group]>}
  */
-const getGroups = async (userId) => {
-    //user ist der Benutzer, der die Daten requestet
-    const user = await User.findById(userId)
-    
+const getGroups = async (user) => {    
     if(user.role === 'admin'){
         //admin hat Zugriff auf alle Gruppen
         return Group.find({})
@@ -34,10 +31,7 @@ const getGroups = async (userId) => {
  * @param {ObjectId} groupId
  * @returns {Promise<Group>}
  */
-const getGroupById = async (userId, groupId) => {
-    //user ist der Benutzer, der die Daten requestet
-    const user = await User.findById(userId)
-
+const getGroupById = async (user, groupId) => {
     if (user.role === 'admin'){
         //admin hat Zugriff auf alle Gruppen
         return Group.findById(groupId)
@@ -58,9 +52,7 @@ const getGroupById = async (userId, groupId) => {
  * @param {Object} groupBody
  * @returns {Promise<Group>}
  */
-const createGroup = async (userId, groupBody) => {
-    const user = await User.findById(userId)
-
+const createGroup = async (user, groupBody) => {
     if (user.role === 'admin') { 
         //Nur Admins dürfen Gruppen erstellen
         return Group.create(groupBody); 
@@ -108,16 +100,15 @@ const queryUsers = async (filter, options) => {
 
 /!**
  * Update user by id
- * @param {ObjectId} userId
+ * @param {User} user
  * @param {Object} updateBody
  * @returns {Promise<User>}
  *!/
-const updateUserById = async (userId, updateBody) => {
-    const user = await getUserById(userId);
+const updateUserById = async (user, updateBody) => {
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
-    if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
+    if (updateBody.email && (await User.isEmailTaken(updateBody.email, user._id))) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
     }
     Object.assign(user, updateBody);
@@ -127,11 +118,10 @@ const updateUserById = async (userId, updateBody) => {
 
 /!**
  * Delete user by id
- * @param {ObjectId} userId
+ * @param {User} user
  * @returns {Promise<User>}
  *!/
-const deleteUserById = async (userId) => {
-    const user = await getUserById(userId);
+const deleteUserById = async (user) => {
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }

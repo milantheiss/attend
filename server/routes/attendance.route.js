@@ -24,7 +24,7 @@ router
 
 router
     .route('/byGroupID/:groupID/:date')
-    .get(verifyToken, attendanceController.getAttendanceByDate)
+    .get(verifyToken, attendanceController.getTrainingssession)
     .put(verifyToken, attendanceController.updateTrainingssession)
     .patch(verifyToken, attendanceController.updateTrainingssession)
     .delete(verifyToken, attendanceController.deleteTrainingssession)

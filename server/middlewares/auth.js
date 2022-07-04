@@ -31,7 +31,7 @@ const verifyToken = async (req, res, next) => {
   try {
     if (typeof access_token !== 'undefined') {
       const decrypt = jwt.verify(access_token, config.secret);
-      req.userID = decrypt.user_id
+      req.user = await authenticationService.getUserById(decrypt.user_id)
       return next();
     }
     else {

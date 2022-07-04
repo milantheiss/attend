@@ -4,16 +4,16 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 
 const getGroups = catchAsync(async (req, res) => {
-    res.send(await groupService.getGroups(req.userID))
+    res.send(await groupService.getGroups(req.user))
 });
 
 const getGroupById = catchAsync(async (req, res) => {
-    res.send(await groupService.getGroupById(req.userID, req.params.groupID))
+    res.send(await groupService.getGroupById(req.user, req.params.groupID))
 });
 
 const createGroup = catchAsync(async (req, res) => {
     //WARNING Nur Admins können Gruppen erstellen
-    const result = await groupService.createGroup(req.userID, req.body);
+    const result = await groupService.createGroup(req.user, req.body);
     res.status(httpStatus.CREATED).send(result)
 });
 
