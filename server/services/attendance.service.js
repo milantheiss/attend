@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Attendance, User } = require('../models');
+const { Attendance } = require('../models');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose')
 
@@ -157,8 +157,12 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
  * @param attendanceID
  * @returns {Promise<Attendance>}
  */
-const deleteAttendance = async (attendanceID) => {
-    return Attendance.findByIdAndDelete(attendanceID)
+const deleteAttendance = async (user, attendanceID) => {
+    if (user.role === 'admin'){
+        return Attendance.findByIdAndDelete(attendanceID)
+    } else {
+        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete a attendance list")
+    }
 };
 
 /**
@@ -167,17 +171,17 @@ const deleteAttendance = async (attendanceID) => {
  * @returns {Promise<Attendance>}
  */
 const deleteTrainingssession = async (user, groupID, date) => {
-    const groupObj = await getAttendanceByGroup(user, groupID)
-    let sessions = groupObj.trainingssessions
-    date = new Date(date)
-
-    for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].date.getMonth() === date.getMonth() && sessions[i].date.getDate() === date.getDate() && sessions[i].date.getFullYear() === date.getFullYear()) {
-            sessions.splice(i, 1)
+    if (user.role === 'admin'){
+        return  Attendance.findOneAndUpdate({'group._id': groupID, }, {'$pull': {'trainingssessions': {'date': date}}})
+    } else if(user.role === 'trainer'){
+        if(user.accessible_groups.includes(groupID)){
+            return  Attendance.findOneAndUpdate({'group._id': groupID, }, {'$pull': {'trainingssessions': {'date': date}}})
+        } else {
+            throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete this trainingssession")
         }
+    } else {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
-
-    return Attendance.findByIdAndUpdate({ '_id': groupObj.id }, { '$set': { 'trainingssessions': sessions } })
 };
 
 //TODO Add new Functions here
