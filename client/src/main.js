@@ -11,4 +11,4 @@ import store from './store'
 axios.defaults.baseURL = process.env.VUE_APP_API_URL
 axios.defaults.withCredentials = true
 
-createApp(App).use(router).use(store).mount("#app");
+createApp(App).use(router).use(require('vue-cookies')).use(store).mount("#app");
