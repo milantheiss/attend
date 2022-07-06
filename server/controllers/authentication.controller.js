@@ -68,7 +68,7 @@ const { default: mongoose } = require('mongoose');
                 expires: new Date(Date.now() + 600000),
                 secure: true,
                 httpOnly: true,
-                sameSite: 'None'
+                sameSite: 'Lax'
             }).cookie('refresh_token', refresh_token, {
                 expires: new Date(Date.now() + 604800000),
                 secure: true,
