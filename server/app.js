@@ -15,7 +15,7 @@ const app = express();
 // enable cors
 app.use(cors({
     credentials: true,
-    origin: "http://localhost:8080"
+    origin: config.origin
 }));
 //app.options('*', cors());
 

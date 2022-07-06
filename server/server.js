@@ -10,8 +10,8 @@ let server;
 mongoose.connect(config.url, {dbName: 'data'}).then(() => {
     logger.info('Connected to MongoDB');
     server = https.createServer({
-        key: fs.readFileSync("key.pem"),
-        cert: fs.readFileSync("cert.pem"),
+        key: fs.readFileSync(config.key),
+        cert: fs.readFileSync(config.cert),
     }, app)
         .listen(config.port, () => {
         logger.info(`Listening to port ${config.port}`);
