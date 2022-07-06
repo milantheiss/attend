@@ -1,5 +1,5 @@
 //import axios from "axios";
-const vueCookie = require('vue-cookies')
+//const vueCookie = require('vue-cookies')
 
 const state = {
   user: null,
