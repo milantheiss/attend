@@ -1,19 +1,15 @@
+const logger = require('../config/logger');
 const {memberService} = require('../services')
 const catchAsync = require('../utils/catchAsync');
-
-//TODO Implement simple GET
-const getMembers = catchAsync(async (req, res) => {
-    const result = await memberService.getMembers();
-    res.send(result);
-});
+const httpStatus = require('http-status');
 
 const addMember = catchAsync(async (req, res) => {
-    const result = await memberService.addMember(req.body);
-    res.send(result);
+    const result = await memberService.addMember(req.user, req.body);
+    logger.debug('CREATED - new member')
+    res.status(httpStatus.CREATED).send(result);
 });
 
 module.exports = {
-    getMembers,
     addMember
 }
 

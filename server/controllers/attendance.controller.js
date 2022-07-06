@@ -21,7 +21,6 @@ const createAttendance = catchAsync(async (req, res) => {
     const result = await attendanceService.createAttendance(req.user, req.body);
     logger.debug('CREATED - new attendance list')
     res.status(httpStatus.CREATED).send(result);
-
 });
 
 const updateTrainingssession = catchAsync(async (req, res) => {
