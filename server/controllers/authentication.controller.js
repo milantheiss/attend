@@ -73,7 +73,7 @@ const { default: mongoose } = require('mongoose');
                 expires: new Date(Date.now() + 604800000),
                 secure: true,
                 httpOnly: true,
-                sameSite: 'None'
+                sameSite: 'Lax'
             })
             .status(httpStatus.OK)
             .send(response)
