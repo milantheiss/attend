@@ -15,12 +15,10 @@ const defaultRoutes = [
 
     //WARNING Unused
     //TODO Auth und Access Controll hinzufügen
-    /*
     {
         path: '/members',
         route: memberRoute,
     },
-    */
     {
         path: '/attendance',
         route: attendanceRoute,

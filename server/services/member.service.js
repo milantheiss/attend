@@ -26,8 +26,13 @@ const getMemberById = async (id) => {
  * @param {Object} memberBody
  * @returns {Promise<Member>}
  */
-const addMember = async (memberBody) => {
-    return Member.create(memberBody);
+const addMember = async (user, memberBody) => {
+    if(user.role === 'admin'){
+        return Member.create(memberBody);
+    }else{
+        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new member")
+    }
+    
 };
 
 

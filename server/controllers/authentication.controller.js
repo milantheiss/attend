@@ -110,12 +110,12 @@ const logout = catchAsync(async (req, res) => {
         return res.clearCookie('access_token', {
             secure: true,
             httpOnly: true,
-            sameSite: 'None'
+            sameSite: 'Lax'
         })
         .clearCookie('refresh_token', {
             secure: true,
             httpOnly: true,
-            sameSite: 'None'
+            sameSite: 'Lax'
         })
         .status(httpStatus.OK)
         .send("Successfully logged out")
