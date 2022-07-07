@@ -42,7 +42,7 @@ import TeilnehmerItem from "@/components/TeilnehmerItem";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import { getShortenedJSONDate } from "@/util/formatter";
-import {fetchGroups, fetchGroup, fetchAttendanceByDate, updateAttendance, deleteAttendance, addAttendance} from '@/util/fetchOperations'
+import {fetchGroups, fetchGroup, fetchAttendanceByDate, deleteTrainingssession, addTrainingssession, updateTrainingssession} from '@/util/fetchOperations'
 //import axios from "axios";
 
 export default {
@@ -123,11 +123,11 @@ export default {
       }
 
       if (newList) {
-        addAttendance(this.selectedGroup.id, this.attended)
+        addTrainingssession(this.selectedGroup.id, this.attended)
       } else if (emptyList) {
-        deleteAttendance(this.selectedGroup.id, this.date)
+        deleteTrainingssession(this.selectedGroup.id, this.date)
       } else {
-        updateAttendance(this.selectedGroup.id, this.date, this.attended)
+        updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
       }
     },
 

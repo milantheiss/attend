@@ -42,7 +42,7 @@ async function fetchAttendanceByDate(groupID, date) {
   })).json());
 }
 
-async function updateAttendance(groupID, date, body) {
+async function updateTrainingssession(groupID, date, body) {
   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
     method: 'PATCH',
     body: JSON.stringify(body),
@@ -52,7 +52,7 @@ async function updateAttendance(groupID, date, body) {
   })).json())
 }
 
-async function addAttendance(groupID, body) {
+async function addTrainingssession(groupID, body) {
   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
     method: 'PATCH',
     body: JSON.stringify(body),
@@ -62,7 +62,7 @@ async function addAttendance(groupID, body) {
   })).json())
 }
 
-async function deleteAttendance(groupID, date) {
+async function deleteTrainingssession(groupID, date) {
   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
     method: 'DELETE',
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -76,7 +76,7 @@ export {
   fetchGroups, 
   fetchAttendance,
   fetchAttendanceByDate,
-  deleteAttendance,
-  updateAttendance,
-  addAttendance
+  deleteTrainingssession,
+  updateTrainingssession,
+  addTrainingssession
 }
