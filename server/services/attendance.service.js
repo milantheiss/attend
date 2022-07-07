@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { Attendance } = require('../models');
+const { groupService } = require('../services');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose')
 
@@ -28,7 +29,6 @@ const getAttendance = async (user) => {
     }
 };
 
-//WARNING Unused
 /*
  * Get a attendance list by ID.
  * @param {ObjectId} id
@@ -43,7 +43,6 @@ const getAttendanceById = async (user, id) => {
         return (list.access.includes(new mongoose.Types.ObjectId(id))) ? list : `The user has no access to the attendance list ${id}`
     }
 };
-
 
 /**
  * Get a attendance list by groupID & date.
@@ -61,7 +60,27 @@ const getTrainingssession = async (user, groupID, date) => {
         return session
     }else{
         //TODO Add Trainingssession hier
-        throw new ApiError(httpStatus.NOT_FOUND, "Requested Trainingssession not found")
+
+        let formated = []
+        
+        const temp = (await groupService.getGroupById(user, groupID)).participants
+
+        temp.forEach((participant) => {
+            formated.push({
+                firstname: participant.firstname,
+                lastname: participant.lastname,
+                attended: false,
+                _id: participant._id
+            })
+        })
+
+        const sessionBody = {
+            date: date,
+            participants: formated
+        }
+
+        addTrainingssession(user, groupID, sessionBody)
+        return sessionBody
     }
 };
 
@@ -130,15 +149,28 @@ const addTrainingssession = async (user, groupID, sessionBody) => {
 const updateTrainingssession = async (user, groupID, date, sessionBody) => {
     const session = await getTrainingssession(user, groupID, date)
 
+    let deleteList = true
+
+    //Gleicht updated SessionBody mit session in DB ab
     sessionBody.participants.forEach(participant => {
         const temp = session.participants.find(foo => foo._id == participant._id)
         if(typeof temp === 'undefined'){
+            //Wenn participant noch nicht in DB existiert
+            //WARNING Kann sein, dass das so nicht funktioniert, da session ein Obj aus Mongoose ist und das geblockt werden könnte
             session.participants.push(participant)
+            deleteList = participant.attended ? false : deleteList
         }else{
             temp.attended = participant.attended
+
+            //Wenn temp.attended true soll Liste nicht gelöscht werden.
+            deleteList = temp.attended ? false : deleteList
         }
     })
-   
+
+    if(deleteList){
+        return deleteTrainingssession(user, groupID, date)
+    }
+    
     if(user.role === 'admin'){
         return  Attendance.findOneAndUpdate({'group._id': groupID, 'trainingssessions.date': date}, {'$set': {'trainingssessions.$': session}})
     } else if(user.role === 'trainer'){

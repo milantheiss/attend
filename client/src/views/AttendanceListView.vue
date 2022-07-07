@@ -41,8 +41,7 @@ import SelectList from "@/components/SelectList";
 import TeilnehmerItem from "@/components/TeilnehmerItem";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { getShortenedJSONDate } from "@/util/formatter";
-import {fetchGroups, fetchGroup, fetchAttendanceByDate, deleteTrainingssession, addTrainingssession, updateTrainingssession} from '@/util/fetchOperations'
+import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 //import axios from "axios";
 
 export default {
@@ -83,7 +82,7 @@ export default {
     GroupInfo
   },
   methods: {
-    
+
 
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await fetchGroup(groupID)
@@ -91,13 +90,17 @@ export default {
 
     async pullAttendance() {
       if (this.selectedGroup.name !== "No group selected") {
+        if(typeof this.attended.participants !== 'undefined'){
+          console.log(this.selectedGroup.id + "\n" +  this.date + "\n" + this.attended)
+
+          updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+        }
+
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         console.log(res)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
-          this.attended = {
-            date: getShortenedJSONDate(this.date),
-            participants: this.formatParticipantArray(this.selectedGroup.participants)
-          }
+          // Sollte nicht mehr erreicht werden
+          console.error("Etwas ist schief gelaufe. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
         }
@@ -107,28 +110,9 @@ export default {
     },
 
     attendanceChange(participant, newVal) {
-      let newList = true
-      let emptyList = true
+      (this.attended.participants.find(foo => foo._id == participant._id)).attended = newVal
 
-      for (const db_participant of this.attended.participants) {
-        if (db_participant.attended === true) {
-          newList = false
-        }
-        if (participant._id === db_participant._id) {
-          db_participant.attended = newVal
-        }
-        if (db_participant.attended === true) {
-          emptyList = false
-        }
-      }
-
-      if (newList) {
-        addTrainingssession(this.selectedGroup.id, this.attended)
-      } else if (emptyList) {
-        deleteTrainingssession(this.selectedGroup.id, this.date)
-      } else {
-        updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
-      }
+      updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 
     formatParticipantArray(participants) {

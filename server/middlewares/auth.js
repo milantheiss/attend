@@ -35,7 +35,15 @@ const verifyToken = async (req, res, next) => {
       return next();
     }
     else {
-      return res
+      return res.clearCookie('access_token', {
+        secure: true,
+        httpOnly: true,
+        sameSite: config.sameSite
+      }).clearCookie('refresh_token', {
+        secure: true,
+        httpOnly: true,
+        sameSite: config.sameSite
+      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
     }
   } catch (err) {
     logger.error(err.toString())
@@ -102,6 +110,7 @@ const getNewToken = async (req, res, old_refresh_token) => {
     return access_token
   } catch (err) {
     logger.error(err.toString())
+    return undefined
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 }
