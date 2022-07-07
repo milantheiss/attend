@@ -7,7 +7,6 @@ const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const logger = require('./config/logger');
-const requestIp = require("request-ip");
 const cookieParser = require('cookie-parser')
 
 const app = express();

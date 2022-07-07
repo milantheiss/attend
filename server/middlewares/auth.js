@@ -18,11 +18,11 @@ const verifyToken = async (req, res, next) => {
       return res.clearCookie('access_token', {
         secure: true,
         httpOnly: true,
-        sameSite: 'Lax'
+        sameSite: config.sameSite
       }).clearCookie('refresh_token', {
         secure: true,
         httpOnly: true,
-        sameSite: 'Lax'
+        sameSite: config.sameSite
       }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
       //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
     }
@@ -52,11 +52,11 @@ const getNewToken = async (req, res, old_refresh_token) => {
     res.clearCookie('access_token', {
       secure: true,
       httpOnly: true,
-      sameSite: 'Lax'
+      sameSite: config.sameSite
     }).clearCookie('refresh_token', {
       secure: true,
       httpOnly: true,
-      sameSite: 'Lax'
+      sameSite: config.sameSite
     }).status(403).send({ redirect: '/logout' })
     //TODO Auto redirect 
     return undefined
@@ -91,12 +91,12 @@ const getNewToken = async (req, res, old_refresh_token) => {
       expires: new Date(Date.now() + 600000),
       secure: true,
       httpOnly: true,
-      sameSite: 'Lax'
+      sameSite: config.sameSite
     }).cookie('refresh_token', refresh_token, {
       expires: new Date(Date.now() + 604800000),
       secure: true,
       httpOnly: true,
-      sameSite: 'Lax'
+      sameSite: config.sameSite
     })
 
     return access_token

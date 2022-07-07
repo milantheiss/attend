@@ -60,6 +60,7 @@ const getTrainingssession = async (user, groupID, date) => {
     if (typeof session !== 'undefined'){
         return session
     }else{
+        //TODO Add Trainingssession hier
         throw new ApiError(httpStatus.NOT_FOUND, "Requested Trainingssession not found")
     }
 };
@@ -160,6 +161,10 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
 const deleteAttendance = async (user, attendanceID) => {
     if (user.role === 'admin'){
         return Attendance.findByIdAndDelete(attendanceID)
+    } else if (user.role === 'trainer') {
+        if(user.accessible_groups.includes(groupID)){
+            return Attendance.findByIdAndDelete(attendanceID)
+        }
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete a attendance list")
     }

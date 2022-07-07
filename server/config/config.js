@@ -29,5 +29,6 @@ module.exports = {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     key: envVars.KEY_PATH,
     cert: envVars.CERT_PATH,
-    secret: envVars.SECRET_KEY
+    secret: envVars.SECRET_KEY,
+    sameSite: envVars.NODE_ENV === "production" ? 'Lax' : 'None'
 };

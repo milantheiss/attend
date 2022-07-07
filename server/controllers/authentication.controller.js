@@ -68,12 +68,12 @@ const { default: mongoose } = require('mongoose');
                 expires: new Date(Date.now() + 600000),
                 secure: true,
                 httpOnly: true,
-                sameSite: 'Lax'
+                sameSite: config.sameSite
             }).cookie('refresh_token', refresh_token, {
                 expires: new Date(Date.now() + 604800000),
                 secure: true,
                 httpOnly: true,
-                sameSite: 'Lax'
+                sameSite: config.sameSite
             })
             .status(httpStatus.OK)
             .send(response)
@@ -110,12 +110,12 @@ const logout = catchAsync(async (req, res) => {
         return res.clearCookie('access_token', {
             secure: true,
             httpOnly: true,
-            sameSite: 'Lax'
+            sameSite: config.sameSite
         })
         .clearCookie('refresh_token', {
             secure: true,
             httpOnly: true,
-            sameSite: 'Lax'
+            sameSite: config.sameSite
         })
         .status(httpStatus.OK)
         .send("Successfully logged out")
