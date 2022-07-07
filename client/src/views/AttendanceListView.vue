@@ -82,19 +82,18 @@ export default {
     GroupInfo
   },
   methods: {
-
-
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
       if (this.selectedGroup.name !== "No group selected") {
+        
+        /*
         if(typeof this.attended.participants !== 'undefined'){
-          console.log(this.selectedGroup.id + "\n" +  this.date + "\n" + this.attended)
-
           updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
         }
+        */
 
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         console.log(res)
