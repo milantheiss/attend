@@ -59,6 +59,11 @@ const deleteTrainingssession = catchAsync(async (req, res) => {
     res.send(result);
 });
 
+const runGarbageCollector = catchAsync(async (req, res) => {
+    const result = await attendanceService.runGarbageCollector(req.user, req.params.groupID, req.params.date, undefined)
+    res.send(result)
+})
+
 module.exports = {
     getAttendance,
     getAttendanceById,
@@ -68,6 +73,7 @@ module.exports = {
     getTrainingssession,
     getAttendanceByGroup,
     addTrainingssession,
-    deleteTrainingssession
+    deleteTrainingssession,
+    runGarbageCollector
 }
 

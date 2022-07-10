@@ -1,15 +1,22 @@
-const arr = [
+const sessionBody = {
+    participants: [
     {
-        date: new Date('2022-06-09'),
-        id: 1
+        attended: false
     },
     {
-        date: new Date('2022-06-15'),
-        id: 2
+        attended: true
     }
-]
+]}
 
-const session = arr.find(element => element.date.toJSON() === new Date('2022-06-09T00:00:00.000+00:00').toJSON())
-session.test = 'ui'
+let deleteList = true
 
-console.log(arr[1].test)
+sessionBody.participants.forEach(participant => {
+    if (participant.attended) {
+        console.log(participant.attended)
+        deleteList =  false
+    }
+})
+
+if (deleteList) {
+    console.log('delete')
+}

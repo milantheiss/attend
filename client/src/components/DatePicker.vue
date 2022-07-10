@@ -30,16 +30,16 @@ export default {
   methods: {
     newGroupSelected(){
       this.date = new Date(Date.now())
-      if (!isClosestTrainingToday(this.weekdays)){
-        this.getLastDate()
-      }else {
+      if (isClosestTrainingToday(this.weekdays)){
         this.formatedDateString = getFormatedDateString(this.date)
         this.$emit('update:modelValue', this.date)
         this.$emit('onChange')
+      }else {
+        this.getLastDate()
       }
     },
     getNextDate() {
-      if (typeof this.weekdays[0] !== 'undefined' && this.weekdays.length !== 0) {
+      if (this.weekdays[0] !== ' ' && this.weekdays.length !== 0) {
         this.date = getDateOfTraining(this.date, this.weekdays, true)
         this.formatedDateString = getFormatedDateString(this.date)
         this.$emit('update:modelValue', this.date)

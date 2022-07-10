@@ -26,19 +26,15 @@
     </div>
 
     <div>
-      <TeilnehmerItem v-for="participant in this.attended.participants" :key="participant._id"
-        :participant="participant" @onAttendedChange="(value) => attendanceChange(participant, value)" />
-      <span class="grid content-center mt-6">
-        <p v-show="attended.error === 'No data yet'"
-          class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
-      </span>
+      <TeilnehmerList :participants="this.attended.participants" :sortByFirstName="true"
+        @onAttendedChange="(value) => attendanceChange(participant, value)"></TeilnehmerList>
     </div>
   </div>
 </template>
 
 <script>
 import SelectList from "@/components/SelectList";
-import TeilnehmerItem from "@/components/TeilnehmerItem";
+import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
@@ -72,12 +68,13 @@ export default {
       date: new Date(),
       showGroups: false,
       attended: Object,
-      weekday: []
+      weekday: [],
+      oldDate: new Date()
     }
   },
   components: {
     SelectList,
-    TeilnehmerItem,
+    TeilnehmerList,
     DatePicker,
     GroupInfo
   },
@@ -88,15 +85,10 @@ export default {
 
     async pullAttendance() {
       if (this.selectedGroup.name !== "No group selected") {
-        
-        /*
-        if(typeof this.attended.participants !== 'undefined'){
-          updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
-        }
-        */
+        //In DatePicker schieben
+        //runGarbageCollector(this.selectedGroup.id, this.date)
 
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
-        console.log(res)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
           console.error("Etwas ist schief gelaufe. Dies hätte nicht passieren sollen. --> pullAttendance")
@@ -144,6 +136,9 @@ export default {
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
       document.title = this.selectedGroup.name + ' - Attend'
+    },
+    date(newVal, oldVal){
+      this.oldDate = oldVal
     }
   }
 }

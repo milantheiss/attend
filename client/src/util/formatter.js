@@ -1,5 +1,6 @@
 class Dateprocessor {
     static convertWeekdaytoNumber(dayString) {
+        console.log(dayString)
 
         const arr = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
         let i = 0
@@ -35,10 +36,10 @@ class Dateprocessor {
     }
 
     static getSoonestWeekdayInPast(referenceWeekday, weekdays) {
-
         let min = this.convertWeekdaytoNumber(weekdays[0])
         let i = 1
 
+        //QUESTION Warum wird das gemacht?
         if ((min - referenceWeekday.getDay()) === 0) {
             try {
                 min = this.convertWeekdaytoNumber(weekdays[1])
@@ -49,9 +50,11 @@ class Dateprocessor {
         }
 
         for (; i < weekdays.length; i++) {
+            console.log("For schleife")
             if (this.calculateDifferenceBackwards(weekdays[i], referenceWeekday.getDay()) > this.calculateDifferenceBackwards(min, referenceWeekday.getDay()) && this.calculateDifferenceBackwards(weekdays[i], referenceWeekday.getDay()) > 0) {
                 min = this.convertWeekdaytoNumber(weekdays[i])
             }
+            console.log("min",min)
         }
 
         return min
@@ -83,6 +86,10 @@ function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
 
     if (OfNextTraining) result.setDate(startdate.getDate() + Dateprocessor.calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
     else result.setDate(startdate.getDate() + Dateprocessor.calculateDifferenceBackwards(weekdayOfStartdate, weekdayOfTraining))
+
+    console.log(weekdayOfStartdate)
+    console.log(weekdayOfTraining)
+    console.log(Dateprocessor.calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
 
     return result
 }

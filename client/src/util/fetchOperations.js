@@ -71,6 +71,15 @@ async function deleteTrainingssession(groupID, date) {
   })).json())
 }
 
+async function runGarbageCollector(groupID, date){
+  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "runGarbageCollector", groupID, getShortenedJSONDate(date)].join('/'), {
+    method: 'PATCH',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -78,5 +87,6 @@ export {
   fetchAttendanceByDate,
   deleteTrainingssession,
   updateTrainingssession,
-  addTrainingssession
+  addTrainingssession,
+  runGarbageCollector
 }
