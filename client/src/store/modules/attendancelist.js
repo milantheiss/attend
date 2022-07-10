@@ -1,6 +1,5 @@
 const state = {
     selectedGroup: null,
-    : false
   };
   
   const getters = {
