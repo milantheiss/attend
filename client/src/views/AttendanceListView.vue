@@ -45,6 +45,8 @@ export default {
   data() {
     return {
       groups: [],
+      selectedGroup: undefined,
+      /*
       selectedGroup: {
         name: "No group selected",
         trainer: [
@@ -65,6 +67,7 @@ export default {
           name: ""
         }
       },
+      */
       date: new Date(),
       showGroups: false,
       attended: Object,
@@ -80,11 +83,17 @@ export default {
   },
   methods: {
     async updateSelectedGroup(groupID) {
+      if (typeof this.selectedGroup !== 'undefined') {
+        console.log(this.selectedGroup.id + ' ' + this.date)
+        //runGarbageCollector(this.selectedGroup._id, this.date)
+      }
       this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
-      if (this.selectedGroup.name !== "No group selected") {
+      //if (this.selectedGroup.name !== "No group selected") {
+      if (typeof this.selectedGroup !== 'undefined') {
+        console.log(this.selectedGroup)
         //In DatePicker schieben
         //runGarbageCollector(this.selectedGroup.id, this.date)
 
@@ -137,7 +146,7 @@ export default {
       this.$refs.datePicker.newGroupSelected()
       document.title = this.selectedGroup.name + ' - Attend'
     },
-    date(newVal, oldVal){
+    date(newVal, oldVal) {
       this.oldDate = oldVal
     }
   }

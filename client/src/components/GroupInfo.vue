@@ -4,8 +4,8 @@
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Abteilung:</p>
       </div>
-      <div>
-        <p class="text-base md:text-lg text-right" >{{group.department.name}}</p>
+      <div v-if="typeof group !== 'undefined'">
+        <p class="text-base md:text-lg text-right">{{group.department.name}}</p>
       </div>
     </div>
 
@@ -13,7 +13,7 @@
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Trainer:</p>
       </div>
-      <div>
+      <div v-if="typeof group !== 'undefined'" >
         <p class="text-base md:text-lg text-right" :key="group.trainer.name">{{ group.trainer.name }}</p>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Assistent:</p>
       </div>
-      <div>
+      <div v-if="typeof group !== 'undefined'">
         <p class="text-base md:text-lg text-right" v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
       </div>
     </div>
@@ -30,8 +30,8 @@
     <div class="grid grid-cols-2">
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Zeiten:</p>
-      </div>
-      <div>
+      </div >
+      <div v-if="typeof group !== 'undefined'">
         <p class="text-base md:text-lg text-right" v-for="time in group.times" :key="time">{{getTime(time)}}</p>
       </div>
     </div>
@@ -40,7 +40,7 @@
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Sportstätte:</p>
       </div>
-      <div>
+      <div v-if="typeof group !== 'undefined'">
         <p class="text-base md:text-lg text-right" :key="group.venue">{{ group.venue }}</p>
       </div>
     </div>

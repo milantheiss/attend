@@ -1,5 +1,7 @@
 const state = {
     selectedGroup: null,
+    date: Date.now(),
+    attendedList: undefined
   };
   
   const getters = {
