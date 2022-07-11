@@ -72,8 +72,8 @@ async function deleteTrainingssession(groupID, date) {
 }
 
 async function runGarbageCollector(groupID, date){
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "runGarbageCollector", groupID, getShortenedJSONDate(date)].join('/'), {
-    method: 'PATCH',
+  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/runGarbageCollector", groupID, getShortenedJSONDate(date)].join('/'), {
+    method: 'POST',
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
     credentials: 'include',
     mode: 'cors'

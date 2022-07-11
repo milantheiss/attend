@@ -27,18 +27,19 @@
 
     <div>
       <TeilnehmerList :participants="this.attended.participants" :sortByFirstName="true"
-        @onAttendedChange="(value) => attendanceChange(participant, value)"></TeilnehmerList>
+        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
     </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable no-unused-vars */
+
 import SelectList from "@/components/SelectList";
 import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
-//import axios from "axios";
+import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession, runGarbageCollector } from '@/util/fetchOperations'
 
 export default {
   name: "AttendanceListView",
@@ -71,8 +72,7 @@ export default {
       date: new Date(),
       showGroups: false,
       attended: Object,
-      weekday: [],
-      oldDate: new Date()
+      weekday: []
     }
   },
   components: {
@@ -84,19 +84,16 @@ export default {
   methods: {
     async updateSelectedGroup(groupID) {
       if (typeof this.selectedGroup !== 'undefined') {
-        console.log(this.selectedGroup.id + ' ' + this.date)
-        //runGarbageCollector(this.selectedGroup._id, this.date)
+        runGarbageCollector(this.selectedGroup.id, this.date)
       }
       this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
-      //if (this.selectedGroup.name !== "No group selected") {
       if (typeof this.selectedGroup !== 'undefined') {
-        console.log(this.selectedGroup)
-        //In DatePicker schieben
-        //runGarbageCollector(this.selectedGroup.id, this.date)
-
+        if (typeof this.attended.participants !== 'undefined') {
+          await runGarbageCollector(this.selectedGroup.id, this.date)
+        }
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
@@ -104,13 +101,11 @@ export default {
         } else {
           this.attended = await res
         }
-      } else {
-        this.attended = { error: "No data yet" }
       }
     },
 
-    attendanceChange(participant, newVal) {
-      (this.attended.participants.find(foo => foo._id == participant._id)).attended = newVal
+    attendanceChange(id, newVal) {
+      (this.attended.participants.find(foo => foo._id == id)).attended = newVal
 
       updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
@@ -145,9 +140,6 @@ export default {
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
       document.title = this.selectedGroup.name + ' - Attend'
-    },
-    date(newVal, oldVal) {
-      this.oldDate = oldVal
     }
   }
 }

@@ -31,7 +31,7 @@ router
 
 router
     .route('/runGarbageCollector/:groupID/:date')
-    .patch(verifyToken, attendanceController.runGarbageCollector)
+    .post(verifyToken, attendanceController.runGarbageCollector)
 //TODO Add patch & post to attendancebygroup
 
 module.exports = router;

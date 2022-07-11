@@ -26,7 +26,7 @@ export default {
   methods: {
     onClick() {
       this.activated = !this.activated
-      this.$emit('onAttendedChange', this.activated)
+      this.$emit('onAttendedChange', this.participant._id, this.activated)
     },
   },
   watch: {

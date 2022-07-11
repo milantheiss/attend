@@ -25,7 +25,7 @@ const createAttendance = catchAsync(async (req, res) => {
 
 const updateTrainingssession = catchAsync(async (req, res) => {
     const result = await attendanceService.updateTrainingssession(req.user, req.params.groupID, req.params.date, req.body);
-    logger.debug(`UPDATED - attendance list by id: ${req.params.attendanceID}`)
+    logger.debug(`UPDATED - attendance list by groupid: ${req.params.attendanceID}`)
     res.send(result);
 });
 

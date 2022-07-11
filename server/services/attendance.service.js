@@ -61,7 +61,8 @@ const getTrainingssession = async (user, groupID, date) => {
     if (typeof session !== 'undefined') {
         return session
     } else {
-        //TODO Add Trainingssession hier
+        //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
+        //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
         let formated = []
 
@@ -81,7 +82,6 @@ const getTrainingssession = async (user, groupID, date) => {
             participants: formated
         }
 
-        addTrainingssession(user, groupID, sessionBody)
         return sessionBody
     }
 };
@@ -198,13 +198,12 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
         //Itariert durch Participants. Wenn min 1 Teilnehmer teilgenommen hat wird die Liste nicht gelösct
         sessionBody.participants.forEach(participant => {
             if (participant.attended) {
-                console.log(participant.attended)
                 deleteList = false
             }
         })
 
         if (deleteList) {
-            logger.debug('Garbage Collector - Trainingssession: Collected a Trainingssession')
+            logger.debug('Garbage Collector - Trainingssession: Deleted a trainingssession')
             return deleteTrainingssession(user, groupID, date)
         }
         logger.debug('Garbage Collector - Trainingssession: No trainingssession deleted')
