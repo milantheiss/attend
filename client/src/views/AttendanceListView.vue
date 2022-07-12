@@ -26,29 +26,28 @@
     </div>
 
     <div>
-      <TeilnehmerItem v-for="participant in this.attended.participants" :key="participant._id"
-        :participant="participant" @onAttendedChange="(value) => attendanceChange(participant, value)" />
-      <span class="grid content-center mt-6">
-        <p v-show="attended.error === 'No data yet'"
-          class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
-      </span>
+      <TeilnehmerList :participants="this.attended.participants" :sortByFirstName="true"
+        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
     </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable no-unused-vars */
+
 import SelectList from "@/components/SelectList";
-import TeilnehmerItem from "@/components/TeilnehmerItem";
+import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
-//import axios from "axios";
+import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession, runGarbageCollector } from '@/util/fetchOperations'
 
 export default {
   name: "AttendanceListView",
   data() {
     return {
       groups: [],
+      selectedGroup: undefined,
+      /*
       selectedGroup: {
         name: "No group selected",
         trainer: [
@@ -69,6 +68,7 @@ export default {
           name: ""
         }
       },
+      */
       date: new Date(),
       showGroups: false,
       attended: Object,
@@ -77,39 +77,35 @@ export default {
   },
   components: {
     SelectList,
-    TeilnehmerItem,
+    TeilnehmerList,
     DatePicker,
     GroupInfo
   },
   methods: {
     async updateSelectedGroup(groupID) {
+      if (typeof this.selectedGroup !== 'undefined') {
+        runGarbageCollector(this.selectedGroup.id, this.date)
+      }
       this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
-      if (this.selectedGroup.name !== "No group selected") {
-        
-        /*
-        if(typeof this.attended.participants !== 'undefined'){
-          updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      if (typeof this.selectedGroup !== 'undefined') {
+        if (typeof this.attended.participants !== 'undefined') {
+          await runGarbageCollector(this.selectedGroup.id, this.date)
         }
-        */
-
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
-        console.log(res)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
           console.error("Etwas ist schief gelaufe. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
         }
-      } else {
-        this.attended = { error: "No data yet" }
       }
     },
 
-    attendanceChange(participant, newVal) {
-      (this.attended.participants.find(foo => foo._id == participant._id)).attended = newVal
+    attendanceChange(id, newVal) {
+      (this.attended.participants.find(foo => foo._id == id)).attended = newVal
 
       updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },

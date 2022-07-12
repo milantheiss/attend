@@ -29,6 +29,9 @@ router
     .patch(verifyToken, attendanceController.updateTrainingssession)
     .delete(verifyToken, attendanceController.deleteTrainingssession)
 
+router
+    .route('/runGarbageCollector/:groupID/:date')
+    .post(verifyToken, attendanceController.runGarbageCollector)
 //TODO Add patch & post to attendancebygroup
 
 module.exports = router;
