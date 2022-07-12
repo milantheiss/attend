@@ -151,8 +151,6 @@ const addTrainingssession = async (user, groupID, sessionBody) => {
 const updateTrainingssession = async (user, groupID, date, sessionBody) => {
     const session = await getTrainingssession(user, groupID, date)
 
-    console.log(session._id)
-
     //Gleicht updated SessionBody mit session in DB ab
     sessionBody.participants.forEach(participant => {
         const temp = session.participants.find(foo => foo._id == participant._id)
@@ -165,19 +163,15 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
         }
     })
 
-    runGarbageCollector(user, groupID, date, sessionBody)
-
     if (user.role === 'admin') {
         let att
         if(typeof session._id === 'undefined'){
-            att = await addTrainingssession(user, groupID, session)
-        } else{
-            att = await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
+            return(addTrainingssession(user, groupID, session))
+        } else if (await !runGarbageCollector(user, groupID, date, sessionBody)){
+            return(Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }))
+        }else{
+            return{}
         }
-                
-        console.log(att)
-
-        return att
     } else if (user.role === 'trainer') {
         if (user.accessible_groups.includes(groupID)) {
             return Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
@@ -196,11 +190,10 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
  * @param {*} groupID 
  * @param {*} date 
  * @param {*} sessionBody 
- * @returns 
+ * @returns {Boolean} 
  */
 const runGarbageCollector = async (user, groupID, date, sessionBody = undefined) => {
     if (typeof sessionBody === 'undefined') {
-        console.log("Client Triggered Collerctor")
         sessionBody = await getTrainingssession(user, groupID, date)
     }
 
@@ -216,9 +209,11 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
 
         if (deleteList) {
             logger.debug('Garbage Collector - Trainingssession: Deleted a trainingssession')
-            return deleteTrainingssession(user, groupID, date)
+            deleteTrainingssession(user, groupID, date)
+            return true
         }
         logger.debug('Garbage Collector - Trainingssession: No trainingssession deleted')
+        return false
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }

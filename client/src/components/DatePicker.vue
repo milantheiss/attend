@@ -56,7 +56,6 @@ export default {
         this.formatedDateString = getFormatedDateString(this.date)
         this.$emit('update:modelValue', this.date)
         this.$emit('onChange')
-        console.log(this.date)
       }
     },
     getLastDate() {
