@@ -61,6 +61,19 @@ const createGroup = async (user, groupBody) => {
     }
 };
 
+/**
+ * Add members to Group Participants
+ * @param {Object} groupBody
+ * @returns {Promise<Group>}
+ */
+ const addMember = async (user,groupId, body) => {
+    if (user.role === 'admin') { 
+        return Group.findOneAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } })
+    }else {
+        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
+    }
+};
+
 //WARNING No Auth implemented
 /*
 
@@ -134,4 +147,5 @@ module.exports = {
     getGroupById,
     getGroups,
     createGroup,
+    addMember
 };

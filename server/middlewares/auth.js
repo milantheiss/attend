@@ -47,7 +47,7 @@ const verifyToken = async (req, res, next) => {
     }
   } catch (err) {
     logger.error(err.toString())
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
+    return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 };
 
