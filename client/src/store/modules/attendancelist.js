@@ -1,24 +1,14 @@
 const state = {
-    selectedGroup: null,
-    date: Date.now(),
-    attendedList: undefined
-  };
-  
-  const getters = {
-  };
-  
-  const actions = {
-    
-  };
-  
-  const mutations = {
-    
-  };
-  
-  export default {
-    state,
-    getters,
-    actions,
-    mutations,
-  };
-  
+  selectedGroupID: undefined
+};
+
+const mutations = {
+  setSelectedGroupID(state, id) {
+    state.selectedGroupID = id;
+  },
+}
+
+export default {
+  state,
+  mutations
+};

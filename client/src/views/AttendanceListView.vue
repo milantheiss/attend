@@ -33,13 +33,11 @@
 </template>
 
 <script>
-/* eslint-disable no-unused-vars */
-
 import SelectList from "@/components/SelectList";
 import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession, runGarbageCollector } from '@/util/fetchOperations'
+import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 
 export default {
   name: "AttendanceListView",
@@ -47,28 +45,6 @@ export default {
     return {
       groups: [],
       selectedGroup: undefined,
-      /*
-      selectedGroup: {
-        name: "No group selected",
-        trainer: [
-          {
-            name: ""
-          }
-        ],
-        assistent: [
-          {
-            name: ""
-          }
-        ],
-        times: [{
-          day: ""
-        }],
-        venue: "",
-        department: {
-          name: ""
-        }
-      },
-      */
       date: new Date(),
       showGroups: false,
       attended: Object,
@@ -82,18 +58,13 @@ export default {
     GroupInfo
   },
   methods: {
+
     async updateSelectedGroup(groupID) {
-      if (typeof this.selectedGroup !== 'undefined') {
-        runGarbageCollector(this.selectedGroup.id, this.date)
-      }
       this.selectedGroup = await fetchGroup(groupID)
     },
 
     async pullAttendance() {
       if (typeof this.selectedGroup !== 'undefined') {
-        if (typeof this.attended.participants !== 'undefined') {
-          await runGarbageCollector(this.selectedGroup.id, this.date)
-        }
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
@@ -107,6 +78,7 @@ export default {
     attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
 
+      console.log(JSON.stringify(this.attended))
       updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 
@@ -139,6 +111,7 @@ export default {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
+      this.$store.commit("setSelectedGroupID",this.selectedGroup.id)
       document.title = this.selectedGroup.name + ' - Attend'
     }
   }

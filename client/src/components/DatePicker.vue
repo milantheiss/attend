@@ -16,6 +16,7 @@
 
 <script>
 import { getDateOfTraining, getFormatedDateString, isClosestTrainingToday } from "@/util/formatter";
+import { runGarbageCollector } from '@/util/fetchOperations'
 
 export default {
   name: "DatePicker",
@@ -33,6 +34,9 @@ export default {
   methods: {
     newGroupSelected() {
       if (typeof this.weekdays !== 'undefined') {
+        if (typeof this.$store.state.attendancelist.selectedGroupID !== 'undefined') {
+          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, this.date)
+        }
         this.date = new Date(Date.now())
         if (isClosestTrainingToday(this.weekdays)) {
           this.formatedDateString = getFormatedDateString(this.date)
@@ -45,7 +49,9 @@ export default {
     },
     getNextDate() {
       if (typeof this.weekdays !== 'undefined') {
-        console.log(this.weekdays)
+        if (typeof this.$store.state.attendancelist.selectedGroupID !== 'undefined') {
+          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, this.date)
+        }
         this.date = getDateOfTraining(this.date, this.weekdays, true)
         this.formatedDateString = getFormatedDateString(this.date)
         this.$emit('update:modelValue', this.date)
@@ -55,6 +61,9 @@ export default {
     },
     getLastDate() {
       if (typeof this.weekdays !== 'undefined') {
+        if (typeof this.$store.state.attendancelist.selectedGroupID !== 'undefined') {
+          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, this.date)
+        }
         this.date = getDateOfTraining(this.date, this.weekdays, false)
         this.formatedDateString = getFormatedDateString(this.date)
         this.$emit('update:modelValue', this.date)

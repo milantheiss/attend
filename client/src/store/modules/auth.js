@@ -7,8 +7,7 @@ const state = {
 };
 
 const getters = {
-  isAuthenticated: (state) => state.authenticated,
-  StateUser: (state) => state.user,
+  isAuthenticated: (state) => state.authenticated
 };
 
 const actions = {
@@ -31,9 +30,6 @@ const actions = {
 
     await commit('setAuthenticated', res.status === 200)
     res = await res.json()
-
-    //Set Cookie in Client damit ios es nicht löscht
-    //vueCookie.set("access_t", res.access_token, '10min', secure = true, sameSite = true)
 
     await commit("setUser", {username: res.username, user_id: res.user_id});
   },
