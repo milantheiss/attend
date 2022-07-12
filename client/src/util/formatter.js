@@ -87,8 +87,6 @@ function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
     if (OfNextTraining) result.setDate(startdate.getDate() + Dateprocessor.calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
     else result.setDate(startdate.getDate() + Dateprocessor.calculateDifferenceBackwards(weekdayOfStartdate, weekdayOfTraining))
 
-    console.log(weekdayOfStartdate)
-    console.log(weekdayOfTraining)
     console.log(Dateprocessor.calculateDifferenceForwards(weekdayOfStartdate, weekdayOfTraining))
 
     return result
