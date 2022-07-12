@@ -26,7 +26,7 @@
     </div>
 
     <div>
-      <TeilnehmerList :participants="this.attended.participants" :sortByFirstName="true"
+      <TeilnehmerList :participants="this.attended.participants" :sortByFirstName="false"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
     </div>
   </div>
