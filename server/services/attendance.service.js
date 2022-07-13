@@ -164,19 +164,20 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
     })
 
     if (user.role === 'admin') {
-        let att
-        if(typeof session._id === 'undefined'){
-            return(addTrainingssession(user, groupID, session))
-        } else if (await !runGarbageCollector(user, groupID, date, sessionBody)){
-            return(Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }))
-        }else{
-            return{}
+        if (typeof session._id === 'undefined') {
+            return await addTrainingssession(user, groupID, session)
+        } else if (!(await runGarbageCollector(user, groupID, date, sessionBody))) {
+            return (Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }))
+        } else {
+            return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Unknown Error')
         }
     } else if (user.role === 'trainer') {
-        if (user.accessible_groups.includes(groupID)) {
+        if (typeof session._id === 'undefined') {
+            return await addTrainingssession(user, groupID, session)
+        } else if (!(await runGarbageCollector(user, groupID, date, sessionBody)) && user.accessible_groups.includes(groupID)) {
             return Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
         } else {
-            throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to update this trainingssession")
+            return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Unknown Error')
         }
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
