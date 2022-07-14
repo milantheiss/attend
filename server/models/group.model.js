@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const {toJSON, paginate} = require('./plugins')
-const {Schema} = require("mongoose");
+const { toJSON, paginate } = require('./plugins')
+const { Schema } = require("mongoose");
 
 const groupSchema = mongoose.Schema(
     {
@@ -31,13 +31,15 @@ const groupSchema = mongoose.Schema(
             required: false,
         },
         trainer: {
-            type: {
-                name: {
-                    type: String,
-                    required: true,
-                    trim: true
+            type: [
+                {
+                    name: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    }
                 }
-            },
+            ],
             required: true
         },
         assistent: {

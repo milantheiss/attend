@@ -53,10 +53,19 @@ const getRefreshTokenSecret = async (userID, token_id) => {
     return secret
 }
 
+const updateUser = async(userID, body) => {
+    return User.findByIdAndUpdate(userID, body)
+}
+
+const deleteUser = async(userID) => {
+    return User.findByIdAndDelete(userID)
+}
+
 module.exports = {
     getUserByUsername,
     getUserById,
     addRefreshToken,
     deleteRefreshToken,
-    getRefreshTokenSecret
+    getRefreshTokenSecret,
+    updateUser
 };
