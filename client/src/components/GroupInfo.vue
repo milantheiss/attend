@@ -1,47 +1,52 @@
 <template>
   <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md">
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2" v-if="typeof group.department.name !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Abteilung:</p>
       </div>
-      <div v-if="typeof group !== 'undefined'">
-        <p class="text-base md:text-lg text-right" :class="group.trainer.name === '. . .' ? 'pr-0.5' : ''">{{group.department.name}}</p>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''">
+          {{ group.department.name }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2" v-if="group.trainer.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Trainer:</p>
       </div>
-      <div v-if="typeof group !== 'undefined'" >
-        <p class="text-base text-right md:text-lg" :class="group.trainer.name === '. . .' ? 'pr-0.5' : ''" :key="group.trainer.name">{{ group.trainer.name }}</p>
+      <div>
+        <p class="text-base text-right md:text-lg" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="trainer in group.trainer" :key="trainer.name">{{ trainer.name }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-2">
-      <div>
+    <div class="grid grid-cols-2" v-if="group.assistent.length !== 0">
+      <div >
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Assistent:</p>
       </div>
-      <div v-if="typeof group !== 'undefined'">
-        <p class="text-base md:text-lg text-right" :class="group.trainer.name === '. . .' ? 'pr-0.5' : ''" v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2" v-if="group.times.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Zeiten:</p>
-      </div >
-      <div v-if="typeof group !== 'undefined'">
-        <p class="text-base md:text-lg text-right" :class="group.trainer.name === '. . .' ? 'pr-0.5' : ''" v-for="time in group.times" :key="time">{{getTime(time)}}</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="time in group.times" :key="time">{{ getTime(time) }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2" v-if="typeof group.venue !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-normal text-base md:text-lg">Sportstätte:</p>
       </div>
-      <div v-if="typeof group !== 'undefined'">
-        <p class="text-base md:text-lg text-right" :class="group.trainer.name === '. . .' ? 'pr-0.5' : ''" :key="group.venue">{{ group.venue }}</p>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          :key="group.venue">{{ group.venue }}</p>
       </div>
     </div>
   </div>
@@ -55,32 +60,33 @@ export default {
       type: Object,
       default() {
         return {
-        trainer: 
-          {
+          trainer:
+            [
+              {
+                name: ". . ."
+              }
+            ]
+          ,
+          assistent: [
+            {
+              name: ". . ."
+            }
+          ],
+          times: [{
+            day: ". . ."
+          }],
+          venue: ". . .",
+          department: {
             name: ". . ."
           }
-        ,
-        assistent: [
-          {
-            name: ". . ."
-          }
-        ],
-        times: [{
-          day: ". . ."
-        }],
-        venue: ". . .",
-        department: {
-          name: ". . ."
-        }
         }
       },
       required: true,
     }
   },
   methods: {
-    getTime(time){
-      if(time.day !== ". . .")
-      {
+    getTime(time) {
+      if (time.day !== ". . .") {
         let shortendday = time.day.charAt(0) + time.day.charAt(1) + "."
         let concattimes = time.starttime + " - " + time.endtime + " Uhr"
         return [shortendday, concattimes].join(' ')
@@ -89,10 +95,9 @@ export default {
         return ". . ."
       }
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
-
 </style>
