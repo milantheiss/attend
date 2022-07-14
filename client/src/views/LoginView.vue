@@ -1,18 +1,18 @@
-<template>
-  <div class="login">
-    <div>
-      <form @submit.prevent="submit">
-        <div>
-          <label for="username">Username:</label>
-          <input type="text" name="username" v-model="form.username" />
+<template >
+  <div class="flex justify-center mt-10">
+    <div class="bg-white px-8 py-4 rounded-lg drop-shadow-md md:w-1/3 ">
+      <form @submit.prevent="submit" class="grid grid-rows-3 grid-col-2">
+        <div class="row-start-1 flex items-center mb-3">
+          <img :src="'./img/avatar-icon.svg'" alt="key icon" class="w-5 mr-3"/>
+          <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey" type="text" name="username" v-model="form.username" placeholder="Username"/>
         </div>
-        <div>
-          <label for="password">Password:</label>
-          <input type="password" name="password" v-model="form.password" />
+        <div class="row-start-2 flex items-center mb-3">
+          <img :src="'./img/key-icon.svg'" alt="key icon" class="w-5 mr-3"/>
+          <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey" type="password" name="password" v-model="form.password" placeholder="Passwort"/>
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" class="row-start-3">Submit</button>
+        <p v-if="showError" id="error" class="row-start-3">Username or Password is incorrect</p>
       </form>
-      <p v-if="showError" id="error">Username or Password is incorrect</p>
     </div>
   </div>
 </template>
