@@ -1,18 +1,20 @@
-<template>
-  <div class="login">
-    <div>
-      <form @submit.prevent="submit">
-        <div>
-          <label for="username">Username:</label>
-          <input type="text" name="username" v-model="form.username" />
+<template >
+  <div class="flex justify-center mt-10 mx-4">
+    <div class="bg-white px-8 py-6 rounded-lg drop-shadow-md md:w-120 sm:w-96">
+      <form @submit.prevent="submit" class="place-items-center text-lg">
+        <div class="flex items-center mb-6 w-full md:px-4">
+          <img :src="'./img/avatar-icon.svg'" alt="key icon" class="w-6 mr-4"/>
+          <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full" type="text" name="username" v-model="form.username" placeholder="Username"/>
         </div>
-        <div>
-          <label for="password">Password:</label>
-          <input type="password" name="password" v-model="form.password" />
+        <div class="flex items-center w-full md:px-4">
+          <img :src="'./img/key-icon.svg'" alt="key icon" class="w-6 mr-4"/>
+          <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full" type="password" name="password" v-model="form.password" placeholder="Passwort"/>
         </div>
-        <button type="submit">Submit</button>
+        <div class="grid grid-rows-2 place-items-center text-lg"> 
+          <p v-show="showError" class="text-special-red text-base place-self-end mr-4">Username oder Passwort ist falsch!</p>
+          <button type="submit" :class="showError ? 'mt-2' : 'mt-5 row-start-1 row-span-2'" class="text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-1.5 md:py-2 rounded-lg drop-shadow-md font-medium place-self-end md:mr-4">Login</button>
+        </div>
       </form>
-      <p v-if="showError" id="error">Username or Password is incorrect</p>
     </div>
   </div>
 </template>

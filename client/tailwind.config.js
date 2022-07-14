@@ -19,13 +19,16 @@ module.exports = {
         'unchecked-gradient-2': '#D3D0E4',
         'dimmed-gradient-1': '#98A4CD',
         'dimmed-gradient-2': '#7C83C3',
-        'background-greywhite': '#FBFCFF'
+        'background-greywhite': '#FBFCFF',
+        'dark-grey': '#464646',
+        'special-red': '#FF1F28FF'
       },
       fontFamily:{
         'ubuntu': ['Ubuntu', 'sans-serif']
       },
       spacing:{
-        '160': '40rem'
+        '160': '40rem',
+        '120': '30rem'
       }
     },
   },
