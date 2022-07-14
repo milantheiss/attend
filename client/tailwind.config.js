@@ -26,7 +26,8 @@ module.exports = {
         'ubuntu': ['Ubuntu', 'sans-serif']
       },
       spacing:{
-        '160': '40rem'
+        '160': '40rem',
+        '120': '30rem'
       }
     },
   },
