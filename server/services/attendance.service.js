@@ -50,7 +50,7 @@ const getAttendanceById = async (user, id) => {
  * Get a attendance list by groupID & date.
  * @param {ObjectID} groupID ID of the searched group
  * @param {Date} date Date of the searched attendance list
- * @returns {Promise<Attendance>}
+ * @returns {Promise<Attendance>}   
  */
 const getTrainingssession = async (user, groupID, date) => {
     //INFO Access controle wird von 'getAttendanceByGroup' gehandelt

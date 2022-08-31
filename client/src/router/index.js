@@ -22,6 +22,11 @@ const routes = [
     path: '/logout',
     name: 'Logout',
     component: () => import('../views/LogoutView.vue'),
+  },
+  {
+    path: '/pdf',
+    name: 'PDF',
+    component: () => import('../views/PdfTest.vue'),
   }
 ]
 
