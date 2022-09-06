@@ -6,80 +6,12 @@
   
 <script>
 import {createListe} from "@/util/generatePdf"
+import {fetchAttendanceByDateRange} from '@/util/fetchOperations'
 
 export default {
     name: "PdfTest",
     data() {
         return {
-            testListe: {
-                dates: [
-                    new Date("2022-08-15T00:00:00.000Z"),
-                    new Date("2022-08-18T00:00:00.000Z"),
-                    new Date("2022-08-22T00:00:00.000Z")
-                ],
-                participants: [
-                    {
-                        _id: 4,
-                        firstname: 'Anna',
-                        lastname: 'Aschilles',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    },
-                    {
-                        _id: 2,
-                        firstname: 'Lynn',
-                        lastname: 'Feuerbach',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    },
-                    {
-                        _id: 6,
-                        firstname: 'Johanna',
-                        lastname: 'Habenicht',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    },
-                    {
-                        _id: 1,
-                        firstname: 'Paula',
-                        lastname: 'Reichert',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    },
-                    {
-                        _id: 3,
-                        firstname: 'Marlene',
-                        lastname: 'Rübsamen',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    },
-                    {
-                        _id: 5,
-                        firstname: 'Mia',
-                        lastname: 'van der Linden',
-                        attendence: [
-                            { date: new Date("2022-08-15T00:00:00.000Z"), attended: true },
-                            { date: new Date("2022-08-22T00:00:00.000Z"), attended: false },
-                            { date: new Date("2022-08-18T00:00:00.000Z"), attended: true }
-                        ]
-                    }
-                ]
-            },
             group: {
                 name: "LA U12",
                 participants: [
@@ -148,7 +80,7 @@ export default {
     },
     async created() {
         console.log("Creating PDF...")
-        await createListe(this.group, this.testListe, 'liste.pdf')
+        await createListe(this.group, await fetchAttendanceByDateRange("62a2022bc0176cd5bb8cfe80", new Date('2022-08-01'), new Date('2022-08-31')), 'liste.pdf')
     }
 };
 </script>

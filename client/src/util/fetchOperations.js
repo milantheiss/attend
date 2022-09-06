@@ -80,6 +80,15 @@ async function runGarbageCollector(groupID, date){
   })).json())
 }
 
+async function fetchAttendanceByDateRange(groupID, startdate, enddate){
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join('/'), {
+    method: 'GET',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -88,5 +97,6 @@ export {
   deleteTrainingssession,
   updateTrainingssession,
   addTrainingssession,
-  runGarbageCollector
+  runGarbageCollector,
+  fetchAttendanceByDateRange
 }
