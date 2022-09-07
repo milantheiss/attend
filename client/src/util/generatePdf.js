@@ -150,15 +150,20 @@ function generateParticipantRows(doc, dates, participants) {
 }
 
 function generateAttendanceBox(doc, dates, participant) {
+  console.log(participant)
   //TODO Bug hier?
   let xPos = 249.89
   for (let i = 0; i < dates.length; i++) {
     dates[i] = new Date(dates[i])
     const temp = participant.attendence.find(foo => {
       foo.date = new Date(foo.date)
-      foo.date.toJSON() === dates[i].toJSON()
-      return foo
+      if (foo.date.toJSON() === dates[i].toJSON()){
+        return foo
+      }
+      
     })
+    
+    console.log(temp)
 
     if (typeof temp === 'undefined') {
       doc

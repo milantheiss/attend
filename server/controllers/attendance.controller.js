@@ -98,9 +98,7 @@ const getFormattedList = catchAsync(async (req, res) => {
 
   tempList.dates.sort((a, b) => a - b)
   tempList.participants.sort((a, b) => a.lastname.localeCompare(b.lastname))
-
-  console.log(tempList.participants[1])
-
+  
   res.send(tempList)
 })
 

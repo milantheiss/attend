@@ -80,7 +80,9 @@ export default {
     },
     async created() {
         console.log("Creating PDF...")
-        await createListe(this.group, await fetchAttendanceByDateRange("62a2022bc0176cd5bb8cfe80", new Date('2022-08-01'), new Date('2022-08-31')), 'liste.pdf')
+        const attendancelist = await fetchAttendanceByDateRange("62a2022bc0176cd5bb8cfe80", new Date('2022-08-01'), new Date('2022-08-31'))
+        console.log(attendancelist)
+        await createListe(this.group, attendancelist, 'liste.pdf')
     }
 };
 </script>
