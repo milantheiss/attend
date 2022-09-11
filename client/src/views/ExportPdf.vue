@@ -1,16 +1,29 @@
 <template>
-    <div>
-        <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-            :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl" />
-        <label for="filename">Dateiname:</label>
-        <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full" type="text" name="filename"
-            v-model="filename" :placeholder="filename" />
-        <label for="startdate">Anfang:</label>
-        <input type="date" v-model="startdate" name="startdate" />
-        <label for="enddate">Ende:</label>
-        <input type="date" v-model="enddate" name="enddate" />
+    <div class="relative container mx-auto p-6 md:max-w-medium-width">
+        <div class="bg-white px-5 py-3 rounded-lg drop-shadow-md">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
+                <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
+                    :options="this.groups" class="bg-background-white font-bold text-xl md:text-2xl" />
+            </div>
+            <div class="flex items-center justify-between mb-4">
+                <label for="filename" class="text-gray-700 font-lighttext-base md:text-lg">Dateiname:</label>
+                <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-base md:text-lg" type="text" name="filename"
+                    v-model="filename" :placeholder="filename" />
+            </div>
+            <div class="flex items-center justify-between mb-4">
+                <label for="startdate" class="text-gray-700 font-lighttext-base md:text-lg">Anfang:</label>
+                <input type="date" v-model="startdate" name="startdate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
+            </div>
+
+            <div class="flex items-center justify-between mb-4">
+                <label for="enddate" class="text-gray-700 font-lighttext-base md:text-lg">Ende:</label>
+                <input type="date" v-model="enddate" name="enddate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
+            </div>
+        </div>
+
         <button @click="exportPDF"
-            class="text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+            class="flex items-center mx-auto mt-5 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-1.5 md:py-2 rounded-lg drop-shadow-md">
             <p class="font-medium font-base md:text-lg">Exportieren</p>
         </button>
     </div>

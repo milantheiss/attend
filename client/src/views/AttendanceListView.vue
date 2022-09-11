@@ -60,6 +60,7 @@ export default {
   methods: {
 
     async updateSelectedGroup(groupID) {
+      console.log(groupID)
       this.selectedGroup = await fetchGroup(groupID)
     },
 

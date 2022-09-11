@@ -26,7 +26,7 @@ const getGroups = async (user) => {
             for(const group of groups){
                 
                 shortenedList.push({
-                    _id: group._id,
+                    id: group._id,
                     name: group.name
                 })
             }
