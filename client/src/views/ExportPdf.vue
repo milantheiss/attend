@@ -7,17 +7,17 @@
                     :options="this.groups" class="bg-background-white font-bold text-xl md:text-2xl" />
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="filename" class="text-gray-700 font-lighttext-base md:text-lg">Dateiname:</label>
+                <label for="filename" class="text-gray-700 font-light text-base md:text-lg">Dateiname:</label>
                 <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-base md:text-lg" type="text" name="filename"
                     v-model="filename" :placeholder="filename" />
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="startdate" class="text-gray-700 font-lighttext-base md:text-lg">Anfang:</label>
+                <label for="startdate" class="text-gray-700 font-light text-base md:text-lg">Anfang:</label>
                 <input type="date" v-model="startdate" name="startdate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <label for="enddate" class="text-gray-700 font-lighttext-base md:text-lg">Ende:</label>
+                <label for="enddate" class="text-gray-700 font-light text-base md:text-lg">Ende:</label>
                 <input type="date" v-model="enddate" name="enddate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
             </div>
         </div>
@@ -76,6 +76,7 @@ export default {
         
         */
         document.title = 'Wähle eine Gruppe - Attend'
+        this.$store.commit("setViewname","Liste exportieren")
     },
     watch: {
         selectedGroup() {

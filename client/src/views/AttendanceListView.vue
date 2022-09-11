@@ -9,7 +9,7 @@
         class="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-lg drop-shadow-md">
         <span class="flex items-center w-6 mr-3">
           <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mx-auto" v-show="!showGroups">
-          <img :src="'./img/x-icon.svg'" alt="x icon" class="w-3.5 mx-auto" v-show="showGroups">
+          <img :src="'./img/x-icon-white.svg'" alt="x icon" class="w-3.5 mx-auto" v-show="showGroups">
         </span>
         <p class="font-medium font-base md:text-lg">Gruppeninfo</p>
       </button>
@@ -105,6 +105,7 @@ export default {
     this.groups = await fetchGroups()
     await this.pullAttendance()
     document.title = 'Wähle eine Gruppe'
+    this.$store.commit("setViewname","Anwesenheitsliste")
   },
   watch: {
     selectedGroup() {
