@@ -14,12 +14,24 @@ const getGroups = async (user) => {
     } else if (user.role === 'trainer') { //Oder z.B. Assistent
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         const groups = await Group.find({'_id': { $in: user.accessible_groups}})
-    
+
         if(!groups.length){
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
         } else {
-            return groups
+            //Es werden nur der Name und die ID der zugreifbaren Gruppen zurückgegeben. 
+
+            let shortenedList = []
+
+            for(const group of groups){
+                
+                shortenedList.push({
+                    _id: group._id,
+                    name: group.name
+                })
+            }
+
+            return shortenedList
         }
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to groups")
@@ -73,6 +85,21 @@ const createGroup = async (user, groupBody) => {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
 };
+
+/**
+ * Get a group by ID and return only info.
+ * @param {ObjectId} groupId
+ * @returns {Promise<Group>}
+ */
+ const getGroupInfo = async (user, groupId) => {
+    let group = await getGroupById(user, groupId);
+
+    //Deletes participants; muss ._doc sein für delete sein
+    delete group._doc.participants
+
+    return group
+};
+
 
 //WARNING No Auth implemented
 /*
@@ -147,5 +174,6 @@ module.exports = {
     getGroupById,
     getGroups,
     createGroup,
-    addMember
+    addMember,
+    getGroupInfo
 };

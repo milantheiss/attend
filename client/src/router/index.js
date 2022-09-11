@@ -24,9 +24,9 @@ const routes = [
     component: () => import('../views/LogoutView.vue'),
   },
   {
-    path: '/pdf',
-    name: 'PDF',
-    component: () => import('../views/PdfTest.vue'),
+    path: '/exportpdf',
+    name: 'ExportPdf',
+    component: () => import('../views/ExportPdf.vue'),
   }
 ]
 

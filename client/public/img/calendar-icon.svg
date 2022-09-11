@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="49.999996mm"
+   height="56.64901mm"
+   viewBox="0 0 49.999996 56.64901"
+   version="1.1"
+   id="svg6550"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="calendar-icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview6552"
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="58.553984"
+     inkscape:cx="135.96001"
+     inkscape:cy="4.5598947"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="2552"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs6547" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-75.060372,-126.97151)">
+    <rect
+       style="fill:none;stroke:#ffffff;stroke-width:6.59967;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+       id="rect634"
+       width="43.400326"
+       height="43.40033"
+       x="78.360207"
+       y="136.92035"
+       rx="6.4934311"
+       ry="6.493432" />
+    <rect
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:4.0688;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+       id="rect2817"
+       width="36.642559"
+       height="9.8780212"
+       x="82.372353"
+       y="139.49792" />
+    <g
+       id="g6509"
+       transform="matrix(0.81774536,0,0,0.81774536,73.445304,-40.83941)">
+      <g
+         id="g6524"
+         transform="translate(0.09111471)">
+        <g
+           id="g6530"
+           transform="translate(-0.02618825)">
+          <rect
+             style="fill:#ffffff;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+             id="rect4273"
+             width="8.1308928"
+             height="16.261786"
+             x="15.086846"
+             y="205.2117"
+             rx="4.0660582"
+             ry="4.0660582" />
+          <rect
+             style="fill:#ffffff;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+             id="rect6526"
+             width="8.1308928"
+             height="16.261786"
+             x="41.746181"
+             y="205.2117"
+             rx="4.0660582"
+             ry="4.0660582" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

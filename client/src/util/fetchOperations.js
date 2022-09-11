@@ -89,6 +89,15 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate){
   })).json())
 }
 
+async function fetchGroupInfo(groupID){
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'getInfo'].join('/'), {
+    method: 'GET',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -98,5 +107,6 @@ export {
   updateTrainingssession,
   addTrainingssession,
   runGarbageCollector,
-  fetchAttendanceByDateRange
+  fetchAttendanceByDateRange,
+  fetchGroupInfo
 }

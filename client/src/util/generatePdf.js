@@ -1,8 +1,5 @@
 import { jsPDF } from "jspdf";
 
-const quartal = '3'
-const year = "2022"
-
 let pagenumber = 1
 let pagecount
 
@@ -15,20 +12,35 @@ async function createListe(group, attendenceList, filename) {
   let doc = new jsPDF({ unit: 'pt', orientation: "landscape", autoFirstPage: false });
 
   let splicedArray = {}
-  const pagesForDates = Math.ceil(attendenceList.dates.length / 26)
-  const pagesForParticipants = Math.ceil(attendenceList.participants.length / 31)
 
-  pagecount = pagesForDates * pagesForParticipants
+  if (attendenceList.dates.length != 0){
+    const pagesForDates = Math.ceil(attendenceList.dates.length / 26)
+    const pagesForParticipants = Math.ceil(attendenceList.participants.length / 31)
 
-  for (let i = 0; i < pagesForParticipants; i++) {
-    splicedArray.participants = attendenceList.participants.splice(0, 31)
-    for (let j = 0; j < pagesForDates; j++) {
-      laufnummer = i * 31
-      splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26)
-      generatePage(doc, group, splicedArray)
-      if ((j + 1) < pagesForDates) doc.addPage({ orientation: "landscape", autoFirstPage: false })
+    
+    pagecount = pagesForDates * pagesForParticipants
+
+    for (let i = 0; i < pagesForParticipants; i++) {
+      splicedArray.participants = attendenceList.participants.splice(0, 31)
+      for (let j = 0; j < pagesForDates; j++) {
+        laufnummer = i * 31
+        splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26)
+        generatePage(doc, group, splicedArray)
+        if ((j + 1) < pagesForDates) doc.addPage({ orientation: "landscape", autoFirstPage: false })
+      }
+      if ((i + 1) < pagesForParticipants) doc.addPage({ orientation: "landscape", autoFirstPage: false })
     }
-    if ((i + 1) < pagesForParticipants) doc.addPage({ orientation: "landscape", autoFirstPage: false })
+  } else {
+    pagecount = 1
+    generateHeader(doc);
+    generateGroupInfo(doc, group);
+
+    doc
+      .setFontSize(12)
+      .setFont('helvetica', "bold")
+      .text("Es wurden keine Daten in der gewählten Zeitspanne gefunden!", 20, posNextLine + 40)
+    
+    generateFooter(doc)
   }
 
   doc.save(filename)
@@ -51,7 +63,6 @@ function generateHeader(doc) {
     .setFont('helvetica', "bold")
     .text("Teilnehmerliste", 20, posNextLine)
     .setFontSize(10)
-    .text(`(Anlage zur ÜL-Abrechnung für das ${quartal}. Quartal ${year})`, 175, posNextLine)
     .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 105, 10, 75, 56);
 }
 
@@ -157,12 +168,12 @@ function generateAttendanceBox(doc, dates, participant) {
     dates[i] = new Date(dates[i])
     const temp = participant.attendence.find(foo => {
       foo.date = new Date(foo.date)
-      if (foo.date.toJSON() === dates[i].toJSON()){
+      if (foo.date.toJSON() === dates[i].toJSON()) {
         return foo
       }
-      
+
     })
-    
+
     console.log(temp)
 
     if (typeof temp === 'undefined') {
