@@ -23,7 +23,7 @@
         </div>
 
         <button @click="exportPDF"
-            class="flex items-center mx-auto mt-5 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+            class="flex items-center mx-auto mt-8 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-1.5 md:py-2 rounded-lg drop-shadow-md">
             <p class="font-medium font-base md:text-lg">Exportieren</p>
         </button>
     </div>

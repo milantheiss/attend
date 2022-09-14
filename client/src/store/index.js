@@ -6,7 +6,7 @@ import attendancelist from './modules/attendancelist'
 // Create store
 export default createStore({
   state: {
-    viewname: "Fehler"
+    viewname: ""
   },
   
   mutations: {

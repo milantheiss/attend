@@ -25,7 +25,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.587745"
-     inkscape:cx="120.5683"
+     inkscape:cx="118.63611"
      inkscape:cy="141.82232"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
@@ -41,7 +41,7 @@
      id="layer1"
      transform="translate(-87.521507,-122.89819)">
     <rect
-       style="fill:#5864e0;fill-opacity:1;stroke-width:6.67674;paint-order:markers stroke fill"
+       style="fill:#6b58e0;fill-opacity:1;stroke-width:6.67674;paint-order:markers stroke fill"
        id="rect16148"
        width="70"
        height="70"
@@ -49,7 +49,7 @@
        y="122.89819" />
     <g
        id="g17293"
-       transform="translate(-0.73454342,0.94022369)">
+       transform="matrix(0.85324154,0,0,0.85324154,17.354324,23.97513)">
       <ellipse
          style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:6.649;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="path1672-1"
