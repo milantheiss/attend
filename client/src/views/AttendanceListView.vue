@@ -28,6 +28,7 @@
     <div>
       <TeilnehmerList :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
+      <AddTeilnehmer></AddTeilnehmer>
     </div>
   </div>
 </template>
@@ -37,6 +38,7 @@ import SelectList from "@/components/SelectList";
 import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
+import AddTeilnehmer from "@/components/AddTeilnehmer.vue";
 import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 
 export default {
@@ -55,8 +57,9 @@ export default {
     SelectList,
     TeilnehmerList,
     DatePicker,
-    GroupInfo
-  },
+    GroupInfo,
+    AddTeilnehmer
+},
   methods: {
 
     async updateSelectedGroup(groupID) {
