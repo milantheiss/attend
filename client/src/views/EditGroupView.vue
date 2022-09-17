@@ -1,42 +1,68 @@
 <template>
-  <div class="relative container mx-auto p-6 md:max-w-medium-width">
-    <div class="flex items-center justify-between mb-4">
+  <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md">
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Gruppe:</p>
+      </div>
       <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
         :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl" />
-
-      <button @click="showGroups = !showGroups"
-        :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
-        class="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-lg drop-shadow-md">
-        <span class="flex items-center w-6 mr-3">
-          <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mx-auto" v-show="!showGroups">
-          <img :src="'./img/x-icon-white.svg'" alt="x icon" class="w-3.5 mx-auto" v-show="showGroups">
-        </span>
-        <p class="font-medium font-base md:text-lg">Gruppeninfo</p>
-      </button>
     </div>
 
-    <div>
-      <GroupInfo v-show="showGroups" :group="selectedGroup" class="mb-4" />
+
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Abteilung:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''">
+          {{ group.department.name }}</p>
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 mb-4 items-center">
-      <p class="text-xl md:text-2xl font-medium text-gray-700 ml-3.5 ">Datum:</p>
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"
-        class="inline-flex items-center justify-items-center" />
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Trainer:</p>
+      </div>
+      <div>
+        <p class="text-base text-right md:text-lg" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="trainer in group.trainer" :key="trainer.name">{{ trainer.name }}</p>
+      </div>
     </div>
 
-    <div>
-      <TeilnehmerList :participants="this.attended.participants" :sortByLastName="true"
-        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Assistent:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Zeiten:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          v-for="time in group.times" :key="time">{{ getTime(time) }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2">
+      <div>
+        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Sportstätte:</p>
+      </div>
+      <div>
+        <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
+          :key="group.venue">{{ group.venue }}</p>
+      </div>
     </div>
   </div>
 </template>
-
+  
 <script>
 import SelectList from "@/components/SelectList";
-import TeilnehmerList from "@/components/TeilnehmerList";
-import GroupInfo from "@/components/GroupInfo";
-import DatePicker from "@/components/DatePicker";
 import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 
 export default {
@@ -52,13 +78,10 @@ export default {
     }
   },
   components: {
-    SelectList,
-    TeilnehmerList,
-    DatePicker,
-    GroupInfo
+    SelectList
   },
-  methods: {
 
+  methods: {
     async updateSelectedGroup(groupID) {
       console.log(groupID)
       this.selectedGroup = await fetchGroup(groupID)
@@ -105,16 +128,21 @@ export default {
     this.groups = await fetchGroups()
     await this.pullAttendance()
     document.title = 'Wähle eine Gruppe'
-    this.$store.commit("setViewname","Anwesenheitsliste")
+    this.$store.commit("setViewname", "Anwesenheitsliste")
   },
   watch: {
     selectedGroup() {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
-      this.$store.commit("setSelectedGroupID",this.selectedGroup.id)
+      this.$store.commit("setSelectedGroupID", this.selectedGroup.id)
       document.title = this.selectedGroup.name + ' - Attend'
     }
   }
 }
 </script>
+  
+<style scoped>
+
+</style>
+  

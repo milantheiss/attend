@@ -26,7 +26,7 @@ router
     .route('/:groupID/addMember')
     .patch(verifyToken, groupController.addMember)
 
-    router
+router
     .route('/:groupID/getInfo')
     .get(verifyToken, groupController.getGroupInfo)
 
