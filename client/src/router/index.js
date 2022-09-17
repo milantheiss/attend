@@ -27,6 +27,11 @@ const routes = [
     path: '/exportpdf',
     name: 'ExportPdf',
     component: () => import('../views/ExportPdf.vue'),
+  },
+  {
+    path: '/editgroup',
+    name: 'EditGroup',
+    component: () => import('../views/EditGroupView.vue')
   }
 ]
 

@@ -28,7 +28,6 @@
     <div>
       <TeilnehmerList :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
-      <AddTeilnehmer></AddTeilnehmer>
     </div>
   </div>
 </template>
@@ -38,9 +37,7 @@ import SelectList from "@/components/SelectList";
 import TeilnehmerList from "@/components/TeilnehmerList";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import AddTeilnehmer from "@/components/AddTeilnehmer.vue";
 import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
-
 export default {
   name: "AttendanceListView",
   data() {
@@ -57,16 +54,13 @@ export default {
     SelectList,
     TeilnehmerList,
     DatePicker,
-    GroupInfo,
-    AddTeilnehmer
-},
+    GroupInfo
+  },
   methods: {
-
     async updateSelectedGroup(groupID) {
       console.log(groupID)
       this.selectedGroup = await fetchGroup(groupID)
     },
-
     async pullAttendance() {
       if (typeof this.selectedGroup !== 'undefined') {
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
@@ -78,20 +72,17 @@ export default {
         }
       }
     },
-
     attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
       console.log(this.date)
       updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
-
     formatParticipantArray(participants) {
       for (const participant of participants) {
         participant.attended = typeof participants.attended === "undefined" ? false : participants.attended
       }
       return participants
     },
-
     getWeekdays(group) {
       let temp = []
       for (const time of group.times) {
@@ -121,6 +112,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>
