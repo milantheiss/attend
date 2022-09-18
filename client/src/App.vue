@@ -19,7 +19,7 @@
     </div>
     
   </nav>
-  <router-view class="font-ubuntu font-normal" />
+  <router-view class="font-ubuntu font-normal"/>
 </template>
 
 <script>

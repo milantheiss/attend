@@ -26,15 +26,15 @@
     </div>
 
     <div>
-      <TeilnehmerList :participants="this.attended.participants" :sortByLastName="true"
-        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></TeilnehmerList>
+      <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
+        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
     </div>
   </div>
 </template>
 
 <script>
 import SelectList from "@/components/SelectList";
-import TeilnehmerList from "@/components/TeilnehmerList";
+import AttendanceListComponent from "@/components/AttendanceListComponent";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
@@ -53,7 +53,7 @@ export default {
   },
   components: {
     SelectList,
-    TeilnehmerList,
+    AttendanceListComponent,
     DatePicker,
     GroupInfo
   },
