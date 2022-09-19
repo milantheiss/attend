@@ -19,10 +19,10 @@
       <GroupInfo v-show="showGroups" :group="selectedGroup" class="mb-4" />
     </div>
 
-    <div class="grid grid-cols-2 mb-4 items-center">
-      <p class="text-xl md:text-2xl font-medium text-gray-700 ml-3.5 ">Datum:</p>
+    <div class="grid grid-cols-3 mb-4 items-center">
+      <p class="text-xl md:text-2xl font-medium text-gray-700 ml-2">Datum:</p>
       <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"
-        class="inline-flex items-center justify-items-center" />
+        class="col-start-2 col-span-2 inline-flex items-center justify-items-center" />
     </div>
 
     <div>
