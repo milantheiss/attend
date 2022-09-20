@@ -1,17 +1,23 @@
 <template>
-    <GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
+    <!--
+<GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
       @onAttendedChange="(id, bool) => $emit('onClick', id, bool)" />
     <span class="grid content-center mt-6">
       <p v-show="participantArr.length === 0"
         class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
     </span>
+    -->
+    <GroupListItem/>
+    <GroupListItem/>
+    <GroupListItem/>
+    <GroupListItem/>  
   </template>
   
   <script>
   import GroupListItem from "@/components/GroupListItem";
   
   export default {
-    name: "GroupListComponent",
+    name: "GroupListGomponent",
     data() {
       return {
         participantArr: []
@@ -29,8 +35,8 @@
       }
     },
     components: {
-        GroupListItem
-    },
+    GroupListItem
+},
     methods: {
       sortParticipants(list) {
         if (this.sortByFirstName) {

@@ -70,14 +70,14 @@
       </div>
     </div>
     -->
-        
-    
     </div>
+    <GroupListGomponent></GroupListGomponent>
   </div>
 </template>
   
 <script>
 import SelectList from "@/components/SelectList";
+import GroupListGomponent from "@/components/GroupListGomponent.vue";
 import { fetchGroups, fetchGroup } from '@/util/fetchOperations'
 
 export default {
@@ -89,7 +89,8 @@ export default {
     }
   },
   components: {
-    SelectList
+    SelectList,
+    GroupListGomponent
   },
 
   methods: {
