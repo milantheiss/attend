@@ -6,7 +6,7 @@
           <p class="text-gray-700 font-light text-normal text-base md:text-lg">Gruppe:</p>
         </div>
         <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-          :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl" />
+          :options="this.groups" class="bg-white  font-bold text-xl md:text-3xl" />
     </div>
 
     <div class="grid grid-cols-2">
