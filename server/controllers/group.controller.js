@@ -21,8 +21,8 @@ const createGroup = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send(result)
 });
 
-const addMember = catchAsync(async (req, res) => {
-    res.send(await groupService.addMember(req.user, req.params.groupID, req.body))
+const modifyMember = catchAsync(async (req, res) => {
+    res.send(await groupService.modifyMember(req.user, req.params.groupID, req.body))
 })
 
 /*
@@ -71,7 +71,7 @@ module.exports = {
     getGroups,
     getGroupById,
     createGroup,
-    addMember,
+    modifyMember,
     getGroupInfo
 }
 

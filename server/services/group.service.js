@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Group } = require('../models');
+const { Group, Member } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -75,13 +75,18 @@ const createGroup = async (user, groupBody) => {
 
 /**
  * Add members to Group Participants
+ * Muss checken ob Member schon existiert und ob er in der Gruppe ist.
+ * Wenn existiert, dann wird in /member modifiziert und in [participants]
+ * Wenn er nicht existiert, dann wird er in /memver erstellt und in [participants] hinzugefügt.
  * @param {Object} groupBody
  * @returns {Promise<Group>}
  */
- const addMember = async (user,groupId, body) => {
-    if (user.role === 'admin') { 
-        return Group.findOneAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } })
-    }else {
+ const modifyMember = async (user, groupId, body) => {
+    if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
+        console.log(body)
+        return Member.findOneAndUpdate({'_id': body._id}, {firstname: body.firstname, lastname: body.lastname, birthday: body.birthday, $addToSet: {'groups._id': groupId}},{new: true})
+       // return Group.findOneAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } })
+    } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
 };
@@ -89,7 +94,7 @@ const createGroup = async (user, groupBody) => {
 /**
  * Get a group by ID and return only info.
  * @param {ObjectId} groupId
- * @returns {Promise<Group>}
+ * @returns {Promise<Group>}0
  */
  const getGroupInfo = async (user, groupId) => {
     let group = await getGroupById(user, groupId);
@@ -174,6 +179,6 @@ module.exports = {
     getGroupById,
     getGroups,
     createGroup,
-    addMember,
+    modifyMember,
     getGroupInfo
 };

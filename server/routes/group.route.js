@@ -23,8 +23,8 @@ router
     */
 
 router
-    .route('/:groupID/addMember')
-    .patch(verifyToken, groupController.addMember)
+    .route('/:groupID/modifyMember')
+    .patch(verifyToken, groupController.modifyMember)
 
 router
     .route('/:groupID/getInfo')
