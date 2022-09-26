@@ -16,7 +16,8 @@
     </div>
 
     <div>
-      <GroupInfo v-show="showGroups" :group="selectedGroup" class="mb-4" />
+      <GroupInfo v-show="showGroups" :group="selectedGroup"
+        class="mb-4 bg-white px-3 py-1.5 rounded-lg drop-shadow-md" />
     </div>
 
     <div class="grid grid-cols-3 mb-4 items-center">
@@ -105,14 +106,14 @@ export default {
     this.groups = await fetchGroups()
     await this.pullAttendance()
     document.title = 'Wähle eine Gruppe'
-    this.$store.commit("setViewname","Anwesenheitsliste")
+    this.$store.commit("setViewname", "Anwesenheitsliste")
   },
   watch: {
     selectedGroup() {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
-      this.$store.commit("setSelectedGroupID",this.selectedGroup.id)
+      this.$store.commit("setSelectedGroupID", this.selectedGroup.id)
       document.title = this.selectedGroup.name + ' - Attend'
     }
   }

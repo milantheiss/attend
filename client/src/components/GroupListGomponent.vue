@@ -1,16 +1,10 @@
 <template>
-    <!--
-<GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
-      @onAttendedChange="(id, bool) => $emit('onClick', id, bool)" />
+    <GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
+      @onClickOnSave="(body) => $emit('onClickOnSave', body)" @onClickOnDelete="(body) => $emit('onClickOnDelete', body)"/>
     <span class="grid content-center mt-6">
       <p v-show="participantArr.length === 0"
         class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
     </span>
-    -->
-    <GroupListItem/>
-    <GroupListItem/>
-    <GroupListItem/>
-    <GroupListItem/>  
   </template>
   
   <script>
@@ -31,7 +25,7 @@
       },
       sortByLastName: {
         type: Boolean,
-        default: false
+        default: true
       }
     },
     components: {

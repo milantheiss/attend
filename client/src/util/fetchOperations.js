@@ -83,7 +83,6 @@ async function runGarbageCollector(groupID, date){
 async function fetchAttendanceByDateRange(groupID, startdate, enddate){
   return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join('/'), {
     method: 'GET',
-    headers: { 'Content-type': 'application/json; charset=UTF-8' },
     credentials: 'include',
     mode: 'cors'
   })).json())
@@ -92,6 +91,24 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate){
 async function fetchGroupInfo(groupID){
   return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'getInfo'].join('/'), {
     method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
+async function updateMemberInGroup(groupID, body){
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'updateMember'].join('/'), {
+    method: "PATCH",
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    body: JSON.stringify(body),
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
+async function removeMemberFromGroup(groupID, memberID) {
+  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'removeMember', memberID].join('/'), {
+    method: 'DELETE',
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
     credentials: 'include',
     mode: 'cors'
@@ -108,5 +125,7 @@ export {
   addTrainingssession,
   runGarbageCollector,
   fetchAttendanceByDateRange,
-  fetchGroupInfo
+  fetchGroupInfo,
+  updateMemberInGroup,
+  removeMemberFromGroup
 }

@@ -4,7 +4,7 @@
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
                 <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-                    :options="this.groups" class="bg-background-white font-bold text-xl md:text-2xl" />
+                    :options="this.groups" class="font-bold text-xl md:text-2xl" />
             </div>
             <div class="flex items-center justify-between mb-4">
                 <label for="filename" class="text-gray-700 font-light text-base md:text-lg">Dateiname:</label>
