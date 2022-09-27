@@ -85,10 +85,10 @@ const updateMember = async (user, groupId, body) => {
     if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
         if (typeof body._id !== 'undefined') {
             //Wenn Member schon existiert, wird er geupdatet
-            return Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
+            return Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } }, {new: true})
         } else {
             //Wenn Member noch nicht existiert, wird er neu erstellt
-            return Group.findByIdAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } })
+            return Group.findByIdAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } }, {new: true})
         }
 
     } else {
@@ -118,7 +118,7 @@ const getGroupInfo = async (user, groupId) => {
  */
 const removeMember = async (user, groupId, memberId) => {
     if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
-        return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } })
+        return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } }, {new: true})
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }

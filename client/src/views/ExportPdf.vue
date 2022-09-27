@@ -9,7 +9,7 @@
             <div class="flex items-center justify-between mb-4">
                 <label for="filename" class="text-gray-700 font-light text-base md:text-lg">Dateiname:</label>
                 <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-base md:text-lg" type="text" name="filename"
-                    v-model="filename" :placeholder="filename" />
+                    v-model="filename" placeholder="Dateiname" />
             </div>
             <div class="flex items-center justify-between mb-4">
                 <label for="startdate" class="text-gray-700 font-light text-base md:text-lg">Anfang:</label>
@@ -40,7 +40,7 @@ export default {
     name: "ExportPdf",
     data() {
         return {
-            filename: 'anwesenheitslist.pdf',
+            filename: 'anwesenheitslist',
             groups: [],
             selectedGroup: undefined,
             startdate: new Date(Date.now()).toJSON().slice(0, 10),

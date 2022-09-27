@@ -12,7 +12,7 @@ async function watchForRedirects(res) {
 
 async function fetchGroups() {
   console.debug("Fetching for all groups")
-  return watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'), {
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups"].join('/'), {
     credentials: 'include',
     mode: 'cors'
   })).json());
@@ -20,7 +20,7 @@ async function fetchGroups() {
 
 async function fetchGroup(groupID) {
   console.debug(`Fetching for group by ID: ${groupID}`)
-  return watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join('/'), {
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join('/'), {
     credentials: 'include',
     mode: 'cors'
   })).json());
@@ -28,7 +28,7 @@ async function fetchGroup(groupID) {
 
 async function fetchAttendance(groupID) {
   console.debug(`Fetching for attendance by ID ${groupID}`)
-  return watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'),{
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'),{
     credentials: 'include',
     mode: 'cors'
   })).json());
@@ -36,7 +36,7 @@ async function fetchAttendance(groupID) {
 
 async function fetchAttendanceByDate(groupID, date) {
   console.debug(`Fetching for attendance by ID ${groupID} and date ${date}`)
-  return watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'),{
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'),{
     credentials: 'include',
     mode: 'cors'
   })).json());

@@ -12,7 +12,8 @@
       <GroupInfo :group="selectedGroup" class="mt-4" />
     </div>
     
-    <GroupListGomponent :participants="getParticipants()" @onClickOnSave="(body) => $emit(onClickOnSave(body))" @onClickOnDelete="(body) => $emit(onClickOnDelete(body))"/>
+    <GroupListGomponent :participants="getParticipants()" @onClickOnSave="(participantData) => onClickOnSave(participantData)" @onClickOnDelete="(participantData) => onClickOnDelete(participantData)"/>
+    <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)" v-show="typeof selectedGroup !== 'undefined'"/>
   </div>
 </template>
   
@@ -21,6 +22,7 @@ import SelectList from "@/components/SelectList";
 import GroupListGomponent from "@/components/GroupListGomponent";
 import { fetchGroups, fetchGroup, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
 import GroupInfo from "@/components/GroupInfo"
+import MemberEditor from "@/components/MemberEditor";
 
 export default {
   name: "EditGroupView",
@@ -33,7 +35,8 @@ export default {
   components: {
     SelectList,
     GroupListGomponent,
-    GroupInfo
+    GroupInfo,
+    MemberEditor
 },
 
   methods: {
@@ -42,17 +45,16 @@ export default {
     },
     getParticipants(){
       if (typeof this.selectedGroup !== 'undefined'){
-        console.log("HALLLLO WARUM????")
         return this.selectedGroup.participants
       } else {
         return undefined
       }
     },
-    async onClickOnSave(body){
-      await updateMemberInGroup(this.selectedGroup.id, body)
+    async onClickOnSave(participantData){
+      this.selectedGroup = await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
-    async onClickOnDelete(body){
-      await removeMemberFromGroup(this.selectedGroup.id, body._id)
+    async onClickOnDelete(participantData){
+      this.selectedGroup = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
     }
   },
 
