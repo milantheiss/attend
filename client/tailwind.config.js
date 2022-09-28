@@ -3,6 +3,7 @@ module.exports = {
   content: ['./public/**/*.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     screens:{
+      ty: '340px',
       sm: '480px',
       md: '768px',
       lg: '976px',
@@ -19,9 +20,11 @@ module.exports = {
         'unchecked-gradient-2': '#D3D0E4',
         'dimmed-gradient-1': '#98A4CD',
         'dimmed-gradient-2': '#7C83C3',
+        'delete-gradient-1': '#DE2C2C',
+        'delete-gradient-2': '#D83535',
         'background-greywhite': '#FBFCFF',
         'dark-grey': '#464646',
-        'special-red': '#FF1F28FF'
+        'special-red': '#FF1F28F'
       },
       fontFamily:{
         'ubuntu': ['Ubuntu', 'sans-serif']

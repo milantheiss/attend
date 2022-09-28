@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md">
+  <div>
     <div class="grid grid-cols-2" v-if="typeof group.department.name !== 'undefined'">
       <div>
-        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Abteilung:</p>
+        <p class="text-gray-700 font-light text-base md:text-lg">Abteilung:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''">
@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-2" v-if="group.trainer.length !== 0">
       <div>
-        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Trainer:</p>
+        <p class="text-gray-700 font-light text-base md:text-lg">Trainer:</p>
       </div>
       <div>
         <p class="text-base text-right md:text-lg" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
@@ -21,8 +21,8 @@
     </div>
 
     <div class="grid grid-cols-2" v-if="group.assistent.length !== 0">
-      <div >
-        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Assistent:</p>
+      <div>
+        <p class="text-gray-700 font-light text-base md:text-lg">Assistent:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
@@ -32,7 +32,7 @@
 
     <div class="grid grid-cols-2" v-if="group.times.length !== 0">
       <div>
-        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Zeiten:</p>
+        <p class="text-gray-700 font-light text-base md:text-lg">Zeiten:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
@@ -42,7 +42,7 @@
 
     <div class="grid grid-cols-2" v-if="typeof group.venue !== 'undefined'">
       <div>
-        <p class="text-gray-700 font-light text-normal text-base md:text-lg">Sportstätte:</p>
+        <p class="text-gray-700 font-light text-base md:text-lg">Sportstätte:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
@@ -65,13 +65,12 @@ export default {
               {
                 name: ". . ."
               }
-            ]
-          ,
+            ],
           assistent: [
             {
               name: ". . ."
             }
-          ],
+          ], 
           times: [{
             day: ". . ."
           }],
@@ -81,7 +80,7 @@ export default {
           }
         }
       },
-      required: true,
+      required: false,
     }
   },
   methods: {
@@ -98,6 +97,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-</style>

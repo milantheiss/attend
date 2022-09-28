@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: "TeilnehmerItem",
+  name: "AttendanceListItem",
   data() {
     return {
       activated: Boolean

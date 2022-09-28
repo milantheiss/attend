@@ -23,8 +23,16 @@ router
     */
 
 router
-    .route('/:groupID/addMember')
-    .patch(verifyToken, groupController.addMember)
+    .route('/:groupID/updateMember')
+    .patch(verifyToken, groupController.updateMember)
+
+router
+    .route('/:groupID/removeMember/:memberID')
+    .delete(verifyToken, groupController.removeMember)
+
+router
+    .route('/:groupID/getInfo')
+    .get(verifyToken, groupController.getGroupInfo)
 
 //TODO Add capability to update members by /:groupID/addmember
 //Backend soll Teilnehmer Liste ziehen und den neuen Teilnehmer anhängen und dann neue Liste in DB pushen

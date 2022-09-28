@@ -50,7 +50,7 @@ const getAttendanceById = async (user, id) => {
  * Get a attendance list by groupID & date.
  * @param {ObjectID} groupID ID of the searched group
  * @param {Date} date Date of the searched attendance list
- * @returns {Promise<Attendance>}
+ * @returns {Promise<Attendance>}   
  */
 const getTrainingssession = async (user, groupID, date) => {
     //INFO Access controle wird von 'getAttendanceByGroup' gehandelt
@@ -256,7 +256,23 @@ const deleteTrainingssession = async (user, groupID, date) => {
     }
 };
 
-//TODO Add new Functions here
+/**
+ * Get all Trainingssessions in Date Range
+ */
+const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate) => {
+    const list = await getAttendanceByGroup(user, groupID)
+    let temp = {}
+    temp.group = list.group
+
+    temp.trainingssessions = list.trainingssessions.filter((e) => {
+        if(e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
+            return e
+        }
+    })
+        
+    return temp
+}
+
 module.exports = {
     getAttendanceById,
     getAttendance,
@@ -267,5 +283,6 @@ module.exports = {
     getAttendanceByGroup,
     deleteTrainingssession,
     addTrainingssession,
-    runGarbageCollector
+    runGarbageCollector,
+    getTrainingssessionsByDateRange
 };

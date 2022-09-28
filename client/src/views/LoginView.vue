@@ -51,5 +51,8 @@ export default {
       }
     },
   },
+  created(){
+    this.$store.commit("setViewname","Login")
+  }
 };
 </script>

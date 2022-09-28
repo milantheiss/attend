@@ -40,9 +40,6 @@ const attendanceSchema = mongoose.Schema(
                     }
                 }
             ]
-        },
-        access: {
-            type: [mongoose.Types.ObjectId]
         }
     }
 );

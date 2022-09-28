@@ -22,6 +22,16 @@ const routes = [
     path: '/logout',
     name: 'Logout',
     component: () => import('../views/LogoutView.vue'),
+  },
+  {
+    path: '/exportpdf',
+    name: 'ExportPdf',
+    component: () => import('../views/ExportPdf.vue'),
+  },
+  {
+    path: '/editgroup',
+    name: 'EditGroup',
+    component: () => import('../views/EditGroupView.vue'),
   }
 ]
 

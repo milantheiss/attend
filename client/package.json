@@ -12,6 +12,7 @@
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "dotenv": "^16.0.1",
+    "jspdf": "^2.5.1",
     "postcss": "^8",
     "register-service-worker": "^1.7.2",
     "tailwindcss": "^3",

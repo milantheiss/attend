@@ -1,5 +1,5 @@
 <template>
-  <TeilnehmerItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
+  <AttendanceListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
     @onAttendedChange="(id, bool) => $emit('onAttendedChange', id, bool)" />
   <span class="grid content-center mt-6">
     <p v-show="participantArr.length === 0"
@@ -8,10 +8,10 @@
 </template>
 
 <script>
-import TeilnehmerItem from "@/components/TeilnehmerItem";
+import AttendanceListItem from "@/components/AttendanceListItem";
 
 export default {
-  name: "TeilnehmerList",
+  name: "AttendanceListComponent",
   data() {
     return {
       participantArr: []
@@ -29,7 +29,7 @@ export default {
     }
   },
   components: {
-    TeilnehmerItem
+    AttendanceListItem
   },
   methods: {
     sortParticipants(list) {
