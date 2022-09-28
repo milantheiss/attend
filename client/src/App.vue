@@ -17,7 +17,7 @@
       <router-link @click="showMenu = !showMenu" to="/exportpdf" class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
       <router-link @click="showMenu = !showMenu" to="/editgroup" class="text-left font-semibold text-lg md:text-xl mt-2">Gruppe bearbeiten</router-link>
       <router-link @click="showMenu = !showMenu" to="/logout" class="text-left font-semibold text-lg md:text-xl mt-2">Logout</router-link>
-      <p class="text-center font-light text-sm md:text-base mt-10">Erstellt von Milan Theiß - Version 0.0.1</p>
+      <p class="text-center font-light text-sm md:text-base mt-10">Erstellt von Milan Theiß - Version 0.1.0</p>
     </div>
   </nav>
   <router-view class="font-ubuntu font-normal"/>
