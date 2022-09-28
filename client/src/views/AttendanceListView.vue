@@ -2,7 +2,7 @@
   <div class="relative container mx-auto p-6 md:max-w-medium-width">
     <div class="flex items-center justify-between mb-4">
       <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-        :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl" />
+        :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl mt-1" />
 
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"

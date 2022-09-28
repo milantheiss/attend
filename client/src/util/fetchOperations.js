@@ -107,7 +107,7 @@ async function updateMemberInGroup(groupID, body){
 }
 
 async function removeMemberFromGroup(groupID, memberID) {
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'removeMember', memberID].join('/'), {
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'removeMember', memberID].join('/'), {
     method: 'DELETE',
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
     credentials: 'include',

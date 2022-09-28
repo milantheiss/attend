@@ -62,7 +62,7 @@ export default {
                     firstname: "",
                     lastname: "",
                     birthday: "",
-                    firsttraining: Date.now()
+                    firsttraining: (new Date(Date.now()).toJSON()).slice(0, 10)
                 }
             }
         }
@@ -76,30 +76,36 @@ export default {
         },
         async onClickOnCreate() {
             this.$emit('onClickOnCreate', this.participantData)
+            this.participantData = {
+                firstname: "",
+                lastname: "",
+                birthday: "",
+                firsttraining: (new Date(Date.now()).toJSON()).slice(0, 10)
+            }
+        },
+        formateParticipant(newVal) {
+            this.participantData = newVal
+            try {
+                this.participantData.birthday = newVal.birthday.slice(0, 10)
+            } catch {
+                console.error("Unable to slice date string of 'participant.birthday'")
+            }
+            try {
+                this.participantData.firsttraining = (new Date(newVal.firsttraining).toJSON()).slice(0, 10)
+            } catch {
+                console.error("Unable to slice date string of 'participant.firsttraining'")
+            }
         }
     },
     watch: {
         participant(newVal) {
-            this.participantData = newVal
-            this.participantData.birthday = newVal.birthday.slice(0, 10)
-            try {
-                this.participantData.firsttraining = (new Date(newVal.firsttraining).toJSON()).slice(0, 10)
-            } catch {
-                console.log("'participant.firsttraining' is not defined")
-            }
-
+            this.formateParticipant(newVal)
         }
     },
 
     created() {
         if (typeof this.participant !== 'undefined') {
-            this.participantData = this.participant
-            this.participantData.birthday = this.participant.birthday.slice(0, 10)
-            try {
-                this.participantData.firsttraining = (new Date(this.participant.firsttraining).toJSON()).slice(0, 10)
-            } catch {
-                console.log("'participant.firsttraining' is not defined")
-            }
+            this.formateParticipant(this.participant)
         }
     }
 };
