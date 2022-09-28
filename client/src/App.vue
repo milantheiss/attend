@@ -14,8 +14,8 @@
 
     <div class="grid" v-show="showMenu">
       <router-link @click="showMenu = !showMenu" to="/attendancelist" class="text-left font-semibold text-lg md:text-xl mt-2">Anwesenheit</router-link>
-      <router-link @click="showMenu = !showMenu" to="/exportpdf" class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
       <router-link @click="showMenu = !showMenu" to="/editgroup" class="text-left font-semibold text-lg md:text-xl mt-2">Gruppe bearbeiten</router-link>
+      <router-link @click="showMenu = !showMenu" to="/exportpdf" class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
       <router-link @click="showMenu = !showMenu" to="/logout" class="text-left font-semibold text-lg md:text-xl mt-2">Logout</router-link>
       <p class="text-center font-light text-sm md:text-base mt-10">Erstellt von Milan Theiß - Version 0.1.0</p>
     </div>
