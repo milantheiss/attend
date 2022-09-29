@@ -161,7 +161,6 @@ function generateParticipantRows(doc, dates, participants) {
 }
 
 function generateAttendanceBox(doc, dates, participant) {
-  console.log(participant)
   //TODO Bug hier?
   let xPos = 249.89
   for (let i = 0; i < dates.length; i++) {
@@ -173,8 +172,6 @@ function generateAttendanceBox(doc, dates, participant) {
       }
 
     })
-
-    console.log(temp)
 
     if (typeof temp === 'undefined') {
       doc
