@@ -3,7 +3,7 @@
     @onAttendedChange="(id, bool) => $emit('onAttendedChange', id, bool)" />
   <span class="grid content-center mt-6">
     <p v-show="participantArr.length === 0"
-      class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 ml-3.5 ">Bitte wähle eine Gruppe</p>
+      class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 mx-auto">Bitte wähle eine Gruppe</p>
   </span>
 </template>
 

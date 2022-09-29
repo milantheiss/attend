@@ -2,13 +2,13 @@
   <nav class="relative container mx-auto p-6 md:max-w-medium-width"
     v-show="currentRouteName != 'Login' && currentRouteName != 'Logout'">
     <div class="flex justify-between mb-4">
-      <button @click="showMenu = !showMenu">
+      <button @click="showMenu = !showMenu" class="w-12">
         <span>
           <img :src="'./img/menu-icon.svg'" alt="eye icon" class="w-7 h-5 mx-auto" v-show="!showMenu">
           <img :src="'./img/x-icon-black.svg'" alt="x icon" class="w-5 ml-1 mr-1" v-show="showMenu">
         </span>
       </button>
-      <h2 class="font-semibold text-xl md:text-2xl ml-5">{{this.$store.state.viewname}}</h2>
+      <h2 class="font-semibold text-xl md:text-2xl mx-auto">{{this.$store.state.viewname}}</h2>
       <img :src="'./img/default-profilpic.svg'" alt="eye icon" class="w-12 rounded-full"/>
     </div>
 
