@@ -3,3 +3,5 @@ cert.pem
 csr.pem
 key.pem
 test.js
+usercontroller.js
+passwordgernerator.js
