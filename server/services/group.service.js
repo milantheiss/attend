@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
 const { Group } = require('../models');
 const ApiError = require('../utils/ApiError');
+const mongoose = require('mongoose');
+//const { attendanceController } = require('../controllers');
 
 /**
  * Get all groups accessable be the user
@@ -85,6 +87,15 @@ const updateMember = async (user, groupId, body) => {
     if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
         if (typeof body._id !== 'undefined') {
             //Wenn Member schon existiert, wird er geupdatet
+            const group = await Group.findById({ '_id': groupId })
+
+            const oldParticipantData = group.participants.find(e => e._id.equals(body._id))
+
+            console.log(oldParticipantData)
+            //TODO Add Call to Attendance Service ...
+
+            //attendanceController.updateParticipantInTrainingssessions(user, groupId, body, oldParticipantData.firsttraining, body.firsttraining)
+
             return Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } }, {new: true})
         } else {
             //Wenn Member noch nicht existiert, wird er neu erstellt

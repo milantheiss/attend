@@ -1,12 +1,12 @@
 <template>
-  <div class="relative container mx-auto p-6 md:max-w-medium-width">
+  <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
     <div class="flex items-center justify-between mb-4">
       <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
         :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl mt-1" />
 
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
-        class="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+        class="inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 rounded-lg drop-shadow-md ml-2">
         <span class="flex items-center w-6 mr-3">
           <img :src="'./img/eye-icon.svg'" alt="eye icon" class="w-6 mx-auto" v-show="!showGroups">
           <img :src="'./img/x-icon-white.svg'" alt="x icon" class="w-3.5 mx-auto" v-show="showGroups">

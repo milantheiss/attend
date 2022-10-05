@@ -1,5 +1,5 @@
 <template>
-  <nav class="relative container mx-auto p-6 md:max-w-medium-width"
+  <nav class="relative container mx-auto p-6 md:max-w-medium-width mb-0 "
     v-show="currentRouteName != 'Login' && currentRouteName != 'Logout'">
     <div class="flex justify-between mb-4">
       <button @click="showMenu = !showMenu" class="w-12">

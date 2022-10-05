@@ -1,5 +1,5 @@
 <template>
-  <div class="relative container mx-auto p-6 md:max-w-medium-width">
+  <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
     <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md mb-4">
       <div class="grid grid-cols-2">
         <div>

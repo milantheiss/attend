@@ -273,6 +273,10 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     return temp
 }
 
+const updateParticipantInTrainingssessions = async (user, groupID, participantData, oldFirsttraining, newFirsttraining) => {
+    console.log(user, groupID, participantData, oldFirsttraining, newFirsttraining)
+}
+
 module.exports = {
     getAttendanceById,
     getAttendance,
@@ -284,5 +288,6 @@ module.exports = {
     deleteTrainingssession,
     addTrainingssession,
     runGarbageCollector,
-    getTrainingssessionsByDateRange
+    getTrainingssessionsByDateRange,
+    updateParticipantInTrainingssessions
 };
