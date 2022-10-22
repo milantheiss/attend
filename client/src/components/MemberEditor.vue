@@ -29,7 +29,8 @@
             <label for="firsttraining" class="text-gray-700 font-light text-base md:text-lg ml-3">Erstes
                 Training:</label>
             <input type="date" v-model="participantData.firsttraining" name="firsttraining"
-                class="border-b-2 border-gray-300 text-black mx-3 font-medium text-base md:text-lg" />
+                class="border-b-2 border-gray-300 text-black mx-3 font-medium text-base md:text-lg"
+                :max="(new Date(Date.now()).toJSON()).slice(0, 10)" />
         </div>
 
         <div class="flex items-center ml-3 my-6" v-show="error.show">
@@ -92,7 +93,7 @@ export default {
             }
         }
     },
-    
+
     methods: {
         async onClickOnSave() {
             if (!this.hasAnError()) {
