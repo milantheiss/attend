@@ -4,6 +4,7 @@
     v-show="!showEditPanel">
     <span class="flex items-center justify-between">
       <h3>{{ participant.lastname }}, {{ participant.firstname }}</h3>
+      <!--Pen Icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-7 rotate-4 py-2 text-black">
         <path stroke-linecap="round" stroke-linejoin="round"

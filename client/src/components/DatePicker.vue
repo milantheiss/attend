@@ -2,6 +2,7 @@
   <div class="grid grid-cols-6">
     <button @click="getLastDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg w-9 md:w-10 h-9 md:h-10 min-w-fit min-h-fit ">
+      <!--Left Chevron Icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
         class="w-6 h-6 mx-auto my-auto text-white">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -10,6 +11,7 @@
     <p class="col-start-2 col-end-6 col-span-3 text-base md:text-2xl font-medium text-center mx-2">{{formatedDateString}}</p>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg w-9 md:w-10 h-9 md:h-10 min-w-fit min-h-fit">
+      <!--Right Chevron Icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
         class="w-6 h-6 mx-auto my-auto text-white">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

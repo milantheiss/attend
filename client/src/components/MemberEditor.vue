@@ -1,6 +1,7 @@
 <template>
     <div class="bg-white px-3 py-4 my-3 rounded-lg drop-shadow-md">
         <div class="grid place-items-end mr-1" v-if="!createsNewMember">
+            <!--Closing X Icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-8 text-black" @click="onClickOnClose()">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -31,14 +32,14 @@
                 class="border-b-2 border-gray-300 text-black mx-3 font-medium text-base md:text-lg" />
         </div>
 
-        <div class="flex justify-left items-center ml-3 my-6" v-show="error.show">
-            <!--Error Panel-->
+        <div class="flex items-center ml-3 my-6" v-show="error.show">
+            <!--Error Icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-6.5 mr-2 text-red-600">
+                stroke="currentColor" class="w-6.5 mr-2 text-special-red">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
             </svg>
-            <p class="font-semibold text-red-600">{{error.text}}</p>
+            <p class="font-semibold text-special-red">{{error.text}}</p>
         </div>
 
         <div class="flex items-center justify-between mb-4 mt-6" v-if="!createsNewMember">
