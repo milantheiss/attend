@@ -1,5 +1,5 @@
 <template>
-    <div class="relative container mx-auto p-6 md:max-w-medium-width">
+    <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
         <div class="bg-white px-5 py-3 rounded-lg drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>

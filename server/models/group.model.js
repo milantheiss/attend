@@ -24,11 +24,15 @@ const groupSchema = mongoose.Schema(
                     },
                     birthday: {
                         type: Date,
-                        required: false,
+                        required: false
+                    },
+                    firsttraining: {
+                        type: Date,
+                        required: false
                     }
                 }
             ],
-            required: false,
+            required: false
         },
         trainer: {
             type: [

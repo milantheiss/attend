@@ -1,7 +1,7 @@
 <template>
   <button @click="onClick()" class="inline-flex items-center px-3 py-1.5 rounded-md drop-shadow-md">
     <img :src="imgsrc" alt="eye icon" v-show="showIMG" class="w-6 mr-2">
-    <p class="font-medium font-normal md:text-xl">{{ text }}</p>
+    <p class="font-medium md:text-xl">{{ text }}</p>
   </button>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-3">
     <div class="grid grid-cols-2" v-if="typeof group.department.name !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Abteilung:</p>

@@ -1,7 +1,7 @@
 <template>
-  <div class="relative container mx-auto p-6 md:max-w-medium-width">
-    <div class="bg-white px-3 py-1.5 rounded-lg drop-shadow-md mb-4">
-      <div class="grid grid-cols-2">
+  <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
+    <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-4">
+      <div class="grid grid-cols-2 mx-3">
         <div>
           <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
         </div>
@@ -11,9 +11,12 @@
 
       <GroupInfo :group="selectedGroup" class="mt-4" />
     </div>
-    
-    <GroupListGomponent :participants="getParticipants()" @onClickOnSave="(participantData) => onClickOnSave(participantData)" @onClickOnDelete="(participantData) => onClickOnDelete(participantData)"/>
-    <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)" v-show="typeof selectedGroup !== 'undefined'"/>
+
+    <GroupListGomponent :participants="getParticipants()"
+      @onClickOnSave="(participantData) => onClickOnSave(participantData)"
+      @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
+    <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)"
+      v-show="typeof selectedGroup !== 'undefined'" />
   </div>
 </template>
   
@@ -37,23 +40,22 @@ export default {
     GroupListGomponent,
     GroupInfo,
     MemberEditor
-},
-
+  },
   methods: {
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await fetchGroup(groupID)
     },
-    getParticipants(){
-      if (typeof this.selectedGroup !== 'undefined'){
+    getParticipants() {
+      if (typeof this.selectedGroup !== 'undefined') {
         return this.selectedGroup.participants
       } else {
         return undefined
       }
     },
-    async onClickOnSave(participantData){
+    async onClickOnSave(participantData) {
       this.selectedGroup = await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
-    async onClickOnDelete(participantData){
+    async onClickOnDelete(participantData) {
       this.selectedGroup = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
     }
   },

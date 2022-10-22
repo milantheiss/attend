@@ -2,13 +2,21 @@
   <div class="grid grid-cols-6">
     <button @click="getLastDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg w-9 md:w-10 h-9 md:h-10 min-w-fit min-h-fit ">
-      <img :src="'./img/arrow-left.svg'" alt="arrow left" class="w-3 mx-auto my-auto">
+      <!--Left Chevron Icon-->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
+        class="w-6 h-6 mx-auto my-auto text-white">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
     </button>
-    <p class="col-start-2 col-end-6 col-span-3 text-base md:text-2xl font-medium text-center mx-2">{{ formatedDateString
-    }}</p>
+    <p class="col-start-2 col-end-6 col-span-3 text-base md:text-2xl font-medium text-center mx-2">
+      {{formatedDateString}}</p>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg w-9 md:w-10 h-9 md:h-10 min-w-fit min-h-fit">
-      <img :src="'./img/arrow-right.svg'" alt="arrow right" class="w-3 mx-auto my-auto">
+      <!--Right Chevron Icon-->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
+        class="w-6 h-6 mx-auto my-auto text-white">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
     </button>
   </div>
 
@@ -23,7 +31,7 @@ export default {
   props: {
     modelValue: Date,
   },
-  emits: ['update:modelValue', 'onChange'],
+  emits: ['update:modelValue', 'onChange', 'on'],
   data() {
     return {
       date: new Date(Date.now()),
@@ -49,13 +57,15 @@ export default {
     },
     getNextDate() {
       if (typeof this.weekdays !== 'undefined') {
-        if (typeof this.$store.state.attendancelist.selectedGroupID !== 'undefined') {
-          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, this.date)
+        if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
+          if (typeof this.$store.state.attendancelist.selectedGroupID !== 'undefined') {
+            runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, this.date)
+          }
+          this.date = getDateOfTraining(this.date, this.weekdays, true)
+          this.formatedDateString = getFormatedDateString(this.date)
+          this.$emit('update:modelValue', this.date)
+          this.$emit('onChange')
         }
-        this.date = getDateOfTraining(this.date, this.weekdays, true)
-        this.formatedDateString = getFormatedDateString(this.date)
-        this.$emit('update:modelValue', this.date)
-        this.$emit('onChange')
       }
     },
     getLastDate() {
@@ -77,4 +87,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>
