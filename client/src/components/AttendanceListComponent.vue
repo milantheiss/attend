@@ -12,7 +12,7 @@ export default {
   name: "AttendanceListComponent",
   data() {
     return {
-      participantArr: []
+      participantArr: Object
     }
   },
   emits: ['onAttendedChange'],

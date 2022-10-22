@@ -37,7 +37,7 @@
         class="col-start-2 col-span-2 inline-flex items-center justify-items-center" />
     </div>
 
-    <div class="mt-4 grid items-center">
+    <div class="mt-12 grid items-center">
       <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
       <p v-show="typeof this.attended.participants === 'undefined'"
