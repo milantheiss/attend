@@ -11,9 +11,12 @@
 
       <GroupInfo :group="selectedGroup" class="mt-4" />
     </div>
-    
-    <GroupListGomponent :participants="getParticipants()" @onClickOnSave="(participantData) => onClickOnSave(participantData)" @onClickOnDelete="(participantData) => onClickOnDelete(participantData)"/>
-    <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)" v-show="typeof selectedGroup !== 'undefined'"/>
+
+    <GroupListGomponent :participants="getParticipants()"
+      @onClickOnSave="(participantData) => onClickOnSave(participantData)"
+      @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
+    <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)"
+      v-show="typeof selectedGroup !== 'undefined'" />
   </div>
 </template>
   
@@ -37,23 +40,22 @@ export default {
     GroupListGomponent,
     GroupInfo,
     MemberEditor
-},
-
+  },
   methods: {
     async updateSelectedGroup(groupID) {
       this.selectedGroup = await fetchGroup(groupID)
     },
-    getParticipants(){
-      if (typeof this.selectedGroup !== 'undefined'){
+    getParticipants() {
+      if (typeof this.selectedGroup !== 'undefined') {
         return this.selectedGroup.participants
       } else {
         return undefined
       }
     },
-    async onClickOnSave(participantData){
+    async onClickOnSave(participantData) {
       this.selectedGroup = await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
-    async onClickOnDelete(participantData){
+    async onClickOnDelete(participantData) {
       this.selectedGroup = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
     }
   },

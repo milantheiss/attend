@@ -17,6 +17,7 @@ export default {
       participantArr: []
     }
   },
+  emits: ['onAttendedChange'],
   props: {
     participants: Array,
     sortByFirstName: {
