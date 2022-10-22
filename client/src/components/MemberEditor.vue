@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-white px-3 py-1.5 mt-3 mb-3 rounded-lg drop-shadow-md">
-        <div class="grid place-items-end mt-1 mr-1" v-if="!createsNewMember">
+    <div class="bg-white px-3 py-4 my-3 rounded-lg drop-shadow-md">
+        <div class="grid place-items-end mr-1" v-if="!createsNewMember">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-8 text-black" @click="onClickOnClose()">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -99,6 +99,7 @@ export default {
             }
         },
         async onClickOnDelete() {
+            console.log(this.participantData)
             this.$emit('onClickOnDelete', this.participantData)
         },
         async onClickOnCreate() {
@@ -117,8 +118,12 @@ export default {
             this.$emit('onClickOnClose')
         },
         formateParticipant(newVal) {
+            // INFO Es wird jedes Attribut einzeln übertragen, da sonst nur ein Pointer zum Prop gesetzt wird. 
+            // IMPORTANT Wenn neues Attribut zu ParticipantData kommt muss es hier erst übergeben werden --> Sonst ist es undefined
+
             this.participantData.firstname = newVal.firstname
             this.participantData.lastname = newVal.lastname
+            this.participantData._id = newVal._id
             try {
                 this.participantData.birthday = newVal.birthday.slice(0, 10)
             } catch {

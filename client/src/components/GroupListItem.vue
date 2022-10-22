@@ -35,13 +35,13 @@ export default {
   },
   emits: ['onClickOnSave', 'onClickOnDelete'],
   methods: {
-    onClickOnSave() {
+    onClickOnSave(participantData) {
       this.showEditPanel = false
-      this.$emit('onClickOnSave', this.participantData)
+      this.$emit('onClickOnSave', participantData)
     },
-    onClickOnDelete() {
+    onClickOnDelete(participantData) {
       this.showEditPanel = false
-      this.$emit('onClickOnDelete', this.participantData)
+      this.$emit('onClickOnDelete', participantData)
     },
     onClickOnClose(){
       this.showEditPanel = false

@@ -16,7 +16,6 @@
       </button>
       <h2 class="font-semibold text-xl md:text-2xl mx-auto my-auto">{{this.$store.state.viewname}}</h2>
 
-      <!-- w-12 h-12 rounded-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 p--->
       <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707" class="w-12 h-12 text-white p-3">
           <g fill="none" stroke="currentColor" stroke-width="6.649" transform="translate(-93.958 -82.631)">
@@ -36,7 +35,7 @@
         class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
       <router-link @click="showMenu = !showMenu" to="/logout" class="text-left font-semibold text-lg md:text-xl mt-2">
         Logout</router-link>
-      <p class="text-center font-light text-sm md:text-base mt-10 mx-auto">Erstellt von Milan Theiß - Version 0.1.1</p>
+      <p class="text-center font-light text-sm md:text-base mt-10 mx-auto">Erstellt von Milan Theiß - Version 0.1.2</p>
     </div>
   </nav>
   <router-view class="font-ubuntu font-normal" />

@@ -26,7 +26,7 @@
 
     <div>
       <GroupInfo v-show="showGroups" :group="selectedGroup"
-        class="mb-4 bg-white px-3 py-1.5 rounded-lg drop-shadow-md" />
+        class="bg-white px-4 py-4 rounded-lg drop-shadow-md mb-4" />
     </div>
 
     <div class="grid grid-cols-3 mb-4 items-center">
