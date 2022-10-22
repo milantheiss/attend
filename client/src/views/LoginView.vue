@@ -21,15 +21,7 @@
           <input class="border-b-2 border-gray-300 pl-1.5 py-0.5 text-dark-grey w-full" type="password" name="password"
             v-model="form.password" placeholder="Passwort" />
         </div>
-        <div class="flex items-center ml-3 my-6" v-show="showError">
-          <!--Error Icon-->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-6.5 mr-2 text-special-red">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-            </svg>
-          <p class="text-special-red font-semibold text-base place-self-end mr-4">Username oder Passwort ist falsch!</p>
-        </div>
+        <ErrorMessage :message="'Username oder Passwort ist falsch!'" v-show="showError" />
         <div class="flex justify-end items-center text-lg mt-6 mr-4">
           <button type="submit" class=" text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-1.5 md:py-2 rounded-lg drop-shadow-md font-medium">Login</button>
         </div>
@@ -40,10 +32,11 @@
 
 <script>
 import { mapActions } from "vuex";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 export default {
   name: "LoginView",
-  components: {},
+  components: { ErrorMessage },
   data() {
     return {
       form: {
