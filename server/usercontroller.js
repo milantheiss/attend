@@ -52,14 +52,3 @@ async function main() {
 }
 
 main()
-/*
-const userID = '62b4c5c182ea5fdec53d4e4c'
-
-const body = {
-    first_name: "Milan"
-}
-
-authService.updateUser(userID, body).then(res => console.log(res)).then(res => mongoose.connection.close())
-
-
-*/

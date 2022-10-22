@@ -3,7 +3,7 @@
     class="px-3.5 rounded-lg mt-3 mb-3 drop-shadow-md font-normal text-xl text-black bg-gradient-to-r from-gray-200 to-background-greywhite"
     v-show="!showEditPanel">
     <span class="flex items-center justify-between">
-      <h3>{{ participantData.lastname }}, {{ participantData.firstname }}</h3>
+      <h3>{{ participant.lastname }}, {{ participant.firstname }}</h3>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-7 rotate-4 py-2 text-black">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -11,9 +11,10 @@
       </svg>
     </span>
   </div>
-  <MemberEditor :participant="participantData" :createsNewMember="false" v-show="showEditPanel"
+  <MemberEditor :participant="participant" :createsNewMember="false" v-show="showEditPanel"
     @onClickOnSave="(participantData) => onClickOnSave(participantData)"
-    @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
+    @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" 
+    @onClickOnClose="onClickOnClose()"/>
 </template>
   
 <script>
@@ -26,13 +27,13 @@ export default {
   },
   data() {
     return {
-      showEditPanel: false,
-      participantData: {}
+      showEditPanel: false
     }
   },
   props: {
     participant: Object,
   },
+  emits: ['onClickOnSave', 'onClickOnDelete'],
   methods: {
     onClickOnSave() {
       this.showEditPanel = false
@@ -41,19 +42,9 @@ export default {
     onClickOnDelete() {
       this.showEditPanel = false
       this.$emit('onClickOnDelete', this.participantData)
-    }
-  },
-  watch: {
-    participant(newVal) {
-      this.participantData = newVal
-      this.participantData.birthday = newVal.birthday.slice(0, 10)
-    }
-  },
-
-  created() {
-    if (typeof this.participant !== 'undefined') {
-      this.participantData = this.participant
-      this.participantData.birthday = this.participant.birthday.slice(0, 10)
+    },
+    onClickOnClose(){
+      this.showEditPanel = false
     }
   }
 };

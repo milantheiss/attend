@@ -1,6 +1,13 @@
 <template>
     <div class="bg-white px-3 py-1.5 mt-3 mb-3 rounded-lg drop-shadow-md">
-        <div class="flex items-center justify-between mb-4 mt-3">
+        <div class="grid place-items-end mt-1" v-if="!createsNewMember">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-8 text-black" @click="onClickOnClose()">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
             <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full mx-3 text-base md:text-lg" type="text"
                 name="firstname" v-model="participantData.firstname" placeholder="Vorname" />
         </div>
@@ -17,7 +24,7 @@
                 class="border-b-2 border-gray-300 text-black mx-3 font-medium text-base md:text-lg" />
         </div>
 
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center justify-between mb-4">
             <label for="firsttraining" class="text-gray-700 font-light text-base md:text-lg ml-3">Erstes
                 Training:</label>
             <input type="date" v-model="participantData.firsttraining" name="firsttraining"
@@ -84,6 +91,7 @@ export default {
             }
         }
     },
+    
     methods: {
         async onClickOnSave() {
             if (!this.hasAnError()) {
@@ -104,8 +112,14 @@ export default {
                 }
             }
         },
+        async onClickOnClose() {
+            this.formateParticipant(this.participant)
+            this.$emit('onClickOnClose')
+        },
         formateParticipant(newVal) {
-            this.participantData = newVal
+            console.log('übertragen?')
+            this.participantData.firstname = newVal.firstname
+            this.participantData.lastname = newVal.lastname
             try {
                 this.participantData.birthday = newVal.birthday.slice(0, 10)
             } catch {
