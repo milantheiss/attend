@@ -68,12 +68,14 @@ const getTrainingssession = async (user, groupID, date) => {
         const temp = (await groupService.getGroupById(user, groupID)).participants
 
         temp.forEach((participant) => {
-            formated.push({
-                firstname: participant.firstname,
-                lastname: participant.lastname,
-                attended: false,
-                _id: participant._id
-            })
+            if (date >= participant.firsttraining){                
+                formated.push({
+                    firstname: participant.firstname,
+                    lastname: participant.lastname,
+                    attended: false,
+                    _id: participant._id
+                })
+            }
         })
 
         const sessionBody = {
