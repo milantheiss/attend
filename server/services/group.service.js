@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
-const { Group } = require('../models');
+const { Group, Attendance } = require('../models');
 const ApiError = require('../utils/ApiError');
-const mongoose = require('mongoose');
 //const { attendanceController } = require('../controllers');
 
 /**
@@ -85,27 +84,98 @@ const createGroup = async (user, groupBody) => {
  */
 const updateMember = async (user, groupId, body) => {
     if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
-        if (typeof body._id !== 'undefined') {
-            //Wenn Member schon existiert, wird er geupdatet
-            const group = await Group.findById({ '_id': groupId })
-
-            const oldParticipantData = group.participants.find(e => e._id.equals(body._id))
-
-            console.log(oldParticipantData)
-            //TODO Add Call to Attendance Service ...
-
-            //attendanceController.updateParticipantInTrainingssessions(user, groupId, body, oldParticipantData.firsttraining, body.firsttraining)
-
-            return Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } }, {new: true})
+        let group
+        let oldFirsttraining
+        
+        //Wenn Member noch nicht existiert, wird er neu erstellt
+        if (typeof body._id === 'undefined') {
+            group = await Group.findByIdAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } }, { new: true })
+            body._id = group.participants[group.participants.length - 1]._id
         } else {
-            //Wenn Member noch nicht existiert, wird er neu erstellt
-            return Group.findByIdAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } }, {new: true})
+            oldFirsttraining = group.participants.find(e => e._id.equals(body._id)).firsttraining
+            group = await Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } }, { new: true })
         }
 
+        //Attendance wird geupdatet
+        updateParticipantInTrainingssessions(groupId, body, oldFirsttraining, body.firsttraining)
+
+        return group
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
 };
+
+const updateParticipantInTrainingssessions = async (groupID, participantData, oldFirsttraining, newFirsttraining) => {
+    const startTime = Date.now()
+
+    let list = await Attendance.findOne({ 'group._id': groupID });
+
+    newFirsttraining = new Date(newFirsttraining)
+
+    //Wenn der Participant geupdatet wird
+    if (typeof oldFirsttraining !== 'undefined') {
+        oldFirsttraining = new Date(oldFirsttraining)
+
+        //Fügt Participant neu in Trainingsessions hinzu, wenn newFirsttraining früher war als oldFirsttraining 
+        if (newFirsttraining <= oldFirsttraining) {
+            for (const session of list.trainingssessions) {
+                //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
+                if (session.date >= newFirsttraining) {
+                    participant = session.participants.find(foo => foo._id.equals(participantData._id))
+
+                    if (typeof participant !== 'undefined') {
+                        participant.firstname = participantData.firstname
+                        participant.lastname = participantData.lastname
+                    } else { //Wenn Participant noch nicht in Trainingssession existiert
+                        session.participants.push({
+                            firstname: participantData.firstname,
+                            lastname: participantData.lastname,
+                            attended: false,
+                            _id: participantData._id
+                        })
+                    }
+                }
+            }
+        } else { //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
+            for (const session of list.trainingssessions) {
+                //Wird auf alle Trainingssessions angewenden, die jünger sind als oldFirsttraining
+                if (session.date >= oldFirsttraining) {
+                    if (session.date >= newFirsttraining) { //Wenn Trainingssession jünger ist als newFirsttraining --> Participant wird geupdatet
+                        for (const participant of session.participants) {
+                            if (participant._id.equals(participantData._id)) {
+                                participant.firstname = participantData.firstname
+                                participant.lastname = participantData.lastname
+                                break
+                            }
+                        }
+                    } else {
+                        for (const participant of session.participants) {
+                            if (participant._id.equals(participantData._id)) {
+                                session.participants.splice(session.participants.indexOf(participant), 1)
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else { //Wenn der Participant neu erstellt wird
+        for (const session of list.trainingssessions) {
+            //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
+            if (session.date >= newFirsttraining) {
+                session.participants.push({
+                    firstname: participantData.firstname,
+                    lastname: participantData.lastname,
+                    attended: false,
+                    _id: participantData._id
+                })
+            }
+        }
+        await Attendance.findOneAndUpdate({ '_id': list._id }, { '$set': { 'trainingssessions': list.trainingssessions } })
+    }
+
+    console.log("In ms: ", (Date.now() - startTime))
+}
 
 /**
  * Get a group by ID and return only info.
@@ -129,7 +199,7 @@ const getGroupInfo = async (user, groupId) => {
  */
 const removeMember = async (user, groupId, memberId) => {
     if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
-        return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } }, {new: true})
+        return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } }, { new: true })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }

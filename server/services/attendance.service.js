@@ -3,7 +3,6 @@ const { Attendance } = require('../models');
 const { groupService } = require('../services');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
-const { date } = require('joi');
 const logger = require('../config/logger');
 
 /**
