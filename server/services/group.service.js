@@ -100,6 +100,8 @@ const updateMember = async (user, groupId, body) => {
             oldFirsttraining = foo.firsttraining
 
             //Lokale Variable group wird geupdatet für den Return
+            foo.firstname = body.firstname
+            foo.lastname = body.lastname
             foo.firsttraining = body.firsttraining
         }
 
