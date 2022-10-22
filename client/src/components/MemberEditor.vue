@@ -117,7 +117,6 @@ export default {
             this.$emit('onClickOnClose')
         },
         formateParticipant(newVal) {
-            console.log('übertragen?')
             this.participantData.firstname = newVal.firstname
             this.participantData.lastname = newVal.lastname
             try {
