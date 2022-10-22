@@ -4,23 +4,42 @@
     <div class="flex justify-between mb-4">
       <button @click="showMenu = !showMenu" class="w-12">
         <span>
-          <img :src="'./img/menu-icon.svg'" alt="eye icon" class="w-7 h-5 mx-auto" v-show="!showMenu">
-          <img :src="'./img/x-icon-black.svg'" alt="x icon" class="w-5 ml-1 mr-1" v-show="showMenu">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
+            stroke="currentColor" class="w-10 text-black" v-show="!showMenu">
+            <path stroke-linecap="butt" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
+            stroke="currentColor" class="w-10 p-1 text-black" v-show="showMenu">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </span>
       </button>
-      <h2 class="font-semibold text-xl md:text-2xl mx-auto">{{this.$store.state.viewname}}</h2>
-      <img :src="'./img/default-profilpic.svg'" alt="eye icon" class="w-12 rounded-full"/>
+      <h2 class="font-semibold text-xl md:text-2xl mx-auto my-auto">{{this.$store.state.viewname}}</h2>
+
+      <!-- w-12 h-12 rounded-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 p--->
+      <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707" class="w-12 h-12 text-white p-3">
+          <g fill="none" stroke="currentColor" stroke-width="6.649" transform="translate(-93.958 -82.631)">
+            <ellipse cx="118.732" cy="96.016" rx="10.439" ry="10.061" />
+            <path d="M97.15 129.409a22.145 17.563 0 0 1 21.581-13.623 22.145 17.563 0 0 1 21.582 13.626" />
+          </g>
+        </svg>
+      </span>
     </div>
 
     <div class="grid" v-show="showMenu">
-      <router-link @click="showMenu = !showMenu" to="/attendancelist" class="text-left font-semibold text-lg md:text-xl mt-2">Anwesenheit</router-link>
-      <router-link @click="showMenu = !showMenu" to="/editgroup" class="text-left font-semibold text-lg md:text-xl mt-2">Gruppe bearbeiten</router-link>
-      <router-link @click="showMenu = !showMenu" to="/exportpdf" class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
-      <router-link @click="showMenu = !showMenu" to="/logout" class="text-left font-semibold text-lg md:text-xl mt-2">Logout</router-link>
+      <router-link @click="showMenu = !showMenu" to="/attendancelist"
+        class="text-left font-semibold text-lg md:text-xl mt-2">Anwesenheit</router-link>
+      <router-link @click="showMenu = !showMenu" to="/editgroup"
+        class="text-left font-semibold text-lg md:text-xl mt-2">Gruppe bearbeiten</router-link>
+      <router-link @click="showMenu = !showMenu" to="/exportpdf"
+        class="text-left font-semibold text-lg md:text-xl mt-2">Liste exportieren</router-link>
+      <router-link @click="showMenu = !showMenu" to="/logout" class="text-left font-semibold text-lg md:text-xl mt-2">
+        Logout</router-link>
       <p class="text-center font-light text-sm md:text-base mt-10 mx-auto">Erstellt von Milan Theiß - Version 0.1.1</p>
     </div>
   </nav>
-  <router-view class="font-ubuntu font-normal"/>
+  <router-view class="font-ubuntu font-normal" />
 </template>
 
 <script>

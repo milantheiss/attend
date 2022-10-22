@@ -22,7 +22,7 @@ module.exports = {
         'dimmed-gradient-2': '#7C83C3',
         'delete-gradient-1': '#DE2C2C',
         'delete-gradient-2': '#D83535',
-        'background-greywhite': '#FBFCFF',
+        'background-greywhite': '#edf0f2',
         'dark-grey': '#464646',
         'special-red': '#FF1F28F'
       },
@@ -30,6 +30,7 @@ module.exports = {
         'ubuntu': ['Ubuntu', 'sans-serif']
       },
       spacing:{
+        '6.5': '1.625rem',
         '160': '40rem',
         '120': '30rem'
       }
