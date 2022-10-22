@@ -23,3 +23,5 @@ pnpm-debug.log*
 *.sw?
 
 /server/.env
+/client/public/legacy_icons
+
