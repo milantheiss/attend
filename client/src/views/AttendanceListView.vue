@@ -1,12 +1,12 @@
 <template>
-  <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
-    <div class="flex items-center justify-between mb-4">
+  <div class="relative container">
+    <div class="flex items-center justify-between mb-8">
       <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-        :options="this.groups" class="bg-background-greywhite  font-bold text-xl md:text-3xl mt-1" />
+        :options="this.groups" class="bg-background-greywhite font-bold text-xl md:text-3xl" />
 
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
-        class="inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 rounded-lg drop-shadow-md ml-2">
+        class="inline-flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2">
         <span class="flex items-center w-6 mr-2">
           <!--Open Eye Icon-->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
@@ -28,20 +28,20 @@
 
     <div>
       <GroupInfo v-show="showGroups" :group="selectedGroup"
-        class="bg-white px-4 py-4 rounded-lg drop-shadow-md mb-4" />
+        class="bg-white px-4 py-4 rounded-lg drop-shadow-md mb-8" />
     </div>
 
-    <div class="grid grid-cols-3 mb-4 items-center">
-      <p class="text-xl md:text-2xl font-medium text-gray-700 ml-2">Datum:</p>
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"
-        class="col-start-2 col-span-2 inline-flex items-center justify-items-center" />
+    <div class="mb-12">
+      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"/>
     </div>
 
-    <div class="mt-12 grid items-center">
+    <div>
       <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
-      <p v-show="typeof this.attended.participants === 'undefined'"
-      class="text-xl md:text-2xl font-normal text-gray-400 mx-auto">Bitte wähle eine Gruppe</p>
+      <span class="flex justify-center items-center">        
+        <p v-show="typeof this.attended.participants === 'undefined'"
+        class="text-xl md:text-2xl font-normal text-gray-400">Bitte wähle eine Gruppe</p>
+      </span>
     </div>
   </div>
 </template>
