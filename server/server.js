@@ -7,15 +7,15 @@ const fs = require('fs')
 
 let server;
 //config.mongoose.url
-mongoose.connect(config.url, {dbName: 'data'}).then(() => {
+mongoose.connect(config.url, { dbName: 'data' }).then(() => {
     logger.info('Connected to MongoDB');
     server = https.createServer({
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert),
     }, app)
         .listen(config.port, () => {
-        logger.info(`Listening to port ${config.port}`);
-    });
+            logger.info(`Listening to port ${config.port}`);
+        });
 });
 
 const exitHandler = () => {

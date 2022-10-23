@@ -53,6 +53,12 @@ const getRefreshTokenSecret = async (userID, token_id) => {
     return secret
 }
 
+//WARNING No Authentication Check
+const createUser = async(body) => {
+    console.log("Hello")
+    return await User.create(body)
+}
+
 const updateUser = async(userID, body) => {
     return User.findByIdAndUpdate(userID, body)
 }
@@ -67,5 +73,7 @@ module.exports = {
     addRefreshToken,
     deleteRefreshToken,
     getRefreshTokenSecret,
-    updateUser
+    updateUser,
+    createUser,
+    deleteUser
 };
