@@ -12,9 +12,13 @@
       <GroupInfo :group="selectedGroup" class="mt-4" />
     </div>
 
-    <GroupListGomponent :participants="getParticipants()"
-      @onClickOnSave="(participantData) => onClickOnSave(participantData)"
-      @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
+    <div class="grid items-center mt-6">
+      <GroupListGomponent :participants="getParticipants()"
+        @onClickOnSave="(participantData) => onClickOnSave(participantData)"
+        @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
+      <p v-show="typeof getParticipants() === 'undefined'"
+        class="text-xl md:text-2xl font-normal text-gray-400 mx-auto">Bitte wähle eine Gruppe</p>
+    </div>
     <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)"
       v-show="typeof selectedGroup !== 'undefined'" />
   </div>

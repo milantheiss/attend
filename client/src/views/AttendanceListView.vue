@@ -91,7 +91,6 @@ export default {
 
     attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
-      console.log(this.date)
       updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 

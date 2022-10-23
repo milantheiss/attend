@@ -94,7 +94,7 @@ const updateMember = async (user, groupId, body) => {
             //oldFirsttraining bleibt 'undefined'
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
             group = await Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
-            
+
             //OldFirsttraining wird aus group gezogen
             const foo = group.participants.find(e => e._id.equals(body._id))
             oldFirsttraining = foo.firsttraining
@@ -115,71 +115,65 @@ const updateMember = async (user, groupId, body) => {
 };
 
 const updateParticipantInTrainingssessions = async (groupID, participantData, oldFirsttraining, newFirsttraining) => {
-    const startTime = Date.now()
-
     let list = await Attendance.findOne({ 'group._id': groupID });
 
-    newFirsttraining = new Date(newFirsttraining)
+    //Wird nur ausgeführt, wenn schon Trainingssession bzw. Attendance Documents existieren
+    if (typeof list !== "undefined" && list !== null) {
+        newFirsttraining = new Date(newFirsttraining)
 
-    //Wenn der Participant geupdatet wird
-    if (typeof oldFirsttraining !== 'undefined') {
-        oldFirsttraining = new Date(oldFirsttraining)
+        //Wenn der Participant geupdatet wird
+        if (typeof oldFirsttraining !== 'undefined') {
+            oldFirsttraining = new Date(oldFirsttraining)
 
-        console.log("new " + newFirsttraining)
-        console.log('old ' + oldFirsttraining)
+            //Fügt Participant neu in Trainingsessions hinzu, wenn newFirsttraining früher war als oldFirsttraining 
+            if (newFirsttraining <= oldFirsttraining) {
+                for (const session of list.trainingssessions) {
+                    //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
+                    if (session.date >= newFirsttraining) {
+                        participant = session.participants.find(foo => foo._id.equals(participantData._id))
 
-        //Fügt Participant neu in Trainingsessions hinzu, wenn newFirsttraining früher war als oldFirsttraining 
-        if (newFirsttraining <= oldFirsttraining) {
-            for (const session of list.trainingssessions) {
-                //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
-                if (session.date >= newFirsttraining) {
-                    console.log(session.date)
-                    participant = session.participants.find(foo => foo._id.equals(participantData._id))
-
-                    if (typeof participant !== 'undefined') {
+                        if (typeof participant !== 'undefined') {
+                            participant.firstname = participantData.firstname
+                            participant.lastname = participantData.lastname
+                        } else { //Wenn Participant noch nicht in Trainingssession existiert
+                            session.participants.push({
+                                firstname: participantData.firstname,
+                                lastname: participantData.lastname,
+                                attended: false,
+                                _id: participantData._id
+                            })
+                        }
+                    }
+                }
+            } else { //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
+                for (const session of list.trainingssessions) {
+                    //In allen Trainingssessions, die jünger sind als newFirsttraining, wird Participant geupdatet
+                    if (session.date >= newFirsttraining) {
+                        participant = session.participants.find(foo => foo._id.equals(participantData._id))
                         participant.firstname = participantData.firstname
                         participant.lastname = participantData.lastname
-                    } else { //Wenn Participant noch nicht in Trainingssession existiert
-                        console.log('Push new Participant')
-                        session.participants.push({
-                            firstname: participantData.firstname,
-                            lastname: participantData.lastname,
-                            attended: false,
-                            _id: participantData._id
-                        })
+                    } else if (session.date >= oldFirsttraining) { //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
+                        participant = session.participants.find(foo => foo._id.equals(participantData._id))
+                        session.participants.splice(session.participants.indexOf(participant), 1)
                     }
                 }
             }
-        } else { //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
+        } else { //Wenn der Participant neu erstellt wird
             for (const session of list.trainingssessions) {
-                //In allen Trainingssessions, die jünger sind als newFirsttraining, wird Participant geupdatet
+                //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
                 if (session.date >= newFirsttraining) {
-                    participant = session.participants.find(foo => foo._id.equals(participantData._id))
-                    participant.firstname = participantData.firstname
-                    participant.lastname = participantData.lastname
-                } else if (session.date >= oldFirsttraining) { //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
-                    participant = session.participants.find(foo => foo._id.equals(participantData._id))
-                    session.participants.splice(session.participants.indexOf(participant), 1)
+                    session.participants.push({
+                        firstname: participantData.firstname,
+                        lastname: participantData.lastname,
+                        attended: false,
+                        _id: participantData._id
+                    })
                 }
             }
         }
-    } else { //Wenn der Participant neu erstellt wird
-        for (const session of list.trainingssessions) {
-            //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
-            if (session.date >= newFirsttraining) {
-                session.participants.push({
-                    firstname: participantData.firstname,
-                    lastname: participantData.lastname,
-                    attended: false,
-                    _id: participantData._id
-                })
-            }
-        }
-    }
-    
-    await Attendance.findOneAndUpdate({ '_id': list._id }, { '$set': { 'trainingssessions': list.trainingssessions } })
 
-    console.log("In ms: ", (Date.now() - startTime))
+        await Attendance.findOneAndUpdate({ '_id': list._id }, { '$set': { 'trainingssessions': list.trainingssessions } })
+    }
 }
 
 /**

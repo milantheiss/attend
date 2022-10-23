@@ -54,12 +54,14 @@ const getAttendanceById = async (user, id) => {
 const getTrainingssession = async (user, groupID, date) => {
     //INFO Access controle wird von 'getAttendanceByGroup' gehandelt
     const attendance = await getAttendanceByGroup(user, groupID)
+    let session
 
-    const session = attendance.trainingssessions.find(element => element.date.toJSON() === new Date(date).toJSON())
+    //Falls es noch gar keine Attendance gibt, 
+    try {
+        session = attendance.trainingssessions.find(element => element.date.toJSON() === new Date(date).toJSON())
+    } catch {}
 
-    if (typeof session !== 'undefined') {
-        return session
-    } else {
+    if(typeof session === 'undefined' && session == null){
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
         //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
@@ -84,6 +86,8 @@ const getTrainingssession = async (user, groupID, date) => {
         }
 
         return sessionBody
+    } else {
+        return session
     }
 };
 
@@ -128,11 +132,27 @@ const createAttendance = async (user, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const addTrainingssession = async (user, groupID, sessionBody) => {
-    if (user.role === 'admin') {
-        return Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
-    } else if (user.role === 'trainer') {
-        if (user.accessible_groups.includes(groupID)) {
-            return Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
+    if (user.role === 'admin' || user.role === 'trainer') {
+        if (user.role === 'admin' || user.accessible_groups.includes(groupID)) {
+            try {
+                const _res = await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
+                
+                //Wenn noch keine Attendance Document existiert, ist _res null
+                if (_res !== null && typeof _res !== 'undefined') {
+                    return _res
+                }else{ //Erstellt neues Attendance Document
+                    return Attendance.create({
+                        group: {
+                            _id: new mongoose.Types.ObjectId(groupID)
+                        },
+                        trainingssessions: [
+                            sessionBody
+                        ]
+                    })
+                }
+            } catch (e) {
+                console.log(e)
+            }
         } else {
             throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add a trainingssession")
         }

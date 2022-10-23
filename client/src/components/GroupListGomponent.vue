@@ -2,10 +2,8 @@
   <GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
     @onClickOnSave="(participantData) => $emit('onClickOnSave', participantData)"
     @onClickOnDelete="(participantData) => $emit('onClickOnDelete', participantData)" />
-  <span class="grid content-center mt-6">
     <p v-show="participantArr.length === 0"
-      class="text-xl justify-self-center md:text-2xl font-normal text-gray-400 mx-auto">Bitte wähle eine Gruppe</p>
-  </span>
+    class="text-xl md:text-2xl font-normal text-gray-400 mx-auto">Liste ist leer</p>
 </template>
   
 <script>
@@ -15,7 +13,7 @@ export default {
   name: "GroupListGomponent",
   data() {
     return {
-      participantArr: []
+      participantArr: Array
     }
   },
   props: {

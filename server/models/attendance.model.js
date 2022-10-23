@@ -8,7 +8,7 @@ const attendanceSchema = mongoose.Schema(
             type: {
                 name: {
                     type: String,
-                    required: true
+                    required: false
                 }
             },
             required: false
