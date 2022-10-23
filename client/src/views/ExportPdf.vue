@@ -1,29 +1,29 @@
 <template>
-    <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
+    <div class="relative container">
         <div class="bg-white px-5 py-3 rounded-lg drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
-                <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
+                <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
                     :options="this.groups" class="font-bold text-xl md:text-2xl mt-1" />
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="filename" class="text-gray-700 font-light text-base md:text-lg">Dateiname:</label>
-                <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-base md:text-lg" type="text" name="filename"
+                <label for="filename" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
+                <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-lg md:text-xl" type="text" name="filename"
                     v-model="filename" placeholder="Dateiname" />
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="startdate" class="text-gray-700 font-light text-base md:text-lg">Anfang:</label>
-                <input type="date" v-model="startdate" name="startdate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
+                <label for="startdate" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Anfang:</label>
+                <input type="date" v-model="startdate" name="startdate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-lg md:text-xl"/>
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <label for="enddate" class="text-gray-700 font-light text-base md:text-lg">Ende:</label>
-                <input type="date" v-model="enddate" name="enddate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-base md:text-lg"/>
+                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Ende:</label>
+                <input type="date" v-model="enddate" name="enddate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-lg md:text-xl"/>
             </div>
         </div>
 
         <button @click="exportPDF"
-            class="flex items-center mx-auto mt-8 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-1.5 md:py-2 rounded-lg drop-shadow-md">
+            class="flex items-center mx-auto mt-8 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md">
             <p class="font-medium font-base md:text-lg">Exportieren</p>
         </button>
     </div>

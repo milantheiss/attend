@@ -1,10 +1,10 @@
 <template>
   <div @click="onClick"
-    :class="this.activated ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2':'text-black bg-gradient-to-br from-unchecked-gradient-1 to-unchecked-gradient-2'"
-    class="pl-3.5 py-2 rounded-lg drop-shadow mb-3 font-normal text-xl">
+    :class="this.activated ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1':'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
+    class="px-3.5 py-3 rounded-lg drop-shadow mb-4 font-normal text-xl">
     <span class="flex items-center justify-between">
       <h3>{{ participant.lastname }}, {{ participant.firstname }}</h3>
-      <span class="self-center w-6 mr-3">
+      <span class="self-center w-6">
         <!--Checkmark Icon-->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 73.031 55.976" class="text-white" v-show="activated">
           <path fill="none" stroke="currentColor" stroke-width="9.973" d="M69.465 3.486 25.048 48.925 3.486 27.847" />

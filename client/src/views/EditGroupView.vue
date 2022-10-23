@@ -1,6 +1,6 @@
 <template>
-  <div class="relative container mx-auto pt-3 px-6 pb-6 md:max-w-medium-width">
-    <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-4">
+  <div class="relative container">
+    <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-12">
       <div class="grid grid-cols-2 mx-3">
         <div>
           <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
@@ -12,7 +12,7 @@
       <GroupInfo :group="selectedGroup" class="mt-4" />
     </div>
 
-    <div class="grid items-center mt-6">
+    <div class="grid items-center mb-2">
       <GroupListGomponent :participants="getParticipants()"
         @onClickOnSave="(participantData) => onClickOnSave(participantData)"
         @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />

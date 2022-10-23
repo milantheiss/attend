@@ -16,8 +16,8 @@ module.exports = {
       colors: {
         'standard-gradient-1': 'rgb(88, 100, 224)',
         'standard-gradient-2': 'rgb(107, 88, 224)',
-        'unchecked-gradient-1': '#E1E2EF',
-        'unchecked-gradient-2': '#D3D0E4',
+        'unchecked-gradient-1': '#c2beda',
+        'unchecked-gradient-2': '#cecfe4',
         'dimmed-gradient-1': '#98A4CD',
         'dimmed-gradient-2': '#7C83C3',
         'delete-gradient-1': '#DE2C2C',
@@ -31,6 +31,7 @@ module.exports = {
       },
       spacing:{
         '6.5': '1.625rem',
+        '38': '9.5rem',
         '160': '40rem',
         '120': '30rem'
       }
