@@ -55,7 +55,6 @@ const getRefreshTokenSecret = async (userID, token_id) => {
 
 //WARNING No Authentication Check
 const createUser = async(body) => {
-    console.log("Hello")
     return await User.create(body)
 }
 
