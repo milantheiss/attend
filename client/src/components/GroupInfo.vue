@@ -1,6 +1,6 @@
 <template>
   <div class="px-3">
-    <div class="grid grid-cols-2" v-if="typeof group.department.name !== 'undefined'">
+    <div class="flex justify-between items-center" v-if="typeof group.department.name !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Abteilung:</p>
       </div>
@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2" v-if="group.trainer.length !== 0">
+    <div class="flex justify-between items-center" v-if="group.trainer.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Trainer:</p>
       </div>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2" v-if="group.assistent.length !== 0">
+    <div class="flex justify-between items-center" v-if="group.assistent.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Assistent:</p>
       </div>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2" v-if="group.times.length !== 0">
+    <div class="flex justify-between items-center" v-if="group.times.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Zeiten:</p>
       </div>
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2" v-if="typeof group.venue !== 'undefined'">
+    <div class="flex justify-between items-center" v-if="typeof group.venue !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Sportstätte:</p>
       </div>
