@@ -1,7 +1,8 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "attend-app",
+  "version": "0.1.2",
   "private": true,
+  "author": "Milan Theiss <milan.theiss@gmx.net> (https://github.com/milantheiss)",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -9,20 +10,18 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.12",
-    "autoprefixer": "^10",
-    "axios": "^0.27.2",
+    "autoprefixer": "^10.4.12",
     "core-js": "^3.8.3",
     "dotenv": "^16.0.1",
     "jspdf": "^2.5.1",
-    "postcss": "^8",
+    "postcss": "^8.4.18",
     "register-service-worker": "^1.7.2",
     "tailwindcss": "^3",
     "vue": "^3.2.13",
     "vue-cookies": "^1.8.1",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.2",
-    "vuex-persistedstate": "^4.1.0",
-    "winston": "^3.7.2"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
