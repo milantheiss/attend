@@ -1,5 +1,5 @@
 <template>
-    <div class="flex items-center mx-3 my-6" v-show="showError">
+    <div class="flex items-center" v-show="show">
         <!--Error Icon-->
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
             class="w-6.5 mr-2 text-special-red">
@@ -19,6 +19,10 @@ export default {
             type: String,
             required: true
         },
+        show: {
+            type: Boolean,
+            required: true
+        }
     }
 }
 </script>

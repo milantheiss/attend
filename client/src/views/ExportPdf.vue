@@ -1,40 +1,48 @@
 <template>
     <div class="relative container">
-        <div class="bg-white px-5 py-3 rounded-lg drop-shadow-md">
+        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
-                <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-                    :options="this.groups" class="font-bold text-xl md:text-2xl mt-1" />
+                <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
+                    class="font-bold text-xl md:text-2xl ml-3" :showError="error.cause.groupInput" />
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="filename" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
-                <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full ml-3 text-lg md:text-xl" type="text" name="filename"
-                    v-model="filename" placeholder="Dateiname" />
+                <label for="filename"
+                    class="text-black font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
+                <TextInput name="filename" v-model="filename" placeholder="Dateiname"
+                    :showError="error.cause.filenameInput" class="ml-3"></TextInput>
             </div>
             <div class="flex items-center justify-between mb-4">
-                <label for="startdate" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Anfang:</label>
-                <input type="date" v-model="startdate" name="startdate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-lg md:text-xl"/>
+                <label for="startdate"
+                    class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
+                <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Ende:</label>
-                <input type="date" v-model="enddate" name="enddate" class="border-b-2 border-gray-300 text-black ml-3 font-medium text-lg md:text-xl"/>
+                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Ende:</label>
+                <DateInput v-model="enddate" name="enddate" class="ml-3"
+                    :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>   
             </div>
+
+            <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
+
+            <button @click="exportPDF"
+                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
+                :class="error.show ? 'mt-4' : 'mt-8'">
+                <p class="font-medium font-base md:text-lg">Exportieren</p>
+            </button>
         </div>
 
-        <button @click="exportPDF"
-            class="flex items-center mx-auto mt-8 text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md">
-            <p class="font-medium font-base md:text-lg">Exportieren</p>
-        </button>
     </div>
 </template>
   
 <script>
 import SelectList from "@/components/SelectList";
-// eslint-disable-next-line 
 import { createListe } from "@/util/generatePdf"
-// eslint-disable-next-line 
-import { fetchAttendanceByDateRange, fetchGroups, fetchGroupInfo } from '@/util/fetchOperations'
+import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
+import ErrorMessage from "@/components/ErrorMessage.vue";
+import TextInput from "@/components/TextInput.vue";
+import DateInput from "@/components/DateInput.vue";
 
 export default {
     name: "ExportPdf",
@@ -44,39 +52,61 @@ export default {
             groups: [],
             selectedGroup: undefined,
             startdate: new Date(Date.now()).toJSON().slice(0, 10),
-            enddate: new Date(Date.now()).toJSON().slice(0, 10)
+            enddate: new Date(Date.now()).toJSON().slice(0, 10),
+            error: {
+                message: "Fehler",
+                show: false,
+                cause: {
+                    groupInput: false,
+                    filenameInput: false,
+                    timespanFaulty: false
+                }
+            }
         }
     },
     components: {
-        SelectList
+        SelectList,
+        ErrorMessage,
+        TextInput,
+        DateInput
     },
     methods: {
-        async updateSelectedGroup(groupID) {
-            this.selectedGroup = await fetchGroupInfo(groupID)
-        },
         async exportPDF() {
             //WARNING Leeres PDF
+            if (!this.hasAnError()) {
+                const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                if (attendance.dates.length === 0) {
+                    this.error.show = true
+                    this.error.cause.timespanFaulty = true
+                    this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
+                } else {
+                    await createListe(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
+                }
+            }
+        },
+        hasAnError() {
+            this.error.message = "Keine Fehler"
 
+            this.error.show = typeof this.selectedGroup === 'undefined' || typeof this.filename !== "string" || this.filename.trim().length === 0;
+            this.error.cause.groupInput = typeof this.selectedGroup === 'undefined'
+            this.error.cause.filenameInput = typeof this.filename !== "string" || this.filename.trim().length === 0
+            this.error.cause.timespanFaulty = false
 
-            const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+            if (this.error.cause.groupInput) {
+                this.error.message = "Es muss eine Gruppe ausgewählt sein.";
+            } else if (this.error.cause.filenameInput) {
+                this.error.message = "Es muss ein Dateiname angegeben werden."
+            }
 
-            console.log(attendance)
+            this.error.message = this.error.cause.groupInput && this.error.cause.filenameInput ? "Alle Felder müssen ausgefüllt sein." : this.error.message
 
-            await createListe(this.selectedGroup, attendance, this.filename)
-            console.log("Now Exporting")
+            return this.error.show;
         }
     },
     async created() {
         this.groups = await fetchGroups()
-
-        /*
-        console.log("Creating PDF...")
-        const attendancelist = await fetchAttendanceByDateRange("62a2022bc0176cd5bb8cfe80", new Date('2022-08-01'), new Date('2022-08-31'))
-        console.log(attendancelist)
-        
-        */
         document.title = 'Wähle eine Gruppe - Attend'
-        this.$store.commit("setViewname","Liste exportieren")
+        this.$store.commit("setViewname", "Liste exportieren")
     },
     watch: {
         selectedGroup() {

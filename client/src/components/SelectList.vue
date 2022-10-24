@@ -1,7 +1,14 @@
 <template>
-  <select @change="onChange" v-model="selected">
-    <option disabled value="">{{ defaultValue }}</option>
-    <option v-for="element in options" :key="element.id" :value="element.id">
+  <select v-model="selected" class="block
+                        w-full
+                        pl-2 pb-0.5 
+                        text-black text-lg md:text-xl
+                        focus:ring-0 focus:border-dark-grey
+                        bg-inherit"
+    :class="showError ? 'border-2 rounded-lg border-special-red': 'border-0 border-b-2 border-gray-300 rounded-none'"
+    style="background-position: right 0.1rem center;padding-right: 1.9rem;">
+    <option disabled :value="defaultValue">{{ defaultValue }}</option>
+    <option v-for="element in options" :key="element.id" :value="element">
       {{ element.name }}
     </option>
   </select>
@@ -12,22 +19,27 @@ export default {
   name: "SelectList",
   data() {
     return {
-      selected: "",
+      selected: this.defaultValue
     };
   },
+  emits: ['update:modelValue', 'onChange', 'on'],
   props: {
+    modelValue: Object,
     defaultValue: {
       type: String,
-      default: "Select",
+      default: "Wähle",
     },
     options: Array,
+    showError: Boolean
   },
-  methods: {
-    onChange() {
-      this.$emit("new-selected-value", this.selected);
+  watch: {
+    selected() {
+      this.$emit("update:modelValue", this.selected);
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>
