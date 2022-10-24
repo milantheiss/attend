@@ -19,21 +19,9 @@ const getGroups = async (user) => {
         if (!groups.length) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
-        } else {
-            //Es werden nur der Name und die ID der zugreifbaren Gruppen zurückgegeben. 
-
-            let shortenedList = []
-
-            for (const group of groups) {
-
-                shortenedList.push({
-                    id: group._id,
-                    name: group.name
-                })
-            }
-
-            return shortenedList
-        }
+        } 
+        
+        return groups
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to groups")
     }
