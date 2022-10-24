@@ -5,7 +5,7 @@
         px-1.5 py-0.5
         text-inherit font-medium text-lg md:text-xl
         focus:ring-0 focus:border-dark-grey
-        bg-inherit'
+        bg-inherit text-left'
         :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
         type='date' :name="name" v-model="input" :max='max' :min='min' />
 </template>
