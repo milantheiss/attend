@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between  items-center">
+  <div class="flex justify-between items-center">
     <button @click="getLastDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
       <!--Left Chevron Icon-->

@@ -1,8 +1,8 @@
 <template>
   <div class="relative container">
     <div class="flex items-center justify-between mb-8">
-      <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-        :options="this.groups" class="bg-background-greywhite font-bold text-xl md:text-3xl" />
+      <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe"
+        :options="this.groups" class="font-bold text-xl md:text-2xl mr-3"/>
 
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
@@ -51,7 +51,7 @@ import SelectList from "@/components/SelectList";
 import AttendanceListComponent from "@/components/AttendanceListComponent";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { fetchGroups, fetchGroup, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
+import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 
 export default {
   name: "AttendanceListView",
@@ -72,11 +72,6 @@ export default {
     GroupInfo
   },
   methods: {
-
-    async updateSelectedGroup(groupID) {
-      this.selectedGroup = await fetchGroup(groupID)
-    },
-
     async pullAttendance() {
       if (typeof this.selectedGroup !== 'undefined') {
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)

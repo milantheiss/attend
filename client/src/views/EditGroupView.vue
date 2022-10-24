@@ -1,12 +1,10 @@
 <template>
   <div class="relative container">
     <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-12">
-      <div class="grid grid-cols-2 mx-3">
-        <div>
-          <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
-        </div>
-        <SelectList @new-selected-value="(value) => updateSelectedGroup(value)" default-value="Gruppe"
-          :options="this.groups" class="font-bold text-xl md:text-2xl mt-1" />
+      <div class="flex justify-between items-center ml-3 mr-3">
+        <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
+        <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
+          class="font-bold text-xl md:text-2xl ml-3" />
       </div>
 
       <GroupInfo :group="selectedGroup" class="mt-4" />
@@ -27,7 +25,7 @@
 <script>
 import SelectList from "@/components/SelectList";
 import GroupListGomponent from "@/components/GroupListGomponent";
-import { fetchGroups, fetchGroup, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
+import { fetchGroups, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
 import GroupInfo from "@/components/GroupInfo"
 import MemberEditor from "@/components/MemberEditor";
 
@@ -46,9 +44,6 @@ export default {
     MemberEditor
   },
   methods: {
-    async updateSelectedGroup(groupID) {
-      this.selectedGroup = await fetchGroup(groupID)
-    },
     getParticipants() {
       if (typeof this.selectedGroup !== 'undefined') {
         return this.selectedGroup.participants

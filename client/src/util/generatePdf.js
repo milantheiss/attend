@@ -6,10 +6,16 @@ let pagecount
 let posNextLine
 let laufnummer = 0
 
+let _startdate
+let _enddate
+
 const tableTopMargin = 10
 
-async function createListe(group, attendenceList, filename) {
+async function createListe(group, attendenceList, filename, startdate, enddate) {
   let doc = new jsPDF({ unit: 'pt', orientation: "landscape", autoFirstPage: false });
+
+  _startdate = startdate
+  _enddate = enddate
 
   let splicedArray = {}
 
@@ -38,7 +44,7 @@ async function createListe(group, attendenceList, filename) {
     doc
       .setFontSize(12)
       .setFont('helvetica', "bold")
-      .text("Es wurden keine Daten in der gewählten Zeitspanne gefunden!", 20, posNextLine + 40)
+      .text("Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!", 20, posNextLine + 40)
     
     generateFooter(doc)
   }
@@ -57,12 +63,16 @@ function generatePage(doc, group, attendenceList) {
 }
 
 function generateHeader(doc) {
+  _startdate = new Date(_startdate).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' })
+  _enddate = new Date(_enddate).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' })
+
   posNextLine = 30
 
   doc.setFontSize(20)
     .setFont('helvetica', "bold")
     .text("Teilnehmerliste", 20, posNextLine)
-    .setFontSize(10)
+    .setFontSize(12)
+    .text(`Vom ${_startdate} bis ${_enddate}`, 180, posNextLine)
     .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 105, 10, 75, 56);
 }
 
@@ -95,7 +105,9 @@ function generateGroupInfo(doc, group) {
   doc
     .text(`Abteilung: ${group.department.name}`, 20, posNextLine, { maxWidth: 150 })
     .text(`Verantw. ÜL.: ${trainer}`, 170, posNextLine, { maxWidth: 326 })
-    .text(`Assistent: ${assistent}`, 496, posNextLine, { maxWidth: 326 })
+  if (assistent.length !== 0){
+    doc.text(`Assistent: ${assistent}`, 496, posNextLine, { maxWidth: 326 })
+  }
 }
 
 function generateTable(doc, attendenceList) {

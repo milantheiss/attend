@@ -1,6 +1,7 @@
 <template>
-    <div class="bg-white px-3 pt-4 pb-5 rounded-lg drop-shadow-md">
-        <div class="grid place-items-end mr-1" v-if="!createsNewMember">
+    <div class="bg-white px-3 rounded-lg drop-shadow-md" :class="!createsNewMember ? 'pt-0 pb-5' : 'py-5'">
+
+        <div class="grid place-items-end mr-1 mt-2 pt-2" v-show="!createsNewMember">
             <!--Closing X Icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-9 text-black" @click="onClickOnClose()">
@@ -9,31 +10,32 @@
         </div>
 
         <div class="flex items-center justify-between mb-4">
-            <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full mx-3 text-lg md:text-xl" type="text"
-                name="firstname" v-model="participantData.firstname" placeholder="Vorname" />
+            <TextInput name="firstname" v-model="participantData.firstname" placeholder="Vorname"
+                :showError="error.cause.firstnameInput" class="mx-3 text-black"></TextInput>
         </div>
 
         <div class="flex items-center justify-between mb-4">
-            <input class="border-b-2 border-gray-300 pl-1.5 text-dark-grey w-full mx-3 text-lg md:text-xl" type="text"
-                name="firstname" v-model="participantData.lastname" placeholder="Nachname" />
+            <TextInput name="lastname" v-model="participantData.lastname" placeholder="Nachname"
+                :showError="error.cause.lastnameInput" class="mx-3 text-black"></TextInput>
         </div>
 
         <div class="flex items-center justify-between mb-4">
-            <label for="birthday" class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3">Geburtstag:</label>
-            <input type="date" v-model="participantData.birthday" name="birthday"
-                :max="(new Date(Date.now()).toJSON()).slice(0, 10)"
-                class="border-b-2 border-gray-300 text-black mx-3 font-medium text-lg md:text-xl" />
+            <label for="birthday"
+                class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Geburtstag:</label>
+            <DateInput v-model="participantData.birthday" name="birthday" :max="participantData.firsttraining"
+                class="mx-3 text-black font-medium" :showError="error.cause.birthdayInput">
+            </DateInput>
         </div>
 
         <div class="flex items-center justify-between mb-6">
-            <label for="firsttraining" class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3">Erstes
+            <label for="firsttraining" class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Erstes
                 Training:</label>
-            <input type="date" v-model="participantData.firsttraining" name="firsttraining"
-                class="border-b-2 border-gray-300 text-black mx-3 font-medium text-lg md:text-xl"
-                :max="(new Date(Date.now()).toJSON()).slice(0, 10)" />
+            <DateInput v-model="participantData.firsttraining" name="firsttraining"
+                :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="participantData.birthday"
+                class="mx-3 text-black font-medium"></DateInput>
         </div>
 
-        <ErrorMessage :message="error.text"  v-show="error.show"/>
+        <ErrorMessage :message="error.message" :show="error.show" class="mx-3 my-6" />
 
         <div class="flex items-center justify-between" v-if="!createsNewMember">
             <button @click="onClickOnDelete()"
@@ -47,7 +49,6 @@
             </button>
         </div>
 
-
         <div class="flex justify-center items-center" v-if="createsNewMember">
             <button @click="onClickOnCreate()"
                 class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
@@ -60,14 +61,22 @@
   
 <script>
 import ErrorMessage from './ErrorMessage.vue';
+import TextInput from './TextInput.vue';
+import DateInput from './DateInput.vue';
 export default {
     name: "MemberEditor",
     data() {
         return {
             participantData: {},
             error: {
-                text: "Fehler",
-                show: false
+                message: "Fehler",
+                show: false,
+                cause: {
+                    firstnameInput: false,
+                    lastnameInput: false,
+                    birthdayInput: false,
+                    firsttrainingInput: false
+                }
             }
         };
     },
@@ -131,31 +140,33 @@ export default {
             }
         },
         hasAnError() {
-            if (typeof this.participantData.firstname !== "string" || this.participantData.firstname.trim().length === 0) {
-                this.error.text = "Fehler: Es wurde kein Vorname angegeben";
+            this.error.cause.firstnameInput = typeof this.participantData.firstname !== "string" || this.participantData.firstname.trim().length === 0
+            this.error.cause.lastnameInput = typeof this.participantData.lastname !== "string" || this.participantData.lastname.trim().length === 0
+            this.error.cause.birthdayInput = typeof this.participantData.birthday !== "string" || this.participantData.birthday.trim().length === 0
+            this.error.cause.firsttrainingInput = typeof this.participantData.firsttraining !== "string" || this.participantData.firsttraining.trim().length === 0
+
+            if (this.error.cause.firstnameInput) {
+                this.error.message = "Es muss ein Vorname angegeben werden.";
                 this.error.show = true;
-                return true;
-            }
-            else if (typeof this.participantData.lastname !== "string" || this.participantData.lastname.trim().length === 0) {
-                this.error.text = "Fehler: Es wurde kein Nachnamen angegeben";
+            } else if (this.error.cause.lastnameInput) {
+                this.error.message = "Es muss ein Nachname angegeben werden.";
                 this.error.show = true;
-                return true;
-            }
-            else if (typeof this.participantData.birthday !== "string" || this.participantData.birthday.trim().length === 0) {
-                this.error.text = "Fehler: Es wurde kein Geburtstag angegeben";
+            } else if (this.error.cause.birthdayInput) {
+                this.error.message = "Es muss ein Geburtstag angegeben werden.";
                 this.error.show = true;
-                return true;
-            }
-            else if (typeof this.participantData.firsttraining !== "string" || this.participantData.firsttraining.trim().length === 0) {
-                this.error.text = "Fehler: Datum des ersten Trainings fehlt.";
+            } else if (this.error.cause.firsttrainingInput) {
+                this.error.message = "Es muss das Datum des ersten Trainings ausgewählt sein.";
                 this.error.show = true;
-                return true;
-            }
-            else {
-                this.error.text = "Fehler";
+            } else {
+                this.error.message = "Kein Fehler";
                 this.error.show = false;
-                return false;
             }
+
+            if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput, this.error.cause.firsttrainingInput].filter(x => x === true).length >= 2) {
+                this.error.message = "Alle Felder müssen ausgefüllt sein."
+            }
+
+            return this.error.show
         }
     },
     watch: {
@@ -168,6 +179,6 @@ export default {
             this.formateParticipant(this.participant);
         }
     },
-    components: { ErrorMessage }
+    components: { ErrorMessage, TextInput, DateInput }
 };
 </script>
