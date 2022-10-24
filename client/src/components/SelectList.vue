@@ -36,7 +36,12 @@ export default {
     selected() {
       this.$emit("update:modelValue", this.selected);
     },
-  },
+    options () {
+      if (this.options.length === 1) {
+        this.selected = this.options[0]
+      }
+    }
+  }
 };
 </script>
 

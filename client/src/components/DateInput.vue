@@ -3,7 +3,7 @@
     <input class='block
         w-full
         pl-1.5 py-0.5
-        text-inherit font-medium text-lg md:text-xl
+        font-medium text-lg md:text-xl
         focus:ring-0 focus:border-dark-grey
         bg-inherit text-left'
         :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
@@ -43,5 +43,8 @@ input[type="date"] {
     background-repeat: no-repeat;
     background-size: 1.5rem 1.5rem;
     background-position: right 0.5rem center;
+}
+input::-webkit-date-and-time-value {
+  text-align: left;
 }
 </style>

@@ -19,7 +19,7 @@
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Ende:</label>
+                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
                 <DateInput v-model="enddate" name="enddate" class="ml-3"
                     :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>   
             </div>
