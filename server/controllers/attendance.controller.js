@@ -102,10 +102,6 @@ const getFormattedList = catchAsync(async (req, res) => {
   res.send(tempList)
 })
 
-const updateParticipantInTrainingssessions = async (user, groupID, participantData, oldFirsttraining, newFirsttraining) => {
-  //attendanceService.updateParticipantInTrainingssessions(user, groupID, participantData, oldFirsttraining, newFirsttraining)
-}
-
 module.exports = {
   getAttendance,
   getAttendanceById,
@@ -117,7 +113,6 @@ module.exports = {
   addTrainingssession,
   deleteTrainingssession,
   runGarbageCollector,
-  getFormattedList,
-  updateParticipantInTrainingssessions
+  getFormattedList
 }
 
