@@ -2,7 +2,7 @@
 <template>
     <input class='block
         w-full
-        px-1.5 py-0.5
+        pl-1.5 py-0.5
         text-inherit font-medium text-lg md:text-xl
         focus:ring-0 focus:border-dark-grey
         bg-inherit text-left'
