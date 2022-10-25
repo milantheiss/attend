@@ -28,11 +28,12 @@
         </div>
 
         <div class="flex items-center justify-between mb-6">
-            <label for="firsttraining" class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Erstes
+            <label for="firsttraining"
+                class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Erstes
                 Training:</label>
             <DateInput v-model="participantData.firsttraining" name="firsttraining"
                 :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="participantData.birthday"
-                class="mx-3 text-black font-medium"></DateInput>
+                class="mx-3 text-black font-medium" :show-error="error.cause.firsttrainingInput"></DateInput>
         </div>
 
         <ErrorMessage :message="error.message" :show="error.show" class="mx-3 my-6" />
