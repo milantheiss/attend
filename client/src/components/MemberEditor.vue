@@ -1,7 +1,6 @@
 <template>
     <div class="bg-white px-3 rounded-lg drop-shadow-md" :class="!createsNewMember ? 'pt-0 pb-5' : 'py-5'">
-
-        <div class="grid place-items-end mr-1 mt-2 pt-2" v-show="!createsNewMember">
+        <div class="grid place-items-end mr-1 pt-2" v-show="!createsNewMember">
             <!--Closing X Icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-9 text-black" @click="onClickOnClose()">
