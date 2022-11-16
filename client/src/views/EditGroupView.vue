@@ -28,9 +28,16 @@ import GroupListGomponent from "@/components/GroupListGomponent";
 import { fetchGroups, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
 import GroupInfo from "@/components/GroupInfo"
 import MemberEditor from "@/components/MemberEditor";
+import { useDataStore } from "@/store/dataStore";
 
 export default {
   name: "EditGroupView",
+    setup() {
+        const dataStore = useDataStore()
+        return {
+            dataStore
+        }
+    },
   data() {
     return {
       groups: [],
@@ -62,7 +69,7 @@ export default {
   async created() {
     this.groups = await fetchGroups()
     document.title = 'Gruppe bearbeiten - Attend'
-    this.$store.commit("setViewname", "Gruppe bearbeiten")
+    this.dataStore.viewname = "Gruppe bearbeiten"
   }
 }
 </script>

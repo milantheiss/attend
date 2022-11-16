@@ -5,14 +5,18 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { useAuthStore } from '@/store/authStore';
 export default {
   name: "LogoutView",
-  components: {},
+  setup() {
+    const auth = useAuthStore()
+    return {
+      auth
+    }
+  },
   methods: {
-    ...mapActions(["LogOut"]),
     async logout() {
-      await this.LogOut();
+      await this.auth.logOut();
       this.$router.push('/login')
     }
   },

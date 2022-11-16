@@ -29,12 +29,21 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
+import { useAuthStore } from "@/store/authStore";
+import { useDataStore } from "@/store/dataStore";
 
 export default {
   name: "LoginView",
+  setup() {
+    const auth = useAuthStore()
+    const dataStore = useDataStore()
+    return {
+      auth,
+      dataStore
+    }
+  },
   components: { ErrorMessage, TextInput },
   data() {
     return {
@@ -46,14 +55,10 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["LogIn"]),
     async submit() {
-      const user = {
-        username: this.form.username,
-        password: this.form.password
-      }
+      const user = this.form
       try {
-        await this.LogIn(user);
+        await this.auth.logIn(user);
         this.$router.push("/attendancelist");
         this.showError = false
       } catch (error) {
@@ -63,7 +68,7 @@ export default {
     },
   },
   created() {
-    this.$store.commit("setViewname", "Login")
+    this.dataStore.viewname = "Login"
   }
 };
 </script>

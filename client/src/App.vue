@@ -15,7 +15,7 @@
             </svg>
           </span>
         </button>
-        <h2 class="font-semibold text-xl md:text-2xl">{{this.$store.state.viewname}}</h2>
+        <h2 class="font-semibold text-xl md:text-2xl">{{dataStore.viewname}}</h2>
 
         <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
@@ -45,7 +45,15 @@
 </template>
 
 <script>
+import { useDataStore } from './store/dataStore'
+
 export default {
+  setup() {
+        const dataStore = useDataStore()
+        return {
+            dataStore
+        }
+    },
   data() {
     return {
       showMenu: false

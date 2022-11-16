@@ -52,9 +52,16 @@ import AttendanceListComponent from "@/components/AttendanceListComponent";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
 import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
+import { useDataStore } from "@/store/dataStore";
 
 export default {
   name: "AttendanceListView",
+  setup() {
+        const dataStore = useDataStore()
+        return {
+            dataStore
+        }
+    },
   data() {
     return {
       groups: [],
@@ -112,14 +119,14 @@ export default {
     this.groups = await fetchGroups()
     await this.pullAttendance()
     document.title = 'Wähle eine Gruppe'
-    this.$store.commit("setViewname", "Anwesenheitsliste")
+    this.dataStore.viewname = "Anwesenheitsliste"
   },
   watch: {
     selectedGroup() {
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
-      this.$store.commit("setSelectedGroupID", this.selectedGroup.id)
+      this.dataStore.selectedGroupID = this.selectedGroup.id
       document.title = this.selectedGroup.name + ' - Attend'
     }
   }

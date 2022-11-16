@@ -25,9 +25,16 @@
 import { getDateOfTraining, isClosestTrainingToday } from "@/util/formatter";
 import { runGarbageCollector } from '@/util/fetchOperations'
 import DateInput from "./DateInput.vue";
+import { useDataStore } from "@/store/dataStore";
 
 export default {
   name: "DatePicker",
+  setup() {
+    const dataStore = useDataStore()
+    return {
+      dataStore
+    }
+  },
   props: {
     modelValue: Date,
   },
@@ -41,8 +48,8 @@ export default {
   methods: {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.$store.state.attendancelist.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, new Date(this.date));
+        if (typeof this.dataStore.selectedGroupID !== "undefined") {
+          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
         }
         if (isClosestTrainingToday(this.weekdays)) {
           this.date = undefined
@@ -56,8 +63,8 @@ export default {
     getNextDate() {
       if (typeof this.weekdays !== "undefined") {
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
-          if (typeof this.$store.state.attendancelist.selectedGroupID !== "undefined") {
-            runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, new Date(this.date));
+          if (typeof this.dataStore.selectedGroupID !== "undefined") {
+            runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
           }
           this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
 
@@ -66,8 +73,8 @@ export default {
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.$store.state.attendancelist.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.$store.state.attendancelist.selectedGroupID, new Date(this.date));
+        if (typeof this.dataStore.selectedGroupID !== "undefined") {
+          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
         }
         this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
       }
@@ -79,7 +86,7 @@ export default {
   components: { DateInput },
   watch: {
     date(newVal) {
-      if(typeof newVal !== 'undefined'){
+      if (typeof newVal !== 'undefined') {
         this.$emit("update:modelValue", new Date(newVal));
         this.$emit("onChange");
       }
