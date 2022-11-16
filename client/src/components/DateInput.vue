@@ -29,6 +29,9 @@ export default {
     watch: {
         input() {
             this.$emit('update:modelValue', this.input)
+        },
+        modelValue() {
+            this.input = this.modelValue
         }
     }
 };
