@@ -8,7 +8,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
       </svg>
     </button>
-    <DateInput class="text-xl md:text-3xl font-medium text-center mx-3 md:mx-12 " v-model="date"
+    <DateInput class="text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
       :max="getFormattedDate(new Date(Date.now()))"></DateInput>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">

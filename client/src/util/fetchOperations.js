@@ -43,11 +43,6 @@ async function fetchAttendanceByDate(groupID, date) {
 }
 
 async function updateTrainingssession(groupID, date, body) {
-  console.log(groupID)
-  console.log(date);
-  console.log(getShortenedJSONDate(date))
-  console.log(body);
-  console.log(JSON.stringify(body));
   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
     method: 'PATCH',
     body: JSON.stringify(body),

@@ -2,7 +2,7 @@
   <div class="relative container">
     <div class="flex items-center justify-between mb-8">
       <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe"
-        :options="this.groups" class="font-bold text-xl md:text-2xl mr-3"/>
+        :options="this.groups" class="font-bold text-2xl md:text-3xl mr-3"/>
 
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'text-white bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
