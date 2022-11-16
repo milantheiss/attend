@@ -56,7 +56,6 @@ class Dateprocessor {
         let min = this.convertWeekdaytoNumber(weekdays[0])
         let i = 1
 
-        //QUESTION Warum wird das gemacht?
         if (this.calculateDifferenceBackwards(referenceWeekday.getDay(), min) === 0) {
             // Wenn weekdays[0] der gleiche Wochentag wie min ist, wird [0] übersprungen und mit [1] weitergemacht 
             try {

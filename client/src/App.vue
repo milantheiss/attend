@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-40">
+  <div class="mb-40 m-4">
     <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width"
       v-show="currentRouteName != 'Login' && currentRouteName != 'Logout'">
       <div class="flex justify-between justify-content-center items-center">
