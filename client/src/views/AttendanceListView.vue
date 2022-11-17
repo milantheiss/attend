@@ -123,6 +123,7 @@ export default {
   },
   watch: {
     selectedGroup() {
+      //Test
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
