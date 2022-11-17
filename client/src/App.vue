@@ -1,7 +1,7 @@
 <template>
   <div class="mb-40 m-4">
     <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width"
-      v-show="currentRouteName != 'Login' && currentRouteName != 'Logout'">
+      v-if="auth.authenticated">
       <div class="flex justify-between justify-content-center items-center">
         <button @click="showMenu = !showMenu" class="w-10">
           <span>
@@ -45,13 +45,16 @@
 </template>
 
 <script>
+import { useAuthStore } from './store/authStore'
 import { useDataStore } from './store/dataStore'
 
 export default {
   setup() {
         const dataStore = useDataStore()
+        const auth = useAuthStore()
         return {
-            dataStore
+            dataStore,
+            auth
         }
     },
   data() {
