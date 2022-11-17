@@ -32,7 +32,7 @@
     </div>
 
     <div class="mb-12">
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"/>
+      <DatePicker @onChange="pullAttendance" @triggerGargabeCollector="(date) => _runGarbageCollector(selectedGroup, date)" v-model="date" ref="datePicker"/>
     </div>
 
     <div>
@@ -51,7 +51,7 @@ import SelectList from "@/components/SelectList";
 import AttendanceListComponent from "@/components/AttendanceListComponent";
 import GroupInfo from "@/components/GroupInfo";
 import DatePicker from "@/components/DatePicker";
-import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
+import { fetchGroups, fetchAttendanceByDate, updateTrainingssession, runGarbageCollector } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 
 export default {
@@ -113,6 +113,11 @@ export default {
         }
       }
       return temp
+    },
+    _runGarbageCollector(group, date){
+      if(typeof group !== 'undefined'){
+        runGarbageCollector(group.id, date)
+      }
     }
   },
   async created() {
@@ -122,12 +127,11 @@ export default {
     this.dataStore.viewname = "Anwesenheitsliste"
   },
   watch: {
-    selectedGroup() {
-      //Test
+    selectedGroup(newVal, oldVal) {
+      this._runGarbageCollector(oldVal, this.date)
       this.weekday = this.getWeekdays(this.selectedGroup)
       this.$refs.datePicker.weekdays = this.weekday
       this.$refs.datePicker.newGroupSelected()
-      this.dataStore.selectedGroupID = this.selectedGroup.id
       document.title = this.selectedGroup.name + ' - Attend'
     }
   }

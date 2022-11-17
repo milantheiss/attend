@@ -23,7 +23,6 @@
 
 <script>
 import { getDateOfTraining, isClosestTrainingToday } from "@/util/formatter";
-import { runGarbageCollector } from '@/util/fetchOperations'
 import DateInput from "./DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 
@@ -38,7 +37,7 @@ export default {
   props: {
     modelValue: Date,
   },
-  emits: ["update:modelValue", "onChange", "on"],
+  emits: ["update:modelValue", "onChange", "on", 'triggerGargabeCollector'],
   data() {
     return {
       date: this.getFormattedDate(new Date(Date.now())),
@@ -48,12 +47,10 @@ export default {
   methods: {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.dataStore.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-        }
         if (isClosestTrainingToday(this.weekdays)) {
-          this.date = undefined
           this.date = this.getFormattedDate(new Date(Date.now()));
+          //Commit muss hier ausgeführt werden, da kein Change in 'this.date' vom Watcher festgestellt wird.
+          this._commitDate(this.date)
         }
         else {
           this.getLastDate();
@@ -63,32 +60,30 @@ export default {
     getNextDate() {
       if (typeof this.weekdays !== "undefined") {
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
-          if (typeof this.dataStore.selectedGroupID !== "undefined") {
-            runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-          }
+          this.$emit('triggerGargabeCollector', new Date(this.date))
           this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
-
         }
       }
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.dataStore.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-        }
+        this.$emit('triggerGargabeCollector', new Date(this.date))
         this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
       }
     },
     getFormattedDate(date) {
       return date.toJSON().slice(0, 10)
+    },
+    _commitDate(date) {
+      this.$emit("update:modelValue", new Date(date));
+      this.$emit("onChange");
     }
   },
   components: { DateInput },
   watch: {
     date(newVal) {
       if (typeof newVal !== 'undefined') {
-        this.$emit("update:modelValue", new Date(newVal));
-        this.$emit("onChange");
+        this._commitDate(newVal)
       }
     }
   }
