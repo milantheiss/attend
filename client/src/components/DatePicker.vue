@@ -52,8 +52,9 @@ export default {
           runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
         }
         if (isClosestTrainingToday(this.weekdays)) {
-          this.date = undefined
           this.date = this.getFormattedDate(new Date(Date.now()));
+          this.$emit("update:modelValue", new Date(this.date));
+          this.$emit("onChange");
         }
         else {
           this.getLastDate();
