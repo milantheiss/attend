@@ -115,6 +115,15 @@ async function removeMemberFromGroup(groupID, memberID) {
   })).json())
 }
 
+async function authenticateSession() {
+  return (await fetch([process.env.VUE_APP_API_URL, 'authenticate'].join('/'), {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json()
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -127,5 +136,6 @@ export {
   fetchAttendanceByDateRange,
   fetchGroupInfo,
   updateMemberInGroup,
-  removeMemberFromGroup
+  removeMemberFromGroup,
+  authenticateSession
 }

@@ -19,9 +19,10 @@
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <label for="enddate" class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
+                <label for="enddate"
+                    class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
                 <DateInput v-model="enddate" name="enddate" class="ml-3"
-                    :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>   
+                    :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
             </div>
 
             <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
@@ -43,9 +44,16 @@ import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
+import { useDataStore } from "@/store/dataStore";
 
 export default {
     name: "ExportPdf",
+    setup() {
+        const dataStore = useDataStore()
+        return {
+            dataStore
+        }
+    },
     data() {
         return {
             filename: 'anwesenheitslist',
@@ -106,7 +114,7 @@ export default {
     async created() {
         this.groups = await fetchGroups()
         document.title = 'Wähle eine Gruppe - Attend'
-        this.$store.commit("setViewname", "Liste exportieren")
+        this.dataStore.viewname = "Liste exportieren"
     },
     watch: {
         selectedGroup() {

@@ -5,6 +5,6 @@ import App from "./App.vue";
 import router from './router'
 
 import './assets/tailwind.css'
-import store from './store'
+import { createPinia } from 'pinia'
 
-createApp(App).use(router).use(require('vue-cookies')).use(store).mount("#app");
+createApp(App).use(createPinia()).use(router).use(require('vue-cookies')).mount("#app");
