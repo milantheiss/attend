@@ -37,7 +37,7 @@
           class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Liste exportieren</router-link>
         <router-link @click="showMenu = !showMenu" to="/logout"
           class="text-left font-medium text-xl md:text-2xl mt-2 ml-2">Logout</router-link>
-        <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.2</p>
+        <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.3</p>
       </div>
     </nav>
     <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" />
