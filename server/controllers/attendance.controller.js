@@ -59,11 +59,6 @@ const deleteTrainingssession = catchAsync(async (req, res) => {
   res.send(result);
 });
 
-const runGarbageCollector = catchAsync(async (req, res) => {
-  const result = await attendanceService.runGarbageCollector(req.user, req.params.groupID, req.params.date, undefined)
-  res.send(result)
-})
-
 const getFormattedList = catchAsync(async (req, res) => {
 
   const result = await attendanceService.getTrainingssessionsByDateRange(req.user, req.params.groupID, req.params.startdate, req.params.enddate)
@@ -112,7 +107,6 @@ module.exports = {
   getAttendanceByGroup,
   addTrainingssession,
   deleteTrainingssession,
-  runGarbageCollector,
   getFormattedList
 }
 

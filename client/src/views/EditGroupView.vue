@@ -1,5 +1,6 @@
 <template>
   <div class="relative container">
+    <!--Selector um Gruppe auszuwählen-->
     <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-6">
       <div class="flex justify-between items-center ml-3 mr-3">
         <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>

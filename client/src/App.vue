@@ -1,8 +1,10 @@
 <template>
   <div class="mb-40 m-4">
+    <!--Navbar: Wird angezeigt, wenn Session Authenticated-->
     <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width"
       v-if="auth.authenticated">
       <div class="flex justify-between justify-content-center items-center">
+        <!--Menu Icon-->
         <button @click="showMenu = !showMenu" class="w-10">
           <span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
@@ -15,8 +17,13 @@
             </svg>
           </span>
         </button>
+
+        <!--Seitentitel-->
         <h2 class="font-semibold text-xl md:text-2xl">{{dataStore.viewname}}</h2>
 
+        <!--Profile Avatar-->
+        <!--TODO Custom Avatar jenach User-->
+        <!--TODO Link zu User Page-->
         <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
             class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">
@@ -28,6 +35,7 @@
         </span>
       </div>
 
+      <!--Navbar Links: Werden angezeigt, wenn auf Menu Icon geklickt wird.-->
       <div class="grid mt-2" v-show="showMenu">
         <router-link @click="showMenu = !showMenu" to="/attendancelist"
           class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>
@@ -40,6 +48,7 @@
         <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.2</p>
       </div>
     </nav>
+    <!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
     <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" />
   </div>
 </template>
@@ -60,11 +69,6 @@ export default {
   data() {
     return {
       showMenu: false
-    }
-  },
-  computed: {
-    currentRouteName() {
-      return this.$route.name;
     }
   }
 }

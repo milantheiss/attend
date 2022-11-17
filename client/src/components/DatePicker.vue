@@ -37,7 +37,7 @@ export default {
   props: {
     modelValue: Date,
   },
-  emits: ["update:modelValue", "onChange", "on", 'triggerGargabeCollector'],
+  emits: ["update:modelValue", "onChange", "on"],
   data() {
     return {
       date: this.getFormattedDate(new Date(Date.now())),
@@ -60,14 +60,12 @@ export default {
     getNextDate() {
       if (typeof this.weekdays !== "undefined") {
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
-          this.$emit('triggerGargabeCollector', new Date(this.date))
           this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
         }
       }
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        this.$emit('triggerGargabeCollector', new Date(this.date))
         this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
       }
     },
