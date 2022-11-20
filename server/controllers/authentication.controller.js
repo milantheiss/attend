@@ -125,6 +125,8 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const authenticate = catchAsync(async (req, res) => {
+    console.log("Trying to Authenticate User");
+
     let access_token = req.cookies.access_token;
     const refresh_token = req.cookies.refresh_token;
 

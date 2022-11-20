@@ -86,8 +86,6 @@ const getTrainingssession = async (user, groupID, date) => {
             participants: formated
         }
 
-        console.log(groupID, date);
-
         return sessionBody
     } else {
         return session
@@ -275,10 +273,6 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     return temp
 }
 
-const updateParticipantInTrainingssessions = async (user, groupID, participantData, oldFirsttraining, newFirsttraining) => {
-    console.log(user, groupID, participantData, oldFirsttraining, newFirsttraining)
-}
-
 module.exports = {
     getAttendanceById,
     getAttendance,
@@ -290,6 +284,5 @@ module.exports = {
     deleteTrainingssession,
     addTrainingssession,
     runGarbageCollector,
-    getTrainingssessionsByDateRange,
-    updateParticipantInTrainingssessions
+    getTrainingssessionsByDateRange
 };
