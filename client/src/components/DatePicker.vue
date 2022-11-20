@@ -9,7 +9,7 @@
       </svg>
     </button>
     <DateInput class="text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
-      :max="getFormattedDate(new Date(Date.now()))"></DateInput>
+      :max="getFormattedDate(new Date())"></DateInput>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
       <!--Right Chevron Icon-->
@@ -40,7 +40,7 @@ export default {
   emits: ["update:modelValue", "onChange", "on"],
   data() {
     return {
-      date: this.getFormattedDate(new Date(Date.now())),
+      date: this.getFormattedDate(new Date()),
       weekdays: undefined
     };
   },
@@ -48,7 +48,7 @@ export default {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
         if (isClosestTrainingToday(this.weekdays)) {
-          this.date = this.getFormattedDate(new Date(Date.now()));
+          this.date = this.getFormattedDate(new Date());
           //Commit muss hier ausgeführt werden, da kein Change in 'this.date' vom Watcher festgestellt wird.
           this._commitDate(this.date)
         }
@@ -59,6 +59,7 @@ export default {
     },
     getNextDate() {
       if (typeof this.weekdays !== "undefined") {
+        //Blockt Button, sodass kein Training in der Zukunft ausgewählt werden kann.
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
           this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
         }

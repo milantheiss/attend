@@ -8,7 +8,7 @@ class Dateprocessor {
         const arr = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
         let i = 0
 
-        while ([dayString.charAt(0), dayString.charAt(1)].join('') !== arr[i]) {
+        while (dayString.substring(0, 2) !== arr[i]) {
             i++
         }
 
@@ -94,6 +94,13 @@ class Dateprocessor {
     }
 }
 
+/**
+ * Berechnet Datum den nächsten Trainings
+ * @param {String} startdate 
+ * @param {Array} weekdays 
+ * @param {Boolean} OfNextTraining 
+ * @returns {Date} Datum des nächsten Trainings
+ */
 function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
     startdate = new Date(startdate)
 
@@ -107,7 +114,9 @@ function getDateOfTraining(startdate, weekdays, OfNextTraining = true) {
     return result
 }
 
-function getFormatedDateString(date) {
+//WARNING Wird nirgends wo genutzt. Ist Disabled
+// eslint-disable-next-line no-unused-vars
+function getFormattedDateString(date) {
     const arr = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
     const mm = date.getMonth() + 1; // getMonth() is zero-based
     const dd = date.getDate();
@@ -118,13 +127,23 @@ function getFormatedDateString(date) {
     return [weekday, ddmmyyyy].join(' ');
 }
 
+/**
+ * Nimmt ein Date an und stringified es im Format YYYY-MM-DD
+ * @param {Date} date 
+ * @returns {String} Das Datum im Format YYYY-MM-DD
+ */
 function getShortenedJSONDate(date) {
     return date.toJSON().substring(0, 10)
 }
 
+/**
+ * Checkt ob nächstes Training heute ist.
+ * @param {Array} weekdays 
+ * @returns {Boolean} Ob nächstes Training heute ist.
+ */
 function isClosestTrainingToday(weekdays){
     for (const weekday of weekdays) {
-        if ((Dateprocessor.convertWeekdaytoNumber(weekday) - new Date(Date.now()).getDay()) === 0){
+        if ((Dateprocessor.convertWeekdaytoNumber(weekday) - new Date().getDay()) === 0){
             return true
         }
     }
@@ -133,7 +152,6 @@ function isClosestTrainingToday(weekdays){
 
 module.exports = {
     getDateOfTraining,
-    getFormatedDateString,
     getShortenedJSONDate,
     isClosestTrainingToday
 }

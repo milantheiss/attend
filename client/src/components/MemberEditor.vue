@@ -8,16 +8,19 @@
             </svg>
         </div>
 
+        <!--Vorname des Teilnehmers-->
         <div class="flex items-center justify-between mb-4">
             <TextInput name="firstname" v-model="participantData.firstname" placeholder="Vorname"
                 :showError="error.cause.firstnameInput" class="mx-3 text-black"></TextInput>
         </div>
 
+        <!--Nachname des Teilnehmers-->
         <div class="flex items-center justify-between mb-4">
             <TextInput name="lastname" v-model="participantData.lastname" placeholder="Nachname"
                 :showError="error.cause.lastnameInput" class="mx-3 text-black"></TextInput>
         </div>
 
+        <!--Geburtstag des Teilnehmers-->
         <div class="flex items-center justify-between mb-4">
             <label for="birthday"
                 class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Geburtstag:</label>
@@ -26,6 +29,7 @@
             </DateInput>
         </div>
 
+        <!--Datum des ersten Trainings seit dem der Teilnehmer aufgelistet werden soll-->
         <div class="flex items-center justify-between mb-6">
             <label for="firsttraining"
                 class="text-gray-700 font-normal md:font-light text-base md:text-lg ml-3 w-full">Erstes
@@ -37,6 +41,7 @@
 
         <ErrorMessage :message="error.message" :show="error.show" class="mx-3 my-6" />
 
+        <!--Wird angezeigt, wenn ein existierender Teilnehmer bearbeitet werden soll-->
         <div class="flex items-center justify-between" v-if="!createsNewMember">
             <button @click="onClickOnDelete()"
                 class="mx-auto text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
@@ -49,13 +54,13 @@
             </button>
         </div>
 
+        <!--Wird angezeigt, wenn ein neuer Teilnehmer erstellt werden soll-->
         <div class="flex justify-center items-center" v-if="createsNewMember">
             <button @click="onClickOnCreate()"
                 class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
                 <p class="font-medium text-base md:text-lg">Hinzufügen</p>
             </button>
         </div>
-
     </div>
 </template>
   
@@ -108,6 +113,7 @@ export default {
         async onClickOnCreate() {
             if (!this.hasAnError()) {
                 this.$emit("onClickOnCreate", this.participantData);
+                //Reset participantData
                 this.participantData = {
                     firstname: "",
                     lastname: "",
@@ -139,6 +145,9 @@ export default {
                 console.error("Unable to slice date string of 'participant.firsttraining'");
             }
         },
+        /**
+         * Checkt ob ein Fehler vorliegt.
+         */
         hasAnError() {
             this.error.cause.firstnameInput = typeof this.participantData.firstname !== "string" || this.participantData.firstname.trim().length === 0
             this.error.cause.lastnameInput = typeof this.participantData.lastname !== "string" || this.participantData.lastname.trim().length === 0

@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
+    //Enthält Name, ID etc. 
+    //Warning Wird im Moment nicht genutzt.
     user: null,
     authenticated: false
   }),
