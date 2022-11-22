@@ -78,7 +78,7 @@ router.beforeEach(async (to, from, next) => {
  */
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.guest)) {
-    if (useAuthStore().authenticated) {
+    if (useAuthStore().authenticated || await useAuthStore().authenticate()) {
       next("/attendancelist");
       return;
     }
