@@ -76,7 +76,7 @@ router.beforeEach(async (to, from, next) => {
  *  Wenn nicht, wird angefragte Unterseite angezeigt.
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.guest)) {
     if (useAuthStore().authenticated || await useAuthStore().authenticate()) {
       next("/attendancelist");
