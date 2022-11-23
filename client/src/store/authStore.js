@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useDataStore } from "./dataStore";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
@@ -27,8 +28,9 @@ export const useAuthStore = defineStore('authStore', {
   
       this.authenticated = res.status === 200
       res = await res.json()
+      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog
   
-     this.user = {username: res.username, user_id: res.user_id}
+     this.user = res.user
     },
   
     async logOut() {
@@ -44,7 +46,7 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async authenticate(){
-      const res = (await fetch([process.env.VUE_APP_API_URL, 'authenticate'].join('/'), {
+      let res = (await fetch([process.env.VUE_APP_API_URL, 'authenticate'].join('/'), {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
         credentials: 'include',
@@ -52,7 +54,12 @@ export const useAuthStore = defineStore('authStore', {
       }))
 
       this.authenticated = res.status === 200
-      return res.status === 200
+
+      res = await res.json()
+      this.user = res.user
+      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
+
+      return this.authenticated
     }
   }
 })

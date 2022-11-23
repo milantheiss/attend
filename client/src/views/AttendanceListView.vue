@@ -75,7 +75,7 @@ export default {
       selectedGroup: undefined,
       date: new Date(),
       showGroups: false,
-      attended: Object,
+      attended: Object
     }
   },
   components: {
@@ -83,7 +83,7 @@ export default {
     AttendanceListComponent,
     DatePicker,
     GroupInfo
-  },
+},
   methods: {
     /**
      * Zieht beim aufrufen die Attendance List der in @see SelectList ausgewählten Gruppe für das im @see DatePicker ausgewählte Datum vom Server. 

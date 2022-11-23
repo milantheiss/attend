@@ -1,4 +1,3 @@
-
 <template>
     <input class="block
                         w-full

@@ -1,8 +1,7 @@
 <template>
   <div class="mb-40 m-4">
     <!--Navbar: Wird angezeigt, wenn Session Authenticated-->
-    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width"
-      v-if="auth.authenticated">
+    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width" v-if="auth.authenticated">
       <div class="flex justify-between justify-content-center items-center">
         <!--Menu Icon-->
         <button @click="showMenu = !showMenu" class="w-10">
@@ -19,7 +18,7 @@
         </button>
 
         <!--Seitentitel-->
-        <h2 class="font-semibold text-xl md:text-2xl">{{dataStore.viewname}}</h2>
+        <h2 class="font-semibold text-xl md:text-2xl">{{ dataStore.viewname }}</h2>
 
         <!--Profile Avatar-->
         <!--TODO Custom Avatar jenach User-->
@@ -48,6 +47,25 @@
         <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.2</p>
       </div>
     </nav>
+
+    <div v-if="dataStore.showPatchNotesDialog">
+      <ModalDialog :show="showPatchNotes">
+        <template #header>
+          <div v-html="patchNotes.title"></div>
+        </template>
+        <template #subheader>
+          <p>{{ new Date(patchNotes.date).toLocaleDateString() }}</p>
+        </template>
+        <template #content>
+          <div v-html="patchNotes.text"></div>
+        </template>
+        <template #footer><button @click="dataStore.readPatchNotes()"
+            class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-6 ty:px-10 sm:px-12 py-1.5 rounded-lg drop-shadow-md">
+            <p class="font-medium text-base md:text-lg">Gelesen</p>
+          </button></template>
+      </ModalDialog>
+    </div>
+
     <!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
     <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" />
   </div>
@@ -56,21 +74,39 @@
 <script>
 import { useAuthStore } from './store/authStore'
 import { useDataStore } from './store/dataStore'
+import { getLastPatchNotes } from "@/util/fetchOperations"
+import ModalDialog from './components/ModalDialog.vue';
+import { ref } from 'vue';
 
 export default {
   setup() {
-        const dataStore = useDataStore()
-        const auth = useAuthStore()
-        return {
-            dataStore,
-            auth
-        }
-    },
+    const dataStore = useDataStore();
+    const auth = useAuthStore();
+    const showPatchNotes = ref(dataStore.showPatchNotesDialog);
+    return {
+      dataStore,
+      auth,
+      showPatchNotes
+    };
+  },
   data() {
     return {
-      showMenu: false
+      showMenu: false,
+      patchNotes: {
+        title: "Patchnotes",
+        text: "Was wurde geändert."
+      }
+    };
+  },
+  watch: {
+    async "dataStore.showPatchNotesDialog"(newVal) {
+      if (newVal) {
+        this.patchNotes = await getLastPatchNotes();
+      }
+      this.showPatchNotes = newVal
     }
-  }
+  },
+  components: { ModalDialog }
 }
 </script>
 

@@ -55,10 +55,11 @@ const login = catchAsync(async (req, res) => {
             );
 
             const response = {
-                username: user.username,
-                user_id: user._id,
-                access_token: access_token,
-                refresh_token: refresh_token
+                user: {
+                    username: user.username,
+                    _id: user._id,
+                },
+                showPatchNotesDialog: !user.readPatchnotes
             }
 
             logger.debug("Successfull Login")
@@ -125,8 +126,6 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const authenticate = catchAsync(async (req, res) => {
-    console.log("Trying to Authenticate User");
-
     let access_token = req.cookies.access_token;
     const refresh_token = req.cookies.refresh_token;
 
@@ -141,8 +140,15 @@ const authenticate = catchAsync(async (req, res) => {
     try {
         if (typeof access_token !== 'undefined') {
             const decrypt = jwt.verify(access_token, config.secret);
-            req.user = await authenticationService.getUserById(decrypt.user_id)
-            return res.status(httpStatus.OK).send('Authorized');
+            const user = await authenticationService.getUserById(decrypt.user_id)
+            const response = {
+                user: {
+                    username: user.username,
+                    _id: user._id,
+                },
+                showPatchNotesDialog: !user.readPatchnotes
+            }
+            return res.status(httpStatus.OK).send(response);
         }
         else {
             return res.clearCookie('access_token', {
@@ -163,67 +169,67 @@ const authenticate = catchAsync(async (req, res) => {
 
 const getNewToken = async (req, res, old_refresh_token) => {
     const decoded = jwt.decode(old_refresh_token)
-  
+
     const secret = await authenticationService.getRefreshTokenSecret(decoded.user_id, decoded.token_id)
-  
+
     if (typeof secret === 'undefined') {
-      res.clearCookie('access_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).clearCookie('refresh_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).status(403).send({ redirect: '/logout' })
-      //TODO Auto redirect 
-      return undefined
+        res.clearCookie('access_token', {
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+        }).clearCookie('refresh_token', {
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+        }).status(403).send({ redirect: '/logout' })
+        //TODO Auto redirect 
+        return undefined
     }
-  
+
     try {
-      const decrypt = jwt.verify(old_refresh_token, secret)
-  
-      const access_token = jwt.sign(
-        { user_id: decrypt.user_id, username: decrypt.username },
-        config.secret,
-        {
-          expiresIn: "15min",
-        }
-      );
-  
-      await authenticationService.deleteRefreshToken(decrypt.user_id, decrypt.token_id)
-  
-      const new_secret = require('crypto').randomBytes(256).toString('base64')
-      await authenticationService.addRefreshToken(decrypt.user_id, { secret: new_secret, _id: decrypt.token_id })
-  
-      // Create refresh token
-      const refresh_token = jwt.sign(
-        { user_id: decrypt.user_id, username: decrypt.username, token_id: decrypt.token_id },
-        new_secret,
-        {
-          expiresIn: "7d",
-        }
-      );
-  
-      res.cookie('access_token', access_token, {
-        expires: new Date(Date.now() + 600000),
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).cookie('refresh_token', refresh_token, {
-        expires: new Date(Date.now() + 604800000),
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      })
-  
-      return access_token
+        const decrypt = jwt.verify(old_refresh_token, secret)
+
+        const access_token = jwt.sign(
+            { user_id: decrypt.user_id, username: decrypt.username },
+            config.secret,
+            {
+                expiresIn: "15min",
+            }
+        );
+
+        await authenticationService.deleteRefreshToken(decrypt.user_id, decrypt.token_id)
+
+        const new_secret = require('crypto').randomBytes(256).toString('base64')
+        await authenticationService.addRefreshToken(decrypt.user_id, { secret: new_secret, _id: decrypt.token_id })
+
+        // Create refresh token
+        const refresh_token = jwt.sign(
+            { user_id: decrypt.user_id, username: decrypt.username, token_id: decrypt.token_id },
+            new_secret,
+            {
+                expiresIn: "7d",
+            }
+        );
+
+        res.cookie('access_token', access_token, {
+            expires: new Date(Date.now() + 600000),
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+        }).cookie('refresh_token', refresh_token, {
+            expires: new Date(Date.now() + 604800000),
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+        })
+
+        return access_token
     } catch (err) {
-      logger.error(err.toString())
-      return undefined
-      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
+        logger.error(err.toString())
+        return undefined
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
     }
-  }
+}
 
 module.exports = {
     login,

@@ -115,6 +115,15 @@ async function authenticateSession() {
   })).json()
 }
 
+async function getLastPatchNotes() {
+  return (await fetch([process.env.VUE_APP_API_URL, 'patchNotes'].join('/'), {
+    method: 'GET',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json()
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -127,5 +136,6 @@ export {
   fetchGroupInfo,
   updateMemberInGroup,
   removeMemberFromGroup,
-  authenticateSession
+  authenticateSession,
+  getLastPatchNotes
 }

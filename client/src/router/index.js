@@ -34,6 +34,11 @@ const routes = [
     name: 'EditGroup',
     component: () => import('../views/EditGroupView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/test",
+    name: "Test",
+    component: () => import("../views/TestView.vue")
   }
 ]
 
