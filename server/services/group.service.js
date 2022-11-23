@@ -9,10 +9,10 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<[Group]>}
  */
 const getGroups = async (user) => {
-    if (user.role === 'admin') {
+    if (user.roles.includes('admin')) {
         //admin hat Zugriff auf alle Gruppen
         return Group.find({})
-    } else if (user.role === 'trainer') { //Oder z.B. Assistent
+    } else if (user.roles.includes('trainer')) { //Oder z.B. Assistent
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         const groups = await Group.find({ '_id': { $in: user.accessible_groups } })
 
@@ -33,10 +33,10 @@ const getGroups = async (user) => {
  * @returns {Promise<Group>}
  */
 const getGroupById = async (user, groupId) => {
-    if (user.role === 'admin') {
+    if (user.roles.includes('admin')) {
         //admin hat Zugriff auf alle Gruppen
         return Group.findById(groupId)
-    } else if (user.role === 'trainer') {
+    } else if (user.roles.includes('trainer')) {
         if (user.accessible_groups.includes(groupId)) {
             //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
             return Group.findById(groupId)
@@ -54,7 +54,7 @@ const getGroupById = async (user, groupId) => {
  * @returns {Promise<Group>}
  */
 const createGroup = async (user, groupBody) => {
-    if (user.role === 'admin') {
+    if (user.roles.includes('admin')) {
         //Nur Admins dürfen Gruppen erstellen
         return Group.create(groupBody);
     } else {
@@ -71,7 +71,7 @@ const createGroup = async (user, groupBody) => {
  * @returns {Promise<Group>}
  */
 const updateMember = async (user, groupId, body) => {
-    if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
+    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupId))) {
         let group
         let oldFirsttraining
 
@@ -185,7 +185,7 @@ const getGroupInfo = async (user, groupId) => {
  * @returns {Promise<Group>}0
  */
 const removeMember = async (user, groupId, memberId) => {
-    if (user.role === 'admin' || (user.role === 'trainer' && user.accessible_groups.includes(groupId))) {
+    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupId))) {
         return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } }, { new: true })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")

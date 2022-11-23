@@ -71,15 +71,6 @@ async function deleteTrainingssession(groupID, date) {
   })).json())
 }
 
-async function runGarbageCollector(groupID, date){
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/runGarbageCollector", groupID, getShortenedJSONDate(date)].join('/'), {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    credentials: 'include',
-    mode: 'cors'
-  })).json())
-}
-
 async function fetchAttendanceByDateRange(groupID, startdate, enddate){
   return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join('/'), {
     method: 'GET',
@@ -124,6 +115,15 @@ async function authenticateSession() {
   })).json()
 }
 
+async function getLastPatchNotes() {
+  return (await fetch([process.env.VUE_APP_API_URL, 'patchNotes'].join('/'), {
+    method: 'GET',
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json()
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -132,10 +132,10 @@ export {
   deleteTrainingssession,
   updateTrainingssession,
   addTrainingssession,
-  runGarbageCollector,
   fetchAttendanceByDateRange,
   fetchGroupInfo,
   updateMemberInGroup,
   removeMemberFromGroup,
-  authenticateSession
+  authenticateSession,
+  getLastPatchNotes
 }

@@ -1,5 +1,6 @@
 <template>
     <div class="relative container">
+        <!--Export Settings-->
         <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
@@ -79,8 +80,10 @@ export default {
         DateInput
     },
     methods: {
+        /**
+         * Zieht Attendance Daten von der Datenbank und erstellt mit @see createList() ein neues PDF
+         */
         async exportPDF() {
-            //WARNING Leeres PDF
             if (!this.hasAnError()) {
                 const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
                 if (attendance.dates.length === 0) {
@@ -92,6 +95,10 @@ export default {
                 }
             }
         },
+        /**
+         * Checkt ob ein Fehler vorliegt.
+         * Error Timespan Faulty kann erst getriggert werden, wenn Attendance List von der Datenbank gezogen wurde.
+         */
         hasAnError() {
             this.error.message = "Keine Fehler"
 
@@ -117,6 +124,9 @@ export default {
         this.dataStore.viewname = "Liste exportieren"
     },
     watch: {
+        /**
+         * Updatet Tabtitel je nach ausgewählter Gruppe
+         */
         selectedGroup() {
             document.title = 'Exportiere Liste für ' + this.selectedGroup.name + ' - Attend'
         }

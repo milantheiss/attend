@@ -1,8 +1,9 @@
 <template>
   <div class="mb-40 m-4">
-    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width"
-      v-if="auth.authenticated">
+    <!--Navbar: Wird angezeigt, wenn Session Authenticated-->
+    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width" v-if="auth.authenticated">
       <div class="flex justify-between justify-content-center items-center">
+        <!--Menu Icon-->
         <button @click="showMenu = !showMenu" class="w-10">
           <span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
@@ -15,8 +16,13 @@
             </svg>
           </span>
         </button>
-        <h2 class="font-semibold text-xl md:text-2xl">{{dataStore.viewname}}</h2>
 
+        <!--Seitentitel-->
+        <h2 class="font-semibold text-xl md:text-2xl">{{ dataStore.viewname }}</h2>
+
+        <!--Profile Avatar-->
+        <!--TODO Custom Avatar jenach User-->
+        <!--TODO Link zu User Page-->
         <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
             class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">
@@ -28,6 +34,7 @@
         </span>
       </div>
 
+      <!--Navbar Links: Werden angezeigt, wenn auf Menu Icon geklickt wird.-->
       <div class="grid mt-2" v-show="showMenu">
         <router-link @click="showMenu = !showMenu" to="/attendancelist"
           class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>
@@ -40,6 +47,26 @@
         <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.3</p>
       </div>
     </nav>
+
+    <div v-if="dataStore.showPatchNotesDialog">
+      <ModalDialog :show="showPatchNotes">
+        <template #header>
+          <div v-html="patchNotes.title"></div>
+        </template>
+        <template #subheader>
+          <p>{{ new Date(patchNotes.date).toLocaleDateString() }}</p>
+        </template>
+        <template #content>
+          <div v-html="patchNotes.text"></div>
+        </template>
+        <template #footer><button @click="dataStore.readPatchNotes()"
+            class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-6 ty:px-10 sm:px-12 py-1.5 rounded-lg drop-shadow-md">
+            <p class="font-medium text-base md:text-lg">Gelesen</p>
+          </button></template>
+      </ModalDialog>
+    </div>
+
+    <!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
     <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" />
   </div>
 </template>
@@ -47,26 +74,39 @@
 <script>
 import { useAuthStore } from './store/authStore'
 import { useDataStore } from './store/dataStore'
+import { getLastPatchNotes } from "@/util/fetchOperations"
+import ModalDialog from './components/ModalDialog.vue';
+import { ref } from 'vue';
 
 export default {
   setup() {
-        const dataStore = useDataStore()
-        const auth = useAuthStore()
-        return {
-            dataStore,
-            auth
-        }
-    },
+    const dataStore = useDataStore();
+    const auth = useAuthStore();
+    const showPatchNotes = ref(dataStore.showPatchNotesDialog);
+    return {
+      dataStore,
+      auth,
+      showPatchNotes
+    };
+  },
   data() {
     return {
-      showMenu: false
+      showMenu: false,
+      patchNotes: {
+        title: "Patchnotes",
+        text: "Was wurde geändert."
+      }
+    };
+  },
+  watch: {
+    async "dataStore.showPatchNotesDialog"(newVal) {
+      if (newVal) {
+        this.patchNotes = await getLastPatchNotes();
+      }
+      this.showPatchNotes = newVal
     }
   },
-  computed: {
-    currentRouteName() {
-      return this.$route.name;
-    }
-  }
+  components: { ModalDialog }
 }
 </script>
 

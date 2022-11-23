@@ -30,10 +30,6 @@ router
     .delete(verifyToken, attendanceController.deleteTrainingssession)
 
 router
-    .route('/runGarbageCollector/:groupID/:date')
-    .post(verifyToken, attendanceController.runGarbageCollector)
-
-router
     .route('/getFormattedList/:groupID/:startdate/:enddate')
     .get(verifyToken, attendanceController.getFormattedList)
 //TODO Add patch & post to attendancebygroup

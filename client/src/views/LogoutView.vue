@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--Einfache Nachricht. Sollte nur für ein Bruchteil einer Sekunde sichtbar sein.-->
     <p>Logging you off...</p>
   </div>
 </template>
