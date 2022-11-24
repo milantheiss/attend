@@ -43,7 +43,7 @@ async function fetchAttendanceByDate(groupID, date) {
 }
 
 async function updateTrainingssession(groupID, date, body) {
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
     method: 'PATCH',
     body: JSON.stringify(body),
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -52,24 +52,26 @@ async function updateTrainingssession(groupID, date, body) {
   })).json())
 }
 
-async function addTrainingssession(groupID, body) {
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
-    method: 'PATCH',
-    body: JSON.stringify(body),
-    headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    credentials: 'include',
-    mode: 'cors'
-  })).json())
-}
+//WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
+// async function addTrainingssession(groupID, body) {
+//   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
+//     method: 'PATCH',
+//     body: JSON.stringify(body),
+//     headers: { 'Content-type': 'application/json; charset=UTF-8' },
+//     credentials: 'include',
+//     mode: 'cors'
+//   })).json())
+// }
 
-async function deleteTrainingssession(groupID, date) {
-  await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
-    method: 'DELETE',
-    headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    credentials: 'include',
-    mode: 'cors'
-  })).json())
-}
+//WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
+// async function deleteTrainingssession(groupID, date) {
+//   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
+//     method: 'DELETE',
+//     headers: { 'Content-type': 'application/json; charset=UTF-8' },
+//     credentials: 'include',
+//     mode: 'cors'
+//   })).json())
+// }
 
 async function fetchAttendanceByDateRange(groupID, startdate, enddate){
   return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join('/'), {
@@ -129,9 +131,7 @@ export {
   fetchGroups, 
   fetchAttendance,
   fetchAttendanceByDate,
-  deleteTrainingssession,
   updateTrainingssession,
-  addTrainingssession,
   fetchAttendanceByDateRange,
   fetchGroupInfo,
   updateMemberInGroup,

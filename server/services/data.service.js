@@ -1,4 +1,5 @@
 const { PatchNotes, User } = require('../models');
+const { hasDeveloperRole } = require('../utils/userroles');
 
 /**
  * Get last Patchnotes.
@@ -15,7 +16,7 @@ const getLastPatchNotes = async () => {
  * @returns {Promise<[PatchNotes.PatchNotes]>}
  */
 const addNewPatchNote = async (user, body) => {
-    if(user.roles.includes("developer")){
+    if(hasDeveloperRole(body)){
         //Mark Patchnotes as Unread for all Users
         User.updateMany({}, { $set: { readPatchnotes: false } })
         return PatchNotes.create(body);

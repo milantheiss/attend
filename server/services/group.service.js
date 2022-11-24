@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const { Group, Attendance } = require('../models');
 const ApiError = require('../utils/ApiError');
+const { hasAdminRole, hasAccessToGroup } = require('../utils/userroles');
 //const { attendanceController } = require('../controllers');
 
 /**
@@ -9,10 +10,10 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<[Group]>}
  */
 const getGroups = async (user) => {
-    if (user.roles.includes('admin')) {
+    if (hasAdminRole(user)) {
         //admin hat Zugriff auf alle Gruppen
-        return Group.find({})
-    } else if (user.roles.includes('trainer')) { //Oder z.B. Assistent
+        return await Group.find({})
+    } else if (user.accessible_groups.length > 0) { //Oder z.B. Assistent
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         const groups = await Group.find({ '_id': { $in: user.accessible_groups } })
 
@@ -23,7 +24,7 @@ const getGroups = async (user) => {
         
         return groups
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to groups")
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to a groups")
     }
 };
 
@@ -32,19 +33,13 @@ const getGroups = async (user) => {
  * @param {ObjectId} groupId
  * @returns {Promise<Group>}
  */
-const getGroupById = async (user, groupId) => {
-    if (user.roles.includes('admin')) {
+const getGroupById = async (user, groupID) => {
+    if (hasAccessToGroup(user, groupID)) {
         //admin hat Zugriff auf alle Gruppen
-        return Group.findById(groupId)
-    } else if (user.roles.includes('trainer')) {
-        if (user.accessible_groups.includes(groupId)) {
-            //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
-            return Group.findById(groupId)
-        } else {
-            throw new ApiError(httpStatus.FORBIDDEN, "The user has no access to the requested group")
-        }
+        //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
+        return await Group.findById(groupID)
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to groups")
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to this group")
     }
 };
 
@@ -54,9 +49,9 @@ const getGroupById = async (user, groupId) => {
  * @returns {Promise<Group>}
  */
 const createGroup = async (user, groupBody) => {
-    if (user.roles.includes('admin')) {
+    if (hasAdminRole(user)) {
         //Nur Admins dürfen Gruppen erstellen
-        return Group.create(groupBody);
+        return await Group.create(groupBody);
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new group")
     }
@@ -70,18 +65,18 @@ const createGroup = async (user, groupBody) => {
  * @param {Object} groupBody
  * @returns {Promise<Group>}
  */
-const updateMember = async (user, groupId, body) => {
-    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupId))) {
+const updateMember = async (user, groupID, body) => {
+    if (hasAccessToGroup(user, groupID)) {
         let group
         let oldFirsttraining
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body._id === 'undefined') {
-            group = await Group.findByIdAndUpdate({ '_id': groupId }, { $addToSet: { participants: body } }, { new: true })
+            group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
             body._id = group.participants[group.participants.length - 1]._id
             //oldFirsttraining bleibt 'undefined'
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
-            group = await Group.findOneAndUpdate({ '_id': groupId, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
+            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
 
             //OldFirsttraining wird aus group gezogen
             const foo = group.participants.find(e => e._id.equals(body._id))
@@ -94,7 +89,7 @@ const updateMember = async (user, groupId, body) => {
         }
 
         //Attendance wird geupdatet
-        updateParticipantInTrainingssessions(groupId, body, oldFirsttraining, body.firsttraining)
+        await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
 
         return group
     } else {
@@ -181,85 +176,16 @@ const getGroupInfo = async (user, groupId) => {
 
 /**
  * Remove Member out of group
- * @param {ObjectId} groupId
+ * @param {ObjectId} groupID
  * @returns {Promise<Group>}0
  */
-const removeMember = async (user, groupId, memberId) => {
-    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupId))) {
-        return Group.findOneAndUpdate({ '_id': groupId, }, { '$pull': { 'participants': { '_id': memberId } } }, { new: true })
+const removeMember = async (user, groupID, memberID) => {
+    if (hasAccessToGroup(user, groupID)) {
+        return await Group.findOneAndUpdate({ '_id': groupID, }, { '$pull': { 'participants': { '_id': memberID } } }, { new: true })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
 };
-
-//WARNING No Auth implemented
-/*
-
-/!**
- * Update a groups data
- * @param groupID
- * @param {Object} groupBody
- * @returns {Promise<Group>}
- *!/
-const updateGroup = async (groupID, groupBody) => {
-    return Group.findByIdAndUpdate(groupID,groupBody)
-};
-
-/!**
- * Delete a group
- * @param groupID
- * @returns {Promise<Group>}
- *!/
-const deleteGroup = async (groupID) => {
-    return Group.findByIdAndDelete(groupID)
-};
-
-/*
-/!**
- * Query for users
- * @param {Object} filter - Mongo filter
- * @param {Object} options - Query options
- * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
- * @param {number} [options.limit] - Maximum number of results per page (default = 10)
- * @param {number} [options.page] - Current page (default = 1)
- * @returns {Promise<QueryResult>}
- *!/
-const queryUsers = async (filter, options) => {
-    const users = await User.paginate(filter, options);
-    return users;
-};
-
-/!**
- * Update user by id
- * @param {User} user
- * @param {Object} updateBody
- * @returns {Promise<User>}
- *!/
-const updateUserById = async (user, updateBody) => {
-    if (!user) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    if (updateBody.email && (await User.isEmailTaken(updateBody.email, user._id))) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
-    Object.assign(user, updateBody);
-    await user.save();
-    return user;
-};
-
-/!**
- * Delete user by id
- * @param {User} user
- * @returns {Promise<User>}
- *!/
-const deleteUserById = async (user) => {
-    if (!user) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    await user.remove();
-    return user;
-};
-*/
 
 module.exports = {
     getGroupById,

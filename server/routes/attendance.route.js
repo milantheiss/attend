@@ -11,10 +11,9 @@ router
     .get(verifyToken, attendanceController.getAttendance)
     .post(verifyToken, attendanceController.createAttendance)
 
-router
-    .route('/:attendanceID')
-    //.get(verifyToken, attendanceController.getAttendanceById)
-    .delete(verifyToken, attendanceController.deleteAttendance)
+// router
+//     .route('/:attendanceID')
+//     .delete(verifyToken, attendanceController.deleteAttendance)
 
 router
     .route('/byGroupID/:groupID')
@@ -32,7 +31,6 @@ router
 router
     .route('/getFormattedList/:groupID/:startdate/:enddate')
     .get(verifyToken, attendanceController.getFormattedList)
-//TODO Add patch & post to attendancebygroup
 
 module.exports = router;
 

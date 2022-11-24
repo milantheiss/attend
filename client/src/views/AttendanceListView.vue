@@ -3,8 +3,8 @@
     <!--Oberer Container: Enthält Gruppenauswahl, Gruppen Info & Date Picker-->
     <div class="flex items-center justify-between mb-8">
       <!--Auswahlelement, um Gruppe auszuwählen-->
-      <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe"
-        :options="this.groups" class="font-bold text-2xl md:text-3xl mr-3"/>
+      <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
+        class="font-bold text-2xl md:text-3xl mr-3" />
 
       <!--Toggelt zwischen Gruppeninfo anzeigen und nicht anzeigen-->
       <button @click="showGroups = !showGroups"
@@ -31,13 +31,12 @@
 
     <!--Gruppeninfo Box: Wird angezeigt, wenn mit Button getoggelt wird.-->
     <div class="mb-8">
-      <GroupInfo v-show="showGroups" :group="selectedGroup"
-        class="bg-white px-4 py-4 rounded-lg drop-shadow-md" />
+      <GroupInfo v-show="showGroups" :group="selectedGroup" class="bg-white px-4 py-4 rounded-lg drop-shadow-md" />
     </div>
 
     <!--Date Picker: Triggert GargabeCollector, wenn Date verändert wird. Bei Veränderung von Date wird eine neue Attendance List gepullt.-->
     <div class="mb-12">
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker"/>
+      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker" />
     </div>
 
     <!--Liste aller Teilnehmer: Wird geupdatet, wenn neue Attendance List gepullt wird.-->
@@ -45,10 +44,15 @@
     <div>
       <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
-      <span class="flex justify-center items-center">        
+      <span class="flex justify-center items-center">
         <p v-show="typeof this.attended.participants === 'undefined'"
-        class="text-xl md:text-2xl font-normal text-gray-400">Bitte wähle eine Gruppe</p>
+          class="text-xl md:text-2xl font-normal text-gray-400">Bitte wähle eine Gruppe</p>
       </span>
+    </div>
+
+    <div v-if="typeof this.attended.participants !== 'undefined'" class="flex justify-center items-center mt-3">
+      <p class="text-xl md:text-2xl font-normal text-gray-400">{{ countParticipants(attended.participants) }} Teilnehmer
+        am {{ new Date(date).toLocaleDateString() }}</p>
     </div>
   </div>
 </template>
@@ -64,11 +68,11 @@ import { useDataStore } from "@/store/dataStore";
 export default {
   name: "AttendanceListView",
   setup() {
-        const dataStore = useDataStore()
-        return {
-            dataStore
-        }
-    },
+    const dataStore = useDataStore()
+    return {
+      dataStore
+    }
+  },
   data() {
     return {
       groups: [],
@@ -83,7 +87,7 @@ export default {
     AttendanceListComponent,
     DatePicker,
     GroupInfo
-},
+  },
   methods: {
     /**
      * Zieht beim aufrufen die Attendance List der in @see SelectList ausgewählten Gruppe für das im @see DatePicker ausgewählte Datum vom Server. 
@@ -107,9 +111,9 @@ export default {
      * @param {String} id ID des Teilnehmers
      * @param {Boolean} newVal Ob der Teilnehmer teilgenommen hat.
      */
-    attendanceChange(id, newVal) {
+    async attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
-      updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      this.attended  = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 
     /**
@@ -128,6 +132,16 @@ export default {
       }
       return temp
     },
+
+    countParticipants(participants) {
+      let count = 0
+      for (const element of participants) {
+        if (element.attended) {
+          count++
+        }
+      }
+      return count > 0 ? count : "Keine"
+    }
   },
   async created() {
     //Zieht sich alle Namen und IDs der Gruppen auf die der Nutzer zugreifen kann.

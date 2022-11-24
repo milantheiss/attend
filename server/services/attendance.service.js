@@ -4,6 +4,7 @@ const { groupService } = require('../services');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
+const { hasAdminRole, hasAccessToGroup } = require('../utils/userroles');
 
 /**
  * Get all attendance lists.
@@ -12,10 +13,10 @@ const logger = require('../config/logger');
 const getAttendance = async (user) => {
     //user ist der Benutzer, der die Daten requestet
 
-    if (user.roles.includes('admin')) {
+    if (hasAdminRole(user)) {
         //admin hat Zugriff auf alle Attendance Lists
         return Attendance.find({})
-    } else if (user.roles.includes('trainer')) {
+    } else if (user.accessible_groups.length > 0) {
         //Wenn user ein Trainer o.ä. ist, wird für alle Attendance Lists die einer Gruppe zugewiesen sind, 
         //auf die der User Zugriff hat
         const list = await Attendance.find({ 'group._id': { $in: user.accessible_groups } })
@@ -26,22 +27,7 @@ const getAttendance = async (user) => {
             return list
         }
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to any attendance list")
-    }
-};
-
-/*
- * Get a attendance list by ID.
- * @param {ObjectId} id
- * @returns {Promise<Attendance>}
- */
-const getAttendanceById = async (user, id) => {
-    if (user.roles.includes('admin')) {
-        //Admin kann auf alle Attendance Lists zugreifen
-        return Attendance.findById(id)
-    } else if (user.roles.includes('trainer')) {
-        const list = await Attendance.findById(id);
-        return (list.access.includes(new mongoose.Types.ObjectId(id))) ? list : `The user has no access to the attendance list ${id}`
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to any group")
     }
 };
 
@@ -52,7 +38,7 @@ const getAttendanceById = async (user, id) => {
  * @returns {Promise<Attendance>}   
  */
 const getTrainingssession = async (user, groupID, date) => {
-    //INFO Access controle wird von 'getAttendanceByGroup' gehandelt
+    //INFO Access control wird von 'getAttendanceByGroup' gehandelt
     const attendance = await getAttendanceByGroup(user, groupID)
     let session
 
@@ -65,13 +51,15 @@ const getTrainingssession = async (user, groupID, date) => {
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
         //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
-        let formated = []
+        let formatted = []
 
         const temp = (await groupService.getGroupById(user, groupID)).participants
-
+        
+        date = new Date(date)
+        
         temp.forEach((participant) => {
             if (date >= participant.firsttraining) {
-                formated.push({
+                formatted.push({
                     firstname: participant.firstname,
                     lastname: participant.lastname,
                     attended: false,
@@ -82,8 +70,9 @@ const getTrainingssession = async (user, groupID, date) => {
 
         const sessionBody = {
             date: date,
-            participants: formated
+            participants: formatted
         }
+
 
         return sessionBody
     } else {
@@ -97,18 +86,27 @@ const getTrainingssession = async (user, groupID, date) => {
  * @returns {Promise<Attendance>}
  */
 const getAttendanceByGroup = async (user, groupID) => {
-    if (user.roles.includes('admin')) {
-        //Admin kann auf alle Listen zugreifen
-        return Attendance.findOne({ 'group._id': groupID })
-    } else if (user.roles.includes('trainer')) {
-        //User kann nur auf Liste zugreifen, wenn er Zugriff auf die verbundene Gruppe hat
-        if (user.accessible_groups.includes(groupID)) {
-            return Attendance.findOne({ 'group._id': groupID })
-        } else {
-            throw new ApiError(httpStatus.FORBIDDEN, "The user has no access to the group associated with this attendance list")
+    if (hasAccessToGroup(user, groupID)) {
+        //Admin kann auf alle Listen zugreifen. Trainer kann nur auf Liste zugreifen, wenn er access auf die Gruppe hat.
+        try {
+            const _res = await Attendance.findOne({ 'group._id': groupID })
+
+            //Wenn noch keine Attendance Document existiert, ist _res null
+            if (_res !== null && typeof _res !== 'undefined') {
+                return _res
+            } else { //Erstellt neues Attendance Document
+                return Attendance.create({
+                    group: {
+                        _id: new mongoose.Types.ObjectId(groupID)
+                    },
+                    trainingssessions: []
+                })
+            }
+        } catch (e) {
+            console.log(e)
         }
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to attendance lists")
     }
 };
 
@@ -118,7 +116,7 @@ const getAttendanceByGroup = async (user, groupID) => {
  * @returns {Promise<Attendance>}
  */
 const createAttendance = async (user, attendanceBody) => {
-    if (user.roles.includes('admin')) {
+    if (hasAdminRole(user)) {
         return Attendance.create(attendanceBody)
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new attendance list")
@@ -132,32 +130,28 @@ const createAttendance = async (user, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const addTrainingssession = async (user, groupID, sessionBody) => {
-    if (user.roles.includes('admin') || user.roles.includes('trainer')) {
-        if (user.roles.includes('admin') || user.accessible_groups.includes(groupID)) {
-            try {
-                const _res = await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
+    if (hasAccessToGroup(user, groupID)) {
+        try {
+            const _res = await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
 
-                //Wenn noch keine Attendance Document existiert, ist _res null
-                if (_res !== null && typeof _res !== 'undefined') {
-                    return _res
-                } else { //Erstellt neues Attendance Document
-                    return Attendance.create({
-                        group: {
-                            _id: new mongoose.Types.ObjectId(groupID)
-                        },
-                        trainingssessions: [
-                            sessionBody
-                        ]
-                    })
-                }
-            } catch (e) {
-                console.log(e)
+            //Wenn noch keine Attendance Document existiert, ist _res null
+            if (_res !== null && typeof _res !== 'undefined') {
+                return _res
+            } else { //Erstellt neues Attendance Document
+                return Attendance.create({
+                    group: {
+                        _id: new mongoose.Types.ObjectId(groupID)
+                    },
+                    trainingssessions: [
+                        sessionBody
+                    ]
+                })
             }
-        } else {
-            throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add a trainingssession")
+        } catch (e) {
+            console.log(e)
         }
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
+        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to attendance lists")
     }
 };
 
@@ -170,7 +164,7 @@ const addTrainingssession = async (user, groupID, sessionBody) => {
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (user, groupID, date, sessionBody) => {
-    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupID))) {
+    if (hasAccessToGroup(user, groupID)) {
         const session = await getTrainingssession(user, groupID, new Date(date))
 
         //Gleicht updated SessionBody mit session in DB ab
@@ -184,15 +178,19 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
         })
 
         if (!session.participants.some(participant => participant.attended === true)) {
+            console.log("Delete Trainingssession");
             await runGarbageCollector(user, groupID, date, session)
         } else {
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
-                return await addTrainingssession(user, groupID, session)
+                console.log('Add new Trainingssession');
+                await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
             } else {
-                return Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
+                console.log('Update Trainingssession');
+                await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })  
             }
         }
+        return await getTrainingssession(user, groupID, date)
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
@@ -213,7 +211,7 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
 
     if (!sessionBody.participants.some(participant => participant.attended === true)) {
         logger.debug('Garbage Collector - Trainingssession: Deleted a trainingssession')
-        deleteTrainingssession(user, groupID, date)
+        await deleteTrainingssession(user, groupID, date)
     } else {
         logger.debug('Garbage Collector - Trainingssession: No trainingssession deleted')
     }
@@ -224,13 +222,14 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
  * @param attendanceID
  * @returns {Promise<Attendance>}
  */
-const deleteAttendance = async (user, attendanceID) => {
-    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupID))) {
-        return Attendance.findByIdAndDelete(attendanceID)
-    } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete a attendance list")
-    }
-};
+//WARNING Wird nicht genutzt --> Kann gelöscht werden
+// const deleteAttendance = async (user, attendanceID) => {
+//     if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupID))) {
+//         return Attendance.findByIdAndDelete(attendanceID)
+//     } else {
+//         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete a attendance list")
+//     }
+// };
 
 /**
  * Delete a trainings session
@@ -238,8 +237,8 @@ const deleteAttendance = async (user, attendanceID) => {
  * @returns {Promise<Attendance>}
  */
 const deleteTrainingssession = async (user, groupID, date) => {
-    if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupID))) {
-        return Attendance.findOneAndUpdate({ 'group._id': groupID, }, { '$pull': { 'trainingssessions': { 'date': date } } })
+    if (hasAccessToGroup(user, groupID)) {
+        return await Attendance.findOneAndUpdate({ 'group._id': groupID, }, { '$pull': { 'trainingssessions': { 'date': date } } })
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
@@ -249,6 +248,7 @@ const deleteTrainingssession = async (user, groupID, date) => {
  * Get all Trainingssessions in Date Range
  */
 const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate) => {
+    //INFO Access control by getAttendanceByGroup()
     const list = await getAttendanceByGroup(user, groupID)
     let temp = {}
     temp.group = list.group
@@ -263,15 +263,12 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
 }
 
 module.exports = {
-    getAttendanceById,
     getAttendance,
-    createAttendance,
-    updateTrainingssession,
-    deleteAttendance,
-    getTrainingssession,
     getAttendanceByGroup,
+    updateTrainingssession,
+    createAttendance,
+    getTrainingssession,
     deleteTrainingssession,
-    addTrainingssession,
-    runGarbageCollector,
-    getTrainingssessionsByDateRange
+    getTrainingssessionsByDateRange,
+    runGarbageCollector
 };
