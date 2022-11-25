@@ -53,6 +53,7 @@ export default {
           this._commitDate(this.date)
         }
         else {
+          this.date = new Date()
           this.getLastDate();
         }
       }
