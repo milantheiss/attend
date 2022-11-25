@@ -18,16 +18,13 @@ jobs:
       matrix:
         node-version: [14.x, 16.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+    name: Use Node.js ${{ matrix.node-version }}
     steps:
-    - name: Checkout Server 
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
       with: 
         path: server
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with:
-        path: server
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
