@@ -6,8 +6,12 @@ name: Server Update
 on:
   push:
     branches: [ "master" ]
+    paths: 
+      - 'server/*'
   pull_request:
     branches: [ "master" ]
+    paths: 
+      - 'server/*'
 
 jobs:
   build-and-deploy:
