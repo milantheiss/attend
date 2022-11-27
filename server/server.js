@@ -9,7 +9,6 @@ let server;
 //config.mongoose.url
 mongoose.connect(config.url, { dbName: 'data' }).then(() => {
     logger.info('Connected to MongoDB');
-    logger.info("TEST")
     server = https.createServer({
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert),
