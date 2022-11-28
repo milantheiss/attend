@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "serve": "node server.js",
-    "format": "prettier server.js **/*.js --write"
+    "format": "prettier server.js **/*.js --write",
+    "restart": "sudo pm2 restart server"
   },
   "license": "ISC",
   "dependencies": {
