@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { Group, Attendance } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { hasAdminRole, hasAccessToGroup } = require('../utils/userroles');
+const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/userroles');
 //const { attendanceController } = require('../controllers');
 
 /**
@@ -20,8 +20,8 @@ const getGroups = async (user) => {
         if (!groups.length) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
-        } 
-        
+        }
+
         return groups
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to a groups")
@@ -186,6 +186,18 @@ const removeMember = async (user, groupID, memberID) => {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
 };
+
+const searchGroups = async (user, body) => {
+    if (hasAdminRole(user) || hasTrainerRole(user) || hasAssistantRole(user)) {
+        return await Group.find(  {$search: { index: "name", 
+        autocomplete: {
+            query: body.query,
+            path: 'name'
+        } } })
+    } else {
+        throw new ApiError(httpStatus.FORBIDDEN, "The user has no permission to search")
+    }
+}
 
 module.exports = {
     getGroupById,

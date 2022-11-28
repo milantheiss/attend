@@ -34,6 +34,10 @@ router
     .route('/:groupID/getInfo')
     .get(verifyToken, groupController.getGroupInfo)
 
+router
+    .route("/search")
+    .get(verifyToken, groupController.searchGroups)
+
 //TODO Add capability to update members by /:groupID/addmember
 //Backend soll Teilnehmer Liste ziehen und den neuen Teilnehmer anhängen und dann neue Liste in DB pushen
 

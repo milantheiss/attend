@@ -7,7 +7,7 @@ const groupSchema = mongoose.Schema(
         name: {
             type: String,
             required: true,
-            trim: true,
+            trim: true
         },
         participants: {
             type: [
