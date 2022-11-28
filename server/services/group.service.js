@@ -189,11 +189,7 @@ const removeMember = async (user, groupID, memberID) => {
 
 const searchGroups = async (user, body) => {
     if (hasAdminRole(user) || hasTrainerRole(user) || hasAssistantRole(user)) {
-        return await Group.find(  {$search: { index: "name", 
-        autocomplete: {
-            query: body.query,
-            path: 'name'
-        } } })
+        return await Group.find({ $text: { $search: body.query } })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user has no permission to search")
     }
@@ -205,5 +201,6 @@ module.exports = {
     createGroup,
     updateMember,
     getGroupInfo,
-    removeMember
+    removeMember,
+    searchGroups
 };
