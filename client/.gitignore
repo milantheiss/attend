@@ -24,3 +24,4 @@ pnpm-debug.log*
 *.sw?
 
 src/test.js
+src/TestView.vue

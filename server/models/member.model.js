@@ -21,8 +21,12 @@ const memberSchema = mongoose.Schema(
         },
         groups: {
             type: [{
-                name: {
-                    type: String,
+                group_id: {
+                    type: mongoose.Types.ObjectId,
+                    required: true
+                },
+                activ: {
+                    type: Boolean,
                     required: true
                 }
             }],
