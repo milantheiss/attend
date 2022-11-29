@@ -1,4 +1,3 @@
-
 <template>
     <input class="block
                         w-full
@@ -36,6 +35,9 @@ export default {
     watch: {
         input() {
             this.$emit('update:modelValue', this.input)
+        },
+        modelValue(newVal) {
+            this.input = newVal
         }
     }
 };

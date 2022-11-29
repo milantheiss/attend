@@ -39,6 +39,13 @@ const userSchema = mongoose.Schema(
         },
         role: {
             type: String
+        },
+        roles: {
+            type: Array
+        },
+        readPatchnotes: {
+            type: Boolean,
+            default: true
         }
     }
 );

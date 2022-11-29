@@ -9,7 +9,7 @@
       </svg>
     </button>
     <DateInput class="text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
-      :max="getFormattedDate(new Date(Date.now()))"></DateInput>
+      :max="getFormattedDate(new Date())"></DateInput>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
       <!--Right Chevron Icon-->
@@ -23,7 +23,6 @@
 
 <script>
 import { getDateOfTraining, isClosestTrainingToday } from "@/util/formatter";
-import { runGarbageCollector } from '@/util/fetchOperations'
 import DateInput from "./DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 
@@ -41,55 +40,50 @@ export default {
   emits: ["update:modelValue", "onChange", "on"],
   data() {
     return {
-      date: this.getFormattedDate(new Date(Date.now())),
+      date: this.getFormattedDate(new Date()),
       weekdays: undefined
     };
   },
   methods: {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.dataStore.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-        }
         if (isClosestTrainingToday(this.weekdays)) {
-          this.date = this.getFormattedDate(new Date(Date.now()));
-          this.$emit("update:modelValue", new Date(this.date));
-          this.$emit("onChange");
+          this.date = this.getFormattedDate(new Date());
+          //Commit muss hier ausgeführt werden, da kein Change in 'this.date' vom Watcher festgestellt wird.
+          this._commitDate(this.date)
         }
         else {
+          this.date = new Date()
           this.getLastDate();
         }
       }
     },
     getNextDate() {
       if (typeof this.weekdays !== "undefined") {
+        //Blockt Button, sodass kein Training in der Zukunft ausgewählt werden kann.
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
-          if (typeof this.dataStore.selectedGroupID !== "undefined") {
-            runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-          }
           this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
-
         }
       }
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        if (typeof this.dataStore.selectedGroupID !== "undefined") {
-          runGarbageCollector(this.dataStore.selectedGroupID, new Date(this.date));
-        }
         this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
       }
     },
     getFormattedDate(date) {
       return date.toJSON().slice(0, 10)
+    },
+    _commitDate(date) {
+      this.$emit("update:modelValue", new Date(date));
+      this.$emit("onChange");
     }
   },
   components: { DateInput },
   watch: {
     date(newVal) {
       if (typeof newVal !== 'undefined') {
-        this.$emit("update:modelValue", new Date(newVal));
-        this.$emit("onChange");
+        this._commitDate(newVal)
       }
     }
   }

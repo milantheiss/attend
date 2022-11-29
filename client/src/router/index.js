@@ -46,8 +46,8 @@ const router = createRouter({
  * Middleware: Wird ausgeführt bevor eine Unterseite aufgerufen wird.
  * Überprüft, ob Unterseite Authentication benötigt.
  * Wenn ja, wir überprüft, ob Session authentifiziert ist.
- *  Wenn ja, wird angefragte Unterseite angezeigt.
- *  Wenn nicht, wird router zu /login weitergeleitet.
+ *    Wenn ja, wird angefragte Unterseite angezeigt.
+ *    Wenn nicht, wird router zu /login weitergeleitet.
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
 router.beforeEach(async (to, from, next) => {
@@ -72,8 +72,8 @@ router.beforeEach(async (to, from, next) => {
  * Middleware: Wird ausgeführt bevor eine Unterseite aufgerufen wird.
  * Überprüft, ob Unterseite für Gäste zugänglich ist.
  * Wenn ja, wir überprüft, ob Session authentifiziert ist.
- *  Wenn ja, wird router zu '/attendancelist' weitergeleitet.
- *  Wenn nicht, wird angefragte Unterseite angezeigt.
+ *    Wenn ja, wird router zu '/attendancelist' weitergeleitet.
+ *    Wenn nicht, wird angefragte Unterseite angezeigt.
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
 router.beforeEach(async (to, from, next) => {
@@ -82,7 +82,7 @@ router.beforeEach(async (to, from, next) => {
       next("/attendancelist");
       return;
     }
-    next();
+    next()
   } else {
     next();
   }
