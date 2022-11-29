@@ -7,23 +7,23 @@
             <div ref="modal-backdrop" class="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50"
                 v-if="showModal">
                 <!--Elementfenster-->
-                <div class="flex items-start justify-center min-h-screen pt-24 text-center">
+                <div class="flex items-start justify-center min-h-screen pt-8 md:pt-24 text-center">
                     <div class="w-5/6 md:max-w-medium-width p-5 bg-white rounded-lg overflow-hidden drop-shadow-md text-black"
                         role="dialog" ref="modal" aria-modal="true" aria-labelledby="modal-headline">
                         <!--Header-->
-                        <div class="text-left font-bold text-2xl text-gray-700">
+                        <div class="text-left font-bold text-xl md:text-2xl text-gray-700">
                             <slot name="header"></slot>
                         </div>
                         <!--Subheader-->
-                        <div class="text-left font-semibold text-xl text-gray-500">
+                        <div class="text-left font-normal text-base md:text-lg text-gray-500">
                             <slot name="subheader"></slot>
                         </div>
                         <!--Content-->
-                        <div class="text-left font-normal text-lg text-black my-4">
+                        <div class="text-left font-normal text-base md:text-lg text-black my-4">
                             <slot name="content"></slot>
                         </div>
                         <!--Footer-->
-                        <div class="text-left font-semibold text-lg text-black">
+                        <div class="text-left font-semibold text-base md:text-lg text-black">
                             <slot name="footer"></slot>
                         </div>
                     </div>
