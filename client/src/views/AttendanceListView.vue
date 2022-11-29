@@ -113,7 +113,7 @@ export default {
      */
     async attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
-      this.attended  = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 
     /**
