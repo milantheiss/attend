@@ -1,5 +1,7 @@
 const { PatchNotes, User } = require('../models');
 const { hasDeveloperRole } = require('../utils/userroles');
+const ApiError = require('../utils/ApiError');
+const httpStatus = require('http-status');
 
 /**
  * Get last Patchnotes.
@@ -18,7 +20,8 @@ const getLastPatchNotes = async () => {
 const addNewPatchNote = async (user, body) => {
     if(hasDeveloperRole(user)){
         //Mark Patchnotes as Unread for all Users
-        User.updateMany({}, { $set: { readPatchnotes: false } })
+        await User.updateMany({}, { $set: {readPatchnotes: false }})
+
         return PatchNotes.create(body);
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Only developer are allowed to add new patch notes")

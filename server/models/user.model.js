@@ -37,9 +37,6 @@ const userSchema = mongoose.Schema(
         accessible_groups: {
             type: [mongoose.Types.ObjectId]
         },
-        role: {
-            type: String
-        },
         roles: {
             type: Array
         },

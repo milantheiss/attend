@@ -173,7 +173,6 @@ const getGroupInfo = async (user, groupId) => {
     return group
 };
 
-
 /**
  * Remove Member out of group
  * @param {ObjectId} groupID
