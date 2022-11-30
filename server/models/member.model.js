@@ -19,14 +19,14 @@ const memberSchema = mongoose.Schema(
             type: Date,
             required: true
         },
+        departments:{
+            type: [mongoose.Types.ObjectId],
+            required: false
+        },
         groups: {
             type: [{
                 group_id: {
                     type: mongoose.Types.ObjectId,
-                    required: true
-                },
-                activ: {
-                    type: Boolean,
                     required: true
                 }
             }],
