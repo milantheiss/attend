@@ -8,7 +8,7 @@ const fs = require('fs')
 let server;
 //config.mongoose.url
 mongoose.connect(config.url, { dbName: 'data' }).then(() => {
-    logger.info('Connected to MongoDB');
+    logger.info(`Connected to MongoDB at ${new Date().toLocaleString()}`);
     server = https.createServer({
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert),
