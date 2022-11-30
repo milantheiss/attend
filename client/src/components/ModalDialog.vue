@@ -19,7 +19,7 @@
                             <slot name="subheader"></slot>
                         </div>
                         <!--Content-->
-                        <div class="text-left font-normal text-base md:text-lg text-black my-4">
+                        <div class="text-left text-base md:text-lg text-black my-4">
                             <slot name="content"></slot>
                         </div>
                         <!--Footer-->
