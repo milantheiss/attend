@@ -16,7 +16,7 @@ const getLastPatchNotes = async () => {
  * @returns {Promise<[PatchNotes.PatchNotes]>}
  */
 const addNewPatchNote = async (user, body) => {
-    if(hasDeveloperRole(body)){
+    if(hasDeveloperRole(user)){
         //Mark Patchnotes as Unread for all Users
         User.updateMany({}, { $set: { readPatchnotes: false } })
         return PatchNotes.create(body);
