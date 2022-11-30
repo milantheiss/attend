@@ -162,7 +162,7 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
 /**
  * Get a group by ID and return only info.
  * @param {ObjectId} groupId
- * @returns {Promise<Group>}0
+ * @returns {Promise<Group>}
  */
 const getGroupInfo = async (user, groupId) => {
     let group = await getGroupById(user, groupId);
