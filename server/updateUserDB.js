@@ -16,7 +16,7 @@ async function main(){
                 firstname: participant.firstname,
                 lastname: participant.lastname,
                 birthday: participant.birthday,
-                departments: [group.departments],
+                departments: [group.department],
                 groups: [group._id]
             })
         }

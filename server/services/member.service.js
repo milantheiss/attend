@@ -42,7 +42,10 @@ const updateMember = async (user, group, memberBody) => {
         {lastname: memberBody.lastname},
         {departments: group.department}
     ]})
-    console.log(members);
+    if(!members.some(val => val.firstname === memberBody.firstname)){
+        members
+    }
+    console.log('Nee')
     return members
 }
 
