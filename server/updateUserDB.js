@@ -10,11 +10,9 @@ async function main(){
     
     const groups = await Group.find({})
 
-    let members = []
-
     for(const group of groups){
         for(const participant of group.participants){
-            members.push({
+            Member.create({
                 firstname: participant.firstname,
                 lastname: participant.lastname,
                 birthday: participant.birthday,
@@ -22,9 +20,7 @@ async function main(){
                 groups: [group._id]
             })
         }
-    }
-
-    
+    }    
 
     console.log('Success');
     return false
