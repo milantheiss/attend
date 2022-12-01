@@ -8,7 +8,7 @@ async function main(){
         console.log('Connected to MongoDB');
     })
     
-    const groups = Group.find({})
+    const groups = await Group.find({})
 
     let members = []
 

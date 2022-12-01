@@ -3,6 +3,7 @@ const { Member } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole } = require('../utils/userroles');
 
+
 //Service updated/zieht die Daten aus DB
 
 /**
@@ -36,10 +37,19 @@ const addMember = async (user, memberBody) => {
     
 };
 
+const updateMember = async (user, group, memberBody) => {
+    const members = await Member.find({ $and: [
+        {lastname: memberBody.lastname},
+        {departments: group.department}
+    ]})
+    console.log(members);
+    return members
+}
 
 //TODO Add new Functions here
 module.exports = {
     getMembers,
     getMemberById,
-    addMember
+    addMember,
+    updateMember
 };

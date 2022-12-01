@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { Group, Attendance } = require('../models');
+const memberService = require("../services/member.service")
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/userroles');
 //const { attendanceController } = require('../controllers');
@@ -72,6 +73,7 @@ const updateMember = async (user, groupID, body) => {
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body._id === 'undefined') {
+            await memberService.updateMember(user, getGroupById(user, groupID), body)
             group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
             body._id = group.participants[group.participants.length - 1]._id
             //oldFirsttraining bleibt 'undefined'
