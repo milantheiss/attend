@@ -29,6 +29,10 @@ const groupSchema = mongoose.Schema(
                     firsttraining: {
                         type: Date,
                         required: false
+                    },
+                    openIssue: {
+                        type: mongoose.Types.ObjectId,
+                        required: false
                     }
                 }
             ],
