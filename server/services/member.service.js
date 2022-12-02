@@ -24,21 +24,7 @@ const getMemberById = async (id) => {
     return Member.findById(id);
 };
 
-/**
- * Create a Group
- * @param {Object} memberBody
- * @returns {Promise<Member>}
- */
-const addMember = async (user, memberBody) => {
-    if (hasAdminRole(user)) {
-        return Member.create(memberBody);
-    } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new member")
-    }
-
-};
-
-const updateMember = async (user, group, memberBody) => {
+const handleNewMemberRequest = async (user, group, memberBody) => {
     //Sucht nach Membern mit dem gleichen Namen und Geburtsdatum
     const members = await Member.find({
         $and: [
@@ -56,75 +42,81 @@ const updateMember = async (user, group, memberBody) => {
     Es wird ein Issue erstellt, damit ein Sachbearbeiter den User verifizieren kann.
     */
     if (members.length === 0) {
-        const openissue = await Issue.find({
-            $and: [
-                { tag: "newMember" },
-                { "body.firstname": memberBody.firstname },
-                { "body.lastname": memberBody.lastname },
-                { "body.birthday": memberBody.birthday }
+        console.log('Totally new Member');
+        let openissue = await Issue.findOne({
+            $or: [
+                {
+                    $and: [
+                        { tag: "newMember" },
+                        { "body.firstname": memberBody.firstname },
+                        { "body.lastname": memberBody.lastname },
+                        { "body.birthday": memberBody.birthday }
+                    ]
+                },
+                {
+                    $and: [
+                        { tag: "newMemberInMultipleGroups" },
+                        { "body.firstname": memberBody.firstname },
+                        { "body.lastname": memberBody.lastname },
+                        { "body.birthday": memberBody.birthday }
+                    ]
+                }
             ]
         })
 
-        //Wenn kein Issue existiert oder ein MultiGroup Issue schon existiert.
+        //Wenn kein Issue existiert.
         if (openissue === null || typeof openissue === "undefined") {
-            const multiGroupIssue = await Issue.find({
-                $and: [
-                    { tag: "newMemberInMultipleGroups" },
-                    { "body.firstname": memberBody.firstname },
-                    { "body.lastname": memberBody.lastname },
-                    { "body.birthday": memberBody.birthday }
-                ]
-            })
-
-            //Wenn kein auch kein MultiGroupIssue existiert
-            if (multiGroupIssue === null || typeof multiGroupIssue === "undefined") {
-                const newID = new mongoose.Types.ObjectId()
-                const issue = await Issue.create({
-                    tag: 'newMember',
-                    date: new Date(),
-                    body: {
-                        groupID: group._id,
-                        memberID: newID,
-                        createdBy: user._id,
-                        firstname: memberBody.firstname,
-                        lastname: memberBody.lastname,
-                        birthday: memberBody.birthday
-                    }
-                })
-                memberBody._id = newID
-                memberBody.openIssue = issue._id
-            } else { //Wenn ein MultiGroupIssue existiert.
-                await Issue.findByIdAndUpdate(multiGroupIssue._id, { "body.groupIDs": { $addToSet: group._id } })
-            }
-        } else { //Wenn bereits ein Issue existiert, aber noch kein MultiGroup Issue erstellt wurde.
-            await Issue.deleteOne({ _id: openissue._id })
-            const multiGroupIssue = await Issue.create({
-                tag: 'newMemberInMultipleGroups',
-                date: openissue.date,
+            const newID = new mongoose.Types.ObjectId()
+            const issue = await Issue.create({
+                tag: 'newMember',
+                date: new Date(),
                 body: {
-                    groupIDs: [
-                        openissue.body.groupID,
-                        group._id
-                    ],
-                    memberID: openissue._id,
-                    createdBy: [
-                        openissue.body.createdBy,
-                        user._id,
-                    ],
+                    groupID: group._id,
+                    memberID: newID,
+                    createdBy: user._id,
                     firstname: memberBody.firstname,
                     lastname: memberBody.lastname,
                     birthday: memberBody.birthday
-                },
-                _id: openissue._id
+                }
             })
-
-            memberBody._id = openissue._id
+            memberBody._id = newID
             memberBody.openIssue = issue._id
+        } else { //Wenn bereits ein Issue oder MultiGroup Issue existiert.
+            //Wenn nur ein einzelnes Issue existiert.
+            //TODO Sicherstellen, dass keine zwei gleich benannte Member in einer Gruppe sind
+            if (openissue.tag === "newMember") {
+                await Issue.deleteOne({ _id: openissue._id })
+                const multiGroupIssue = await Issue.create({
+                    tag: 'newMemberInMultipleGroups',
+                    date: openissue.date,
+                    body: {
+                        groupIDs: [
+                            openissue.body.groupID,
+                            group._id
+                        ],
+                        memberID: openissue.body.memberID,
+                        createdBy: [
+                            openissue.body.createdBy,
+                            user._id,
+                        ],
+                        firstname: memberBody.firstname,
+                        lastname: memberBody.lastname,
+                        birthday: memberBody.birthday
+                    },
+                    _id: openissue._id
+                })
+
+                memberBody.openIssue = multiGroupIssue._id
+            } else { //Wenn schon ein MultiGroupIssue existiert.
+                openissue = await Issue.findByIdAndUpdate(openissue._id, { "body.groupIDs": { $addToSet: group._id }, "body.createdBy": { $addToSet: user._id } })
+                memberBody.openIssue = openissue._id
+            }
+
+            memberBody._id = openissue.body.memberID
         }
-
-
-        console.log(memberBody);
     } else if (members.length > 1) { //Wenn es mehr als einen gleichen Member gibt.
+        console.log('DuplicateMemberInDB');
+
         //* --> Issue für Duplicate Conflict wird erstellt.
         const issueBody = {
             tag: "duplicateMemberInDB",
@@ -138,15 +130,23 @@ const updateMember = async (user, group, memberBody) => {
         }
 
         members.forEach(val => issueBody.body.memberIDs.push(val._id))
-     
-        await Issue.create(issueBody)
-    } else if (!members[0].departments.some(v => v === group.department._id)) { //Wenn gleicher Members nicht im selben Department ist. 
+
+        const openissue = await Issue.create(issueBody)
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Internal database error detected: The database contains several members with the same basic data. The system has created a ticket with the ID ${openissue._id}. Please contact a system administrator.`)
+    } else if (!members[0].departments.some(v => v === group.department._id)) { //Wenn Member in DB schon existiert, aber noch nicht Teil des Department ist. 
+        console.log('Add Member to Department');
+
         //* --> Issue zum hinzufügen zur Abteilung wird erstellt.
 
-        const openIssues = await Issue.find({tag: "addMemberToDepartment"})
+        let openissue = await Issue.find({
+            $and: [
+                { tag: "addMemberToDepartment" },
+                { "body.memberID": members[0]._id }
+            ]
+        })
 
-        if(!openIssues.some(val => val.body.memberID === members[0]._id) && !openIssues.some(val => val.body.department === group.department._id)) {
-            await Issue.create({
+        if (openissue === null || typeof openissue === "undefined" || !openissue.some(val => val.body.department === group.department._id)) {
+            let openissue = await Issue.create({
                 tag: "addMemberToDepartment",
                 date: new Date(),
                 body: {
@@ -158,24 +158,27 @@ const updateMember = async (user, group, memberBody) => {
                     createdBy: user._id
                 }
             })
-        }
+            memberBody.openIssue = openissue._id
+            memberBody._id = members[0]._id
+        } 
+        memberBody.openIssue = openissue._id
+        memberBody._id = openissue.body.memberID
+    } else {//Wenn der Member schon in DB existiert und auch Teil des Departments ist.
+        console.log('Add Member to group');
 
-    } else {
-        if (members[0].groups.some(v => v === group._id)) {
-            //* --> Issue wird erstellt, um Member in Datenbank zu bearbeiten.
-        } else {
-            //* --> Member wird der neuen Gruppe ohne Issue hinzugefügt.
-        }
+        //* --> Member wird der neuen Gruppe ohne Issue hinzugefügt.
+        await Member.findByIdAndUpdate(members[0]._id, { groups: { $addToSet: group._id } })
+        memberBody._id = members[0]._id
     }
-
 
     return memberBody
 }
 
-//TODO Add new Functions here
+//TODO UpdateMember
+
+
 module.exports = {
     getMembers,
     getMemberById,
-    addMember,
-    updateMember
+    handleNewMemberRequest
 };

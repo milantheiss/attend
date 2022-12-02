@@ -73,11 +73,10 @@ const updateMember = async (user, groupID, body) => {
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body._id === 'undefined') {
-            await memberService.updateMember(user, await getGroupById(user, groupID), body)
-            group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
-            body._id = group.participants[group.participants.length - 1]._id
-            //oldFirsttraining bleibt 'undefined'
+            body = await memberService.handleNewMemberRequest(user, await getGroupById(user, groupID), body)
+            await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
+
             group = await Group.findOneAndUpdate({ '_id': groupID, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
 
             //OldFirsttraining wird aus group gezogen
