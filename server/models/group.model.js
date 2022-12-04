@@ -24,11 +24,11 @@ const groupSchema = mongoose.Schema(
                     },
                     birthday: {
                         type: Date,
-                        required: false
+                        required: true
                     },
                     firsttraining: {
                         type: Date,
-                        required: false
+                        required: true
                     },
                     openIssue: {
                         type: mongoose.Types.ObjectId,

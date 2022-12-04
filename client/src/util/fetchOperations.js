@@ -90,7 +90,6 @@ async function fetchGroupInfo(groupID){
 }
 
 async function updateMemberInGroup(groupID, body){
-  console.log(groupID, body);
   return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "groups", groupID, 'updateMember'].join('/'), {
     method: "PATCH",
     headers: { 'Content-type': 'application/json; charset=UTF-8' },
