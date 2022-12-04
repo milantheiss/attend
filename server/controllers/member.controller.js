@@ -9,7 +9,12 @@ const addMember = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send(result);
 });
 
+const updateMember = catchAsync(async (user, groupID, body) => {
+    return await memberService.updateMember(user, groupID, body)
+})
+
 module.exports = {
-    addMember
+    addMember,
+    updateMember
 }
 

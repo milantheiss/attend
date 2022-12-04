@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
-const { Group, Attendance } = require('../models');
+const { Group, Attendance, Member } = require('../models');
+const memberService = require("../services/member.service")
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/userroles');
 //const { attendanceController } = require('../controllers');
@@ -72,10 +73,10 @@ const updateMember = async (user, groupID, body) => {
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body._id === 'undefined') {
+            body = await memberService.handleNewMemberEvent(user, await getGroupById(user, groupID), body)
             group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
-            body._id = group.participants[group.participants.length - 1]._id
-            //oldFirsttraining bleibt 'undefined'
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
+
             group = await Group.findOneAndUpdate({ '_id': groupID, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
 
             //OldFirsttraining wird aus group gezogen
@@ -180,6 +181,7 @@ const getGroupInfo = async (user, groupId) => {
  */
 const removeMember = async (user, groupID, memberID) => {
     if (hasAccessToGroup(user, groupID)) {
+        await Member.findByIdAndUpdate(memberID, {$pull: {groups: groupID}})
         return await Group.findOneAndUpdate({ '_id': groupID, }, { '$pull': { 'participants': { '_id': memberID } } }, { new: true })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")

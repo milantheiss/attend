@@ -1,4 +1,4 @@
-const {User} = require('./models');
+const {Group, Member} = require('./models');
 const mongoose = require('mongoose')
 const config = require("./config/config")
 
@@ -8,12 +8,18 @@ async function main(){
         console.log('Connected to MongoDB');
     })
     
-    const users = await User.find({})
-    
-    for (const user of users) {
-        const role = user.role
-        await User.findByIdAndUpdate(user._id, { roles: [role] })
-        await User.findByIdAndUpdate(user._id, { $unset: {role: 1} })
+    const groups = await Group.find({})
+
+    for(const group of groups){
+        for(const participant of group.participants){
+            Member.create({
+                firstname: participant.firstname,
+                lastname: participant.lastname,
+                birthday: participant.birthday,
+                departments: [group.department._id],
+                groups: [group._id]
+            })
+        }
     }    
 
     console.log('Success');
