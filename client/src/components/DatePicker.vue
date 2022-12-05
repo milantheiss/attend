@@ -48,13 +48,11 @@ export default {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
         if (isClosestTrainingToday(this.weekdays)) {
-          this.date = this.getFormattedDate(new Date());
-          //Commit muss hier ausgeführt werden, da kein Change in 'this.date' vom Watcher festgestellt wird.
-          this._commitDate(this.date)
+          this._updateDate(this.getFormattedDate(new Date()));
         }
         else {
           this.date = new Date()
-          this.getLastDate();
+          this._updateDate(this.getLastDate());
         }
       }
     },
@@ -62,31 +60,25 @@ export default {
       if (typeof this.weekdays !== "undefined") {
         //Blockt Button, sodass kein Training in der Zukunft ausgewählt werden kann.
         if (getDateOfTraining(this.date, this.weekdays, true) <= Date.now()) {
-          this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true));
+          this._updateDate(this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, true)));
         }
       }
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        this.date = this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
+        return this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
       }
     },
     getFormattedDate(date) {
       return date.toJSON().slice(0, 10)
     },
-    _commitDate(date) {
+    _updateDate(date) {
+      this.date = date
       this.$emit("update:modelValue", new Date(date));
       this.$emit("onChange");
     }
   },
-  components: { DateInput },
-  watch: {
-    date(newVal) {
-      if (typeof newVal !== 'undefined') {
-        this._commitDate(newVal)
-      }
-    }
-  }
+  components: { DateInput }
 }
 </script>
 
