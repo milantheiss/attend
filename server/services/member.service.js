@@ -49,7 +49,6 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
     Es wird ein Issue erstellt, damit ein Sachbearbeiter den User verifizieren kann.
     */
     if (members.length === 0) {
-        console.log('Totally new Member');
         let openIssue = await Issue.findOne({
             $or: [
                 {
@@ -130,8 +129,6 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
             memberBody._id = openIssue.body.memberID
         }
     } else if (members.length > 1) { //Wenn es mehr als einen gleichen Member gibt.
-        console.log('DuplicateMemberInDB');
-
         //* --> Issue für Duplicate Conflict wird erstellt.
         const issueBody = {
             tag: "duplicateMemberInDB",
@@ -149,7 +146,6 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
         const openIssue = await Issue.create(issueBody)
         throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Internal database error detected: The database contains several members with the same basic data. The system has created a ticket with the ID ${openIssue._id}. Please contact a system administrator.`)
     } else if (!members[0].departments.some(v => v.equals(group.department._id))) { //Wenn Member in DB schon existiert, aber noch nicht Teil des Department ist. 
-        console.log('Add Member to Department');
         //* --> Issue zum hinzufügen zur Abteilung wird erstellt.
 
         //WARNING Im Moment wird dem Member zwar die GroupID hinzugefügt, jedoch nicht die Id des Departments
@@ -192,8 +188,6 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
 
         await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
     } else {//Wenn der Member schon in DB existiert und auch Teil des Departments ist.
-        console.log('Add Member to group');
-
         //* --> Member wird der neuen Gruppe ohne Issue hinzugefügt.
         await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
         memberBody._id = members[0]._id
