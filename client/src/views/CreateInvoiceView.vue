@@ -15,7 +15,7 @@
             <div class="flex items-start justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <!--Add Collapsable Container here-->
-                <CheckboxList v-model="testList"></CheckboxList>
+                <CheckboxList v-model="testList" class="w-1/6"></CheckboxList>
             </div>
             <div class="flex items-center justify-between mb-4">
                 <label for="startdate"

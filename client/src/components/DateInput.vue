@@ -39,6 +39,13 @@ export default {
 
 <style scoped>
 input[type="date"]::-webkit-calendar-picker-indicator {
+    display: block;
+    opacity: 0;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-clear-button {
+    display: block;
     opacity: 0;
 }
 
@@ -47,6 +54,8 @@ input[type="date"] {
     background-repeat: no-repeat;
     background-size: 1.5rem 1.5rem;
     background-position: right 0.5rem center;
+
+    cursor: pointer;
 }
 
 input::-webkit-date-and-time-value {

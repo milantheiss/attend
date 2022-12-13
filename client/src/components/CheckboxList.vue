@@ -1,9 +1,9 @@
 <template>
     <div >
         <!--TODO Styling-->
-        <div v-for="element of formattedList" :key="element.text" class="flex items-center justify-between">
+        <div v-for="element of formattedList" :key="element.text" class="flex items-center justify-end mb-2 w-fit">
             <p>{{element.text}}</p>
-            <CheckboxInput v-model="element.checked"></CheckboxInput>
+            <CheckboxInput v-model="element.checked" class="color-standard-gradient-1"></CheckboxInput>
         </div>
     </div>
 </template>
