@@ -34,6 +34,12 @@ const routes = [
     name: 'EditGroup',
     component: () => import('../views/EditGroupView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/createInvoice",
+    name: "CreateInvoice",
+    component: () => import("../views/CreateInvoiceView.vue"),
+    meta: { requiresAuth: true }
   }
 ]
 
