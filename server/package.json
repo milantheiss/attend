@@ -1,7 +1,6 @@
 {
-  "name": "server-template",
+  "name": "attend-app-backend",
   "version": "1.0.0",
-  "description": "Express.js template",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",

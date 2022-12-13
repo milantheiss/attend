@@ -52,7 +52,7 @@ export default {
         }
         else {
           this.date = new Date()
-          this._updateDate(this.getLastDate());
+          this.getLastDate();
         }
       }
     },
@@ -66,7 +66,7 @@ export default {
     },
     getLastDate() {
       if (typeof this.weekdays !== "undefined") {
-        return this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false));
+        this._updateDate(this.getFormattedDate(getDateOfTraining(this.date, this.weekdays, false)));
       }
     },
     getFormattedDate(date) {
