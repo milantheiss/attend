@@ -4,7 +4,7 @@
             enter-to-class="opacity-100" leave-active-class="transition ease-in duration-150 transform"
             leave-from-class="opacity-100" leave-to-class="opacity-0">
             <!--Backdrop-->
-            <div ref="modal-backdrop" class="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50"
+            <div ref="modal-backdrop" class="fixed z-30 inset-0 overflow-y-auto bg-black bg-opacity-50"
                 v-if="showModal">
                 <!--Elementfenster-->
                 <div class="flex items-start justify-center min-h-screen pt-8 md:pt-24 text-center">

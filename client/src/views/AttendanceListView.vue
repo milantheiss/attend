@@ -50,6 +50,14 @@
       </span>
     </div>
 
+    <div>
+      
+    </div>
+    
+    <div>
+      <AttendanceListComponent :participants="this.attended.trainer" :sortByLastName="true"></AttendanceListComponent>
+    </div>
+
     <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)" class="flex justify-center items-center mt-3">
       <p class="text-lg md:text-xl font-normal text-gray-600">{{ countParticipants(attended.participants) }} Teilnehmer
         am {{ new Date(date).toLocaleDateString() }}</p>

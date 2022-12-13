@@ -10,23 +10,23 @@
       </div>
     </div>
 
-    <div class="flex justify-between items-center" v-if="group.trainer.length !== 0">
+    <div class="flex justify-between items-center" v-if="group.trainer.filter(val => val.position === 'trainer').length.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Trainer:</p>
       </div>
       <div>
         <p class="text-base text-right md:text-lg" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
-          v-for="trainer in group.trainer" :key="trainer.name">{{ trainer.name }}</p>
+          v-for="trainer in group.trainer.filter(val => val.position === 'trainer')" :key="trainer.name">{{ trainer.firstname }} {{ trainer.lastname}}</p>
       </div>
     </div>
 
-    <div class="flex justify-between items-center" v-if="group.assistent.length !== 0">
+    <div class="flex justify-between items-center" v-if="group.trainer.filter(val => val.position === 'assistant').length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Assistent:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
-          v-for="assistent in group.assistent" :key="assistent.name">{{ assistent.name }}</p>
+          v-for="assistant in group.trainer.filter(val => val.position === 'assistant')" :key="assistant.name">{{ assistant.firstname }} {{ assistant.lastname}}</p>
       </div>
     </div>
 
@@ -63,14 +63,10 @@ export default {
           trainer:
             [
               {
-                name: ". . ."
+                name: ". . .",
+                position: "trainer"
               }
             ],
-          assistent: [
-            {
-              name: ". . ."
-            }
-          ], 
           times: [{
             day: ". . ."
           }],

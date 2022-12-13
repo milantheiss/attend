@@ -37,6 +37,20 @@ const attendanceSchema = mongoose.Schema(
                                 }
                             }
                         ]
+                    },
+                    trainers: {
+                        type: [
+                            {
+                                _id: {
+                                    type: mongoose.Types.ObjectId,
+                                    required: true
+                                },
+                                attended: {
+                                    type: Boolean,
+                                    required: true
+                                }
+                            }
+                        ]
                     }
                 }
             ]

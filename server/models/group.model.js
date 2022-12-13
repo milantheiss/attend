@@ -41,7 +41,22 @@ const groupSchema = mongoose.Schema(
         trainer: {
             type: [
                 {
+                    firstname: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    },
+                    lastname: {
+                        type: String,
+                        required: true,
+                        trim: true
+                    },
                     name: {
+                        type: String,
+                        required: false,
+                        trim: true
+                    },
+                    position: {
                         type: String,
                         required: true,
                         trim: true

@@ -1,29 +1,52 @@
-const {Group, Member} = require('./models');
-const mongoose = require('mongoose')
-const config = require("./config/config")
+const { Group, Attendance } = require("./models");
+const mongoose = require("mongoose");
+const config = require("./config/config");
 
+async function main() {
+  await mongoose.connect(config.url, { dbName: "data" }).then(() => {
+    console.log("Connected to MongoDB");
+  });
+  //Name von Trainer aufsplitten.
+  //Trainer in alle Trainingssessions hinzufügen
+  //User updaten
 
-async function main(){
-    await mongoose.connect(config.url, { dbName: 'data' }).then(() => {
-        console.log('Connected to MongoDB');
-    })
-    
-    const groups = await Group.find({})
+  const groups = await Group.find({});
 
-    for(const group of groups){
-        for(const participant of group.participants){
-            Member.create({
-                firstname: participant.firstname,
-                lastname: participant.lastname,
-                birthday: participant.birthday,
-                departments: [group.department._id],
-                groups: [group._id]
-            })
-        }
-    }    
+  for (const group of groups) {
+    for (const trainer of group.trainer) {
+      trainer.firstname = trainer.name.split(" ")[0];
+      trainer.lastname = trainer.name.split(" ")[1];
+      trainer.position = "trainer";
 
-    console.log('Success');
-    return false
+      delete trainer.name;
+    }
+
+    for (const assistent of group.assistent) {
+      assistent.firstname = assistent.name.split(" ")[0];
+      assistent.lastname = assistent.name.split(" ")[1];
+      assistent.position = "assistant";
+
+      delete assistent.name;
+
+      group.trainer.push(assistent);
+    }
+
+    await Group.findByIdAndUpdate(group._id, {
+      $set: { trainer: group.trainer },
+      $unset: { assistent: "" },
+    });
+
+    await Attendance.findOneAndUpdate(
+      { "group._id": group._id },
+      {
+        $set: { "trainingssessions.$[].trainers": group.trainer },
+        $set: { "trainingssessions.$[].trainers.$[].attended": false },
+      }
+    );
+  }
+
+  console.log("Success");
+  return false;
 }
 
-main()
+main();

@@ -5,6 +5,7 @@ const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
 const { hasAdminRole, hasAccessToGroup } = require('../utils/userroles');
+const { translateAliases } = require('../models/attendance.model');
 
 /**
  * Get all attendance lists.
@@ -51,15 +52,15 @@ const getTrainingssession = async (user, groupID, date) => {
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
         //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
-        let formatted = []
+        let participants = []
 
-        const temp = (await groupService.getGroupById(user, groupID)).participants
+        const group = await groupService.getGroupById(user, groupID)
         
         date = new Date(date)
         
-        temp.forEach((participant) => {
+        group.participants.forEach((participant) => {
             if (date >= participant.firsttraining) {
-                formatted.push({
+                participants.push({
                     firstname: participant.firstname,
                     lastname: participant.lastname,
                     attended: false,
@@ -68,11 +69,22 @@ const getTrainingssession = async (user, groupID, date) => {
             }
         })
 
+        let trainers = []
+
+        group.trainer.forEach(trainer => {
+            trainers.push({
+                firstname: trainer.firstname,
+                lastname: trainer.lastname,
+                attended: false, 
+                _id: trainer._id
+            })
+        })
+
         const sessionBody = {
             date: date,
-            participants: formatted
+            participants: participants,
+            trainer: trainers
         }
-
 
         return sessionBody
     } else {
@@ -120,38 +132,6 @@ const createAttendance = async (user, attendanceBody) => {
         return Attendance.create(attendanceBody)
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new attendance list")
-    }
-};
-
-/**
- * Add a trainings session to a group
- * @param {ObjectID} groupID ID of the group where to add trainings session to
- * @param sessionBody The body muss include date: Date, participants: [Member]
- * @returns {Promise<Attendance>}
- */
-const addTrainingssession = async (user, groupID, sessionBody) => {
-    if (hasAccessToGroup(user, groupID)) {
-        try {
-            const _res = await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
-
-            //Wenn noch keine Attendance Document existiert, ist _res null
-            if (_res !== null && typeof _res !== 'undefined') {
-                return _res
-            } else { //Erstellt neues Attendance Document
-                return Attendance.create({
-                    group: {
-                        _id: new mongoose.Types.ObjectId(groupID)
-                    },
-                    trainingssessions: [
-                        sessionBody
-                    ]
-                })
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to attendance lists")
     }
 };
 
