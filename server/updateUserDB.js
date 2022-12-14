@@ -40,7 +40,13 @@ async function main() {
       { "group._id": group._id },
       {
         $set: { "trainingssessions.$[].trainers": group.trainer },
-        $set: { "trainingssessions.$[].trainers.$[].attended": false },
+      }
+    );
+
+    await Attendance.findOneAndUpdate(
+      { "group._id": group._id },
+      {
+        $set: { "trainingssessions.$[].trainers.$[].attended": false }
       }
     );
   }
