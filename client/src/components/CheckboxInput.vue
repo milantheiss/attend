@@ -5,6 +5,7 @@
     focus:ring-blue-500 focus:ring-0 focus:ring-transparent
     focus:ring-offset-0
     bg-checkmark
+    ease-in-out duration-200
     "/>
 </template>
 

@@ -1,8 +1,8 @@
 <template>
-    <div >
+    <div class="w-inherit">
         <!--TODO Styling-->
-        <div v-for="element of formattedList" :key="element.text" class="flex items-center justify-end mb-2 w-fit">
-            <p>{{element.text}}</p>
+        <div v-for="element of formattedList" :key="element.text" class="flex items-center justify-between mb-2 truncate">
+            <p class="font-medium text-lg truncate text-right">{{element.text}}</p>
             <CheckboxInput v-model="element.checked" class="color-standard-gradient-1"></CheckboxInput>
         </div>
     </div>

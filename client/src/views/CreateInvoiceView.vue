@@ -15,7 +15,10 @@
             <div class="flex items-start justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <!--Add Collapsable Container here-->
-                <CheckboxList v-model="testList" class="w-1/6"></CheckboxList>
+                <!--TODO Styling hier fixen-->
+                <CollapsibleContainer class="ml-3 w-full">
+                    <CheckboxList v-model="testList"></CheckboxList>
+                </CollapsibleContainer>
             </div>
             <div class="flex items-center justify-between mb-4">
                 <label for="startdate"
@@ -50,6 +53,7 @@ import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
+import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 
 export default {
     name: "CreateInvoice",
@@ -77,17 +81,18 @@ export default {
             },
             testList: [
                 "U12",
-                "U08",
+                "U08 GanzGanz GanzGanz GanzGanz GanzGanz GanzGanz GanzGanzs",
                 "U14"
             ]
         }
     },
     components: {
-        ErrorMessage,
-        TextInput,
-        DateInput,
-        CheckboxList
-    },
+    ErrorMessage,
+    TextInput,
+    DateInput,
+    CheckboxList,
+    CollapsibleContainer
+},
     methods: {
         /**
          * Zieht Attendance Daten von der Datenbank und erstellt mit @see createList() ein neues PDF

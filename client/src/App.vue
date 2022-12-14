@@ -35,17 +35,21 @@
       </div>
 
       <!--Navbar Links: Werden angezeigt, wenn auf Menu Icon geklickt wird.-->
-      <div class="grid mt-2" v-show="showMenu">
-        <router-link @click="showMenu = !showMenu" to="/attendancelist"
-          class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>
-        <router-link @click="showMenu = !showMenu" to="/editgroup"
-          class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Gruppe bearbeiten</router-link>
-        <router-link @click="showMenu = !showMenu" to="/exportpdf"
-          class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Liste exportieren</router-link>
-        <router-link @click="showMenu = !showMenu" to="/logout"
-          class="text-left font-medium text-xl md:text-2xl mt-2 ml-2">Logout</router-link>
-        <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.3</p>
-      </div>
+      <transition enter-active-class="transition ease-in-out duration-400 transition" enter-from-class="-translate-y-9 opacity-0"
+            enter-to-class="translate-y-0 opacity-100" leave-active-class="transition ease-in-out duration-400 transform"
+            leave-from-class="translate-y-0 opacity-100" leave-to-class="-translate-y-7 opacity-0">
+        <div class="grid mt-2" v-show="showMenu">
+          <router-link @click="showMenu = !showMenu" to="/attendancelist"
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>
+          <router-link @click="showMenu = !showMenu" to="/editgroup"
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Gruppe bearbeiten</router-link>
+          <router-link @click="showMenu = !showMenu" to="/exportpdf"
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Liste exportieren</router-link>
+          <router-link @click="showMenu = !showMenu" to="/logout"
+            class="text-left font-medium text-xl md:text-2xl mt-2 ml-2">Logout</router-link>
+          <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.3</p>
+        </div>
+      </transition>
     </nav>
 
     <div v-if="dataStore.showPatchNotesDialog">
