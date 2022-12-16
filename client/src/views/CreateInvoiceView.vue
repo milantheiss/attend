@@ -12,12 +12,12 @@
                 <TextInput name="filename" v-model="filename" placeholder="Dateiname"
                     :showError="error.cause.filenameInput" class="ml-3"></TextInput>
             </div>
-            <div class="flex items-start justify-between mb-4">
+            <div class="flex items-start justify-between mb-4 w-full">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <!--Add Collapsable Container here-->
                 <!--TODO Styling hier fixen-->
-                <CollapsibleContainer class="ml-3 w-full">
-                    <CheckboxList v-model="testList"></CheckboxList>
+                <CollapsibleContainer class="ml-3"> 
+                    <CheckboxList v-model="testList" class="" :sortAlphabetically="true"></CheckboxList>
                 </CollapsibleContainer>
             </div>
             <div class="flex items-center justify-between mb-4">
@@ -81,7 +81,7 @@ export default {
             },
             testList: [
                 "U12",
-                "U08 GanzGanz GanzGanz GanzGanz GanzGanz GanzGanz GanzGanzs",
+                "U08",
                 "U14"
             ]
         }
