@@ -126,6 +126,16 @@ async function getLastPatchNotes() {
   })).json()
 }
 
+async function fetchDataForInvoice(body){
+  return await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "invoice"].join('/'), {
+    method: 'GET',
+    body: JSON.stringify(body),
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    credentials: 'include',
+    mode: 'cors'
+  })).json())
+}
+
 export {
   fetchGroup,
   fetchGroups, 
@@ -137,5 +147,6 @@ export {
   updateMemberInGroup,
   removeMemberFromGroup,
   authenticateSession,
-  getLastPatchNotes
+  getLastPatchNotes,
+  fetchDataForInvoice
 }

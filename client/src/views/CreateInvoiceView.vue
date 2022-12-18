@@ -46,8 +46,8 @@
 </template>
   
 <script>
-import { createListe } from "@/util/generatePdf"
-import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
+import { createInvoice } from "@/util/generatePdf"
+import { fetchDataForInvoice, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
@@ -99,14 +99,14 @@ export default {
          */
         async exportPDF() {
             if (!this.hasAnError()) {
-                const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
-                if (attendance.dates.length === 0) {
-                    this.error.show = true
-                    this.error.cause.timespanFaulty = true
-                    this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
-                } else {
+                const attendance = await fetchDataForInvoice(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                // if (attendance.dates.length === 0) {
+                //     this.error.show = true
+                //     this.error.cause.timespanFaulty = true
+                //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
+                // } else {
                     await createListe(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
-                }
+                // }
             }
         },
         /**

@@ -36,8 +36,7 @@
 
       <!--Navbar Links: Werden angezeigt, wenn auf Menu Icon geklickt wird.-->
       <transition enter-active-class="transition ease-in-out duration-700" enter-from-class="-translate-y-9 opacity-0"
-        enter-to-class="translate-y-0 opacity-100" leave-active-class="transition ease-in-out duration-700 transform"
-        leave-from-class="translate-y-0 opacity-100" leave-to-class="-translate-y-7 opacity-0">
+        enter-to-class="translate-y-0 opacity-100">
         <div class="grid mt-2" v-show="showMenu">
           <router-link @click="showMenu = !showMenu" to="/attendancelist"
             class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>

@@ -234,12 +234,45 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     temp.group = list.group
 
     temp.trainingssessions = list.trainingssessions.filter((e) => {
+        //TODO Mit MongoDB Query machen
         if (e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
             return e
         }
     })
 
     return temp
+}
+
+/**
+ * Returns all trainingssessions a trainer attended, in the required formate for pdf generation.
+ * @param {*} user 
+ * @param {*} groupID 
+ * @param {*} startdate 
+ * @param {*} enddate 
+ * @returns Array
+ */
+const getDataForInvoice = async (user, groupID, startdate, enddate) => {
+    let dataset = (await getTrainingssessionsByDateRange(user, groupID, startdate, enddate)).trainingssessions.filter((e) => {
+        //Es werden nur Trainingssessions zurückgeben an denen der Trainer teilgenommen hat.
+        if (e.trainers.some(e => e._id.equals(user._id) && e.attended)){
+            //.trainers Property wird nicht mehr benötigt
+            delete e._doc.trainers
+
+            //Zählt wie viele Teilnehmer an der Trainingssession teilgenommen haben.
+            e.participantCount = e.participants.filter(e => {
+                if(e.attended) {
+                    return e
+                }
+            }).length
+
+            //.participants Property wird nicht mehr gebraucht
+            delete e._doc.participants
+
+            return e
+        }
+    })
+
+    return dataset
 }
 
 module.exports = {
@@ -250,5 +283,6 @@ module.exports = {
     getTrainingssession,
     deleteTrainingssession,
     getTrainingssessionsByDateRange,
-    runGarbageCollector
+    runGarbageCollector,
+    getDataForInvoice
 };
