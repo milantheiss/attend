@@ -46,7 +46,7 @@
 </template>
   
 <script>
-import { createInvoice } from "@/util/generatePdf"
+//import { createInvoice } from "@/util/generatePdf"
 import { fetchDataForInvoice, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -99,13 +99,14 @@ export default {
          */
         async exportPDF() {
             if (!this.hasAnError()) {
-                const attendance = await fetchDataForInvoice(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                const dataset = await fetchDataForInvoice(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                console.log(dataset)
                 // if (attendance.dates.length === 0) {
                 //     this.error.show = true
                 //     this.error.cause.timespanFaulty = true
                 //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
                 // } else {
-                    await createListe(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
+                   // await createInvoice(dataset)
                 // }
             }
         },
@@ -133,7 +134,13 @@ export default {
         }
     },
     async created() {
-        this.groups = await fetchGroups()
+        //? Warum wird warum wird bei fetchGroups nur .id zurückgegeben nicht _id?
+        this.groups = (await fetchGroups()).map(val => {
+            return {
+                name: val.name,
+                _id: val.id
+            }
+        })
         document.title = 'Erstelle eine Abrechnung - Attend'
         this.dataStore.viewname = "Abrechnung erstellen"
     },

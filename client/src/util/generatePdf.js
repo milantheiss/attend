@@ -52,6 +52,10 @@ async function createListe(group, attendenceList, filename, startdate, enddate) 
   doc.save(filename)
 }
 
+async function createInvoice(){
+  
+}
+
 //INFO Aufteilung Koordinaten erst Horizontale Verschiebung (x) dann Vertikale (y)
 //INFO Es wird von linker oberer Ecke gemessen
 
@@ -224,5 +228,6 @@ function drawBox(doc, x, y, width, height) {
 }
 
 export {
-  createListe
+  createListe,
+  createInvoice
 };

@@ -18,7 +18,7 @@ const getGroups = async (user) => {
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         const groups = await Group.find({ '_id': { $in: user.accessible_groups } })
 
-        if (!groups.length) {
+        if (groups.length === 0) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
         }
