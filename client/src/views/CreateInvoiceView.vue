@@ -16,8 +16,9 @@
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <!--Add Collapsable Container here-->
                 <!--TODO Styling hier fixen-->
-                <CollapsibleContainer class="ml-3"> 
-                    <CheckboxList v-model="testList" class="" :sortAlphabetically="true"></CheckboxList>
+                <CollapsibleContainer class="ml-3">
+                    <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class="" :sortAlphabetically="true">
+                    </CheckboxList>
                 </CollapsibleContainer>
             </div>
             <div class="flex items-center justify-between mb-4">
@@ -46,7 +47,7 @@
 </template>
   
 <script>
-//import { createInvoice } from "@/util/generatePdf"
+import { createInvoice } from "@/util/generatePdf"
 import { fetchDataForInvoice, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -67,7 +68,6 @@ export default {
         return {
             filename: 'anwesenheitslist',
             groups: [],
-            selectedGroup: undefined,
             startdate: new Date(Date.now()).toJSON().slice(0, 10),
             enddate: new Date(Date.now()).toJSON().slice(0, 10),
             error: {
@@ -78,37 +78,33 @@ export default {
                     filenameInput: false,
                     timespanFaulty: false
                 }
-            },
-            testList: [
-                "U12",
-                "U08",
-                "U14"
-            ]
+            }
         }
     },
     components: {
-    ErrorMessage,
-    TextInput,
-    DateInput,
-    CheckboxList,
-    CollapsibleContainer
-},
+        ErrorMessage,
+        TextInput,
+        DateInput,
+        CheckboxList,
+        CollapsibleContainer
+    },
     methods: {
         /**
          * Zieht Attendance Daten von der Datenbank und erstellt mit @see createList() ein neues PDF
          */
         async exportPDF() {
-            if (!this.hasAnError()) {
-                const dataset = await fetchDataForInvoice(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+            //if (!this.hasAnError()) {
+                console.log(this.selectedGroups);
+                const dataset = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
                 console.log(dataset)
                 // if (attendance.dates.length === 0) {
                 //     this.error.show = true
                 //     this.error.cause.timespanFaulty = true
                 //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
                 // } else {
-                   // await createInvoice(dataset)
+                await createInvoice(this.filename, dataset)
                 // }
-            }
+            //}
         },
         /**
          * Checkt ob ein Fehler vorliegt.
@@ -134,7 +130,6 @@ export default {
         }
     },
     async created() {
-        //? Warum wird warum wird bei fetchGroups nur .id zurückgegeben nicht _id?
         this.groups = (await fetchGroups()).map(val => {
             return {
                 name: val.name,
@@ -145,6 +140,11 @@ export default {
         this.dataStore.viewname = "Abrechnung erstellen"
     },
     watch: {
+    },
+    computed: {
+        selectedGroups(){
+            return (this.groups.filter(val => this.$refs.checkboxList.selectedElements.includes(val.name))).map(val => val._id)
+        }
     }
 };
 </script>

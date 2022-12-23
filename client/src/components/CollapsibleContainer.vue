@@ -51,7 +51,6 @@ export default {
     },
     methods: {
         toggleShowContent() {
-            console.log("Show Content");
             this.showContent = !this.showContent
         }
     }

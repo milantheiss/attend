@@ -40,7 +40,7 @@
   
 <script>
 import SelectList from "@/components/SelectList";
-import { createListe } from "@/util/generatePdf"
+import { createList } from "@/util/generatePdf"
 import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -91,7 +91,7 @@ export default {
                     this.error.cause.timespanFaulty = true
                     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
                 } else {
-                    await createListe(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
+                    await createList(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
                 }
             }
         },

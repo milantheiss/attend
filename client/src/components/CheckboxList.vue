@@ -12,13 +12,15 @@ import CheckboxInput from "@/components/CheckboxInput.vue"
 
 export default {
     name: "CheckboxList",
-    emits: ['update:modelValue', 'onChange', 'on'],
+    emits: ["selectedElements"],
     components: {
         CheckboxInput
     },
     data() {
         return {
-            formattedList: []
+            formattedList: [],
+            //TODO Entfernen
+            debugToggle: false
         }
     },
     props: {
@@ -26,7 +28,7 @@ export default {
             type: Boolean,
             default: false
         },
-        modelValue: String.Array
+        list: String.Array
     },
     methods: {
         _sortAlphabetically(list) {
@@ -44,16 +46,21 @@ export default {
         }
     },
     watch: {
-        modelValue(newVal) {
+        list(newVal) {
             this.formattedList = this.formatList(newVal)
         },
-        input() {
-            this.$emit('update:modelValue', this.input)
-        },
+        debugToggle(){
+            console.log(this.selectedElements);
+        }
     },
     created() {
-        if (typeof this.modelValue !== 'undefined') {
-            this.formattedList = this.formatList(this.modelValue)
+        if (typeof this.list !== 'undefined') {
+            this.formattedList = this.formatList(this.list)
+        }
+    },
+    computed: {
+        selectedElements(){
+            return (this.formattedList.filter(val => val.checked)).map(val => val.text)
         }
     }
 };
