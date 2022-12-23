@@ -11,55 +11,66 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
     trainingssessions: [],
   };
 
+  let department;
+
   for (groupID of req.body.groups) {
     const groupInfos = (await groupService.getGroupInfo(req.user, groupID))._doc;
     delete groupInfos.trainer;
 
-    let trainingssessions = await attendanceService.getDataForInvoice(
-      req.user,
-      groupID,
-      req.body.startdate,
-      req.body.enddate
-    );
-
-    for (session of trainingssessions) {
-      const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-      
-      //TODO Handle timeInfo undefined
-      //Sucht die entsprechende Zeit für den Wochentag heraus.
-      const timeInfo = groupInfos.times.find(val => val.day === weekday[new Date(session.date).getDay()])
-      
-      if(typeof timeInfo.starttime !== "undefined" && typeof timeInfo.endtime !== "undefined"){
-        //Formatiert Zeit vom Format 18:45 in 18,75
-        const startingTime = Number(timeInfo?.starttime.split(":")[0]) + Number(timeInfo?.starttime.split(":")[1] / 60)
-  
-        const endingTime = Number(timeInfo?.endtime.split(":")[0]) + Number(timeInfo?.endtime.split(":")[1] / 60)
-
-        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-        timeInfo.length = endingTime - startingTime
-      }
-
-      session._doc.info = {
-        groupName: groupInfos.name,
-        departmentName: groupInfos.department.name,
-        weekday: timeInfo?.day,
-        starttime: timeInfo?.starttime,
-        endtime: timeInfo?.endtime,
-        length: timeInfo?.length,
-        venue: groupInfos.venue
-      }
-      session._doc.groupID = groupID;
+    if (typeof department === "undefined") {
+      department = groupInfos.department;
     }
 
-    dataset.trainingssessions = dataset.trainingssessions.concat(trainingssessions);
+    if (department._id.equals(groupInfos.department._id)) {
+      let trainingssessions = await attendanceService.getDataForInvoice(
+        req.user,
+        groupID,
+        req.body.startdate,
+        req.body.enddate
+      );
+
+      for (session of trainingssessions) {
+        const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+        //TODO Handle timeInfo undefined
+        //Sucht die entsprechende Zeit für den Wochentag heraus.
+        const timeInfo = groupInfos.times.find((val) => val.day === weekday[new Date(session.date).getDay()]);
+
+        if (typeof timeInfo.starttime !== "undefined" && typeof timeInfo.endtime !== "undefined") {
+          //Formatiert Zeit vom Format 18:45 in 18,75
+          const startingTime =
+            Number(timeInfo?.starttime.split(":")[0]) + Number(timeInfo?.starttime.split(":")[1] / 60);
+
+          const endingTime = Number(timeInfo?.endtime.split(":")[0]) + Number(timeInfo?.endtime.split(":")[1] / 60);
+
+          //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+          timeInfo.length = endingTime - startingTime;
+        }
+
+        session._doc.info = {
+          groupName: groupInfos.name,
+          departmentName: groupInfos.department.name,
+          weekday: timeInfo?.day,
+          starttime: timeInfo?.starttime,
+          endtime: timeInfo?.endtime,
+          length: timeInfo?.length,
+          venue: groupInfos.venue,
+        };
+        session._doc.groupID = groupID;
+      }
+
+      dataset.trainingssessions = dataset.trainingssessions.concat(trainingssessions);
+    }
   }
+
+  dataset.department = department
 
   //Hinzufügen --> Get User Info
 
   dataset.userInfo = {
     email: req.user.email,
     firstname: req.user.firstname,
-    lastname: req.user.lastname
+    lastname: req.user.lastname,
   };
 
   res.status(httpStatus.OK).send(dataset);

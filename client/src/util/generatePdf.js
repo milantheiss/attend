@@ -12,6 +12,7 @@ let _startdate;
 let _enddate;
 
 let _userInfo;
+let _department;
 
 const tableTopMargin = 10;
 
@@ -185,9 +186,9 @@ class AttendanceListPdf {
 }
 
 class InvoicePdf {
-  static generatePage(doc) {
+  static generatePage(doc, trainingssessions) {
     this.generateHeader(doc);
-    //this.generateInvoiceTable(doc, trainingssessions);
+    this.generateInvoiceTable(doc, trainingssessions);
     //this.generateFooter(doc);
   }
 
@@ -197,9 +198,6 @@ class InvoicePdf {
 
     posNextLine = 40;
 
-    console.log(doc.internal.pageSize.getWidth());
-    console.log(doc.internal.pageSize.getHeight());
-
     //Erste Zeile
     doc
       .setFontSize(20)
@@ -207,27 +205,66 @@ class InvoicePdf {
       .text(`Abrechnung`, 40, posNextLine)
       .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 109, 10, 75, 75);
 
-    posNextLine += 25
+    posNextLine += 25;
 
-    doc
-      .setFontSize(15)
-      .setFont("helvetica", "bold")
-      .text(`vom ${_startdate} bis ${_enddate}`, 40, posNextLine)
+    doc.setFontSize(15).setFont("helvetica", "bold").text(`vom ${_startdate} bis ${_enddate}`, 40, posNextLine);
 
     //Übungsleiter Info Tabelle
     posNextLine += 40;
 
-    //TODO Ränder ändern. Tabelle richtig aufteilen --> Inkscape
-
-    //Height: 7.3
     doc
       .setFont("helvetica", "bold")
       .setFontSize(10)
       .text(`Name: ${_userInfo.firstname} ${_userInfo.lastname}`, 40, posNextLine, { maxWidth: 350 })
-      .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 })
+      .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 });
 
     drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
     drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(10)
+      .text(`Abteilung: ${_department.name}`, 40, posNextLine, { maxWidth: 350 });
+
+    drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
+  }
+
+  static generateInvoiceTable(doc, trainingssessions) {
+    //Übungsleiter Info Tabelle
+    posNextLine += 40;
+
+    trainingssessions;
+    //Tabellenkopf
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(10)
+      .text(`Wochentag`, 40, posNextLine, { maxWidth: 70 })
+      .text(`Datum`, 114, posNextLine, { maxWidth: 70 })
+      .text(`Uhrzeit`, 188, posNextLine, { maxWidth: 70 })
+      .text(`Stundenzahl`, 262, posNextLine, { maxWidth: 70 })
+      .text(`Anzahl der Teiln.`, 336, posNextLine, { maxWidth: 70 })
+      .text(`Bezeichnung der Gruppe`, 394, posNextLine, { maxWidth: 165.28 });
+
+    drawBox(doc, 38, posNextLine - tableTopMargin, 74, 13.3);
+    drawBox(doc, 112, posNextLine - tableTopMargin, 74, 13.3);
+    drawBox(doc, 186, posNextLine - tableTopMargin, 74, 13.3);
+    drawBox(doc, 260, posNextLine - tableTopMargin, 74, 13.3);
+    drawBox(doc, 334, posNextLine - tableTopMargin, 74, 13.3);
+    drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
+
+
+    // for (trainingssession of trainingssessions) {
+    //   doc
+    //     .setFont("helvetica", "bold")
+    //     .setFontSize(10)
+    //     .text(`Name: ${_userInfo.firstname} ${_userInfo.lastname}`, 40, posNextLine, { maxWidth: 350 })
+    //     .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 });
+
+    //   drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
+    //   drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
+    // }
   }
 }
 
@@ -281,6 +318,7 @@ async function createInvoice(filename, dataset) {
   _startdate = dataset.startdate;
   _enddate = dataset.enddate;
   _userInfo = dataset.userInfo;
+  _department = dataset.department;
 
   if (dataset.trainingssessions.length != 0) {
     const pages = Math.ceil(dataset.trainingssessions.length / 25);
