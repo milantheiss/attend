@@ -24,9 +24,20 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
 
     for (session of trainingssessions) {
       const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+      
+      //TODO Handle timeInfo undefined
+      //Sucht die entsprechende Zeit für den Wochentag heraus.
       const timeInfo = groupInfos.times.find(val => val.day === weekday[new Date(session.date).getDay()])
       
-      //TODO Handeling von fehlenden Zeiten hinzufügen
+      if(typeof timeInfo.starttime !== "undefined" && typeof timeInfo.endtime !== "undefined"){
+        //Formatiert Zeit vom Format 18:45 in 18,75
+        const startingTime = Number(timeInfo?.starttime.split(":")[0]) + Number(timeInfo?.starttime.split(":")[1] / 60)
+  
+        const endingTime = Number(timeInfo?.endtime.split(":")[0]) + Number(timeInfo?.endtime.split(":")[1] / 60)
+
+        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+        timeInfo.length = endingTime - startingTime
+      }
 
       session._doc.info = {
         groupName: groupInfos.name,
@@ -34,6 +45,7 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
         weekday: timeInfo?.day,
         starttime: timeInfo?.starttime,
         endtime: timeInfo?.endtime,
+        length: timeInfo?.length,
         venue: groupInfos.venue
       }
       session._doc.groupID = groupID;

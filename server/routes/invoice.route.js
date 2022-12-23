@@ -6,6 +6,6 @@ const router = express.Router();
 
 router
     .route('/')
-    .get(verifyToken, invoiceController.getDatasetForInvoice)
+    .post(verifyToken, invoiceController.getDatasetForInvoice)
     
 module.exports = router;
