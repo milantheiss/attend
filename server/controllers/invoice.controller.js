@@ -8,7 +8,7 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
   let dataset = {
     startdate: req.body.startdate,
     enddate: req.body.enddate,
-    trainingssessions: [],
+    trainingssessions: []
   };
 
   let department;
@@ -28,7 +28,7 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
         req.body.startdate,
         req.body.enddate
       );
-
+      
       for (session of trainingssessions) {
         const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
@@ -36,7 +36,7 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
         //Sucht die entsprechende Zeit für den Wochentag heraus.
         const timeInfo = groupInfos.times.find((val) => val.day === weekday[new Date(session.date).getDay()]);
 
-        if (typeof timeInfo.starttime !== "undefined" && typeof timeInfo.endtime !== "undefined") {
+        if (typeof timeInfo?.starttime !== "undefined" && typeof timeInfo?.endtime !== "undefined") {
           //Formatiert Zeit vom Format 18:45 in 18,75
           const startingTime =
             Number(timeInfo?.starttime.split(":")[0]) + Number(timeInfo?.starttime.split(":")[1] / 60);
@@ -57,23 +57,27 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
           venue: groupInfos.venue,
         };
         session._doc.groupID = groupID;
-      }
 
-      dataset.trainingssessions = dataset.trainingssessions.concat(trainingssessions);
+        dataset.trainingssessions.push(session._doc)
+      }
     }
   }
-
+  
   dataset.department = department
-
+  
   //Hinzufügen --> Get User Info
-
+  
   dataset.userInfo = {
     email: req.user.email,
     firstname: req.user.firstname,
     lastname: req.user.lastname,
   };
 
-  res.status(httpStatus.OK).send(dataset);
+  dataset.totalHours = 0
+
+  dataset.trainingssessions.forEach(val => dataset.totalHours += val.info.length)
+
+  await res.status(httpStatus.OK).send(dataset);
 });
 
 module.exports = {

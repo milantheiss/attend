@@ -96,9 +96,7 @@ export default {
             //if (!this.hasAnError()) {
                 //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
 
-                console.log(this.selectedGroups);
                 const dataset = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
-                console.log(dataset)
                 // if (attendance.dates.length === 0) {
                 //     this.error.show = true
                 //     this.error.cause.timespanFaulty = true

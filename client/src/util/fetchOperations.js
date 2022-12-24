@@ -188,7 +188,7 @@ async function fetchDataForInvoice(groupIDs, startdate, enddate) {
     startdate: startdate,
     enddate: enddate,
   };
-  return await watchForRedirects(
+  const res = await watchForRedirects(
     (
       await fetch([process.env.VUE_APP_API_URL, "invoice"].join("/"), {
         method: "POST",
@@ -199,6 +199,11 @@ async function fetchDataForInvoice(groupIDs, startdate, enddate) {
       })
     ).json()
   );
+
+  console.log(JSON.parse(JSON.stringify(res.trainingssessions)));
+
+  return res  
+
 }
 
 export {

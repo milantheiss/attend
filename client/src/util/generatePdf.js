@@ -189,7 +189,7 @@ class InvoicePdf {
   static generatePage(doc, trainingssessions) {
     this.generateHeader(doc);
     this.generateInvoiceTable(doc, trainingssessions);
-    //this.generateFooter(doc);
+    this.generateFooter(doc);
   }
 
   static generateHeader(doc) {
@@ -235,36 +235,79 @@ class InvoicePdf {
     //Übungsleiter Info Tabelle
     posNextLine += 40;
 
-    trainingssessions;
     //Tabellenkopf
     doc
       .setFont("helvetica", "bold")
       .setFontSize(10)
-      .text(`Wochentag`, 40, posNextLine, { maxWidth: 70 })
-      .text(`Datum`, 114, posNextLine, { maxWidth: 70 })
-      .text(`Uhrzeit`, 188, posNextLine, { maxWidth: 70 })
-      .text(`Stundenzahl`, 262, posNextLine, { maxWidth: 70 })
-      .text(`Anzahl der Teiln.`, 336, posNextLine, { maxWidth: 70 })
+      .text(`Wochentag`, 40, posNextLine, { maxWidth: 66.8 })
+      .text(`Datum`, 110.8, posNextLine, { maxWidth: 66.8 })
+      .text(`Uhrzeit`, 181.6, posNextLine, { maxWidth: 66.8 })
+      .text(`Stundenzahl`, 252.4, posNextLine, { maxWidth: 66.8 })
+      .text(`Anzahl der Teiln.`, 323.2, posNextLine, { maxWidth: 66.8 })
       .text(`Bezeichnung der Gruppe`, 394, posNextLine, { maxWidth: 165.28 });
 
-    drawBox(doc, 38, posNextLine - tableTopMargin, 74, 13.3);
-    drawBox(doc, 112, posNextLine - tableTopMargin, 74, 13.3);
-    drawBox(doc, 186, posNextLine - tableTopMargin, 74, 13.3);
-    drawBox(doc, 260, posNextLine - tableTopMargin, 74, 13.3);
-    drawBox(doc, 334, posNextLine - tableTopMargin, 74, 13.3);
-    drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
+    //Zeichnet Tabellen Boxen um Text
+    for (let i = 38; i < 322; i += 70.8) {
+      drawBox(doc, i, posNextLine - tableTopMargin, 70.8, 24.6);
+    }
+    drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 24.6);
 
+    posNextLine += 24.6;
 
-    // for (trainingssession of trainingssessions) {
-    //   doc
-    //     .setFont("helvetica", "bold")
-    //     .setFontSize(10)
-    //     .text(`Name: ${_userInfo.firstname} ${_userInfo.lastname}`, 40, posNextLine, { maxWidth: 350 })
-    //     .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 });
+    for (const trainingssession of trainingssessions) {
+      doc
+        .setFont("helvetica", "normal")
+        .setFontSize(10)
+        .text(`${trainingssession.info.weekday}`, 40, posNextLine, { maxWidth: 66 })
+        .text(
+          `${new Date(trainingssession.date).toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+          })}`,
+          110.8,
+          posNextLine,
+          { maxWidth: 66 }
+        )
+        .text(`${trainingssession.info.starttime} - ${trainingssession.info.endtime}`, 181.6, posNextLine, {
+          maxWidth: 66,
+        })
+        .text(`${trainingssession.info.length}`, 252.4, posNextLine, { maxWidth: 66.8 })
+        .text(`${trainingssession.participantCount}`, 323.2, posNextLine, { maxWidth: 66.8 });
 
-    //   drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
-    //   drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
-    // }
+      const groupName =
+        trainingssession.info.groupName.length < 28
+          ? trainingssession.info.groupName
+          : trainingssession.info.groupName.slice(0, 28) + "...";
+      doc.text(`${groupName}`, 394, posNextLine, { maxWidth: 165.28 });
+
+      //Zeichnet Tabellen Boxen um Text
+      for (let i = 38; i < 322; i += 70.8) {
+        drawBox(doc, i, posNextLine - tableTopMargin, 70.8, 13.3);
+      }
+      drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
+
+      posNextLine += 13.3;
+    }
+  }
+
+  static generateFooter(doc) {
+    const today = new Date(Date.now()).toLocaleDateString("de-DE", {
+      weekday: "short",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    doc
+      .setFontSize(10)
+      .text(`Abrechnung am ${today} erstellt.`, 40, doc.internal.pageSize.getHeight() - 20)
+      .text(
+        `Seite ${pagenumber} von ${pagecount}`,
+        doc.internal.pageSize.getWidth() - 91,
+        doc.internal.pageSize.getHeight() - 20,
+        { align: "left" }
+      );
   }
 }
 
@@ -321,12 +364,13 @@ async function createInvoice(filename, dataset) {
   _department = dataset.department;
 
   if (dataset.trainingssessions.length != 0) {
-    const pages = Math.ceil(dataset.trainingssessions.length / 25);
+    const pages = Math.ceil(dataset.trainingssessions.length / 42);
 
     for (let i = 0; i < pages; i++) {
       pagecount = i + 1;
 
-      const splicedArray = dataset.trainingssessions.splice(0, 25);
+      const splicedArray = dataset.trainingssessions.splice(0, 42);
+      console.log(splicedArray);
 
       InvoicePdf.generatePage(doc, splicedArray);
 
@@ -334,6 +378,31 @@ async function createInvoice(filename, dataset) {
       if (i + 1 < pages) {
         //Muss in if Statement stehen, da sonst das PDF eine leere Seite hat.
         doc.addPage({ orientation: "portrait", autoFirstPage: false });
+      } else {
+        doc
+          .setFont("helvetica", "bold")
+          .setFontSize(10)
+          .text(`Stundenanzahl gesamt`, 40, posNextLine, { maxWidth: 210.4 })
+          .text(`${dataset.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 });
+
+        drawBox(doc, 38, posNextLine - tableTopMargin, 212.4, 13.3);
+        drawBox(doc, 250.4, posNextLine - tableTopMargin, 70.8, 13.3);
+
+        posNextLine += 13.3;
+
+        drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 39.9);
+        drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 39.9);
+
+        posNextLine += 39.9;
+
+        doc
+          .setFont("helvetica", "bold")
+          .setFontSize(10)
+          .text(`Datum/Unterschrift Übungsleiter`, 40, posNextLine, { maxWidth: 261.64 })
+          .text(`Datum/Unterschrift Abteilungsleiter`, 301.64, posNextLine, { maxWidth: 261.64 });
+
+        drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 13.3);
+        drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 13.3);
       }
     }
   } else {

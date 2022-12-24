@@ -259,11 +259,7 @@ const getDataForInvoice = async (user, groupID, startdate, enddate) => {
             delete e._doc.trainers
 
             //Zählt wie viele Teilnehmer an der Trainingssession teilgenommen haben.
-            e._doc.participantCount = e.participants.filter(e => {
-                if(e.attended) {
-                    return e
-                }
-            }).length
+            e._doc.participantCount = e.participants.filter(e => e.attended).length
 
             //.participants Property wird nicht mehr gebraucht
             delete e._doc.participants
