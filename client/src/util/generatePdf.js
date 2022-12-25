@@ -37,7 +37,7 @@ class AttendanceListPdf {
       .text("Teilnehmerliste", 20, posNextLine)
       .setFontSize(12)
       .text(`Vom ${_startdate} bis ${_enddate}`, 180, posNextLine)
-      .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 105, 10, 75, 75);
+      .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 97, 10, 75, 75);
   }
 
   static generateGroupInfo(doc, group) {
