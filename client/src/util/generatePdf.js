@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { fetchAttendanceByDateRange } from '@/util/fetchOperations'
 
 //INFO Buchstaben in Helvetica & Font Size 10 haben ca. eine Zeichenhöhe 7.3 pt
 
@@ -311,13 +312,15 @@ class InvoicePdf {
   }
 }
 
-async function createList(group, attendenceList, filename, startdate, enddate) {
-  let doc = new jsPDF({ unit: "pt", orientation: "landscape", autoFirstPage: false, compress: true });
+async function createList(group, attendenceList, startdate, enddate, options) {
+  if(typeof options.doc === "undefined"){
+    options.doc = new jsPDF({ unit: "pt", orientation: "landscape", autoFirstPage: false, compress: true });
+  }
 
   _startdate = startdate;
   _enddate = enddate;
 
-  let splicedArray = {};
+  let splicedArray = [];
 
   if (attendenceList.dates.length != 0) {
     const pagesForDates = Math.ceil(attendenceList.dates.length / 26);
@@ -330,25 +333,27 @@ async function createList(group, attendenceList, filename, startdate, enddate) {
       for (let j = 0; j < pagesForDates; j++) {
         laufnummer = i * 31;
         splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26);
-        AttendanceListPdf.generatePage(doc, group, splicedArray);
-        if (j + 1 < pagesForDates) doc.addPage({ orientation: "landscape", autoFirstPage: false });
+        AttendanceListPdf.generatePage(options.doc, group, splicedArray);
+        if (j + 1 < pagesForDates) options.doc.addPage({ orientation: "landscape", autoFirstPage: false });
       }
-      if (i + 1 < pagesForParticipants) doc.addPage({ orientation: "landscape", autoFirstPage: false });
+      if (i + 1 < pagesForParticipants) options.doc.addPage({ orientation: "landscape", autoFirstPage: false });
     }
   } else {
     pagecount = 1;
-    AttendanceListPdf.generateHeader(doc);
-    AttendanceListPdf.generateGroupInfo(doc, group);
+    AttendanceListPdf.generateHeader(options.doc);
+    AttendanceListPdf.generateGroupInfo(options.doc, group);
 
-    doc
+    options.doc
       .setFontSize(12)
       .setFont("helvetica", "bold")
       .text("Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!", 20, posNextLine + 40);
 
-    AttendanceListPdf.generateFooter(doc);
+    AttendanceListPdf.generateFooter(options.doc);
   }
 
-  doc.save(filename);
+  if(typeof options.filename !== "undefined"){
+    options.doc.save(options.filename);
+  }
 }
 
 /**
@@ -359,11 +364,11 @@ async function createInvoice(filename, dataset) {
   let doc = new jsPDF({ unit: "pt", orientation: "portrait", autoFirstPage: false, compress: true });
 
   _startdate = dataset.startdate;
-  _enddate = dataset.enddate;
+  _enddate = dataset.startdate;
   _userInfo = dataset.userInfo;
   _department = dataset.department;
 
-  if (dataset.trainingssessions.length != 0) {
+  if (dataset.trainingssessions.length !== 0) {
     const pages = Math.ceil(dataset.trainingssessions.length / 42);
 
     for (let i = 0; i < pages; i++) {
@@ -405,6 +410,14 @@ async function createInvoice(filename, dataset) {
         drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 13.3);
       }
     }
+
+    for(const group of dataset.groups){
+      console.log(_startdate);
+      console.log(_enddate);
+      doc.addPage({ orientation: "l"}); 
+      createList(group, await fetchAttendanceByDateRange(group._id, new Date(dataset.startdate), new Date(dataset.enddate)), dataset.startdate, dataset.enddate, {doc: doc})
+    }
+
   } else {
     pagecount = 1;
     InvoicePdf.generateHeader(doc);

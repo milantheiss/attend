@@ -91,7 +91,7 @@ export default {
                     this.error.cause.timespanFaulty = true
                     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
                 } else {
-                    await createList(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
+                    await createList(this.selectedGroup, attendance, this.startdate, this.enddate, {filename: this.filename})
                 }
             }
         },

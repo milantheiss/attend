@@ -200,10 +200,7 @@ async function fetchDataForInvoice(groupIDs, startdate, enddate) {
     ).json()
   );
 
-  console.log(JSON.parse(JSON.stringify(res.trainingssessions)));
-
   return res  
-
 }
 
 export {

@@ -8,20 +8,22 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
   let dataset = {
     startdate: req.body.startdate,
     enddate: req.body.enddate,
-    trainingssessions: []
+    trainingssessions: [],
+    groups: []
   };
 
   let department;
 
   for (groupID of req.body.groups) {
     const groupInfos = (await groupService.getGroupInfo(req.user, groupID))._doc;
-    delete groupInfos.trainer;
-
+    
     if (typeof department === "undefined") {
       department = groupInfos.department;
     }
-
+    
     if (department._id.equals(groupInfos.department._id)) {
+      dataset.groups.push(groupInfos)
+      
       let trainingssessions = await attendanceService.getDataForInvoice(
         req.user,
         groupID,
