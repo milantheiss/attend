@@ -37,7 +37,7 @@ class AttendanceListPdf {
       .text("Teilnehmerliste", 20, posNextLine)
       .setFontSize(12)
       .text(`Vom ${_startdate} bis ${_enddate}`, 180, posNextLine)
-      .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 105, 10, 75, 56);
+      .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 105, 10, 75, 75);
   }
 
   static generateGroupInfo(doc, group) {
@@ -314,7 +314,7 @@ class InvoicePdf {
 
 async function createList(group, attendenceList, startdate, enddate, options) {
   if(typeof options.doc === "undefined"){
-    options.doc = new jsPDF({ unit: "pt", orientation: "landscape", autoFirstPage: false, compress: true });
+    options.doc = new jsPDF({ unit: "pt", orientation: "landscape", compress: true });
   }
 
   _startdate = startdate;
@@ -334,9 +334,11 @@ async function createList(group, attendenceList, startdate, enddate, options) {
         laufnummer = i * 31;
         splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26);
         AttendanceListPdf.generatePage(options.doc, group, splicedArray);
-        if (j + 1 < pagesForDates) options.doc.addPage({ orientation: "landscape", autoFirstPage: false });
+        if (j + 1 < pagesForDates) options.doc.addPage("a4","landscape"); 
+
       }
-      if (i + 1 < pagesForParticipants) options.doc.addPage({ orientation: "landscape", autoFirstPage: false });
+      if (i + 1 < pagesForParticipants) options.doc.addPage("a4","landscape"); 
+
     }
   } else {
     pagecount = 1;
@@ -361,7 +363,7 @@ async function createList(group, attendenceList, startdate, enddate, options) {
  * @param {Object} dataset Dataset, dass vom Backend generiert wird
  */
 async function createInvoice(filename, dataset) {
-  let doc = new jsPDF({ unit: "pt", orientation: "portrait", autoFirstPage: false, compress: true });
+  let doc = new jsPDF({ unit: "pt", compress: true });
 
   _startdate = dataset.startdate;
   _enddate = dataset.startdate;
@@ -382,19 +384,20 @@ async function createInvoice(filename, dataset) {
       //Wenn eine weitere Steite benötigt wird
       if (i + 1 < pages) {
         //Muss in if Statement stehen, da sonst das PDF eine leere Seite hat.
-        doc.addPage({ orientation: "portrait", autoFirstPage: false });
+        doc.addPage();
       } else {
+        
         doc
-          .setFont("helvetica", "bold")
-          .setFontSize(10)
-          .text(`Stundenanzahl gesamt`, 40, posNextLine, { maxWidth: 210.4 })
-          .text(`${dataset.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 });
-
+        .setFont("helvetica", "bold")
+        .setFontSize(10)
+        .text(`Stundenanzahl gesamt`, 40, posNextLine, { maxWidth: 210.4 })
+        .text(`${dataset.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 });
+        
         drawBox(doc, 38, posNextLine - tableTopMargin, 212.4, 13.3);
         drawBox(doc, 250.4, posNextLine - tableTopMargin, 70.8, 13.3);
-
-        posNextLine += 13.3;
-
+        
+        posNextLine = 754.8
+        
         drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 39.9);
         drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 39.9);
 
@@ -412,9 +415,7 @@ async function createInvoice(filename, dataset) {
     }
 
     for(const group of dataset.groups){
-      console.log(_startdate);
-      console.log(_enddate);
-      doc.addPage({ orientation: "l"}); 
+      doc.addPage("a4","landscape"); 
       createList(group, await fetchAttendanceByDateRange(group._id, new Date(dataset.startdate), new Date(dataset.enddate)), dataset.startdate, dataset.enddate, {doc: doc})
     }
 
