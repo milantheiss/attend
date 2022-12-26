@@ -49,15 +49,13 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
           timeInfo.length = endingTime - startingTime;
         }
 
-        session._doc.info = {
-          groupName: groupInfos.name,
-          departmentName: groupInfos.department.name,
-          weekday: timeInfo?.day,
-          starttime: timeInfo?.starttime,
-          endtime: timeInfo?.endtime,
-          length: timeInfo?.length,
-          venue: groupInfos.venue,
-        };
+        session._doc.groupName = groupInfos.name,
+        session._doc.departmentName = groupInfos.department.name,
+        session._doc.weekday = timeInfo?.day,
+        session._doc.starttime = timeInfo?.starttime,
+        session._doc.endtime = timeInfo?.endtime,
+        session._doc.length = timeInfo?.length,
+        session._doc.venue = groupInfos.venue,
         session._doc.groupID = groupID;
 
         dataset.trainingssessions.push(session._doc)
@@ -77,7 +75,7 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
 
   dataset.totalHours = 0
 
-  dataset.trainingssessions.forEach(val => dataset.totalHours += val.info.length)
+  dataset.trainingssessions.forEach(val => dataset.totalHours += val.length)
 
   await res.status(httpStatus.OK).send(dataset);
 });

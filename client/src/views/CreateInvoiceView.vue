@@ -1,48 +1,109 @@
 <template>
     <div class="relative container">
-        <!--Export Settings-->
-        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-            <!--WENN Trainer Daten incomplete -> Dialog-->
-            <!--Timespan-->
-            <!--Gruppen also collapsable Dropdown-->
-            <!--Dateiname-->
-            <div class="flex items-center justify-between mb-4">
-                <label for="filename"
-                    class="text-black font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
-                <TextInput name="filename" v-model="filename" placeholder="Dateiname"
-                    :showError="error.cause.filenameInput" class="ml-3"></TextInput>
-            </div>
-            <div class="flex items-start justify-between mb-4 w-full">
-                <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
-                <!--Add Collapsable Container here-->
-                <!--TODO Styling hier fixen-->
-                <CollapsibleContainer class="ml-3">
-                    <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class="" :sortAlphabetically="true">
-                    </CheckboxList>
-                </CollapsibleContainer>
-            </div>
-            <div class="flex items-center justify-between mb-4">
-                <label for="startdate"
-                    class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
-                <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
-            </div>
+        <div v-show="Object.keys(dataStore?.invoiceData).length === 0 || dataStore.invoiceData.trainingssessions?.length === 0">
+            <!--Export Settings-->
+            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+                <!--WENN Trainer Daten incomplete -> Dialog-->
+                <!--Timespan-->
+                <!--Gruppen also collapsable Dropdown-->
+                <!--Dateiname-->
+                <div class="flex items-center justify-between mb-4">
+                    <label for="filename"
+                        class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
+                    <TextInput name="filename" v-model="filename" placeholder="Dateiname"
+                        :showError="error.cause.filenameInput" class="ml-3"></TextInput>
+                </div>
+                <div class="flex items-start justify-between mb-4 w-full">
+                    <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
+                    <!--Add Collapsable Container here-->
+                    <!--TODO Styling hier fixen-->
+                    <CollapsibleContainer class="ml-3">
+                        <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
+                            :sortAlphabetically="true">
+                        </CheckboxList>
+                    </CollapsibleContainer>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <label for="startdate"
+                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
+                    <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
+                </div>
 
-            <div class="flex items-center justify-between mb-4">
-                <label for="enddate"
-                    class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
-                <DateInput v-model="enddate" name="enddate" class="ml-3"
-                    :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
+                <div class="flex items-center justify-between mb-4">
+                    <label for="enddate"
+                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
+                    <DateInput v-model="enddate" name="enddate" class="ml-3"
+                        :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
+                </div>
+
+                <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
+
+                <button @click="getInvoice"
+                    class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
+                    :class="error.show ? 'mt-4' : 'mt-8'">
+                    <p class="font-medium font-base md:text-lg">Exportieren</p>
+                </button>
             </div>
-
-            <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
-
-            <button @click="exportPDF"
-                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
-                :class="error.show ? 'mt-4' : 'mt-8'">
-                <p class="font-medium font-base md:text-lg">Exportieren</p>
-            </button>
         </div>
-
+        <div v-if="dataStore.invoiceData.trainingssessions?.length > 0">
+            <!--TODO Add ÜL Nummer Prompt-->
+            <!--TODO ÜL Info-->
+            <!-- prettier-ignore-start -->
+            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+                <!--Info Field-->
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Abrechnung für den Zeitraum: </p>
+                    <p class="text-black font-normal text-base md:text-lg text-right">{{
+        new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "short", day: "numeric"
+        })
+}}
+                        bis {{
+        new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "short", day: "numeric"
+        })
+}}</p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Name: </p>
+                    <p class="text-black font-normal text-base md:text-lg text-right">
+                        {{ dataStore.invoiceData.userInfo.firstname }} {{ dataStore.invoiceData.userInfo.lastname }}
+                    </p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
+                    <p class="text-black font-normal text-base md:text-lg text-right">{{
+        dataStore.invoiceData.groups[0].department.name
+}}</p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg"> </p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
+                    <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
+                </div>
+            </div>
+            <!-- prettier-ignore-end -->
+            <div>
+                <!--Je Gruppe ein Container-->
+                <CollapsibleContainer :show="true">
+                    <TrainingssessionItem class="mb-4"
+                        v-for="(trainingsssession, index) in dataStore.invoiceData.trainingssessions"
+                        :key="trainingsssession._id" v-model="dataStore.invoiceData.trainingssessions[index]"
+                        @onClickOnRemove="(session) => removeTrainingssession(session)">
+                    </TrainingssessionItem>
+                </CollapsibleContainer>
+                <div>
+                    <!--Je Trainingsstunde ein Element-->
+                </div>
+            </div>
+            <div>
+                <!--Bestätigungsfeld-->
+            </div>
+        </div>
     </div>
 </template>
   
@@ -55,13 +116,18 @@ import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
+import TrainingssessionItem from "@/components/TrainingssessionItem.vue"
+import { ref } from 'vue';
 
 export default {
     name: "CreateInvoice",
     setup() {
         const dataStore = useDataStore()
+        const showCollapsibleContainer = ref(true);
+
         return {
-            dataStore
+            dataStore,
+            showCollapsibleContainer
         }
     },
     data() {
@@ -76,7 +142,7 @@ export default {
                 cause: {
                     groupInput: false,
                     filenameInput: false,
-                    timespanFaulty: false
+                    noData: false
                 }
             }
         }
@@ -86,7 +152,8 @@ export default {
         TextInput,
         DateInput,
         CheckboxList,
-        CollapsibleContainer
+        CollapsibleContainer,
+        TrainingssessionItem
     },
     methods: {
         /**
@@ -94,18 +161,32 @@ export default {
          */
         async exportPDF() {
             //if (!this.hasAnError()) {
-                //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
+            //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
 
-                const dataset = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
-                // if (attendance.dates.length === 0) {
-                //     this.error.show = true
-                //     this.error.cause.timespanFaulty = true
-                //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
-                // } else {
-                await createInvoice(this.filename, dataset)
-                // }
+            this.dataStore.invoiceData = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+            // if (attendance.dates.length === 0) {
+            //     this.error.show = true
+            //     this.error.cause.timespanFaulty = true
+            //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
+            // } else {
+            await createInvoice(this.filename, this.dataStore.invoiceData)
+            // }
             //}
         },
+        async getInvoice() {
+            if (!this.hasAnError()) {
+                this.dataStore.invoiceData = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+                console.log("🚀 ~ file: CreateInvoiceView.vue:151 ~ getInvoice ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
+
+                if (this.dataStore.invoiceData.trainingssessions.length === 0) {
+                    this.error.show = true
+                    this.error.cause.noData = true
+                    this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
+                    this.dataStore.invoiceData = {}
+                }
+            }
+        },
+
         /**
          * Checkt ob ein Fehler vorliegt.
          * Error Timespan Faulty kann erst getriggert werden, wenn Attendance List von der Datenbank gezogen wurde.
@@ -113,20 +194,25 @@ export default {
         hasAnError() {
             this.error.message = "Keine Fehler"
 
-            this.error.show = typeof this.selectedGroup === 'undefined' || typeof this.filename !== "string" || this.filename.trim().length === 0;
-            this.error.cause.groupInput = typeof this.selectedGroup === 'undefined'
+            this.error.show = this.selectedGroups.length === 0 || typeof this.filename !== "string" || this.filename.trim().length === 0;
+            this.error.cause.groupInput = this.selectedGroups.length === 0
             this.error.cause.filenameInput = typeof this.filename !== "string" || this.filename.trim().length === 0
-            this.error.cause.timespanFaulty = false
+            this.error.cause.noData = false
 
             if (this.error.cause.groupInput) {
-                this.error.message = "Es muss eine Gruppe ausgewählt sein.";
+                this.error.message = "Es muss mindesten eine Gruppe ausgewählt sein.";
             } else if (this.error.cause.filenameInput) {
                 this.error.message = "Es muss ein Dateiname angegeben werden."
             }
 
-            this.error.message = this.error.cause.groupInput && this.error.cause.filenameInput ? "Alle Felder müssen ausgefüllt sein." : this.error.message
+            this.error.message = this.error.cause.groupInput && this.error.cause.filenameInput ? "Mehrere Fehler." : this.error.message
 
             return this.error.show;
+        },
+
+        removeTrainingssession(session){
+            const index = this.dataStore.invoiceData.trainingssessions.indexOf(session)
+            this.dataStore.invoiceData.trainingssessions.splice(index, 1)
         }
     },
     async created() {
@@ -142,8 +228,33 @@ export default {
     watch: {
     },
     computed: {
-        selectedGroups(){
+        selectedGroups() {
             return (this.groups.filter(val => this.$refs.checkboxList.selectedElements.includes(val.name))).map(val => val._id)
+        },
+        totalHours() {
+            let tHours = 0
+
+            this.dataStore.invoiceData.trainingssessions.forEach(element => {
+                if (typeof element.starttime === "undefined" || typeof element.endtime === "undefined") {
+                    element.faultyTimes = true
+                } else {
+                    //Formatiert Zeit vom Format 18:45 in 18,75
+                    const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60);
+
+                    const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60);
+
+                    //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+                    element.length = endingTime - startingTime;
+                    tHours += element.length
+                }
+            })
+
+            return tHours
+        },
+        readableTotalHours() {
+            const hh = Math.trunc(this.totalHours)
+            const mm = Math.round(60 * (this.totalHours - hh))
+            return `${hh} Std ${mm} Min`
         }
     }
 };

@@ -18,9 +18,7 @@ export default {
     },
     data() {
         return {
-            formattedList: [],
-            //TODO Entfernen
-            debugToggle: false
+            formattedList: []
         }
     },
     props: {
@@ -48,9 +46,6 @@ export default {
     watch: {
         list(newVal) {
             this.formattedList = this.formatList(newVal)
-        },
-        debugToggle(){
-            console.log(this.selectedElements);
         }
     },
     created() {

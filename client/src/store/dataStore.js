@@ -5,6 +5,7 @@ export const useDataStore = defineStore('dateStore', {
     //Seitenname, der zwischen dem Menu und dem Avatar angezeigt wird.
     viewname: '',
     showPatchNotesDialog: false,
+    invoiceData: {}
   }),
   actions: {
     async readPatchNotes() {
