@@ -1,11 +1,10 @@
 <template>
     <div class="relative container">
-        <div v-show="Object.keys(dataStore?.invoiceData).length === 0 || dataStore.invoiceData.trainingssessions?.length === 0">
+        <div
+            v-show="Object.keys(dataStore?.invoiceData).length === 0 || dataStore.invoiceData.trainingssessions?.length === 0">
             <!--Export Settings-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <!--WENN Trainer Daten incomplete -> Dialog-->
-                <!--Timespan-->
-                <!--Gruppen also collapsable Dropdown-->
+                <!--TODO WENN Trainer Daten incomplete -> Dialog-->
                 <!--Dateiname-->
                 <div class="flex items-center justify-between mb-4">
                     <label for="filename"
@@ -13,16 +12,20 @@
                     <TextInput name="filename" v-model="filename" placeholder="Dateiname"
                         :showError="error.cause.filenameInput" class="ml-3"></TextInput>
                 </div>
+                <!--Gruppen also collapsable Dropdown-->
                 <div class="flex items-start justify-between mb-4 w-full">
                     <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                     <!--Add Collapsable Container here-->
                     <!--TODO Styling hier fixen-->
                     <CollapsibleContainer class="ml-3">
-                        <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
-                            :sortAlphabetically="true">
-                        </CheckboxList>
+                        <template #content>
+                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
+                                :sortAlphabetically="true">
+                            </CheckboxList>
+                        </template>
                     </CollapsibleContainer>
                 </div>
+                <!--Timespan-->
                 <div class="flex items-center justify-between mb-4">
                     <label for="startdate"
                         class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
@@ -48,7 +51,6 @@
         <div v-if="dataStore.invoiceData.trainingssessions?.length > 0">
             <!--TODO Add ÜL Nummer Prompt-->
             <!--TODO ÜL Info-->
-            <!-- prettier-ignore-start -->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--Info Field-->
                 <div class="flex justify-between items-center">
@@ -83,25 +85,33 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
-                    <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
+                    <p class="text-black font-medium text-base md:text-lg text-right">{{ readableTotalHours }}</p>
                 </div>
             </div>
-            <!-- prettier-ignore-end -->
-            <div>
+
+            <div class="mt-8">
                 <!--Je Gruppe ein Container-->
-                <CollapsibleContainer :show="true">
-                    <TrainingssessionItem class="mb-4"
-                        v-for="(trainingsssession, index) in dataStore.invoiceData.trainingssessions"
-                        :key="trainingsssession._id" v-model="dataStore.invoiceData.trainingssessions[index]"
-                        @onClickOnRemove="(session) => removeTrainingssession(session)">
-                    </TrainingssessionItem>
-                </CollapsibleContainer>
-                <div>
-                    <!--Je Trainingsstunde ein Element-->
+                <div class="flex justify-between items-center min-w-full" v-for="group in dataStore.invoiceData.groups"
+                    :key="group._id">
+                    <CollapsibleContainer :show="true" class="mb-4">
+                        <template #header>
+                            <CheckboxInput class="mr-3"></CheckboxInput>
+                            <p class="truncate text-xl font-semibold">{{ group.name }}</p>
+                        </template>
+                        <template #content>
+                            <!--Je Trainingsstunde ein Element-->
+                            <TrainingssessionItem class="mb-4"
+                                v-for="(trainingsssession, index) in dataStore.invoiceData.trainingssessions.filter(val => val.groupID === group._id)"
+                                :key="trainingsssession._id" v-model="dataStore.invoiceData.trainingssessions[index]"
+                                @onClickOnRemove="(session) => removeTrainingssession(session)">
+                            </TrainingssessionItem>
+                        </template>
+                    </CollapsibleContainer>
                 </div>
             </div>
+
+            <!--Bestätigungsfeld-->
             <div>
-                <!--Bestätigungsfeld-->
             </div>
         </div>
     </div>
@@ -118,6 +128,7 @@ import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import TrainingssessionItem from "@/components/TrainingssessionItem.vue"
 import { ref } from 'vue';
+import CheckboxInput from "@/components/CheckboxInput.vue";
 
 export default {
     name: "CreateInvoice",
@@ -153,7 +164,8 @@ export default {
         DateInput,
         CheckboxList,
         CollapsibleContainer,
-        TrainingssessionItem
+        TrainingssessionItem,
+        CheckboxInput
     },
     methods: {
         /**
@@ -210,7 +222,7 @@ export default {
             return this.error.show;
         },
 
-        removeTrainingssession(session){
+        removeTrainingssession(session) {
             const index = this.dataStore.invoiceData.trainingssessions.indexOf(session)
             this.dataStore.invoiceData.trainingssessions.splice(index, 1)
         }
