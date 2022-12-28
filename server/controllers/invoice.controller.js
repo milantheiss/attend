@@ -3,12 +3,12 @@ const { groupService, attendanceService } = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const mongoose = require("mongoose")
 
 const getDatasetForInvoice = catchAsync(async (req, res) => {
   let dataset = {
     startdate: req.body.startdate,
     enddate: req.body.enddate,
-    trainingssessions: [],
     groups: []
   };
 
@@ -30,6 +30,8 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
         req.body.startdate,
         req.body.enddate
       );
+
+      dataset.groups.find(val => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions = []
       
       for (session of trainingssessions) {
         const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
@@ -38,27 +40,13 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
         //Sucht die entsprechende Zeit für den Wochentag heraus.
         const timeInfo = groupInfos.times.find((val) => val.day === weekday[new Date(session.date).getDay()]);
 
-        if (typeof timeInfo?.starttime !== "undefined" && typeof timeInfo?.endtime !== "undefined") {
-          //Formatiert Zeit vom Format 18:45 in 18,75
-          const startingTime =
-            Number(timeInfo?.starttime.split(":")[0]) + Number(timeInfo?.starttime.split(":")[1] / 60);
-
-          const endingTime = Number(timeInfo?.endtime.split(":")[0]) + Number(timeInfo?.endtime.split(":")[1] / 60);
-
-          //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-          timeInfo.length = endingTime - startingTime;
-        }
-
-        session._doc.groupName = groupInfos.name,
-        session._doc.departmentName = groupInfos.department.name,
         session._doc.weekday = timeInfo?.day,
         session._doc.starttime = timeInfo?.starttime,
         session._doc.endtime = timeInfo?.endtime,
-        session._doc.length = timeInfo?.length,
         session._doc.venue = groupInfos.venue,
         session._doc.groupID = groupID;
 
-        dataset.trainingssessions.push(session._doc)
+        dataset.groups.find(val => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions.push(session._doc)
       }
     }
   }
@@ -72,10 +60,6 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
     firstname: req.user.firstname,
     lastname: req.user.lastname,
   };
-
-  dataset.totalHours = 0
-
-  dataset.trainingssessions.forEach(val => dataset.totalHours += val.length)
 
   await res.status(httpStatus.OK).send(dataset);
 });

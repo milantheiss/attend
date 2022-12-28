@@ -22,9 +22,10 @@ module.exports = {
         'dimmed-gradient-2': '#7C83C3',
         'delete-gradient-1': '#DE2C2C',
         'delete-gradient-2': '#D83535',
-        'background-greywhite': '#edf0f2',
+        'background-graywhite': '#edf0f2',
         'dark-grey': '#464646',
-        'special-red': '#FF1F28'
+        'special-red': '#FF1F28',
+        "light-gray": "#6C7F8C",
       },
       fontFamily:{
         'ubuntu': ['Ubuntu', 'sans-serif']

@@ -1,7 +1,7 @@
 <template>
     <div class="relative container">
         <div
-            v-show="Object.keys(dataStore?.invoiceData).length === 0 || dataStore.invoiceData.trainingssessions?.length === 0">
+            v-show="Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)">
             <!--Export Settings-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--TODO WENN Trainer Daten incomplete -> Dialog-->
@@ -17,10 +17,10 @@
                     <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                     <!--Add Collapsable Container here-->
                     <!--TODO Styling hier fixen-->
-                    <CollapsibleContainer class="ml-3">
+                    <CollapsibleContainer class="ml-3" :show="true">
                         <template #content>
                             <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
-                                :sortAlphabetically="true">
+                                :sortAlphabetically="true" :default="true">
                             </CheckboxList>
                         </template>
                     </CollapsibleContainer>
@@ -48,25 +48,27 @@
                 </button>
             </div>
         </div>
-        <div v-if="dataStore.invoiceData.trainingssessions?.length > 0">
+
+        <!--Abrechnungsanzeige-->
+        <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)">
             <!--TODO Add ÜL Nummer Prompt-->
             <!--TODO ÜL Info-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--Info Field-->
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Abrechnung für den Zeitraum: </p>
-                    <p class="text-black font-normal text-base md:text-lg text-right">{{
+                    <p class="text-black font-normal text-base md:text-lg text-right"><span class="font-medium">{{
         new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
             year: "numeric",
             month: "short", day: "numeric"
         })
-}}
-                        bis {{
+}}</span>
+                        bis <span class="font-medium">{{
         new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
             year: "numeric",
             month: "short", day: "numeric"
         })
-}}</p>
+}}</span></p>
                 </div>
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Name: </p>
@@ -77,7 +79,7 @@
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
                     <p class="text-black font-normal text-base md:text-lg text-right">{{
-        dataStore.invoiceData.groups[0].department.name
+        dataStore.invoiceData.department.name
 }}</p>
                 </div>
                 <div class="flex justify-between items-center">
@@ -93,16 +95,17 @@
                 <!--Je Gruppe ein Container-->
                 <div class="flex justify-between items-center min-w-full" v-for="group in dataStore.invoiceData.groups"
                     :key="group._id">
-                    <CollapsibleContainer :show="true" class="mb-4">
+                    <CollapsibleContainer :show="group.include" class="mb-4">
                         <template #header>
-                            <CheckboxInput class="mr-3"></CheckboxInput>
-                            <p class="truncate text-xl font-semibold">{{ group.name }}</p>
+                            <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
+                            <p class="truncate text-xl font-semibold"
+                                :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
                         </template>
                         <template #content>
                             <!--Je Trainingsstunde ein Element-->
                             <TrainingssessionItem class="mb-4"
-                                v-for="(trainingsssession, index) in dataStore.invoiceData.trainingssessions.filter(val => val.groupID === group._id)"
-                                :key="trainingsssession._id" v-model="dataStore.invoiceData.trainingssessions[index]"
+                                v-for="(trainingsssession, index) in group.trainingssessions"
+                                :key="trainingsssession._id" v-model="group.trainingssessions[index]"
                                 @onClickOnRemove="(session) => removeTrainingssession(session)">
                             </TrainingssessionItem>
                         </template>
@@ -111,7 +114,25 @@
             </div>
 
             <!--Bestätigungsfeld-->
-            <div>
+            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+                <div class="flex items-center">
+                    <CheckboxInput class="mr-3"></CheckboxInput>
+                    <p class="text-black font-medium text-base md:text-lg text-left"><span class="text-orange-600">TODO
+                            Bestätigungsmessage</span>
+                    </p>
+                </div>
+                <div class="flex justify-around items-center">
+                    <button @click="cancel"
+                        class="flex items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
+                        :class="error.show ? 'mt-4' : 'mt-8'">
+                        <p class="font-medium font-base md:text-lg">Abbrechen</p>
+                    </button>
+                    <button @click="send"
+                        class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
+                        :class="error.show ? 'mt-4' : 'mt-8'">
+                        <p class="font-medium font-base md:text-lg">Senden</p>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -188,9 +209,10 @@ export default {
         async getInvoice() {
             if (!this.hasAnError()) {
                 this.dataStore.invoiceData = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+                this.dataStore.invoiceData.groups.forEach(group => group.include = true)
                 console.log("🚀 ~ file: CreateInvoiceView.vue:151 ~ getInvoice ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
 
-                if (this.dataStore.invoiceData.trainingssessions.length === 0) {
+                if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
                     this.error.show = true
                     this.error.cause.noData = true
                     this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
@@ -223,8 +245,25 @@ export default {
         },
 
         removeTrainingssession(session) {
-            const index = this.dataStore.invoiceData.trainingssessions.indexOf(session)
-            this.dataStore.invoiceData.trainingssessions.splice(index, 1)
+            const group = this.dataStore.invoiceData.groups.find(val => val._id === session._id)
+            const index = group.trainingssessions.indexOf(session)
+            group.trainingssessions.splice(index, 1)
+        },
+
+        cancel() {
+            this.dataStore.invoiceData = {}
+        },
+
+        send() {
+            this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
+            this.dataStore.invoiceData.groups.forEach(group => delete group.include)
+
+            //Send Invoice
+            console.log("🚀 ~ file: CreateInvoiceView.vue:260 ~ send ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
+
+            //Trigger send success
+
+            this.dataStore.invoiceData = {}
         }
     },
     async created() {
@@ -238,6 +277,9 @@ export default {
         this.dataStore.viewname = "Abrechnung erstellen"
     },
     watch: {
+        totalHours(newVal) {
+            this.dataStore.invoiceData.totalHours = newVal
+        }
     },
     computed: {
         selectedGroups() {
@@ -246,19 +288,23 @@ export default {
         totalHours() {
             let tHours = 0
 
-            this.dataStore.invoiceData.trainingssessions.forEach(element => {
-                if (typeof element.starttime === "undefined" || typeof element.endtime === "undefined") {
-                    element.faultyTimes = true
-                } else {
-                    //Formatiert Zeit vom Format 18:45 in 18,75
-                    const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60);
 
-                    const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60);
 
-                    //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                    element.length = endingTime - startingTime;
-                    tHours += element.length
-                }
+            this.dataStore.invoiceData.groups?.filter(val => val.include).forEach(val => {
+                val.trainingssessions.forEach(element => {
+                    if (typeof element.starttime === "undefined" || typeof element.endtime === "undefined") {
+                        element.faultyTimes = true
+                    } else {
+                        //Formatiert Zeit vom Format 18:45 in 18,75
+                        const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60);
+
+                        const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60);
+
+                        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+                        element.length = endingTime - startingTime;
+                        tHours += element.length
+                    }
+                })
             })
 
             return tHours

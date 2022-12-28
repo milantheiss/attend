@@ -26,7 +26,11 @@ export default {
             type: Boolean,
             default: false
         },
-        list: String.Array
+        list: String.Array,
+        default: {
+            type: Boolean,
+            default: false
+        }
     },
     methods: {
         _sortAlphabetically(list) {
@@ -40,7 +44,7 @@ export default {
             if (this.sortAlphabetically) {
                 list = this._sortAlphabetically(list)
             }
-            return list.map(val => val = { text: val, checked: false })
+            return list.map(val => val = { text: val, checked: this.default })
         }
     },
     watch: {
