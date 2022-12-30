@@ -4,17 +4,19 @@ const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose")
+const {Department, Invoice} = require("../models");
+const { addNewNotification } = require("../services/notification.service");
 
-const getDatasetForInvoice = catchAsync(async (req, res) => {
+const getDatasetForNewInvoice = catchAsync(async (req, res) => {
   let dataset = {
-    startdate: req.body.startdate,
-    enddate: req.body.enddate,
+    startdate: req.query.startdate,
+    enddate: req.query.enddate,
     groups: []
   };
-
+  
   let department;
 
-  for (groupID of req.body.groups) {
+  for (groupID of req.query.groups) {
     const groupInfos = (await groupService.getGroupInfo(req.user, groupID))._doc;
     
     if (typeof department === "undefined") {
@@ -27,8 +29,8 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
       let trainingssessions = await attendanceService.getDataForInvoice(
         req.user,
         groupID,
-        req.body.startdate,
-        req.body.enddate
+        dataset.startdate,
+        dataset.enddate
       );
 
       dataset.groups.find(val => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions = []
@@ -56,14 +58,44 @@ const getDatasetForInvoice = catchAsync(async (req, res) => {
   //Hinzufügen --> Get User Info
   
   dataset.userInfo = {
+    userID: req.user._id,
     email: req.user.email,
     firstname: req.user.firstname,
-    lastname: req.user.lastname,
+    lastname: req.user.lastname
   };
 
   await res.status(httpStatus.OK).send(dataset);
 });
 
+const submitInvoice = catchAsync(async (req, res) => {
+  //Invoice wird kontrolliert und in Datenbank gespeichert
+  let invoice = req.body
+
+  const departmentHeadIDs = await Department.findById(invoice.department._id)
+
+  if (departmentHeadIDs === null || typeof departmentHeadIDs === "undefined"){
+    throw new ApiError(httpStatus.BAD_REQUEST, "No department head found")
+  }
+
+  //TODO: Add access control
+  invoice = await Invoice.create(invoice)
+
+  const notification = await addNewNotification(
+    {
+      title: "Neue Abrechnung",
+      priority: "normal",
+      from: req.user._id,
+      recipients: "ids",
+      message: `${req.user.firstname} ${req.user.lastname} hat eine neue Abrechnung erstellt`,
+      type: "invoice",
+      data: {invoiceID: invoice._id}
+    }
+  )
+  
+  
+})
+
 module.exports = {
-  getDatasetForInvoice,
+  getDatasetForNewInvoice,
+  submitInvoice
 };

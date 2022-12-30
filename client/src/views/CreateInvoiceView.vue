@@ -140,7 +140,7 @@
   
 <script>
 import { createInvoice } from "@/util/generatePdf"
-import { fetchDataForInvoice, fetchGroups } from '@/util/fetchOperations'
+import { fetchDataForNewInvoice, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
@@ -196,7 +196,7 @@ export default {
             //if (!this.hasAnError()) {
             //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
 
-            this.dataStore.invoiceData = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+            this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
             // if (attendance.dates.length === 0) {
             //     this.error.show = true
             //     this.error.cause.timespanFaulty = true
@@ -208,7 +208,7 @@ export default {
         },
         async getInvoice() {
             if (!this.hasAnError()) {
-                this.dataStore.invoiceData = await fetchDataForInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+                this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
                 this.dataStore.invoiceData.groups.forEach(group => group.include = true)
                 console.log("🚀 ~ file: CreateInvoiceView.vue:151 ~ getInvoice ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
 

@@ -125,7 +125,7 @@ async function fetchGroupInfo(groupID) {
   return await watchForRedirects(
     (
       await fetch([process.env.VUE_APP_API_URL, "groups", groupID, "getInfo"].join("/"), {
-        method: "GET",
+                    method: "GET",
         credentials: "include",
         mode: "cors",
       })
@@ -182,18 +182,11 @@ async function getLastPatchNotes() {
   ).json();
 }
 
-async function fetchDataForInvoice(groupIDs, startdate, enddate) {
-  const body = {
-    groups: groupIDs,
-    startdate: startdate,
-    enddate: enddate,
-  };
+async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
   const res = await watchForRedirects(
     (
-      await fetch([process.env.VUE_APP_API_URL, "invoice"].join("/"), {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: { "Content-type": "application/json; charset=UTF-8" },
+      await fetch(`${process.env.VUE_APP_API_URL}/invoice/create?startdate=${startdate.toJSON()}&enddate=${enddate.toJSON()}&groups[]=${groupIDs.join("&groups[]=")}`, {
+        method: "GET",
         credentials: "include",
         mode: "cors",
       })
@@ -202,6 +195,10 @@ async function fetchDataForInvoice(groupIDs, startdate, enddate) {
 
   return res  
 }
+
+// async function sendInvoice(body){
+//   return await watchForRedirects(await fetch([process.env.VUE_APP_API_URL, "invoice/submit"]))
+// }
 
 export {
   fetchGroup,
@@ -215,5 +212,5 @@ export {
   removeMemberFromGroup,
   authenticateSession,
   getLastPatchNotes,
-  fetchDataForInvoice,
+  fetchDataForNewInvoice,
 };
