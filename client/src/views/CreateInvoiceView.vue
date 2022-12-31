@@ -1,7 +1,7 @@
 <template>
     <div class="relative container">
         <div
-            v-show="Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)">
+            v-show="(Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) && !status.show">
             <!--Export Settings-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--TODO WENN Trainer Daten incomplete -> Dialog-->
@@ -50,7 +50,7 @@
         </div>
 
         <!--Abrechnungsanzeige-->
-        <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)">
+        <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
             <!--TODO Add ÜL Nummer Prompt-->
             <!--TODO ÜL Info-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
@@ -135,6 +135,38 @@
                 </div>
             </div>
         </div>
+
+        <!--Sendebestätigung-->
+        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md" v-show="status.show">
+            <div class="flex flex-col justify-center items-center">
+                <div class="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]" v-show="status.processing">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+
+                    <!--Check Circle-->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor" class="w-16 h-16 text-lime-600 animate-smaller_bounce" v-show="status.success && !status.processing">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <!--X Circle-->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle" v-show="!status.success && !status.processing">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <p class="mb-3 text-lg">{{ status.text }}</p>
+                <button @click="ok"
+                    class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
+                    <p class="font-medium font-base md:text-lg">Okay</p>
+                </button>
+            </div>
+        </div>
     </div>
 </template>
   
@@ -176,6 +208,12 @@ export default {
                     filenameInput: false,
                     noData: false
                 }
+            },
+            status: {
+                text: 'Abrechnung wird versendet...',
+                show: false,
+                processing: true,
+                success: false,
             }
         }
     },
@@ -255,6 +293,8 @@ export default {
         },
 
         async send() {
+            this.status.show = true
+
             this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
             this.dataStore.invoiceData.groups.forEach(group => delete group.include)
 
@@ -262,13 +302,25 @@ export default {
             const res = await sendInvoice(this.dataStore.invoiceData)
 
             if (res.status === 200 && await res.text() === "Invoice submitted") {
+                this.status.success = true
+                this.status.processing = false
+                this.status.text = 'Abrechnung erfolgreich versendet!'
                 console.log("Invoice submitted");
                 //Trigger send success
             } else {
+                this.status.success = false
+                this.status.processing = false
+                this.status.text = 'Abrechnung konnte nicht versendet werden!'
                 //Trigger send error
             }
 
             this.dataStore.invoiceData = {}
+        },
+        ok(){
+            this.status.show = false
+            this.status.processing = true
+            this.status.success = false
+            this.status.text = 'Abrechnung wird versendet...'
         }
     },
     async created() {
@@ -317,7 +369,7 @@ export default {
         },
         readableTotalHours() {
             const hh = Math.trunc(this.totalHours)
-            const mm = Math.round(60 * (this.totalHours - hh)) 
+            const mm = Math.round(60 * (this.totalHours - hh))
             return `${hh} Std ${mm} Min`
         }
     }

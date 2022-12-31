@@ -47,6 +47,24 @@ module.exports = {
       },
       translate: {
         '13': '3.25rem',
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-5deg)' },
+          '50%': { transform: 'rotate(5deg)' },
+        },
+        "smaller-bounce": {
+          "0% 100%": {
+            transform: "translateY(-10%)"
+          },
+          "50%": {
+            transform: "translateY(0)"
+          }
+        }
+      },
+      animation: {
+        wiggle: 'wiggle 1s ease-in-out infinite',
+        "smaller-bounce": "smaller-bounce 1s ease-in-out infinite"
       }
     },
   },

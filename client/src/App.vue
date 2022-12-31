@@ -88,6 +88,7 @@ import { ref } from 'vue';
 
 export default {
   setup() {
+    document.title = 'Attend'
     const dataStore = useDataStore();
     const auth = useAuthStore();
     const showPatchNotes = ref(dataStore.showPatchNotesDialog);
