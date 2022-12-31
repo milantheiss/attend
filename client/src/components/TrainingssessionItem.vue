@@ -115,11 +115,11 @@ export default {
 
             const endingTime = Number(this.session.endtime?.split(":")[0]) + Number(this.session.endtime?.split(":")[1] / 60) || 0;
 
-            return endingTime - startingTime
+        return endingTime - startingTime > 0 ? endingTime - startingTime : 0;
         },
         readableTotalHours() {
             const hh = Math.trunc(this.totalHours )
-            const mm = Math.round(60 * (this.totalHours - hh))
+            const mm = Math.round(60 * (this.totalHours - hh)) 
             return `${hh} Std ${mm} Min`
         }
     },

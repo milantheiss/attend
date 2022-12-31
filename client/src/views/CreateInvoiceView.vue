@@ -259,10 +259,10 @@ export default {
             this.dataStore.invoiceData.groups.forEach(group => delete group.include)
 
             //Send Invoice
-            console.log("🚀 ~ file: CreateInvoiceView.vue:260 ~ send ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
             const res = await sendInvoice(this.dataStore.invoiceData)
 
-            if (res.status === 200 && res === "Invoice submitted") {
+            if (res.status === 200 && await res.text() === "Invoice submitted") {
+                console.log("Invoice submitted");
                 //Trigger send success
             } else {
                 //Trigger send error
@@ -272,7 +272,9 @@ export default {
         }
     },
     async created() {
-        this.groups = (await fetchGroups()).map(val => {
+        const res = await fetchGroups()
+        console.log("🚀 ~ file: CreateInvoiceView.vue:278 ~ created ~ res", res)
+        this.groups = (res).map(val => {
             return {
                 name: val.name,
                 _id: val.id
@@ -293,20 +295,19 @@ export default {
         totalHours() {
             let tHours = 0
 
-
-
             this.dataStore.invoiceData.groups?.filter(val => val.include).forEach(val => {
                 val.trainingssessions.forEach(element => {
                     if (typeof element.starttime === "undefined" || typeof element.endtime === "undefined") {
                         element.faultyTimes = true
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
-                        const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60);
+                        const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60) || 0;
 
-                        const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60);
+                        const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
                         element.length = endingTime - startingTime;
+                        element.length = element.length < 0 ? 0 : element.length
                         tHours += element.length
                     }
                 })
@@ -316,7 +317,7 @@ export default {
         },
         readableTotalHours() {
             const hh = Math.trunc(this.totalHours)
-            const mm = Math.round(60 * (this.totalHours - hh))
+            const mm = Math.round(60 * (this.totalHours - hh)) 
             return `${hh} Std ${mm} Min`
         }
     }

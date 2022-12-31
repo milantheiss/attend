@@ -6,5 +6,6 @@ import router from './router'
 
 import './assets/tailwind.css'
 import { createPinia } from 'pinia'
+import VueCookies from 'vue3-cookies'
 
-createApp(App).use(createPinia()).use(router).use(require('vue-cookies')).mount("#app");
+createApp(App).use(createPinia()).use(router).use(VueCookies).mount("#app");

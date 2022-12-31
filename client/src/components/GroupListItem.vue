@@ -21,7 +21,7 @@
 </template>
   
 <script>
-import MemberEditor from "@/components/MemberEditor"
+import MemberEditor from "@/components/MemberEditor.vue"
 
 export default {
   name: "GroupListItem",

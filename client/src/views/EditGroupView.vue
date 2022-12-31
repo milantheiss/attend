@@ -30,11 +30,11 @@
 </template>
   
 <script>
-import SelectList from "@/components/SelectList";
-import GroupListGomponent from "@/components/GroupListGomponent";
+import SelectList from "@/components/SelectList.vue";
+import GroupListGomponent from "@/components/GroupListGomponent.vue";
 import { fetchGroups, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
-import GroupInfo from "@/components/GroupInfo"
-import MemberEditor from "@/components/MemberEditor";
+import GroupInfo from "@/components/GroupInfo.vue"
+import MemberEditor from "@/components/MemberEditor.vue";
 import { useDataStore } from "@/store/dataStore";
 
 export default {

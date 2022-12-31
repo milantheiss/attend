@@ -39,7 +39,7 @@
 </template>
   
 <script>
-import SelectList from "@/components/SelectList";
+import SelectList from "@/components/SelectList.vue";
 import { createList } from "@/util/generatePdf"
 import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";

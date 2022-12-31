@@ -150,7 +150,7 @@ function isClosestTrainingToday(weekdays){
     return false
 }
 
-module.exports = {
+export{
     getDateOfTraining,
     getShortenedJSONDate,
     isClosestTrainingToday

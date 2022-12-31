@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('authStore', {
     // },
   
     async logIn(user_credentials) {
-      let res = (await fetch([process.env.VUE_APP_API_URL, "login"].join('/'), {
+      let res = (await fetch([import.meta.env.VITE_API_URL, "login"].join('/'), {
         method: 'POST',
         body: JSON.stringify(user_credentials),
         headers: {'Content-type': 'application/json; charset=UTF-8'},
@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('authStore', {
   
     async logOut() {
       //let user = null;
-      const res = await fetch([process.env.VUE_APP_API_URL, "logout"].join('/'), {
+      const res = await fetch([import.meta.env.VITE_API_URL, "logout"].join('/'), {
         method: 'POST',
         headers: {'Content-type': 'application/json; charset=UTF-8'},
         credentials: 'include',
@@ -46,7 +46,8 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async authenticate(){
-      let res = (await fetch([process.env.VUE_APP_API_URL, 'authenticate'].join('/'), {
+      console.log("🚀 ~ file: authStore.js:50 ~ res ~ import.meta.env.VITE_API_URL", import.meta.env.VITE_API_URL)
+      let res = (await fetch([import.meta.env.VITE_API_URL, 'authenticate'].join('/'), {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
         credentials: 'include',

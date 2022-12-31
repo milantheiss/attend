@@ -66,10 +66,10 @@
 </template>
 
 <script>
-import SelectList from "@/components/SelectList";
-import AttendanceListComponent from "@/components/AttendanceListComponent";
-import GroupInfo from "@/components/GroupInfo";
-import DatePicker from "@/components/DatePicker";
+import SelectList from "@/components/SelectList.vue";
+import AttendanceListComponent from "@/components/AttendanceListComponent.vue";
+import GroupInfo from "@/components/GroupInfo.vue";
+import DatePicker from "@/components/DatePicker.vue";
 import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 

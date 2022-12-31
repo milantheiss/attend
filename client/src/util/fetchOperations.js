@@ -1,132 +1,140 @@
 import router from "@/router/index";
-import { getShortenedJSONDate } from "@/util/formatter";
+import { getShortenedJSONDate } from "./formatter.js";
 
-async function watchForRedirects(res) {
+/**
+ * 
+ * @param {Promise<Response>} res 
+ * @returns 
+ */
+async function watchForRedirects(res, { raw = false } = {}) {
 	if ((await res.status) === 401 && res === "logout") {
 		console.log("Server responded with 401, redirecting to logout");
 		router.push("/logout");
 		return undefined;
+	} else if (raw) {
+		return await res
+	} else {
+		return (await res).json();
 	}
-	return res;
 }
 
 async function fetchGroups() {
 	console.debug("Fetching for all groups");
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "groups"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups"].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function fetchGroup(groupID) {
 	console.debug(`Fetching for group by ID: ${groupID}`);
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "groups", groupID].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function fetchAttendance(groupID) {
 	console.debug(`Fetching for attendance by ID ${groupID}`);
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function fetchAttendanceByDate(groupID, date) {
 	console.debug(`Fetching for attendance by ID ${groupID} and date ${date}`);
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function updateTrainingssession(groupID, date, body) {
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
 			method: "PATCH",
 			body: JSON.stringify(body),
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 //WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
 // async function addTrainingssession(groupID, body) {
-//   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID].join('/'), {
+//   await watchForRedirects((await fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID].join('/'), {
 //     method: 'PATCH',
 //     body: JSON.stringify(body),
 //     headers: { 'Content-type': 'application/json; charset=UTF-8' },
 //     credentials: 'include',
 //     mode: 'cors'
-//   })).json())
+//   })))
 // }
 
 //WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
 // async function deleteTrainingssession(groupID, date) {
-//   await watchForRedirects((await fetch([process.env.VUE_APP_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
+//   await watchForRedirects((await fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
 //     method: 'DELETE',
 //     headers: { 'Content-type': 'application/json; charset=UTF-8' },
 //     credentials: 'include',
 //     mode: 'cors'
-//   })).json())
+//   })))
 // }
 
 async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 	return await watchForRedirects(
-		await fetch(
-			[process.env.VUE_APP_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join("/"),
+		fetch(
+			[import.meta.env.VITE_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join("/"),
 			{
 				method: "GET",
 				credentials: "include",
 				mode: "cors",
 			}
 		)
-	).json();
+	);
 }
 
 async function fetchGroupInfo(groupID) {
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "groups", groupID, "getInfo"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "getInfo"].join("/"), {
 			method: "GET",
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function updateMemberInGroup(groupID, body) {
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "groups", groupID, "updateMember"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "updateMember"].join("/"), {
 			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 async function removeMemberFromGroup(groupID, memberID) {
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "groups", groupID, "removeMember", memberID].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "removeMember", memberID].join("/"), {
 			method: "DELETE",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
 			mode: "cors",
 		})
-	).json();
+	);
 }
 
 /**
@@ -135,7 +143,7 @@ async function removeMemberFromGroup(groupID, memberID) {
  */
 async function authenticateSession() {
 	return (
-		await fetch([process.env.VUE_APP_API_URL, "authenticate"].join("/"), {
+		await fetch([import.meta.env.VITE_API_URL, "authenticate"].join("/"), {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
@@ -150,7 +158,7 @@ async function authenticateSession() {
  */
 async function getLastPatchNotes() {
 	return (
-		await fetch([process.env.VUE_APP_API_URL, "patchNotes"].join("/"), {
+		await fetch([import.meta.env.VITE_API_URL, "patchNotes"].join("/"), {
 			method: "GET",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
@@ -168,8 +176,8 @@ async function getLastPatchNotes() {
  */
 async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
 	const res = await watchForRedirects(
-		await fetch(
-			`${process.env.VUE_APP_API_URL}/invoice/create?startdate=${startdate.toJSON()}&enddate=${enddate.toJSON()}&groups[]=${groupIDs.join(
+		fetch(
+			`${import.meta.env.VITE_API_URL}/invoice/create?startdate=${startdate.toJSON()}&enddate=${enddate.toJSON()}&groups[]=${groupIDs.join(
 				"&groups[]="
 			)}`,
 			{
@@ -178,7 +186,7 @@ async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
 				mode: "cors",
 			}
 		)
-	).json();
+	);
 
 	return res;
 }
@@ -189,14 +197,14 @@ async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
  */
 async function sendInvoice(body) {
 	return await watchForRedirects(
-		await fetch([process.env.VUE_APP_API_URL, "invoice/submit"], {
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/submit`, {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),
 			credentials: "include",
 			mode: "cors",
-		})
-	).json();
+		}), {raw: true}
+	);
 }
 
 export {
