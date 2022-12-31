@@ -140,7 +140,7 @@
   
 <script>
 import { createInvoice } from "@/util/generatePdf"
-import { fetchDataForNewInvoice, fetchGroups } from '@/util/fetchOperations'
+import { fetchDataForNewInvoice, fetchGroups, sendInvoice } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
@@ -254,14 +254,19 @@ export default {
             this.dataStore.invoiceData = {}
         },
 
-        send() {
+        async send() {
             this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
             this.dataStore.invoiceData.groups.forEach(group => delete group.include)
 
             //Send Invoice
             console.log("🚀 ~ file: CreateInvoiceView.vue:260 ~ send ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
+            const res = await sendInvoice(this.dataStore.invoiceData)
 
-            //Trigger send success
+            if (res.status === 200 && res === "Invoice submitted") {
+                //Trigger send success
+            } else {
+                //Trigger send error
+            }
 
             this.dataStore.invoiceData = {}
         }

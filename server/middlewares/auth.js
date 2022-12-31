@@ -23,7 +23,7 @@ const verifyToken = async (req, res, next) => {
         secure: true,
         httpOnly: true,
         sameSite: config.sameSite
-      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
+      }).status(httpStatus.UNAUTHORIZED).send('Logout')
       //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
     }
   }
@@ -43,7 +43,7 @@ const verifyToken = async (req, res, next) => {
         secure: true,
         httpOnly: true,
         sameSite: config.sameSite
-      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
+      }).status(httpStatus.UNAUTHORIZED).send('Logout')
     }
   } catch (err) {
     logger.error(err.toString())

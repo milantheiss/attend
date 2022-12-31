@@ -56,7 +56,19 @@ async function main() {
         } while (true)
         
         body.email = prompt(`E-Mail (${user.email}): `, user.email)
-        body.role = prompt(`Rolle (${user.role}): `, user.role)
+
+        do {
+            const _role = prompt(`Rollen (${user.role}): `)
+            if (typeof _role !== 'undefined' && _role.length > 0) {
+                body.roles.push(new mongoose.Types.ObjectId(_role))
+                if (prompt("Möchten Sie noch eine Rolle dem User zu weisen? (Y/N) ").toUpperCase() !== 'Y') {
+                    break
+                }
+            } else {
+                break
+            }
+        } while (true)
+
         body.refresh_tokens = []
         body.accessible_groups = []
 

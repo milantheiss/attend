@@ -63,6 +63,32 @@ const invoiceSchema = mongoose.Schema(
                 email: String,
             },
             required: true
+        },
+        submittedBy: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
+        status: {
+            type: String,
+            required: true,
+            default: "pending"
+        },
+        assignedTo: {
+            type: [mongoose.Types.ObjectId],
+            required: false
+        },
+        reviewer: {
+            type: mongoose.Types.ObjectId,
+            required: false
+        },
+        dateOfReceipt: {
+            type: Date,
+            required: true,
+            default: new Date()
+        },
+        dateOfLastChange: {
+            type: Date,
+            required: false
         }
     }
 );
