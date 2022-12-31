@@ -65,7 +65,7 @@ const getNewToken = async (req, res, old_refresh_token) => {
       secure: true,
       httpOnly: true,
       sameSite: config.sameSite
-    }).status(403).send({ redirect: '/logout' })
+    }).status(httpStatus.UNAUTHORIZED).send('Logout')
     //TODO Auto redirect 
     return undefined
   }
@@ -110,7 +110,6 @@ const getNewToken = async (req, res, old_refresh_token) => {
     return access_token
   } catch (err) {
     logger.error(err.toString())
-    return undefined
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 }

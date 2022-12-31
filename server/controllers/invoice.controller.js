@@ -6,6 +6,7 @@ const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
 const { Department, Invoice } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
+const { hasTrainerRole, hasAssistantRole } = require("../utils/roleCheck");
 
 const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 	let dataset = {
@@ -69,7 +70,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 		//Invoice is not empty
 		if (invoice !== null && typeof invoice !== "undefined") {
 			//Check if department head exists
-			const departmentHeadIDs = await Department.findById(invoice.department._id);
+			const departmentHeadIDs = (await Department.findById(invoice.department._id)).head;
 
 			if (departmentHeadIDs === null || typeof departmentHeadIDs === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");

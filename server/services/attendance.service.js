@@ -4,7 +4,7 @@ const { groupService } = require('../services');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
-const { hasAdminRole, hasAccessToGroup } = require('../utils/userroles');
+const { hasAdminRole, hasAccessToGroup } = require('../utils/roleCheck');
 const { translateAliases } = require('../models/attendance.model');
 
 /**

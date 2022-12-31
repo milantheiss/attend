@@ -133,7 +133,7 @@ const authenticate = catchAsync(async (req, res) => {
         if (refresh_token) {
             access_token = await getNewToken(req, res, refresh_token)
         } else {
-            return res.status(httpStatus.UNAUTHORIZED).send({ redirect: '/login' })
+            return res.status(httpStatus.UNAUTHORIZED).send('Logout')
         }
     }
 
@@ -159,7 +159,7 @@ const authenticate = catchAsync(async (req, res) => {
                 secure: true,
                 httpOnly: true,
                 sameSite: config.sameSite
-            }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
+            }).status(httpStatus.UNAUTHORIZED).send('Logout')
         }
     } catch (err) {
         logger.error(err.toString())
@@ -181,7 +181,7 @@ const getNewToken = async (req, res, old_refresh_token) => {
             secure: true,
             httpOnly: true,
             sameSite: config.sameSite
-        }).status(403).send({ redirect: '/logout' })
+        }).status(httpStatus.UNAUTHORIZED).send('Logout')
         //TODO Auto redirect 
         return undefined
     }

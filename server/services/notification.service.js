@@ -1,5 +1,5 @@
 const { Notification, User } = require("../models");
-const { hasDeveloperRole } = require("../utils/userroles");
+const { hasDeveloperRole } = require("../utils/roleCheck");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const { default: mongoose } = require("mongoose");

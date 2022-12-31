@@ -19,7 +19,7 @@ const invoiceSchema = mongoose.Schema(
             type: Date,
             required: true
         },
-        group: {
+        groups: {
             type: [
                 {
                     asssistent: Array,

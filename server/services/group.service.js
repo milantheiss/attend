@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { Group, Attendance, Member } = require('../models');
 const memberService = require("../services/member.service")
 const ApiError = require('../utils/ApiError');
-const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/userroles');
+const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
 //const { attendanceController } = require('../controllers');
 
 /**
