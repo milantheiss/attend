@@ -1,8 +1,8 @@
 const { Notification, User } = require("../models");
-const { hasDeveloperRole } = require("../utils/roleCheck");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const { default: mongoose } = require("mongoose");
+const { hasAdminRole } = require("../utils/roleCheck");
 
 /**
  * Adds a new notification to DB
@@ -11,7 +11,7 @@ const { default: mongoose } = require("mongoose");
 const addNewNotification = async (body) => {
 	//WARNING No access control here
 	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
-    body.date = body.date || new Date();
+	body.date = body.date || new Date();
 	const notification = await Notification.create(body);
 	await User.updateMany({ _id: { $in: notification.recipients } }, { $addToSet: { notifications: notification._id } });
 	return notification;
@@ -24,7 +24,7 @@ const addNewNotification = async (body) => {
  */
 const addRecipients = async (notificationID, recipients) => {
 	//TODO Add access control here
-    await User.updateMany({ _id: { $in: userIDs } }, { $addToSet: { notifications: notificationID } });
+	await User.updateMany({ _id: { $in: userIDs } }, { $addToSet: { notifications: notificationID } });
 	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { recipients: recipients } });
 };
 
@@ -34,7 +34,7 @@ const addRecipients = async (notificationID, recipients) => {
  */
 const removeRecipients = async (notificationID, recipients) => {
 	//TODO Add access control here
-    await User.updateMany({ _id: { $in: recipients } }, { $pull: { notifications: notificationID } });
+	await User.updateMany({ _id: { $in: recipients } }, { $pull: { notifications: notificationID } });
 	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: recipients } });
 };
 
@@ -46,7 +46,7 @@ const removeRecipients = async (notificationID, recipients) => {
  */
 const updateMessage = async (notificationID, message) => {
 	//TODO Add access control here
-	return Notification.findByIdAndUpdate(notificationID, {$set: {message: message}}, { new: true });
+	return Notification.findByIdAndUpdate(notificationID, { $set: { message: message } }, { new: true });
 };
 
 /**
@@ -57,7 +57,7 @@ const updateMessage = async (notificationID, message) => {
  */
 const updateData = async (notificationID, data) => {
 	//TODO Add access control here
-	return Notification.findByIdAndUpdate(notificationID, {$set: {data: data}}, { new: true });
+	return Notification.findByIdAndUpdate(notificationID, { $set: { data: data } }, { new: true });
 };
 
 /**
@@ -67,14 +67,57 @@ const updateData = async (notificationID, data) => {
  * @returns {Promise<[Notification]>} Returns updated notification
  */
 const changePriority = async (notificationID, priority) => {
-    return Notification.findByIdAndUpdate(notificationID, {$set: {priority: priority}}, { new: true });
-}
+	return Notification.findByIdAndUpdate(notificationID, { $set: { priority: priority } }, { new: true });
+};
+
+/**
+ * Get notification by ID
+ * @param {mongoose.Types.ObjectId} notificationID
+ * @returns {Promise<[Notification]>}
+ */
+const getNotificationById = async (notificationID) => {
+	return Notification.findOne({ _id: notificationID });
+};
+
+/**
+ * Get notifications by IDs
+ * @param {[mongoose.Types.ObjectId]} notificationIDs
+ * @returns {Promise<[Notification]>}
+ */
+const getNotificationsByIds = async (notificationIDs) => {
+	return Notification.find({ _id: { $in: notificationIDs } });
+};
+
+/**
+ * Get all notifications of a user
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const getNotificationsByUser = async (userID) => {
+	return Notification.find({ recipients: { $in: userID } });
+};
+
+/**
+ * Delete notification by ID
+ * @param {mongoose.Types.ObjectId} notificationID
+ * @returns {Promise<[Notification]>}
+ */
+const deleteNotificationById = async (user, notificationID) => {
+	if (hasAdminRole(user)) {
+		return Notification.findByIdAndDelete(notificationID);
+	}
+	return Notification.findAndDelete({ _id: notificationID, $or: [{ recipients: { $in: user._id } }, { from: user._id }] });
+};
 
 module.exports = {
 	addNewNotification,
 	addRecipients,
 	removeRecipients,
 	updateMessage,
-    updateData,
-    changePriority
+	updateData,
+	changePriority,
+	getNotificationById,
+	getNotificationsByIds,
+	getNotificationsByUser,
+	deleteNotificationById
 };

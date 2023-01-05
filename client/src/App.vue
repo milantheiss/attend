@@ -23,15 +23,19 @@
         <!--Profile Avatar-->
         <!--TODO Custom Avatar jenach User-->
         <!--TODO Link zu User Page-->
-        <span class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
-            class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">
-            <g fill="none" stroke="currentColor" stroke-width="6.649" transform="translate(-93.958 -82.631)">
-              <ellipse cx="118.732" cy="96.016" rx="10.439" ry="10.061" />
-              <path d="M97.15 129.409a22.145 17.563 0 0 1 21.581-13.623 22.145 17.563 0 0 1 21.582 13.626" />
-            </g>
-          </svg>
-        </span>
+
+          <router-link @click="showMenu = false" to="/profile">
+              <div class="absolute -top-2 -right-2 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold">2</div>
+              <div class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
+                  class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">
+                  <g fill="none" stroke="currentColor" stroke-width="6.649" transform="translate(-93.958 -82.631)">
+                    <ellipse cx="118.732" cy="96.016" rx="10.439" ry="10.061" />
+                    <path d="M97.15 129.409a22.145 17.563 0 0 1 21.581-13.623 22.145 17.563 0 0 1 21.582 13.626" />
+                  </g>
+                </svg>
+              </div>
+          </router-link>
       </div>
 
       <!--Navbar Links: Werden angezeigt, wenn auf Menu Icon geklickt wird.-->
@@ -39,14 +43,16 @@
         enter-to-class="translate-y-0 opacity-100">
         <div class="grid mt-2" v-show="showMenu">
           <router-link @click="showMenu = !showMenu" to="/attendancelist"
-            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheit</router-link>
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheitsliste</router-link>
+          <router-link @click="showMenu = !showMenu" to="/createInvoice"
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Abrechnung erstellen</router-link>
           <router-link @click="showMenu = !showMenu" to="/editgroup"
             class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Gruppe bearbeiten</router-link>
           <router-link @click="showMenu = !showMenu" to="/exportpdf"
             class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Liste exportieren</router-link>
           <router-link @click="showMenu = !showMenu" to="/logout"
             class="text-left font-medium text-xl md:text-2xl mt-2 ml-2">Logout</router-link>
-          <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.3
+          <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.4
           </p>
         </div>
       </transition>
@@ -71,11 +77,13 @@
     </div>
 
     <!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
-    <transition enter-active-class="transition ease-in-out duration-500" enter-from-class="opacity-0"
-      enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500 transform"
-      leave-from-class="opacity-100" leave-to-class="opacity-0">
-      <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" />
-    </transition>
+    <router-view class="font-ubuntu font-normal md:max-w-medium-width mx-auto" v-slot="{ Component }">
+      <transition enter-active-class="transition ease-in-out duration-500" enter-from-class="opacity-0"
+        enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500 transform"
+        leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </div>
 </template>
 

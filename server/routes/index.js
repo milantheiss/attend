@@ -7,6 +7,7 @@ const logoutRoute = require('./logout.route')
 const authenticationRoute = require('./authentication.route')
 const patchNotesRoute = require("./patchnotes.route")
 const invoiceRoute = require("./invoice.route")
+const notificationRoute = require("./notification.route")
 
 const router = express.Router();
 
@@ -45,6 +46,10 @@ const defaultRoutes = [
     {
         path: "/invoice",
         route: invoiceRoute
+    },
+    {
+        path: "/notification",
+        route: notificationRoute
     }
 ];
 

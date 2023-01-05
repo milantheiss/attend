@@ -46,7 +46,6 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async authenticate(){
-      console.log("🚀 ~ file: authStore.js:50 ~ res ~ import.meta.env.VITE_API_URL", import.meta.env.VITE_API_URL)
       let res = (await fetch([import.meta.env.VITE_API_URL, 'authenticate'].join('/'), {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
