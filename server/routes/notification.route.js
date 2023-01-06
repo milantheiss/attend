@@ -10,10 +10,10 @@ router
     .get(verifyToken, notificationController.getNotifications)
 
 router
-    .route('/:notificationId')
+    .route('/:notificationID')
     .get(verifyToken, notificationController.getNotificationById)
 
-//In Query Parameter wird die ID der Notification übergeben (?notificationId=...)
+//In Query Parameter wird die ID der Notification übergeben (?notificationID=...)
 router
     .route('/delete')
     .delete(verifyToken, notificationController.deleteNotificationById)
@@ -23,22 +23,22 @@ router
     .delete(verifyToken, notificationController.deleteAllNotificationsOfUser)
 
 
-//In Query Parameter wird die ID der Notification übergeben (?notificationId=...)
+//In Query Parameter wird die ID der Notification übergeben (?notificationID=...)
 router
     .route("/read")
     .patch(verifyToken, notificationController.markNotificationAsRead)
 
 router
     .route("/readAll")
-    .patch(verifyToken, notificationController.markAllNotificationsAsRead)
+    .patch(verifyToken, notificationController.markAllNotificationsOfUserAsRead)
 
-//In Query Parameter wird die ID der Notification übergeben (?notificationId=...)
+//In Query Parameter wird die ID der Notification übergeben (?notificationID=...)
 router
     .route("/unread")
     .patch(verifyToken, notificationController.markNotificationAsUnread)
 
 router
     .route("/unreadAll")
-    .patch(verifyToken, notificationController.markAllNotificationsAsUnread)
+    .patch(verifyToken, notificationController.markAllNotificationsOfUserAsUnread)
 
 module.exports = router;

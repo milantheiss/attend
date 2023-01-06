@@ -12,30 +12,27 @@ const addNewNotification = async (body) => {
 	//WARNING No access control here
 	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
 	body.date = body.date || new Date();
+	console.log("🚀 ~ file: notification.service.js:15 ~ addNewNotification ~ body", body);
 	const notification = await Notification.create(body);
-	await User.updateMany({ _id: { $in: notification.recipients } }, { $addToSet: { notifications: notification._id } });
 	return notification;
 };
 
 /**
  * Adds recipients to notification
- * @param {[mongoose.Types.ObjectId]} recipients
+ * @param {[mongoose.Types.ObjectId]} userID
  * @returns {Promise<[Notification]>}
  */
-const addRecipients = async (notificationID, recipients) => {
-	//TODO Add access control here
-	await User.updateMany({ _id: { $in: userIDs } }, { $addToSet: { notifications: notificationID } });
-	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { recipients: recipients } });
+const addRecipients = async (notificationID, userID) => {
+	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { "recipients.userID": userID } });
 };
 
 /**
  * Remove a recipient from notification
  * @returns {Promise<[Notification]>}
  */
-const removeRecipients = async (notificationID, recipients) => {
-	//TODO Add access control here
-	await User.updateMany({ _id: { $in: recipients } }, { $pull: { notifications: notificationID } });
-	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: recipients } });
+const removeRecipients = async (notificationID, userID) => {
+	//TODO FIX THIS
+	return Notification.findByIdAndUpdate(notificationID, { $pull: { "recipients.userID": userID } });
 };
 
 /**
@@ -56,7 +53,6 @@ const updateMessage = async (notificationID, message) => {
  * @returns {Promise<[Notification]>} Returns updated notification
  */
 const updateData = async (notificationID, data) => {
-	//TODO Add access control here
 	return Notification.findByIdAndUpdate(notificationID, { $set: { data: data } }, { new: true });
 };
 
@@ -76,7 +72,7 @@ const changePriority = async (notificationID, priority) => {
  * @returns {Promise<[Notification]>}
  */
 const getNotificationById = async (notificationID) => {
-	return Notification.findOne({ _id: notificationID });
+	return Notification.findById(notificationID);
 };
 
 /**
@@ -93,8 +89,8 @@ const getNotificationsByIds = async (notificationIDs) => {
  * @param {mongoose.Types.ObjectId} userID
  * @returns {Promise<[Notification]>}
  */
-const getNotificationsByUser = async (userID) => {
-	return Notification.find({ recipients: { $in: userID } });
+const getAllNotificationsOfUser = async (userID) => {
+	return Notification.find({ $in: { recipients: { userID: userID } } });
 };
 
 /**
@@ -102,11 +98,52 @@ const getNotificationsByUser = async (userID) => {
  * @param {mongoose.Types.ObjectId} notificationID
  * @returns {Promise<[Notification]>}
  */
-const deleteNotificationById = async (user, notificationID) => {
-	if (hasAdminRole(user)) {
-		return Notification.findByIdAndDelete(notificationID);
-	}
-	return Notification.findAndDelete({ _id: notificationID, $or: [{ recipients: { $in: user._id } }, { from: user._id }] });
+const deleteNotificationById = async (notificationID) => {
+	return Notification.findByIdAndDelete(notificationID);
+};
+
+/**
+ * Mark notification as read
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const markNotificationAsRead = async (notificationID, userID) => {
+	return Notification.findOneAndUpdate(
+		{ _id: notificationID, recipients: { $elemMatch: { userID: userID } } },
+		{ $set: { "recipients.$.read": true } },
+		{ new: true }
+	);
+};
+
+/**
+ * Mark all notifications of a user as read
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const markAllNotificationsOfUserAsRead = async (userID) => {
+	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": true } });
+};
+
+/**
+ * Mark notification as unread
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const markNotificationAsUnread = async (notificationID, userID) => {
+	return Notification.findOneAndUpdate(
+		{ _id: notificationID, recipients: { $elemMatch: { userID: userID } } },
+		{ $set: { "recipients.$.read": false } },
+		{ new: true }
+	);
+};
+
+/**
+ * Mark all notifications of a user as unread
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const markAllNotificationsOfUserAsUnread = async (userID) => {
+	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": false } });
 };
 
 module.exports = {
@@ -118,6 +155,10 @@ module.exports = {
 	changePriority,
 	getNotificationById,
 	getNotificationsByIds,
-	getNotificationsByUser,
-	deleteNotificationById
+	getAllNotificationsOfUser,
+	deleteNotificationById,
+	markNotificationAsRead,
+	markAllNotificationsOfUserAsRead,
+	markNotificationAsUnread,
+	markAllNotificationsOfUserAsUnread,
 };

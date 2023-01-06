@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { toJSON, paginate } = require('./plugins')
 const { Schema } = require("mongoose");
+const { required } = require('joi');
 
 const notificationSchema = mongoose.Schema(
     {
@@ -18,7 +19,15 @@ const notificationSchema = mongoose.Schema(
             required: false
         },
         recipients: {
-            type: [mongoose.Types.ObjectId],
+            type: [{
+                userID: mongoose.Types.ObjectId,
+                read: {
+                    type: Boolean,
+                    default: false,
+                    required: true
+                }
+            }],
+            default: [],
             required: true
         },
         message: {
