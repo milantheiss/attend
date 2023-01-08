@@ -1,7 +1,7 @@
 <template>
   <div class="mb-40 m-4">
     <!--Navbar: Wird angezeigt, wenn Session Authenticated-->
-    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width" v-if="auth.authenticated">
+    <nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-2" v-if="auth.authenticated">
       <div class="flex justify-between justify-content-center items-center">
         <!--Menu Icon-->
         <button @click="showMenu = !showMenu" class="w-10">
@@ -25,8 +25,8 @@
         <!--TODO Link zu User Page-->
 
           <router-link @click="showMenu = false" to="/profile">
-              <div class="absolute -top-2 -right-2 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold">2</div>
-              <div class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0">
+              <div class="absolute -top-2 right-0 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold">{{ dataStore.notifications.length }}</div>
+              <div class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0 drop-shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
                   class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">
                   <g fill="none" stroke="currentColor" stroke-width="6.649" transform="translate(-93.958 -82.631)">

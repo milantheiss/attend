@@ -40,8 +40,14 @@ export const useAuthStore = defineStore('authStore', {
         headers: {'Content-type': 'application/json; charset=UTF-8'},
         credentials: 'include',
         mode: 'cors'
-      })
+      });
+      
+      console.log("🚀 ~ file: authStore.js:39 ~ res ~ res", res)
+
       this.authenticated = !res.status === 200
+      console.log("🚀 ~ file: authStore.js:48 ~ logOut ~ this.authenticated", this.authenticated)
+
+      
       this.user = undefined
     },
 
@@ -54,10 +60,15 @@ export const useAuthStore = defineStore('authStore', {
       }))
 
       this.authenticated = res.status === 200
+      
+      if (this.authenticated) {
+        res = await res.json()
+        this.user = res.user
+        useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
+        useDataStore().getNotifications()
+      }
 
-      res = await res.json()
-      this.user = res.user
-      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
+      console.log("🚀 ~ file: authStore.js:63 ~ authenticate ~ this.authenticated", this.authenticated)
 
       return this.authenticated
     }

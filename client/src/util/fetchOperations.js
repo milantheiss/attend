@@ -2,17 +2,17 @@ import router from "@/router/index";
 import { getShortenedJSONDate } from "./formatter.js";
 
 /**
- * 
- * @param {Promise<Response>} res 
- * @returns 
+ *
+ * @param {Promise<Response>} res
+ * @returns
  */
 async function watchForRedirects(res, { raw = false } = {}) {
-	if ((await res.status) === 401 && res === "logout") {
+	if ((await res).status === 401 && await (await res).text() === "Logout") {
 		console.log("Server responded with 401, redirecting to logout");
 		router.push("/logout");
 		return undefined;
 	} else if (raw) {
-		return await res
+		return await res;
 	} else {
 		return (await res).json();
 	}
@@ -94,7 +94,9 @@ async function updateTrainingssession(groupID, date, body) {
 async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 	return await watchForRedirects(
 		fetch(
-			[import.meta.env.VITE_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join("/"),
+			[import.meta.env.VITE_API_URL, "attendance/getFormattedList", groupID, getShortenedJSONDate(startdate), getShortenedJSONDate(enddate)].join(
+				"/"
+			),
 			{
 				method: "GET",
 				credentials: "include",
@@ -172,7 +174,7 @@ async function getLastPatchNotes() {
  * @param {String} groupIDs ObjectID of the groups
  * @param {Date}} startdate Startdate of the invoice
  * @param {Date} enddate Enddate of the invoice
- * @returns 
+ * @returns
  */
 async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
 	const res = await watchForRedirects(
@@ -190,6 +192,7 @@ async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
 
 	return res;
 }
+
 /**
  * Submits an invoice to the backend
  * @param {Object} body
@@ -203,7 +206,18 @@ async function sendInvoice(body) {
 			body: JSON.stringify(body),
 			credentials: "include",
 			mode: "cors",
-		}), {raw: true}
+		}),
+		{ raw: true }
+	);
+}
+
+async function getNotifications() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
 	);
 }
 
@@ -220,5 +234,6 @@ export {
 	authenticateSession,
 	getLastPatchNotes,
 	fetchDataForNewInvoice,
-  sendInvoice
+	sendInvoice,
+	getNotifications,
 };

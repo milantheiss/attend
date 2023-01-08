@@ -16,7 +16,6 @@
                 <div class="flex items-start justify-between mb-4 w-full">
                     <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                     <!--Add Collapsable Container here-->
-                    <!--TODO Styling hier fixen-->
                     <CollapsibleContainer class="ml-3" :show="true">
                         <template #content>
                             <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""

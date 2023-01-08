@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
+import { getNotifications } from "@/util/fetchOperations";
 
 export const useDataStore = defineStore('dateStore', {
   state: () => ({
     //Seitenname, der zwischen dem Menu und dem Avatar angezeigt wird.
     viewname: '',
     showPatchNotesDialog: false,
-    invoiceData: {}
+    invoiceData: {},
+    notifications: [],
   }),
   actions: {
     async readPatchNotes() {
@@ -16,6 +18,12 @@ export const useDataStore = defineStore('dateStore', {
         mode: 'cors'
       })
       this.showPatchNotesDialog = false
-    }
+    },
+    async getNotifications() {
+      const res = await getNotifications()
+      console.log("🚀 ~ file: dataStore.js:24 ~ getNotifications ~ res", res)
+      
+      this.notifications = res
+    },
   }
 })
