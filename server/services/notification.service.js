@@ -12,7 +12,6 @@ const addNewNotification = async (body) => {
 	//WARNING No access control here
 	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
 	body.date = body.date || new Date();
-	console.log("🚀 ~ file: notification.service.js:15 ~ addNewNotification ~ body", body);
 	const notification = await Notification.create(body);
 	return notification;
 };
@@ -23,16 +22,19 @@ const addNewNotification = async (body) => {
  * @returns {Promise<[Notification]>}
  */
 const addRecipients = async (notificationID, userID) => {
-	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { "recipients.userID": userID } });
+	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { recipients: { userID: userID } } });
 };
 
 /**
  * Remove a recipient from notification
  * @returns {Promise<[Notification]>}
  */
-const removeRecipients = async (notificationID, userID) => {
+const removeRecipient = async (notificationID, userID) => {
+	console.log("🚀 ~ file: notification.service.js:33 ~ removeRecipient ~ notificationID", notificationID);
+	console.log("🚀 ~ file: notification.service.js:33 ~ removeRecipient ~ userID", userID);
 	//TODO FIX THIS
-	return Notification.findByIdAndUpdate(notificationID, { $pull: { "recipients.userID": userID } });
+
+	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: { userID: userID } } });
 };
 
 /**
@@ -90,7 +92,7 @@ const getNotificationsByIds = async (notificationIDs) => {
  * @returns {Promise<[Notification]>}
  */
 const getAllNotificationsOfUser = async (userID) => {
-	return Notification.find({ $in: { recipients: { userID: userID } } });
+	return Notification.find({ recipients: { $elemMatch: { userID: userID } } });
 };
 
 /**
@@ -149,7 +151,7 @@ const markAllNotificationsOfUserAsUnread = async (userID) => {
 module.exports = {
 	addNewNotification,
 	addRecipients,
-	removeRecipients,
+	removeRecipient,
 	updateMessage,
 	updateData,
 	changePriority,

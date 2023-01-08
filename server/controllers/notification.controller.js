@@ -5,7 +5,7 @@ const httpStatus = require("http-status");
 const { hasAdminRole } = require("../utils/roleCheck");
 
 const getNotifications = catchAsync(async (req, res) => {
-	const notificationIDs = req.query.notificationIDs || null;
+	const notificationIDs = req.query.ids || null;
 	if (notificationIDs) {
 		//Wenn notificationIDs übergeben wurden, werden diese abgefragt
 		const notifications = await notificationService.getNotificationsByIds(notificationIDs);
@@ -48,7 +48,7 @@ const getNotificationById = catchAsync(async (req, res) => {
 });
 
 const deleteNotificationById = catchAsync(async (req, res) => {
-	const notificationID = req.query.notificationID;
+	const notificationID = req.query.id;
 	if (!notificationID) {
 		//Wenn keine NotificationID übergeben wird, wird ein Fehler zurückgegeben
 		logger.debug("No notificationID provided");
@@ -104,7 +104,7 @@ const deleteAllNotificationsOfUser = catchAsync(async (req, res) => {
 });
 
 const markNotificationAsRead = catchAsync(async (req, res) => {
-	const notificationID = req.query.notificationID;
+	const notificationID = req.query.id;
 	console.log("🚀 ~ file: notification.controller.js:108 ~ markNotificationAsRead ~ notificationID", notificationID)
 	if (!notificationID) {
 		logger.debug("No notificationID provided");
@@ -130,7 +130,7 @@ const markAllNotificationsOfUserAsRead = catchAsync(async (req, res) => {
 });
 
 const markNotificationAsUnread = catchAsync(async (req, res) => {
-	const notificationID = req.query.notificationID;
+	const notificationID = req.query.id;
 	if (!notificationID) {
 		logger.debug("No notificationID provided");
 		return res.status(httpStatus.BAD_REQUEST).send("No notificationID provided");

@@ -34,6 +34,10 @@ const getUserByUsername = async (username) => {
     return User.findByIdAndUpdate(userID, {$pull: {refresh_tokens: {_id: token_id}}})
 };
 
+const deleteAllRefreshTokens = async (userID) => {
+    return User.findByIdAndUpdate(userID, {$set: {refresh_tokens: []}})
+};
+
 const getRefreshTokenSecret = async (userID, token_id) => {
     const user = await getUserById(userID)
 
@@ -74,5 +78,6 @@ module.exports = {
     getRefreshTokenSecret,
     updateUser,
     createUser,
-    deleteUser
+    deleteUser,
+    deleteAllRefreshTokens
 };
