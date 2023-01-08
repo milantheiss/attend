@@ -12,7 +12,7 @@ const addNewNotification = async (body) => {
 	//WARNING No access control here
 	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
 	body.date = body.date || new Date();
-	const notification = await Notification.create(body);
+	const notification = await Notification.create(body, { new: true });
 	return notification;
 };
 
@@ -22,7 +22,7 @@ const addNewNotification = async (body) => {
  * @returns {Promise<[Notification]>}
  */
 const addRecipients = async (notificationID, userID) => {
-	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { recipients: { userID: userID } } });
+	return Notification.findByIdAndUpdate(notificationID, { $addToSet: { recipients: { userID: userID } } }, { new: true });
 };
 
 /**
@@ -34,7 +34,7 @@ const removeRecipient = async (notificationID, userID) => {
 	console.log("🚀 ~ file: notification.service.js:33 ~ removeRecipient ~ userID", userID);
 	//TODO FIX THIS
 
-	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: { userID: userID } } });
+	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: { userID: userID } } }, { new: true });
 };
 
 /**
@@ -101,7 +101,7 @@ const getAllNotificationsOfUser = async (userID) => {
  * @returns {Promise<[Notification]>}
  */
 const deleteNotificationById = async (notificationID) => {
-	return Notification.findByIdAndDelete(notificationID);
+	return Notification.findByIdAndDelete(notificationID, { new: true });
 };
 
 /**
@@ -123,7 +123,7 @@ const markNotificationAsRead = async (notificationID, userID) => {
  * @returns {Promise<[Notification]>}
  */
 const markAllNotificationsOfUserAsRead = async (userID) => {
-	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": true } });
+	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": true } }, { new: true });
 };
 
 /**
@@ -145,7 +145,7 @@ const markNotificationAsUnread = async (notificationID, userID) => {
  * @returns {Promise<[Notification]>}
  */
 const markAllNotificationsOfUserAsUnread = async (userID) => {
-	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": false } });
+	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": false } }, { new: true });
 };
 
 module.exports = {

@@ -221,6 +221,66 @@ async function getNotifications() {
 	);
 }
 
+async function setNotificationAsRead(notificationID) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/read?id=${notificationID}`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function setAllNotificationsAsRead() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/readAll`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function deleteNotification(notificationID) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/delete?id=${notificationID}`, {
+			method: "DELETE",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function deleteAllNotifications() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/deleteAll`, {
+			method: "DELETE",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function setNotificationAsUnread(notificationID) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/unread?id=${notificationID}`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function setAllNotificationsAsUnread() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/unreadAll`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -236,4 +296,10 @@ export {
 	fetchDataForNewInvoice,
 	sendInvoice,
 	getNotifications,
+	setNotificationAsRead,
+	setAllNotificationsAsRead,
+	setNotificationAsUnread,
+	setAllNotificationsAsUnread,
+	deleteNotification,
+	deleteAllNotifications,
 };
