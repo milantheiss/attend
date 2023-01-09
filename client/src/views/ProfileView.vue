@@ -40,7 +40,7 @@
                         </svg>
                     </div>
                 </span>
-                <CheckboxInput class="mr-2"></CheckboxInput>
+                <CheckboxInput class="mr-2" v-model="selectAll"></CheckboxInput>
             </div>
         </transition>
         <div class="flex justify-start items-center bg-white rounded-lg drop-shadow-md p-1"
@@ -69,11 +69,11 @@
                         enter-from-class="opacity-0" enter-to-class="opacity-100"
                         leave-active-class="transition ease-in-out duration-500"
                         leave-from-class="opacity-100" leave-to-class="opacity-0">
-                        <CheckboxInput class="mr-1 " v-show="showToolbar" @click="true"></CheckboxInput>
+                        <CheckboxInput class="mr-1 " v-show="showToolbar" @click="true" v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                         <!--TODO Selector hinzufügen-->
                 </div>
-                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2" v-show="show[index]">{{ notification.message }}
+                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2" v-show="localNotifications[index]?.show">{{ notification.message }}
                 </p>
                 <!--TODO Delete & Unread Btn hinzufügen-->
             </div>
@@ -99,8 +99,9 @@ export default {
     },
     data() {
         return {
-            show: [],
+            localNotifications: [],
             showToolbar: false,
+            selectAll: false
         }
     },
     components: {
@@ -108,35 +109,54 @@ export default {
     },
     methods: {
         async toggleNotification(index) {
-            if (!this.show[index]) {
+            if (!this.dataStore.notifications[index].recipients.find((r) => r.userID === this.authStore.user._id).read) {
                 const notification = this.dataStore.notifications[index]
                 const res = await setNotificationAsRead(notification.id)
                 console.log("🚀 ~ file: ProfileView.vue:56 ~ toggleNotification ~ res", res)
                 this.dataStore.notifications[index].recipients = res.recipients
             }
-            this.show[index] = !this.show[index]
+            this.localNotifications[index].show = !this.localNotifications[index].show
+        },
+
+        setupLocalNotifications(){
+            const oldShow = this.localNotifications
+            this.localNotifications = []
+            console.log("🚀 ~ file: ProfileView.vue:121 ~ created ~ this.dataStore.notifications", this.dataStore.notifications);
+            for (const notification of this.dataStore.notifications) {
+                const oldNotification = oldShow.find((n) => n.id === notification.id)
+                if (oldNotification) {
+                    this.localNotifications.push(oldNotification)
+                } else {
+                    this.localNotifications.push({
+                        id: notification.id,
+                        show: false,
+                        selected: false
+                    })
+                }
+            }
+        },
+
+        async deleteSelected(){
+            const selectedNotification = this.localNotifications.filter((n) => n.selected)
+
+            await this.deleteNotifications(selectedNotification.map((n) => n.id))
+            //TODO Call Backend mit Array von ids
         }
     },
     async created() {
         document.title = 'Wähle eine Gruppe - Attend'
         this.dataStore.viewname = "Benachrichtigungen"
+
+        this.setupLocalNotifications()
     },
     watch: {
         "dataStore.notifications"() {
-            const oldShow = this.show
-            this.show = []
-            for (const notification of this.dataStore.notifications) {
-                const oldNotification = oldShow.find((n) => n.id === notification.id)
-                if (oldNotification) {
-                    this.show.push(oldNotification)
-                } else {
-                    this.show.push({
-                        id: notification.id,
-                        show: false
-                    })
-                }
-                this.show.push(oldNotification)
-            }
+            this.setupLocalNotifications()
+        },
+        selectAll(){
+            for (const notification of this.localNotifications) {
+                notification.selected = this.selectAll
+            }   
         }
     }
 };

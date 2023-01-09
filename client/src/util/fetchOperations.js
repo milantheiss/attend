@@ -281,6 +281,20 @@ async function setAllNotificationsAsUnread() {
 	);
 }
 
+async function deleteManyNotifications(notificationIDs){
+	let ids = notificationIDs.join("&ids[]=");
+
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/notification/deleteMany?ids[]=${ids}`, {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(notificationIDs),
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -302,4 +316,5 @@ export {
 	setAllNotificationsAsUnread,
 	deleteNotification,
 	deleteAllNotifications,
+	deleteManyNotifications
 };

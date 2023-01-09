@@ -5,11 +5,14 @@ const verifyToken = require("../middlewares/auth");
 const router = express.Router();
 
 //Wenn keine ID übergeben wird, werden alle Notifications des Users zurückgegeben
-//Array von IDs kann übergeben werden, um bestimmte Notifications abzufragen (/ids[]=...&ids[]=...)
+//Array von IDs kann übergeben werden, um bestimmte Notifications abzufragen (?ids[]=...&ids[]=...)
 router.route("/").get(verifyToken, notificationController.getNotifications); 
 
 //In Query Parameter wird die ID der Notification übergeben (?id=...)
 router.route("/delete").delete(verifyToken, notificationController.deleteNotificationById); 
+
+//In Query Parameter werden die IDs der Notifications übergeben (?ids[]=...&ids[]=...)
+router.route("/deleteMany").delete(verifyToken, notificationController.deleteManyNotifications);
 
 router.route("/deleteAll").delete(verifyToken, notificationController.deleteAllNotificationsOfUser); 
 
