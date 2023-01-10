@@ -25,7 +25,7 @@
         <!--TODO Link zu User Page-->
 
           <router-link @click="showMenu = false" to="/profile">
-              <div class="absolute -top-2 right-0 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold">{{ dataStore.notifications.length }}</div>
+              <div class="absolute -top-2 right-0 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold" v-if="dataStore.notifications?.length > 0">{{ dataStore.notifications.length }}</div>
               <div class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0 drop-shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
                   class=" text-white w-10 h-10 md:w-12 md:h-12 p-2 md:p-3">

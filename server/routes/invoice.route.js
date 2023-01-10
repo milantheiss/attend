@@ -5,7 +5,7 @@ const verifyToken = require('../middlewares/auth');
 const router = express.Router();
 
 router
-    .route('/create')
+    .route('/getDatasetForNewInvoice')
     .get(verifyToken, invoiceController.getDatasetForNewInvoice)
 
 router

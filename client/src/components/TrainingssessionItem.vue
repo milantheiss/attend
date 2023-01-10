@@ -41,6 +41,7 @@
                             <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
                     </div>
                     <div class="flex justify-end pt-3">
+                        <!--FIXME die Trainingssession wird nicht removed. Error: Trainingssession is undefined-->
                         <button @click="onClickOnRemove()"
                         class="text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 px-1.5 ty:px-3 sm:px-4 md:px-4 py-1.5 rounded-lg drop-shadow-md">
                             <p class="font-medium text-base md:text-lg">Entfernen</p>

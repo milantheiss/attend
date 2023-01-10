@@ -1,11 +1,10 @@
 const logger = require("../config/logger");
-const { groupService, attendanceService } = require("../services");
+const { groupService, attendanceService, notificationService } = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
 const { Department, Invoice } = require("../models");
-const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole } = require("../utils/roleCheck");
 
 const getDatasetForNewInvoice = catchAsync(async (req, res) => {
@@ -90,14 +89,15 @@ const submitInvoice = catchAsync(async (req, res) => {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Invoice could not be created");
 			}
 
-			const notification = await addNewNotification({
+			const notification = await notificationService.addNewNotification({
 				title: "Neue Abrechnung",
 				priority: "normal",
 				from: req.user._id,
-				recipients: {userID: departmentHeadIDs},
+				recipients: departmentHeadIDs.map((id) => {return {userID: id}}),
 				message: `${req.user.firstname} ${req.user.lastname} hat eine neue Abrechnung erstellt`,
 				type: "invoice",
 				data: { invoiceID: invoice._id },
+				date: new Date(),
 			});
 
 			if (notification === null || typeof notification === "undefined") {

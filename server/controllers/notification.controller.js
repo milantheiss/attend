@@ -113,10 +113,10 @@ const deleteManyNotifications = catchAsync(async (req, res) => {
 		notifications = notifications.map(async (notification) => {
 			if (notification.recipients.length > 1) {
 				//Wenn die Notification noch an andere User gesendet wird, wird der User nur aus der Liste der Empfänger entfernt
-				return await notificationService.removeRecipient(notificationID, req.user._id);
+				return await notificationService.removeRecipient(notification._id, req.user._id);
 			} else {
 				//Wenn die Notification nur noch an den User gesendet wird, wird sie gelöscht
-				return await notificationService.deleteNotificationById(notificationID);
+				return await notificationService.deleteNotificationById(notification._id);
 			}
 		});
 
@@ -206,6 +206,23 @@ const markAllNotificationsOfUserAsUnread = catchAsync(async (req, res) => {
 	return res.send(notifications);
 });
 
+const markManyNotificationsAsRead = catchAsync(async (req, res) => {
+	const notificationIDs = req.query.ids || null;
+
+	if (!notificationIDs) {
+		logger.debug("No notificationIDs provided");
+		return res.status(httpStatus.BAD_REQUEST).send("No notificationIDs provided");
+	} else {
+		const notifications = await notificationService.markManyNotificationsAsRead(notificationIDs, req.user._id);
+		if (!notifications) {
+			//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
+			logger.debug("No notification found");
+			return res.status(httpStatus.NOT_FOUND).send("No notification found");
+		}
+		return res.send(notifications);
+	}
+});
+
 module.exports = {
 	getNotifications,
 	getNotificationById,
@@ -215,5 +232,6 @@ module.exports = {
 	markAllNotificationsOfUserAsRead,
 	markNotificationAsUnread,
 	markAllNotificationsOfUserAsUnread,
-	deleteManyNotifications
+	deleteManyNotifications,
+	markManyNotificationsAsRead
 };

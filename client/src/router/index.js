@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/authStore';
+import { useDataStore } from '@/store/dataStore';
 
 const routes = [
   {
@@ -65,10 +66,12 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (useAuthStore().authenticated) {
+      await useDataStore().getNotifications()
       next();
       return;
     } else {
       if (await useAuthStore().authenticate()) {
+        await useDataStore().getNotifications()
         next()
         return
       } else {
@@ -91,6 +94,7 @@ router.beforeEach(async (to, from, next) => {
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.guest)) {
     if (useAuthStore().authenticated || await useAuthStore().authenticate()) {
+      await useDataStore().getNotifications()
       next("/attendancelist");
       return;
     }

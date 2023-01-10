@@ -12,7 +12,8 @@ const addNewNotification = async (body) => {
 	//WARNING No access control here
 	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
 	body.date = body.date || new Date();
-	const notification = await Notification.create(body, { new: true });
+	const notification = await Notification.create(body);
+
 	return notification;
 };
 
@@ -118,6 +119,18 @@ const markNotificationAsRead = async (notificationID, userID) => {
 };
 
 /**
+ * Mark many notifications as read
+ * @param {mongoose.Types.ObjectId} userID
+ * @returns {Promise<[Notification]>}
+ */
+const markManyNotificationsAsRead = async (notificationIDs, userID) => {
+	return Notification.updateMany(
+		{_id: {$in: notificationIDs}, recipients: {$elemMatch: {userID: userID}}},
+		{$set: {"recipients.$.read": true}}
+	)
+};
+
+/**
  * Mark all notifications of a user as read
  * @param {mongoose.Types.ObjectId} userID
  * @returns {Promise<[Notification]>}
@@ -163,4 +176,5 @@ module.exports = {
 	markAllNotificationsOfUserAsRead,
 	markNotificationAsUnread,
 	markAllNotificationsOfUserAsUnread,
+	markManyNotificationsAsRead,
 };

@@ -234,7 +234,7 @@ export default {
             //if (!this.hasAnError()) {
             //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
 
-            this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+            //this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
             // if (attendance.dates.length === 0) {
             //     this.error.show = true
             //     this.error.cause.timespanFaulty = true

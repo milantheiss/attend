@@ -19,6 +19,8 @@ router.route("/deleteAll").delete(verifyToken, notificationController.deleteAllN
 //In Query Parameter wird die ID der Notification übergeben (?id=...)
 router.route("/read").get(verifyToken, notificationController.markNotificationAsRead); 
 
+router.route("/readMany").get(verifyToken, notificationController.markManyNotificationsAsRead)
+
 router.route("/readAll").get(verifyToken, notificationController.markAllNotificationsOfUserAsRead);  
 
 //In Query Parameter wird die ID der Notification übergeben (?id=...)

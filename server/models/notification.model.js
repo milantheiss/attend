@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const { toJSON, paginate } = require('./plugins')
 const { Schema } = require("mongoose");
-const { required } = require('joi');
 
 const notificationSchema = mongoose.Schema(
     {
@@ -11,7 +10,7 @@ const notificationSchema = mongoose.Schema(
         },
         priority: {
             type: String,
-            required: false,
+            required: true,
             default: "normal"
         },
         from: {

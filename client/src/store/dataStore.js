@@ -21,8 +21,6 @@ export const useDataStore = defineStore('dateStore', {
     },
     async getNotifications() {
       const res = await getNotifications()
-      console.log("🚀 ~ file: dataStore.js:24 ~ getNotifications ~ res", res)
-      
       this.notifications = res
     },
   }
