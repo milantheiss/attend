@@ -43,13 +43,13 @@
         enter-to-class="translate-y-0 opacity-100">
         <div class="grid mt-2" v-show="showMenu">
           <router-link @click="showMenu = !showMenu" to="/attendancelist"
-            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Anwesenheitsliste</router-link>
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2" v-if="auth.user?.lengthAccessibleGroups > 0">Anwesenheitsliste</router-link>
           <router-link @click="showMenu = !showMenu" to="/createInvoice"
-            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Abrechnung erstellen</router-link>
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2" v-if="auth.user?.lengthAccessibleGroups > 0">Abrechnung erstellen</router-link>
           <router-link @click="showMenu = !showMenu" to="/editgroup"
-            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Gruppe bearbeiten</router-link>
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2" v-if="auth.user?.lengthAccessibleGroups > 0">Gruppe bearbeiten</router-link>
           <router-link @click="showMenu = !showMenu" to="/exportpdf"
-            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2">Liste exportieren</router-link>
+            class="text-left font-medium text-xl md:text-2xl mt-2  ml-2" v-if="auth.user?.lengthAccessibleGroups > 0">Liste exportieren</router-link>
           <router-link @click="showMenu = !showMenu" to="/logout"
             class="text-left font-medium text-xl md:text-2xl mt-2 ml-2">Logout</router-link>
           <p class="text-center font-light text-sm md:text-base mt-2 mx-auto">Erstellt von Milan Theiß - Version 0.1.4

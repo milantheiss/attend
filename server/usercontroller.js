@@ -56,11 +56,12 @@ async function main() {
         } while (true)
         
         body.email = prompt(`E-Mail (${user.email}): `, user.email)
+        body.roles = []
 
         do {
             const _role = prompt(`Rollen (${user.role}): `)
             if (typeof _role !== 'undefined' && _role.length > 0) {
-                body.roles.push(new mongoose.Types.ObjectId(_role))
+                body.roles.push(_role)
                 if (prompt("Möchten Sie noch eine Rolle dem User zu weisen? (Y/N) ").toUpperCase() !== 'Y') {
                     break
                 }

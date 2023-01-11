@@ -1,7 +1,7 @@
 <template>
     <div class="relative container">
         <!--Toolbar toggle-->
-        <div class="flex justify-end items-center w-full mb-4">
+        <div class="flex justify-end items-center w-full mb-4" v-show="typeof dataStore.notifications !== 'undefined' && dataStore.notifications?.length !== 0">
             <span class="w-8 h-8 mr-[0.372rem]">
                 <!--Horizontal Dots-->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -78,11 +78,11 @@
                             v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                 </div>
-                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2" v-show="localNotifications[index]?.show">{{
+                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2" v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">{{
                     notification.message
                 }}</p>
                 <!--Wird angezeigt, wenn ein existierender Teilnehmer bearbeitet werden soll-->
-                <span class="flex justify-end items-center mt-5 mr-2 mb-2" v-show="localNotifications[index]?.show">
+                <span class="flex justify-end items-center mt-5 mr-2 mb-2" v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">
                     <div class="bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 p-1.5 rounded-lg mr-6"
                         @click="onClickDelete(notification.id)">
                         <!--Trashcan icon-->
@@ -95,7 +95,7 @@
                     <div class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 p-1.5 rounded-lg"
                         @click="onClickUnread(notification.id)">
                         <!--Unread icon-->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="#ffffff" class="w-9 h-9">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -106,7 +106,7 @@
             </div>
         </div>
         <!--TODO Style den Text-->
-        <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0">Keine
+        <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0" class="text-xl md:text-2xl font-normal text-gray-500 text-center">Keine
             Benachrichtigungen</p>
     </div>
 </template>

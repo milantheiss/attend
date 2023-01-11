@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: "AttendanceListItem",
+  name: "AttendanceListCard",
   data() {
     return {
       activated: Boolean

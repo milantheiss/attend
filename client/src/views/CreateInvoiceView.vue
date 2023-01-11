@@ -179,7 +179,7 @@ import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
-import TrainingssessionItem from "@/components/TrainingssessionItem.vue"
+import TrainingssessionItem from "@/components/TrainingssessionCard.vue"
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 

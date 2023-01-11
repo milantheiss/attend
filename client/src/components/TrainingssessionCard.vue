@@ -58,7 +58,7 @@ import TimeInput from './TimeInput.vue';
 import { ref, watch } from 'vue';
 
 export default {
-    name: "TrainingssessionItem",
+    name: "TrainingssessionCard",
     setup(props) {
         const showPanel = ref(props.show);
 

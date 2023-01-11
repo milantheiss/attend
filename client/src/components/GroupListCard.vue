@@ -24,7 +24,7 @@
 import MemberEditor from "@/components/MemberEditor.vue"
 
 export default {
-  name: "GroupListItem",
+  name: "GroupListCard",
   components: {
     MemberEditor
   },

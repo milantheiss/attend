@@ -7,10 +7,10 @@
 </template>
   
 <script>
-import GroupListItem from "@/components/GroupListItem.vue";
+import GroupListItem from "@/components/GroupListCard.vue";
 
 export default {
-  name: "GroupListGomponent",
+  name: "GroupListComponent",
   data() {
     return {
       participantArr: Array

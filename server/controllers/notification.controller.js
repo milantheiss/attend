@@ -223,6 +223,22 @@ const markManyNotificationsAsRead = catchAsync(async (req, res) => {
 	}
 });
 
+const changeDate = catchAsync(async (req, res) => {
+	const notificationID = req.query.id;
+	const date = req.query.date;
+	if (!notificationID) {
+		logger.debug("No notificationID provided");
+		return res.status(httpStatus.BAD_REQUEST).send("No notificationID provided");
+	} else {
+		const notification = await notificationService.changeDate(notificationID, date);
+		if (!notification) {
+			//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
+			logger.debug("No notification found");
+			return res.status(httpStatus.NOT_FOUND).send("No notification found");		}
+		return res.send(notification);
+	}
+});
+
 module.exports = {
 	getNotifications,
 	getNotificationById,
@@ -233,5 +249,6 @@ module.exports = {
 	markNotificationAsUnread,
 	markAllNotificationsOfUserAsUnread,
 	deleteManyNotifications,
-	markManyNotificationsAsRead
+	markManyNotificationsAsRead,
+	changeDate,
 };

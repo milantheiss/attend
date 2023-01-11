@@ -45,11 +45,13 @@ const login = catchAsync(async (req, res) => {
 			const refresh_token = jwt.sign({ user_id: user._id, username: user.username, token_id: secret_id }, new_secret, {
 				expiresIn: "7d",
 			});
+		
 
 			const response = {
 				user: {
 					username: user.username,
 					_id: user._id,
+					lengthAccessibleGroups: user.accessible_groups.length 
 				},
 				showPatchNotesDialog: !user.readPatchnotes,
 			};
@@ -155,6 +157,7 @@ const authenticate = catchAsync(async (req, res) => {
 				user: {
 					username: user.username,
 					_id: user._id,
+					lengthAccessibleGroups: user.accessible_groups.length 
 				},
 				showPatchNotesDialog: !user.readPatchnotes,
 			};

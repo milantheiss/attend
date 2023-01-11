@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import AttendanceListItem from "@/components/AttendanceListItem.vue";
+import AttendanceListItem from "@/components/AttendanceListCard.vue";
 
 export default {
   name: "AttendanceListComponent",
