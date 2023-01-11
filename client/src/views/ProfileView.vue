@@ -3,25 +3,42 @@
         <!--Toolbar toggle-->
         <div class="flex justify-between items-center w-full mb-4">
             <Transition>
-                <span class="w-8 h-8 ml-4" @click="refreshNotifications" ref="refreshIcon" :class="spin ? 'animate-refreshSpin' : ''" @animationend="spin = false">
+                <span class="w-8 h-8 ml-3 shrink-0" @click="refreshNotifications" ref="refreshIcon"
+                    :class="spin ? 'animate-refreshSpin' : ''" @animationend="spin = false">
                     <!--Refresh Icon-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" >
+                        stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
                 </span>
             </Transition>
-            <span class="w-8 h-8 mr-[0.372rem]" v-show="typeof dataStore.notifications !== 'undefined' && dataStore.notifications?.length !== 0">
+            <p class="text-dark-grey text-base sm:text-lg font-normal w-full text-right hidden ty:block align-middle ml-3 mt-1">Sortieren: </p>
+            <span class="mx-3 w-[40rem] sm:w-64">
+                <select v-model="sortBy" class="block
+                        w-full
+                        pl-2 pb-0.5 
+                        text-black text-lg md:text-xl align-middle
+                        focus:ring-0 focus:border-dark-grey
+                        bg-inherit"
+                    :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
+                    style="background-position: right 0.1rem center;padding-right: 1.9rem;">
+                    <option value="date" default>Datum</option>
+                    <option value="read">Ungelesen</option>
+                    <option value="title">Betreff</option>
+                </select>
+            </span>
+            <span class="mr-[0.372rem]"
+                v-show="typeof dataStore.notifications !== 'undefined' && dataStore.notifications?.length !== 0">
                 <!--Horizontal Dots-->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" v-show="!showToolbar" @click="showToolbar = true">
+                    stroke="currentColor" v-show="!showToolbar" @click="showToolbar = true" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <!--X in Circle-->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" v-show="showToolbar" @click="showToolbar = false">
+                    stroke="currentColor" v-show="showToolbar" @click="showToolbar = false" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -145,7 +162,8 @@ export default {
             localNotifications: [],
             showToolbar: false,
             selectAll: false,
-            spin: false
+            spin: false,
+            sortBy: "date"
         }
     },
     components: {
@@ -177,6 +195,8 @@ export default {
                     })
                 }
             }
+
+            this.sortNotifications()
         },
 
         async deleteSelected() {
@@ -225,10 +245,30 @@ export default {
             }
         },
 
-        async refreshNotifications(){
+        async refreshNotifications() {
             this.spin = true
-            console.log("🚀 ~ file: ProfileView.vue:228 ~ refreshNotifications ~ spin", this.spin)
             await this.dataStore.getNotifications()
+            this.setupLocalNotifications()
+        },
+
+        sortNotifications() {
+            //Verschieben in setupLocalNotifications?
+            this.dataStore.notifications.sort((a, b) => {
+                if (this.sortBy === "date") {
+                    return new Date(b.date) - new Date(a.date)
+                } else if (this.sortBy === "title") {
+                    return a.title.localeCompare(b.title)
+                } else if (this.sortBy === "unread") {
+                    if (a.read && b.read) {
+                        return 0
+                    } else if (a.read && !b.read) {
+                        return 1
+                    } else if (!a.read && b.read) {
+                        return -1
+                    }
+                }
+            })
+
             this.setupLocalNotifications()
         }
     },
@@ -246,6 +286,9 @@ export default {
             for (const notification of this.localNotifications) {
                 notification.selected = this.selectAll
             }
+        },
+        sortBy() {
+            this.sortNotifications()
         }
     }
 };
