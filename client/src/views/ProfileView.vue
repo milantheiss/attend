@@ -252,6 +252,7 @@ export default {
         },
 
         sortNotifications() {
+            //TODO Fix dass Notifications sortiert werden
             //Verschieben in setupLocalNotifications?
             this.dataStore.notifications.sort((a, b) => {
                 if (this.sortBy === "date") {
