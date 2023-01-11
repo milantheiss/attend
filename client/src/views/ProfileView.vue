@@ -1,8 +1,18 @@
 <template>
     <div class="relative container">
         <!--Toolbar toggle-->
-        <div class="flex justify-end items-center w-full mb-4" v-show="typeof dataStore.notifications !== 'undefined' && dataStore.notifications?.length !== 0">
-            <span class="w-8 h-8 mr-[0.372rem]">
+        <div class="flex justify-between items-center w-full mb-4">
+            <Transition>
+                <span class="w-8 h-8 ml-4" @click="refreshNotifications" ref="refreshIcon" :class="spin ? 'animate-refreshSpin' : ''" @animationend="spin = false">
+                    <!--Refresh Icon-->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" >
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </span>
+            </Transition>
+            <span class="w-8 h-8 mr-[0.372rem]" v-show="typeof dataStore.notifications !== 'undefined' && dataStore.notifications?.length !== 0">
                 <!--Horizontal Dots-->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" v-show="!showToolbar" @click="showToolbar = true">
@@ -78,11 +88,13 @@
                             v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                 </div>
-                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2" v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">{{
-                    notification.message
-                }}</p>
+                <p class="text-xl font-normal text-[#3f3f3f] mt-2 ml-2"
+                    v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">{{
+                        notification.message
+                    }}</p>
                 <!--Wird angezeigt, wenn ein existierender Teilnehmer bearbeitet werden soll-->
-                <span class="flex justify-end items-center mt-5 mr-2 mb-2" v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">
+                <span class="flex justify-end items-center mt-5 mr-2 mb-2"
+                    v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">
                     <div class="bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 p-1.5 rounded-lg mr-6"
                         @click="onClickDelete(notification.id)">
                         <!--Trashcan icon-->
@@ -106,7 +118,8 @@
             </div>
         </div>
         <!--TODO Style den Text-->
-        <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0" class="text-xl md:text-2xl font-normal text-gray-500 text-center">Keine
+        <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0"
+            class="text-xl md:text-2xl font-normal text-gray-500 text-center">Keine
             Benachrichtigungen</p>
     </div>
 </template>
@@ -131,7 +144,8 @@ export default {
         return {
             localNotifications: [],
             showToolbar: false,
-            selectAll: false
+            selectAll: false,
+            spin: false
         }
     },
     components: {
@@ -151,7 +165,6 @@ export default {
         setupLocalNotifications() {
             const oldShow = this.localNotifications
             this.localNotifications = []
-            console.log("🚀 ~ file: ProfileView.vue:121 ~ created ~ this.dataStore.notifications", this.dataStore.notifications);
             for (const notification of this.dataStore.notifications) {
                 const oldNotification = oldShow.find((n) => n.id === notification.id)
                 if (oldNotification) {
@@ -195,7 +208,7 @@ export default {
             //TODO Call Backend mit Array von ids
         },
 
-        async onClickDelete(notificationID){
+        async onClickDelete(notificationID) {
             const res = await deleteNotification(notificationID)
 
             if (res.status === 200) {
@@ -204,12 +217,19 @@ export default {
             }
         },
 
-        async onClickUnread(notificationID){
+        async onClickUnread(notificationID) {
             const res = await setNotificationAsUnread(notificationID)
 
             if (res.status === 200) {
                 this.dataStore.notifications.find((n2) => n2.id === notificationID).recipients.find((r) => r.userID === this.authStore.user._id).read = false
             }
+        },
+
+        async refreshNotifications(){
+            this.spin = true
+            console.log("🚀 ~ file: ProfileView.vue:228 ~ refreshNotifications ~ spin", this.spin)
+            await this.dataStore.getNotifications()
+            this.setupLocalNotifications()
         }
     },
     async created() {

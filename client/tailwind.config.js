@@ -66,7 +66,8 @@ module.exports = {
       },
       animation: {
         wiggle: 'wiggle 1s ease-in-out infinite',
-        "smaller-bounce": "smaller-bounce 1s ease-in-out infinite"
+        "smaller-bounce": "smaller-bounce 1s ease-in-out infinite",
+        refreshSpin: "spin 1s linear"
       }
     },
   },

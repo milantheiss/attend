@@ -248,7 +248,6 @@ export default {
             if (!this.hasAnError()) {
                 this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
                 this.dataStore.invoiceData.groups.forEach(group => group.include = true)
-                console.log("🚀 ~ file: CreateInvoiceView.vue:151 ~ getInvoice ~ this.dataStore.invoiceData", this.dataStore.invoiceData)
 
                 if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
                     this.error.show = true
@@ -283,7 +282,7 @@ export default {
         },
 
         removeTrainingssession(session) {
-            const group = this.dataStore.invoiceData.groups.find(val => val._id === session._id)
+            const group = this.dataStore.invoiceData.groups.find(val => val._id === session.groupID)
             const index = group.trainingssessions.indexOf(session)
             group.trainingssessions.splice(index, 1)
         },
@@ -305,7 +304,6 @@ export default {
                 this.status.success = true
                 this.status.processing = false
                 this.status.text = 'Abrechnung erfolgreich versendet!'
-                console.log("Invoice submitted");
                 //Trigger send success
             } else {
                 this.status.success = false
@@ -325,7 +323,6 @@ export default {
     },
     async created() {
         const res = await fetchGroups()
-        console.log("🚀 ~ file: CreateInvoiceView.vue:278 ~ created ~ res", res)
         this.groups = (res).map(val => {
             return {
                 name: val.name,

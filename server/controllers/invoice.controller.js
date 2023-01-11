@@ -94,7 +94,9 @@ const submitInvoice = catchAsync(async (req, res) => {
 				title: "Neue Abrechnung",
 				priority: "normal",
 				from: req.user._id,
-				recipients: departmentHeadIDs,
+				recipients: departmentHeadIDs.map((val) => {
+					return { userID: val, read: false };
+				}),
 				message: `${req.user.firstname} ${req.user.lastname} hat eine neue Abrechnung erstellt`,
 				type: "invoice",
 				data: { invoiceID: invoice._id },

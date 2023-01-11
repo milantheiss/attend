@@ -40,7 +40,6 @@ export default {
         },
 
         formatList(list) {
-            console.log(list);
             if (this.sortAlphabetically) {
                 list = this._sortAlphabetically(list)
             }
