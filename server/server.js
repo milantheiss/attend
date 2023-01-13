@@ -7,6 +7,9 @@ const fs = require('fs')
 
 let server;
 //config.mongoose.url
+
+mongoose.set('strictQuery', true);
+
 mongoose.connect(config.url, { dbName: 'data' }).then(() => {
     logger.info(`Connected to MongoDB at ${new Date().toLocaleString()}`);
     server = https.createServer({
@@ -36,6 +39,10 @@ const unexpectedErrorHandler = (error) => {
 
 process.on('uncaughtException', unexpectedErrorHandler);
 process.on('unhandledRejection', unexpectedErrorHandler);
+
+process.on('warning', (warning) => {
+    console.log(warning.stack);
+});
 
 process.on('SIGTERM', () => {
     logger.info('SIGTERM received');

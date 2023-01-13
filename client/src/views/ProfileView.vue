@@ -101,7 +101,7 @@
                     <transition enter-active-class="transition ease-in-out duration-700" enter-from-class="opacity-0"
                         enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500"
                         leave-from-class="opacity-100" leave-to-class="opacity-0">
-                        <CheckboxInput class="mr-1 " v-show="showToolbar" @click="true"
+                        <CheckboxInput class="mr-1 " v-if="showToolbar" @click="true"
                             v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                 </div>

@@ -14,8 +14,8 @@ async function main() {
 
   for (const group of groups) {
     for (const trainer of group.trainer) {
-      trainer.firstname = trainer.name.split(" ")[0];
-      trainer.lastname = trainer.name.split(" ")[1];
+      trainer.firstname = trainer.firstname;
+      trainer.lastname = trainer.lastname;
       trainer.position = "trainer";
 
       delete trainer.name;
