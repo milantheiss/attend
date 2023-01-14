@@ -3,7 +3,7 @@
     <!--TODO Add Willkommens Msg wie bei Figma-->
     <div class="flex flex-col justify-center items-start ml-6 mb-4">
       <p class="text-xl font-medium">Willkommen...</p>
-      <p class="text-lg font-normal text-dark-grey">Bitte melde dich</p>
+      <p class="text-lg font-normal text-dark-grey">Bitte melde dich an</p>
     </div>
     <div class="bg-white px-8 py-6 rounded-lg drop-shadow-md w-full">
       <form @submit.prevent="submit" class="place-items-center text-lg">
