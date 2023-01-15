@@ -9,29 +9,42 @@
       <!--Toggelt zwischen Gruppeninfo anzeigen und nicht anzeigen-->
       <button @click="showGroups = !showGroups"
         :class="showGroups ? 'bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
-        class="text-white inline-flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2">
+        class="text-white flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2">
         <span class="flex items-center w-6 mr-2">
-          <!--Open Eye Icon-->
+          <!--Clock Icon-->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
             stroke="currentColor" class="w-6 h-6 mx-auto" v-show="!showGroups">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <!--Closed Eye Icon-->
+
+          <!--Close Icon-->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
             stroke="currentColor" class="w-6 h-6 mx-auto" v-show="showGroups">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </span>
-        <p class="font-medium font-base md:text-lg">Gruppeninfo</p>
+        <p class="font-medium font-base md:text-lg">Zeiten</p>
       </button>
     </div>
 
     <!--Gruppeninfo Box: Wird angezeigt, wenn mit Button getoggelt wird.-->
     <div class="mb-8">
-      <GroupInfo v-show="showGroups" :group="selectedGroup" class="bg-white px-4 py-4 rounded-lg drop-shadow-md" />
+      <div v-show="showGroups" class="bg-white px-4 py-4 rounded-lg drop-shadow-md">
+        <div class="flex justify-between items-center mb-3">
+          <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="starttime" min="00:00"
+            :max="endtime" :show-error="typeof starttime === 'undefined'"></TimeInput>
+        </div>
+        <div class="flex justify-between items-center mb-3">
+          <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="endtime" :min="starttime"
+            max="23:59" :show-error="typeof endtime === 'undefined'"></TimeInput>
+        </div>
+        <div class="flex justify-between items-center">
+          <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl: </p>
+          <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
+        </div>
+      </div>
     </div>
 
     <!--Date Picker: Triggert GargabeCollector, wenn Date verändert wird. Bei Veränderung von Date wird eine neue Attendance List gepullt.-->
@@ -51,14 +64,15 @@
     </div>
 
     <div>
-      
+
     </div>
-    
+
     <div>
       <AttendanceListComponent :participants="this.attended.trainer" :sortByLastName="true"></AttendanceListComponent>
     </div>
 
-    <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)" class="flex justify-center items-center mt-3">
+    <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)"
+      class="flex justify-center items-center mt-3">
       <p class="text-lg md:text-xl font-normal text-gray-600">{{ countParticipants(attended.participants) }} Teilnehmer
         am {{ new Date(date).toLocaleDateString() }}</p>
     </div>
@@ -68,10 +82,10 @@
 <script>
 import SelectList from "@/components/SelectList.vue";
 import AttendanceListComponent from "@/components/AttendanceListComponent.vue";
-import GroupInfo from "@/components/GroupInfo.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
+import TimeInput from "@/components/TimeInput.vue";
 
 export default {
   name: "AttendanceListView",
@@ -87,14 +101,16 @@ export default {
       selectedGroup: undefined,
       date: new Date(),
       showGroups: false,
-      attended: Object
+      attended: Object,
+      starttime: "",
+      endtime: "",
     }
   },
   components: {
     SelectList,
     AttendanceListComponent,
     DatePicker,
-    GroupInfo
+    TimeInput
   },
   methods: {
     /**
@@ -168,6 +184,20 @@ export default {
       this.$refs.datePicker.newGroupSelected()
 
       document.title = this.selectedGroup.name + ' - Attend'
+    }
+  },
+  computed: {
+    totalHours() {
+      const startingTime = Number(this.starttime?.split(":")[0]) + Number(this.starttime?.split(":")[1] / 60) || 0;
+
+      const endingTime = Number(this.endtime?.split(":")[0]) + Number(this.endtime?.split(":")[1] / 60) || 0;
+
+      return endingTime - startingTime > 0 ? endingTime - startingTime : 0;
+    },
+    readableTotalHours() {
+      const hh = Math.trunc(this.totalHours)
+      const mm = Math.round(60 * (this.totalHours - hh))
+      return `${hh} Std ${mm} Min`
     }
   }
 }
