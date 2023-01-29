@@ -350,14 +350,12 @@ export default {
                         element.faultyTimes = true
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
-                        const startingTime = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60) || 0;
+                        const starttimeNumeric = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60) || 0;
 
-                        const endingTime = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60) || 0;
+                        const endtimeNumeric = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        element.length = endingTime - startingTime;
-                        element.length = element.length < 0 ? 0 : element.length
-                        tHours += element.length
+                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
                     }
                 })
             })

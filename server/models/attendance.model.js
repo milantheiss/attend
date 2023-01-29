@@ -20,6 +20,18 @@ const attendanceSchema = mongoose.Schema(
                         type: Date,
                         required: true
                     },
+                    starttime: {
+                        type: String,
+                        required: true
+                    },
+                    endtime: {
+                        type: String,
+                        required: true
+                    },
+                    totalHours: {
+                        type: Number,
+                        required: true
+                    },
                     participants: {
                         type: [
                             {

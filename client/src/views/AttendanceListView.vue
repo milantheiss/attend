@@ -27,21 +27,21 @@
       </button>
     </div>
 
-    <!--Gruppeninfo Box: Wird angezeigt, wenn mit Button getoggelt wird.-->
+    <!--Trainingszeiten Box-->
     <div class="mb-8">
       <div v-show="showGroups" class="bg-white px-4 py-4 rounded-lg drop-shadow-md">
         <div class="flex justify-between items-center mb-3">
           <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="starttime" min="00:00"
-            :max="endtime" :show-error="typeof starttime === 'undefined'"></TimeInput>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.starttime" min="00:00"
+            :max="attended.endtime" :show-error="typeof attended.starttime === 'undefined'"></TimeInput>
         </div>
         <div class="flex justify-between items-center mb-3">
           <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="endtime" :min="starttime"
-            max="23:59" :show-error="typeof endtime === 'undefined'"></TimeInput>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.endtime" :min="attended.starttime"
+            max="23:59" :show-error="typeof attended.endtime === 'undefined'"></TimeInput>
         </div>
         <div class="flex justify-between items-center">
-          <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl: </p>
+          <p class="text-gray-700 font-light text-base md:text-lg ">Stundenanzahl: </p>
           <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
         </div>
       </div>
@@ -102,8 +102,6 @@ export default {
       date: new Date(),
       showGroups: false,
       attended: Object,
-      starttime: "",
-      endtime: "",
     }
   },
   components: {
@@ -123,7 +121,7 @@ export default {
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
-          console.error("Etwas ist schief gelaufe. Dies hätte nicht passieren sollen. --> pullAttendance")
+          console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
         }
@@ -137,6 +135,7 @@ export default {
      */
     async attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
+      this.attended.totalHours = this.totalHours
       this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
     },
 
@@ -184,15 +183,21 @@ export default {
       this.$refs.datePicker.newGroupSelected()
 
       document.title = this.selectedGroup.name + ' - Attend'
+    },
+    async totalHours() {
+      if(this.attended.participants.some(foo => foo.attended)){
+        this.attended.totalHours = this.totalHours
+        this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      }
     }
   },
   computed: {
     totalHours() {
-      const startingTime = Number(this.starttime?.split(":")[0]) + Number(this.starttime?.split(":")[1] / 60) || 0;
+      const startingTime = Number(this.attended.starttime?.split(":")[0]) + Number(this.attended.starttime?.split(":")[1] / 60) || 0;
 
-      const endingTime = Number(this.endtime?.split(":")[0]) + Number(this.endtime?.split(":")[1] / 60) || 0;
+      const endingTime = Number(this.attended.endtime?.split(":")[0]) + Number(this.attended.endtime?.split(":")[1] / 60) || 0;
 
-      return endingTime - startingTime > 0 ? endingTime - startingTime : 0;
+      return endingTime - startingTime > 0 && startingTime > 0 ? endingTime - startingTime : 0;
     },
     readableTotalHours() {
       const hh = Math.trunc(this.totalHours)

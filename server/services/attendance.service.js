@@ -55,9 +55,9 @@ const getTrainingssession = async (user, groupID, date) => {
         let participants = []
 
         const group = await groupService.getGroupById(user, groupID)
-        
+
         date = new Date(date)
-        
+
         group.participants.forEach((participant) => {
             if (date >= participant.firsttraining) {
                 participants.push({
@@ -75,13 +75,38 @@ const getTrainingssession = async (user, groupID, date) => {
             trainers.push({
                 firstname: trainer.firstname,
                 lastname: trainer.lastname,
-                attended: false, 
+                attended: false,
                 _id: trainer._id
             })
         })
 
+        const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+        //TODO Handle timeInfo undefined
+        //Sucht die entsprechende Zeit für den Wochentag heraus.
+        const timeInfo = group.times.find((val) => val.day === weekday[new Date(date).getDay()]);
+
+        const starttime = timeInfo?.starttime;
+        const endtime = timeInfo?.endtime;
+
+        let totalHours = 0;
+
+        if (typeof starttime !== "undefined" && typeof endtime !== "undefined") {
+            //Formatiert Zeit vom Format 18:45 in 18,75
+            const starttimeNumeric = Number(timeInfo.starttime.split(":")[0]) + Number(timeInfo.starttime.split(":")[1] / 60) || 0;
+
+            const endtimeNumeric = Number(timeInfo.endtime.split(":")[0]) + Number(timeInfo.endtime.split(":")[1] / 60) || 0;
+
+            totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+        } else {
+            totalHours = null
+        }
+
         const sessionBody = {
             date: date,
+            starttime: starttime,
+            endtime: endtime,
+            totalHours: totalHours,
             participants: participants,
             trainer: trainers
         }
@@ -157,17 +182,36 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             }
         })
 
+        sessionBody.trainers.forEach(trainer => {
+            const temp = session.trainer.find(foo => foo._id == trainer._id)
+            //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
+            if (typeof temp !== 'undefined') {
+                temp.attended = trainer.attended
+            }
+        })
+
+        session.starttime = sessionBody.starttime
+        session.endtime = sessionBody.endtime
+
+        //Formatiert Zeit vom Format 18:45 in 18,75
+        const starttimeNumeric = Number(sessionBody.starttime.split(":")[0]) + Number(sessionBody.starttime.split(":")[1] / 60) || 0;
+
+        const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) + Number(sessionBody.endtime.split(":")[1] / 60) || 0;
+
+        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+
         if (!session.participants.some(participant => participant.attended === true)) {
-            console.log("Delete Trainingssession");
+            console.debug("Delete Trainingssession");
             await runGarbageCollector(user, groupID, date, session)
         } else {
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
-                console.log('Add new Trainingssession');
+                console.debug('Add new Trainingssession');
                 await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
             } else {
-                console.log('Update Trainingssession');
-                await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })  
+                console.debug('Update Trainingssession');
+                await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
             }
         }
         return await getTrainingssession(user, groupID, date)
@@ -254,7 +298,7 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
 const getDataForInvoice = async (user, groupID, startdate, enddate) => {
     let dataset = (await getTrainingssessionsByDateRange(user, groupID, startdate, enddate)).trainingssessions.filter((e) => {
         //Es werden nur Trainingssessions zurückgeben an denen der Trainer teilgenommen hat.
-        if (e.trainers.some(e => e._id.equals(user._id) && e.attended)){
+        if (e.trainers.some(e => e._id.equals(user._id) && e.attended)) {
             //.trainers Property wird nicht mehr benötigt
             delete e._doc.trainers
 
