@@ -6,20 +6,20 @@
       <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
         class="font-bold text-2xl md:text-3xl mr-3" />
 
-      <!--Toggelt zwischen Gruppeninfo anzeigen und nicht anzeigen-->
-      <button @click="showGroups = !showGroups"
-        :class="showGroups ? 'bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
+      <!--Toggelt zwischen TimesBox anzeigen und nicht anzeigen-->
+      <button @click="showTimesBox = !showTimesBox"
+        :class="showTimesBox ? 'bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
         class="text-white flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2">
         <span class="flex items-center w-6 mr-2">
           <!--Clock Icon-->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
-            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="!showGroups">
+            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="!showTimesBox">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
           <!--Close Icon-->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
-            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="showGroups">
+            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="showTimesBox">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </span>
@@ -29,16 +29,16 @@
 
     <!--Trainingszeiten Box-->
     <div class="mb-8">
-      <div v-show="showGroups" class="bg-white px-4 py-4 rounded-lg drop-shadow-md">
+      <div v-show="showTimesBox" class="bg-white px-4 py-4 rounded-lg drop-shadow-md">
         <div class="flex justify-between items-center mb-3">
           <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.starttime" min="00:00"
-            :max="attended.endtime" :show-error="typeof attended.starttime === 'undefined'"></TimeInput>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.starttime"
+            min="00:00" :max="attended.endtime" :show-error="attended.starttime === null || attended.starttime === ''"></TimeInput>
         </div>
         <div class="flex justify-between items-center mb-3">
           <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.endtime" :min="attended.starttime"
-            max="23:59" :show-error="typeof attended.endtime === 'undefined'"></TimeInput>
+          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.endtime"
+            :min="attended.starttime" max="23:59" :show-error="attended.endtime === null || attended.endtime === ''"></TimeInput>
         </div>
         <div class="flex justify-between items-center">
           <p class="text-gray-700 font-light text-base md:text-lg ">Stundenanzahl: </p>
@@ -49,7 +49,7 @@
 
     <!--Date Picker: Triggert GargabeCollector, wenn Date verändert wird. Bei Veränderung von Date wird eine neue Attendance List gepullt.-->
     <div class="mb-12">
-      <DatePicker @onChange="pullAttendance" v-model="date" ref="datePicker" />
+      <DatePicker @onChange="pullAttendance()" v-model="date" ref="datePicker" />
     </div>
 
     <!--Liste aller Teilnehmer: Wird geupdatet, wenn neue Attendance List gepullt wird.-->
@@ -100,7 +100,7 @@ export default {
       groups: [],
       selectedGroup: undefined,
       date: new Date(),
-      showGroups: false,
+      showTimesBox: false,
       attended: Object,
     }
   },
@@ -124,6 +124,9 @@ export default {
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
+          if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+            this.showTimesBox = true
+          }
         }
       }
     },
@@ -137,6 +140,10 @@ export default {
       (this.attended.participants.find(foo => foo._id == id)).attended = newVal
       this.attended.totalHours = this.totalHours
       this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+
+      if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+        this.showTimesBox = true
+      }
     },
 
     /**
@@ -185,23 +192,29 @@ export default {
       document.title = this.selectedGroup.name + ' - Attend'
     },
     async totalHours() {
-      if(this.attended.participants.some(foo => foo.attended)){
+      console.log("🚀 ~ file: AttendanceListView.vue:191 ~ totalHours ~ this.totalHours", this.totalHours)
+
+      if (this.attended.participants.some(foo => foo.attended)) {
         this.attended.totalHours = this.totalHours
         this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
       }
-    }
+    },
   },
   computed: {
     totalHours() {
-      const startingTime = Number(this.attended.starttime?.split(":")[0]) + Number(this.attended.starttime?.split(":")[1] / 60) || 0;
+      if (this.attended.starttime && this.attended.endtime) {
+        const startingTime = Number(this.attended.starttime?.split(":")[0]) + Number(this.attended.starttime?.split(":")[1] / 60) || 0;
 
-      const endingTime = Number(this.attended.endtime?.split(":")[0]) + Number(this.attended.endtime?.split(":")[1] / 60) || 0;
+        const endingTime = Number(this.attended.endtime?.split(":")[0]) + Number(this.attended.endtime?.split(":")[1] / 60) || 0;
 
-      return endingTime - startingTime > 0 && startingTime > 0 ? endingTime - startingTime : 0;
+        return endingTime - startingTime > 0 && startingTime > 0 ? endingTime - startingTime : 0;
+      } else {
+        return null
+      }
     },
     readableTotalHours() {
-      const hh = Math.trunc(this.totalHours)
-      const mm = Math.round(60 * (this.totalHours - hh))
+      const hh = Math.trunc(this.totalHours) ?? 0
+      const mm = Math.round(60 * (this.totalHours - hh)) ?? 0
       return `${hh} Std ${mm} Min`
     }
   }

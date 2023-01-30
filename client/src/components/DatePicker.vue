@@ -78,6 +78,11 @@ export default {
       this.$emit("onChange");
     }
   },
+  watch:{
+    date(newVal){
+      this._updateDate(newVal)
+    }
+  },  
   components: { DateInput }
 }
 </script>

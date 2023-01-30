@@ -28,7 +28,7 @@ export default {
     watch: {
         input(newVal, oldVal) {
             //WARNING ES ist kein Midnight Wraparound möglich
-            if (typeof newVal !== "undefined") {                
+            if (typeof newVal !== "undefined" && newVal !== null && newVal !== "") {                
                 if(Number(newVal.split(":")[0]) + Number(newVal.split(":")[1] / 60) > Number(this.max?.split(":")[0]) + Number(this.max?.split(":")[1] / 60)) {
                     console.error(`Input is greater than max (${this.max} is the max value)`)
                     this.input = oldVal

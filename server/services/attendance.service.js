@@ -86,12 +86,12 @@ const getTrainingssession = async (user, groupID, date) => {
         //Sucht die entsprechende Zeit für den Wochentag heraus.
         const timeInfo = group.times.find((val) => val.day === weekday[new Date(date).getDay()]);
 
-        const starttime = timeInfo?.starttime;
-        const endtime = timeInfo?.endtime;
+        const starttime = timeInfo?.starttime ?? null;
+        const endtime = timeInfo?.endtime ?? null;
 
         let totalHours = 0;
 
-        if (typeof starttime !== "undefined" && typeof endtime !== "undefined") {
+        if (starttime && endtime) {
             //Formatiert Zeit vom Format 18:45 in 18,75
             const starttimeNumeric = Number(timeInfo.starttime.split(":")[0]) + Number(timeInfo.starttime.split(":")[1] / 60) || 0;
 
@@ -108,7 +108,7 @@ const getTrainingssession = async (user, groupID, date) => {
             endtime: endtime,
             totalHours: totalHours,
             participants: participants,
-            trainer: trainers
+            trainers: trainers
         }
 
         return sessionBody
@@ -183,7 +183,7 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
         })
 
         sessionBody.trainers.forEach(trainer => {
-            const temp = session.trainer.find(foo => foo._id == trainer._id)
+            const temp = session.trainers.find(foo => foo._id == trainer._id)
             //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
             if (typeof temp !== 'undefined') {
                 temp.attended = trainer.attended
@@ -194,12 +194,12 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
         session.endtime = sessionBody.endtime
 
         //Formatiert Zeit vom Format 18:45 in 18,75
-        const starttimeNumeric = Number(sessionBody.starttime.split(":")[0]) + Number(sessionBody.starttime.split(":")[1] / 60) || 0;
+        const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) + Number(sessionBody.starttime?.split(":")[1] / 60) ?? null;
 
-        const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) + Number(sessionBody.endtime.split(":")[1] / 60) || 0;
+        const endtimeNumeric = Number(sessionBody.endtime?.split(":")[0]) + Number(sessionBody.endtime?.split(":")[1] / 60) ?? null;
 
         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0 ?? null;
 
         if (!session.participants.some(participant => participant.attended === true)) {
             console.debug("Delete Trainingssession");
