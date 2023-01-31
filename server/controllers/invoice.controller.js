@@ -34,15 +34,8 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 			for (session of trainingssessions) {
 				const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
-				//TODO Handle timeInfo undefined
-				//Sucht die entsprechende Zeit für den Wochentag heraus.
-				const timeInfo = groupInfos.times.find((val) => val.day === weekday[new Date(session.date).getDay()]);
-
-				(session._doc.weekday = timeInfo?.day),
-					(session._doc.starttime = timeInfo?.starttime),
-					(session._doc.endtime = timeInfo?.endtime),
-					(session._doc.venue = groupInfos.venue),
-					(session._doc.groupID = groupID);
+				session._doc.venue = groupInfos.venue
+				session._doc.groupID = groupID
 
 				dataset.groups.find((val) => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions.push(session._doc);
 			}

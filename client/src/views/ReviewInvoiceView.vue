@@ -1,57 +1,11 @@
 <template>
     <div class="relative container">
-        <div
-            v-show="(Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) && !status.show">
-            <!--Export Settings-->
-            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <!--TODO WENN Trainer Daten incomplete -> Dialog-->
-                <!--Dateiname-->
-                <div class="flex items-center justify-between mb-4">
-                    <label for="filename"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
-                    <TextInput name="filename" v-model="filename" placeholder="Dateiname"
-                        :showError="error.cause.filenameInput" class="ml-3"></TextInput>
-                </div>
-                <!--Gruppen also collapsable Dropdown-->
-                <div class="flex items-start justify-between mb-4 w-full">
-                    <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
-                    <!--Add Collapsable Container here-->
-                    <CollapsibleContainer class="ml-3" :show="true">
-                        <template #content>
-                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
-                                :sortAlphabetically="true" :default="true">
-                            </CheckboxList>
-                        </template>
-                    </CollapsibleContainer>
-                </div>
-                <!--Timespan-->
-                <div class="flex items-center justify-between mb-4">
-                    <label for="startdate"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
-                    <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
-                </div>
-
-                <div class="flex items-center justify-between mb-4">
-                    <label for="enddate"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
-                    <DateInput v-model="enddate" name="enddate" class="ml-3"
-                        :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
-                </div>
-
-                <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
-
-                <button @click="getInvoice"
-                    class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
-                    :class="error.show ? 'mt-4' : 'mt-8'">
-                    <p class="font-medium font-base md:text-lg">Exportieren</p>
-                </button>
-            </div>
+        <div>
+            <!--Liste aller offenen Abrechnungen-->
         </div>
 
         <!--Abrechnungsanzeige-->
         <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
-            <!--TODO Add ÜL Nummer Prompt-->
-            <!--TODO ÜL Info-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--Info Field-->
                 <div class="flex justify-between items-center">
@@ -102,6 +56,7 @@
                         </template>
                         <template #content>
                             <!--Je Trainingsstunde ein Element-->
+                            <!--TODO Auswechseln für reine Anzeige-->
                             <TrainingssessionItem class="mb-4"
                                 v-for="(trainingsssession, index) in group.trainingssessions"
                                 :key="trainingsssession._id" v-model="group.trainingssessions[index]"
@@ -299,8 +254,6 @@ export default {
 
             this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
             this.dataStore.invoiceData.groups.forEach(group => delete group.include)
-
-            //TODO Fehlerprävention hinzufügen --> z.B. wenn Zeiten fehlen.
 
             //Send Invoice
             const res = await sendInvoice(this.dataStore.invoiceData)

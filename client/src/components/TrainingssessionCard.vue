@@ -30,11 +30,11 @@
                     </div>
                     <div class="flex justify-between items-center mb-3">
                             <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
-                            <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="session.starttime" min="00:00" :max="session.endtime" :show-error="typeof session.starttime === 'undefined'"></TimeInput>
+                            <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="session.starttime" min="00:00" :max="session.endtime" :show-error="typeof session.starttime === 'undefined' || session.starttime === null"></TimeInput>
                     </div>
                     <div class="flex justify-between items-center mb-3">
                             <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
-                            <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="session.endtime" :min="session.starttime" max="23:59" :show-error="typeof session.endtime === 'undefined'"></TimeInput>
+                            <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="session.endtime" :min="session.starttime" max="23:59" :show-error="typeof session.endtime === 'undefined' || session.endtime === null"></TimeInput>
                     </div>
                     <div class="flex justify-between items-center mb-3">
                             <p class="text-gray-700 font-light text-base md:text-lg w-full">Stundenanzahl: </p>
