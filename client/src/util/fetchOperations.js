@@ -388,6 +388,16 @@ async function setManyNotificationsAsRead(notificationIDs) {
 	);
 }
 
+async function getAllAssignedInvoices() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/assigned`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -411,4 +421,5 @@ export {
 	deleteAllNotifications,
 	deleteManyNotifications,
 	setManyNotificationsAsRead,
+	getAllAssignedInvoices
 };

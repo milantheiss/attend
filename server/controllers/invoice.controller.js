@@ -1,5 +1,5 @@
 const logger = require("../config/logger");
-const { groupService, attendanceService } = require("../services");
+const { groupService, attendanceService, userService } = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
@@ -108,7 +108,52 @@ const submitInvoice = catchAsync(async (req, res) => {
 	}
 });
 
+const getAllAssignedInvoices = catchAsync(async (req, res) => {
+	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
+		const invoices = await Invoice.find({ assignedTo: req.user._id });
+
+		if (invoices === null || typeof invoices === "undefined") {
+			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
+		}
+		
+		await res.status(httpStatus.OK).send(invoices);
+	} else {
+		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+	}
+});
+
+const getInvoiceByID = catchAsync(async (req, res) => {
+	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
+		const invoice = await Invoice.findById(req.params.id);
+		
+		if (invoice === null || typeof invoice === "undefined") {
+			throw new ApiError(httpStatus.BAD_REQUEST, "No invoice found");
+		}
+
+		await res.status(httpStatus.OK).send(invoice);
+	} else {
+		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+	}
+});
+
+const getOwnInvoices = catchAsync(async (req, res) => {
+	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
+		const invoices = await Invoice.find({ submittedBy: req.user._id });
+
+		if (invoices === null || typeof invoices === "undefined") {
+			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
+		}
+
+		await res.status(httpStatus.OK).send(invoices);
+	} else {
+		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+	}
+});
+
 module.exports = {
 	getDatasetForNewInvoice,
 	submitInvoice,
+	getAllAssignedInvoices,
+	getInvoiceByID,
+	getOwnInvoices,
 };

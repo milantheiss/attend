@@ -10,22 +10,35 @@ const verifyToken = async (req, res, next) => {
   let access_token = req.cookies.access_token;
   const refresh_token = req.cookies.refresh_token;
 
-  if (!access_token) {
-    if (refresh_token) {
-      access_token = await getNewToken(req, res, refresh_token)
-    } else {
-      //TODO Hier auch auto redirect
-      return res.clearCookie('access_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).clearCookie('refresh_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).status(httpStatus.UNAUTHORIZED).send('Logout')
-      //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
+  try {
+    if (!access_token) {
+      if (refresh_token) {
+        access_token = await getNewToken(req, res, refresh_token)
+      } else {
+        //TODO Hier auch auto redirect
+        return res.clearCookie('access_token', {
+          secure: true,
+          httpOnly: true,
+          sameSite: config.sameSite
+        }).clearCookie('refresh_token', {
+          secure: true,
+          httpOnly: true,
+          sameSite: config.sameSite
+        }).status(httpStatus.UNAUTHORIZED).send('Logout')
+        //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
+      }
     }
+  } catch (err) {
+    logger.error(err.toString())
+    return res.clearCookie('access_token', {
+      secure: true,
+      httpOnly: true,
+      sameSite: config.sameSite
+    }).clearCookie('refresh_token', {
+      secure: true,
+      httpOnly: true,
+      sameSite: config.sameSite
+    }).status(httpStatus.UNAUTHORIZED).send('Logout')
   }
 
   try {

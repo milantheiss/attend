@@ -9,7 +9,20 @@ router
     .get(verifyToken, invoiceController.getDatasetForNewInvoice)
 
 router
-    .route("/submit")   
+    .route("/submit")
     .post(verifyToken, invoiceController.submitInvoice)
+
+router
+    .route("/assigned")
+    .get(verifyToken, invoiceController.getAllAssignedInvoices)
+
     
+router
+    .route("/getOwnInvoices")
+    .get(verifyToken, invoiceController.getOwnInvoices)
+    
+router
+        .route("/:id")
+        .get(verifyToken, invoiceController.getInvoiceByID)
+
 module.exports = router;

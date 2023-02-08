@@ -2,6 +2,24 @@
     <div class="relative container">
         <div>
             <!--Liste aller offenen Abrechnungen-->
+            <div v-for="invoice of allAssignedInvoices" :key="invoice.id" class="flex text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1 px-3.5 py-3 rounded-lg drop-shadow mb-4 font-normal text-xl hover:cursor-pointer">
+                <p>{{
+                    new Date(invoice.startdate).toLocaleDateString('de-DE', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    })
+                }}</p>
+                <p class="mx-2"> -</p>
+                <p>{{
+                    new Date(invoice.enddate).toLocaleDateString('de-DE', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    })
+                }}</p>
+                <p>Von {{ invoice.userInfo.firstname + ' ' + invoice.userInfo.lastname }}</p>
+            </div>
         </div>
 
         <!--Abrechnungsanzeige-->
@@ -130,19 +148,15 @@
 
 <script>
 import { createInvoice } from "@/util/generatePdf"
-import { fetchDataForNewInvoice, fetchGroups, sendInvoice } from '@/util/fetchOperations'
-import ErrorMessage from "@/components/ErrorMessage.vue";
-import TextInput from "@/components/TextInput.vue";
-import DateInput from "@/components/DateInput.vue";
+import { fetchDataForNewInvoice, fetchGroups, sendInvoice, getAllAssignedInvoices } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
-import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import TrainingssessionItem from "@/components/TrainingssessionCard.vue"
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 
 export default {
-    name: "CreateInvoice",
+    name: "ReviewInvoice",
     setup() {
         const dataStore = useDataStore()
         const showCollapsibleContainer = ref(true);
@@ -172,14 +186,11 @@ export default {
                 show: false,
                 processing: true,
                 success: false,
-            }
+            },
+            allAssignedInvoices: [],
         }
     },
     components: {
-        ErrorMessage,
-        TextInput,
-        DateInput,
-        CheckboxList,
         CollapsibleContainer,
         TrainingssessionItem,
         CheckboxInput
@@ -288,7 +299,7 @@ export default {
             }
         })
         document.title = 'Erstelle eine Abrechnung - Attend'
-        this.dataStore.viewname = "Abrechnung erstellen"
+        this.dataStore.viewname = "Offene Abrechnungen"
     },
     watch: {
         totalHours(newVal) {
@@ -325,6 +336,9 @@ export default {
             const mm = Math.round(60 * (this.totalHours - hh))
             return `${hh} Std ${mm} Min`
         }
+    },
+    async mounted() {
+        this.allAssignedInvoices = await getAllAssignedInvoices()
     }
 };
 </script>
