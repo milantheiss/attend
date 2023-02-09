@@ -82,6 +82,7 @@
                 <div class="flex items-center w-full" @click="{
                     if(!showToolbar) toggleNotification(index);
                 }">
+                    <!--New Notification Dot ~ Blauer Pulsierender Punkt-->
                     <div class="flex h-4 w-4 ml-2.5 mr-1j"
                         v-show="!dataStore.notifications[index].recipients.find((r) => r.userID === authStore.user._id).read">
                         <div
@@ -174,7 +175,6 @@ export default {
             if (!this.dataStore.notifications[index].recipients.find((r) => r.userID === this.authStore.user._id).read && !this.localNotifications[index].show) {
                 const notification = this.dataStore.notifications[index]
                 const res = await setNotificationAsRead(notification.id)
-                console.log("🚀 ~ file: ProfileView.vue:56 ~ toggleNotification ~ res", res)
                 this.dataStore.notifications[index].recipients = res.recipients
             }
             this.localNotifications[index].show = !this.localNotifications[index].show

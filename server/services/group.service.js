@@ -168,7 +168,6 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
 const getGroupInfo = async (user, groupId) => {
     let group = await getGroupById(user, groupId);
 
-    
     //Deletes participants; muss ._doc sein für delete sein
     delete group._doc.participants
 

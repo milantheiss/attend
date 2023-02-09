@@ -4,7 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
-const { Department, Invoice } = require("../models");
+const { Department, Invoice, Group, User } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole } = require("../utils/roleCheck");
 
@@ -115,8 +115,25 @@ const getAllAssignedInvoices = catchAsync(async (req, res) => {
 		if (invoices === null || typeof invoices === "undefined") {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
 		}
-		
-		await res.status(httpStatus.OK).send(invoices);
+
+		const i = Promise.all(invoices.map(async (val) => {
+			const obj = {
+				id: val._id,
+				department: val.department,
+				dateOfReceipt: val.dateOfReceipt,
+				status: val.status,
+				submittedBy: undefined,
+				startdate: val.startdate,
+				enddate: val.enddate,
+				submittedBy: await userService.getUserInfo(val.submittedBy)
+			}
+
+			return await obj
+		}));
+
+		console.log(await i);
+
+		res.status(httpStatus.OK).send(await i);
 	} else {
 		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
 	}
