@@ -147,6 +147,10 @@ const getInvoiceByID = catchAsync(async (req, res) => {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoice found");
 		}
 
+		if(!invoice.assignedTo.includes(req.user._id)) {
+			throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+		}
+
 		await res.status(httpStatus.OK).send(invoice);
 	} else {
 		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");

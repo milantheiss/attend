@@ -49,6 +49,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/openInvoices",
+    name: "OpenInvoices",
+    component: () => import("../views/OpenInvoicesView.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/reviewInvoice",
     name: "ReviewInvoice",
     component: () => import("../views/ReviewInvoiceView.vue"),
