@@ -163,7 +163,7 @@
                             d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <p class="mb-3 text-lg">{{ status.text }}</p>
+                <p class="mb-3 text-lg text-center">{{ status.text }}</p>
                 <button @click="ok"
                     class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
                     <p class="font-medium font-base md:text-lg">Okay</p>

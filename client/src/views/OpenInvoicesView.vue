@@ -109,6 +109,7 @@ export default {
         goToInvoice(id) {
             //TODO --> Go to Invoice by ID
             console.log(id);
+            this.$router.push({path: '/reviewInvoice', query: {id: id}})
         }
     },
     async created() {

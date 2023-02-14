@@ -43,18 +43,15 @@
 
                 <div class="mt-8">
                     <!--Je Gruppe ein Container-->
-                    <div class="flex justify-between items-center min-w-full" v-for="group in invoice.groups"
+                    <div class="flex justify-between items-center min-w-full" v-for="(group, i) in invoice.groups"
                         :key="group._id">
                         <CollapsibleContainer :show="true" class="mb-4">
                             <template #header>
                                 <p class="truncate text-xl font-semibold">{{ group.name }}</p>
                             </template>
                             <template #content>
-                                <!--Je Trainingsstunde ein Element-->
-                                <!--TODO Auswechseln für reine Anzeige-->
-
-                                <Card class="mb-4" v-for="(trainingsssession) in group.trainingssessions"
-                                    :key="trainingsssession._id">
+                                <Card class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions" :ref="`sessionCard${i}`"
+                                    :key="trainingsssession._id" >
                                     <template #header>
                                         <h3>{{
                                             new Date(trainingsssession.date).toLocaleDateString("de-DE", {
@@ -64,11 +61,10 @@
                                         }}</h3>
                                     </template>
                                     <template #content>
-                                        <!--TODO Add @click zum Zuklappen-->
                                         <div
                                             class="bg-white px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black overflow-hidden">
                                             <!--Chevron Up-->
-                                            <div class="flex justify-between items-center mb-6">
+                                            <div class="flex justify-between items-center mb-6" @click="$refs[`sessionCard${i}`][index].togglePanel()">
                                                 <h3>{{
                                                     new Date(trainingsssession.date).toLocaleDateString("de-DE",
                                                         {
@@ -78,7 +74,7 @@
                                                 }}</h3>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor" class="w-6 h-6"
-                                                    @click="showPanel = false">
+                                                    >
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                                                 </svg>
@@ -86,11 +82,12 @@
                                             <div class="flex justify-between items-center mb-3">
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Beginn: </p>
-                                                <p class="text-black font-normal text-base md:text-lg text-right">
+                                                <p class="text-black font-medium text-base md:text-lg text-right flex items-center">
                                                     {{ trainingsssession.starttime }}
+                                                    <!--Clock Icon-->
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="w-6 h-6 ml-2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
@@ -100,11 +97,12 @@
                                             <div class="flex justify-between items-center mb-3">
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Ende: </p>
-                                                <p class="text-black font-normal text-base md:text-lg text-right">
+                                                <p class="text-black font-medium text-base md:text-lg text-right flex items-center">
                                                     {{ trainingsssession.endtime }}
+                                                    <!--Clock Icon-->
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="w-6 h-6 ml-2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
@@ -115,7 +113,7 @@
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Stundenanzahl: </p>
                                                 <p class="text-black font-bold text-base md:text-lg text-right">{{
-                                                    trainingsssession.length
+                                                    convertToReadableTime(trainingsssession.length)
                                                 }}</p>
                                             </div>
                                         </div>
@@ -136,15 +134,15 @@
                         </p>
                     </div>
                     <div class="flex justify-around items-center">
-                        <button @click="cancel"
+                        <button @click="reject"
                             class="flex items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
                             :class="error.show ? 'mt-4' : 'mt-8'">
-                            <p class="font-medium font-base md:text-lg">Abbrechen</p>
+                            <p class="font-medium font-base md:text-lg">Ablehnen</p>
                         </button>
-                        <button @click="send"
+                        <button @click="approve"
                             class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
                             :class="error.show ? 'mt-4' : 'mt-8'">
-                            <p class="font-medium font-base md:text-lg">Senden</p>
+                            <p class="font-medium font-base md:text-lg">Bestätigen</p>
                         </button>
                     </div>
                 </div>
@@ -304,11 +302,18 @@ export default {
             group.trainingssessions.splice(index, 1)
         },
 
-        cancel() {
+        reject() {
+            //Backend: Invoice wird als Rejected gesetzt & Submitter wird benachrichtigt
+            //... Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
             this.dataStore.invoiceData = {}
         },
 
-        async send() {
+        async approve() {
+            //Es wird Message an Backend gesendet --> Invoice wird als Approved gesetzt
+            //... Submitter wird benachrichtigt
+
+            //In Frontend: Invoice wird als PDF generiert und als Download angeboten
+            //... bzw. als Email versendet/mailto Link generiert
             this.status.show = true
 
             this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)

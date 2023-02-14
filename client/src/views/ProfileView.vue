@@ -172,6 +172,7 @@ export default {
     },
     methods: {
         async toggleNotification(index) {
+            console.log(index);
             if (!this.dataStore.notifications[index].recipients.find((r) => r.userID === this.authStore.user._id).read && !this.localNotifications[index].show) {
                 const notification = this.dataStore.notifications[index]
                 const res = await setNotificationAsRead(notification.id)

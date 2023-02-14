@@ -315,6 +315,43 @@ const getDataForInvoice = async (user, groupID, startdate, enddate) => {
     return dataset
 }
 
+const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, enddate) => {
+    const result = await attendanceService.getTrainingssessionsByDateRange(user, groupID, startdate, enddate)
+
+    let tempList = {
+        dates: [],
+        participants: []
+    }
+
+    for (session of result.trainingssessions) {
+        tempList.dates.push(session.date)
+        for (participant of session.participants) {
+            const temp = tempList.participants.find(foo => foo._id.equals(participant._id))
+            if (typeof temp === 'undefined') {
+                tempList.participants.push({
+                    _id: participant._id,
+                    firstname: participant.firstname,
+                    lastname: participant.lastname,
+                    attendence: [{
+                        date: session.date,
+                        attended: participant.attended
+                    }]
+                })
+            } else {
+                temp.attendence.push({
+                    date: session.date,
+                    attended: participant.attended
+                })
+            }
+        }
+    }
+
+    tempList.dates.sort((a, b) => a - b)
+    tempList.participants.sort((a, b) => a.lastname.localeCompare(b.lastname))
+
+    return tempList
+}
+
 module.exports = {
     getAttendance,
     getAttendanceByGroup,
@@ -324,5 +361,6 @@ module.exports = {
     deleteTrainingssession,
     getTrainingssessionsByDateRange,
     runGarbageCollector,
-    getDataForInvoice
+    getDataForInvoice,
+    getFormattedListForAttendanceListPDF
 };

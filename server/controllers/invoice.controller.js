@@ -27,13 +27,12 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 		if (department._id.equals(groupInfos.department._id)) {
 			dataset.groups.push(groupInfos);
 
+			//TODO Ändern für Attendance List
 			let trainingssessions = await attendanceService.getDataForInvoice(req.user, groupID, dataset.startdate, dataset.enddate);
 
 			dataset.groups.find((val) => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions = [];
 
 			for (session of trainingssessions) {
-				const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-
 				session._doc.venue = groupInfos.venue
 				session._doc.groupID = groupID
 
@@ -51,7 +50,7 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 		email: req.user.email,
 		firstname: req.user.firstname,
 		lastname: req.user.lastname,
-	};
+	};	
 
 	await res.status(httpStatus.OK).send(dataset);
 });
@@ -69,12 +68,22 @@ const submitInvoice = catchAsync(async (req, res) => {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");
 			}
 
+			console.log(invoice.groups[0].trainingssessions)
+
 			//Set invoice properties
 			invoice.assignedTo = departmentHeadIDs;
 			invoice.status = "pending";
 			invoice.dateOfReceipt = new Date();
 			invoice.submittedBy = req.user._id;
 			invoice.dateOfLastChange = new Date();
+
+			invoice.groups.forEach(async (val) => {
+				console.log(await attendanceService.getAttendance(req.user));
+
+
+				//WARNING Fehler: attendanceService is not defined
+				val.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, val.groupID, invoice.startdate, invoice.enddate);
+			});
 
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
