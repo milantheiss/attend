@@ -25,8 +25,11 @@ class AttendanceListPdf {
   }
 
   static generateHeader(doc) {
-    _startdate = new Date(_startdate).toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" });
-    _enddate = new Date(_enddate).toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" });
+    _startdate = new Date(_startdate);
+    _enddate = new Date(_enddate);
+    
+    console.log("startdate", _startdate);
+    console.log("enddate", _enddate);
 
     posNextLine = 30;
 
@@ -35,7 +38,7 @@ class AttendanceListPdf {
       .setFont("helvetica", "bold")
       .text("Teilnehmerliste", 20, posNextLine)
       .setFontSize(12)
-      .text(`Vom ${_startdate} bis ${_enddate}`, 180, posNextLine)
+      .text(`Vom ${_startdate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })} bis ${_enddate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })}`, 180, posNextLine)
       .addImage("./img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 97, 10, 75, 75);
   }
 
@@ -193,8 +196,8 @@ class InvoicePdf {
   }
 
   static generateHeader(doc) {
-    _startdate = new Date(_startdate).toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" });
-    _enddate = new Date(_enddate).toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" });
+    _startdate = new Date(_startdate);
+    _enddate = new Date(_enddate);
 
     posNextLine = 40;
 
@@ -207,7 +210,7 @@ class InvoicePdf {
 
     posNextLine += 25;
 
-    doc.setFontSize(15).setFont("helvetica", "bold").text(`vom ${_startdate} bis ${_enddate}`, 40, posNextLine);
+    doc.setFontSize(15).setFont("helvetica", "bold").text(`vom ${_startdate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })} bis ${_enddate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })}`, 40, posNextLine);
 
     //Übungsleiter Info Tabelle
     posNextLine += 40;
@@ -258,7 +261,7 @@ class InvoicePdf {
       doc
         .setFont("helvetica", "normal")
         .setFontSize(10)
-        .text(`${trainingssession.info.weekday}`, 40, posNextLine, { maxWidth: 66 })
+        .text(`${trainingssession.weekday}`, 40, posNextLine, { maxWidth: 66 })
         .text(
           `${new Date(trainingssession.date).toLocaleDateString("de-DE", {
             year: "numeric",
@@ -269,16 +272,16 @@ class InvoicePdf {
           posNextLine,
           { maxWidth: 66 }
         )
-        .text(`${trainingssession.info.starttime} - ${trainingssession.info.endtime}`, 181.6, posNextLine, {
+        .text(`${trainingssession.starttime} - ${trainingssession.endtime}`, 181.6, posNextLine, {
           maxWidth: 66,
         })
-        .text(`${trainingssession.info.length}`, 252.4, posNextLine, { maxWidth: 66.8 })
+        .text(`${trainingssession.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 })
         .text(`${trainingssession.participantCount}`, 323.2, posNextLine, { maxWidth: 66.8 });
 
       const groupName =
-        trainingssession.info.groupName.length < 28
-          ? trainingssession.info.groupName
-          : trainingssession.info.groupName.slice(0, 28) + "...";
+        trainingssession.groupName.length < 28
+          ? trainingssession.groupName
+          : trainingssession.groupName.slice(0, 28) + "...";
       doc.text(`${groupName}`, 394, posNextLine, { maxWidth: 165.28 });
 
       //Zeichnet Tabellen Boxen um Text
@@ -311,13 +314,16 @@ class InvoicePdf {
   }
 }
 
-async function createList(group, attendenceList, startdate, enddate, options) {
-  if(typeof options.doc === "undefined"){
+async function createList(group, attendenceList, options) {
+  if (typeof options?.doc === "undefined") {
     options.doc = new jsPDF({ unit: "pt", orientation: "landscape", compress: true });
   }
 
-  _startdate = startdate;
-  _enddate = enddate;
+  console.log("sd", _startdate);
+  console.log("ed", _enddate);
+
+  _startdate = options.startdate ?? _startdate;
+  _enddate = options.enddate ?? _enddate;
 
   let splicedArray = [];
 
@@ -333,10 +339,10 @@ async function createList(group, attendenceList, startdate, enddate, options) {
         laufnummer = i * 31;
         splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26);
         AttendanceListPdf.generatePage(options.doc, group, splicedArray);
-        if (j + 1 < pagesForDates) options.doc.addPage("a4","landscape"); 
+        if (j + 1 < pagesForDates) options.doc.addPage("a4", "landscape");
 
       }
-      if (i + 1 < pagesForParticipants) options.doc.addPage("a4","landscape"); 
+      if (i + 1 < pagesForParticipants) options.doc.addPage("a4", "landscape");
 
     }
   } else {
@@ -352,7 +358,7 @@ async function createList(group, attendenceList, startdate, enddate, options) {
     AttendanceListPdf.generateFooter(options.doc);
   }
 
-  if(typeof options.filename !== "undefined"){
+  if (typeof options.filename !== "undefined") {
     options.doc.save(options.filename);
   }
 }
@@ -365,26 +371,38 @@ async function createInvoice(filename, dataset) {
   let doc = new jsPDF({ unit: "pt", compress: true });
 
   _startdate = dataset.startdate;
-  _enddate = dataset.startdate;
+  _enddate = dataset.enddate;
   _userInfo = dataset.userInfo;
   _department = dataset.department;
 
   if (dataset.groups.length !== 0) {
-    
     const _trainingssessions = dataset.groups.map((group) => {
       const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
       group.trainingssessions.forEach((trainingssession) => {
+        
         trainingssession.weekday = weekdays[new Date(trainingssession.date).getDay()]
         trainingssession.groupName = group.name
         
+        if(trainingssession.totalHours === undefined || trainingssession.totalHours === null){
+          //Formatiert Zeit vom Format 18:45 in 18,75
+          const starttimeNumeric = Number(trainingssession.starttime.split(":")[0]) + Number(trainingssession.starttime.split(":")[1] / 60) || 0;
+          const endtimeNumeric = Number(trainingssession.endtime.split(":")[0]) + Number(trainingssession.endtime.split(":")[1] / 60) || 0;
+
+          //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+          trainingssession.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+        }
+      })
       return group.trainingssessions
-    })
-    const pages = dataset.groups.for Math.ceil(dataset.trainingssessions.length / 42);
+    }).flat()
+
+    console.log("trainingsession", _trainingssessions);
+
+    const pages = Math.ceil(_trainingssessions.length / 42);
 
     for (let i = 0; i < pages; i++) {
       pagecount = i + 1;
 
-      const splicedArray = dataset.trainingssessions.splice(0, 42);
+      const splicedArray = _trainingssessions.splice(0, 42);
       console.log(splicedArray);
 
       InvoicePdf.generatePage(doc, splicedArray);
@@ -394,18 +412,18 @@ async function createInvoice(filename, dataset) {
         //Muss in if Statement stehen, da sonst das PDF eine leere Seite hat.
         doc.addPage();
       } else {
-        
+
         doc
-        .setFont("helvetica", "bold")
-        .setFontSize(10)
-        .text(`Stundenanzahl gesamt`, 40, posNextLine, { maxWidth: 210.4 })
-        .text(`${dataset.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 });
-        
+          .setFont("helvetica", "bold")
+          .setFontSize(10)
+          .text(`Stundenanzahl gesamt`, 40, posNextLine, { maxWidth: 210.4 })
+          .text(`${dataset.totalHours}`, 252.4, posNextLine, { maxWidth: 66.8 });
+
         drawBox(doc, 38, posNextLine - tableTopMargin, 212.4, 13.3);
         drawBox(doc, 250.4, posNextLine - tableTopMargin, 70.8, 13.3);
-        
+
         posNextLine = 754.8
-        
+
         drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 39.9);
         drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 39.9);
 
@@ -422,9 +440,9 @@ async function createInvoice(filename, dataset) {
       }
     }
 
-    for(const group of dataset.groups){
-      doc.addPage("a4","landscape"); 
-      createList(group, group.attendenceList)
+    for (const group of dataset.groups) {
+      doc.addPage("a4", "landscape");
+      createList(group, group.attendanceList, { doc: doc})
     }
 
   } else {
@@ -434,7 +452,7 @@ async function createInvoice(filename, dataset) {
     doc
       .setFontSize(12)
       .setFont("helvetica", "bold")
-      .text("Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!", 20, posNextLine + 40);
+      .text("Es wurden keine Daten gefunden!", 20, posNextLine + 40);
 
     InvoicePdf.generateFooter(doc);
   }
