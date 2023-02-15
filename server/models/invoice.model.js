@@ -41,7 +41,7 @@ const invoiceSchema = mongoose.Schema(
                                 starttime: String,
                                 endtime: String,
                                 groupID: mongoose.Types.ObjectId,
-                                length: Number,
+                                totalHours: Number,
                                 participantCount: Number,
                                 venue: String,
                                 weekday: String
@@ -49,6 +49,7 @@ const invoiceSchema = mongoose.Schema(
                            ],
                         required: true
                     },
+                    attendanceList: Object,
                     venue: String
                 }
             ],

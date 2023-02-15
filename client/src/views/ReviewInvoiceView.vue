@@ -189,7 +189,7 @@
 
 <script>
 import { createInvoice } from "@/util/generatePdf"
-import { fetchDataForNewInvoice, sendInvoice, getInvoiceById } from '@/util/fetchOperations'
+import { fetchDataForNewInvoice, getInvoiceById } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
@@ -314,27 +314,30 @@ export default {
 
             //In Frontend: Invoice wird als PDF generiert und als Download angeboten
             //... bzw. als Email versendet/mailto Link generiert
-            this.status.show = true
 
-            this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
-            this.dataStore.invoiceData.groups.forEach(group => delete group.include)
+            await createInvoice(this.filename, this.invoice)
 
-            //Send Invoice
-            const res = await sendInvoice(this.dataStore.invoiceData)
+            // this.status.show = true
 
-            if (res.status === 200 && await res.text() === "Invoice submitted") {
-                this.status.success = true
-                this.status.processing = false
-                this.status.text = 'Abrechnung erfolgreich versendet!'
-                //Trigger send success
-            } else {
-                this.status.success = false
-                this.status.processing = false
-                this.status.text = 'Abrechnung konnte nicht versendet werden!'
-                //Trigger send error
-            }
+            // this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
+            // this.dataStore.invoiceData.groups.forEach(group => delete group.include)
 
-            this.dataStore.invoiceData = {}
+            // //Send Invoice
+            // const res = await sendInvoice(this.dataStore.invoiceData)
+
+            // if (res.status === 200 && await res.text() === "Invoice submitted") {
+            //     this.status.success = true
+            //     this.status.processing = false
+            //     this.status.text = 'Abrechnung erfolgreich versendet!'
+            //     //Trigger send success
+            // } else {
+            //     this.status.success = false
+            //     this.status.processing = false
+            //     this.status.text = 'Abrechnung konnte nicht versendet werden!'
+            //     //Trigger send error
+            // }
+
+            // this.dataStore.invoiceData = {}
         },
         ok() {
             this.status.show = false

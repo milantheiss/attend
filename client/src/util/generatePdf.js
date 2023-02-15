@@ -1,5 +1,4 @@
 import { jsPDF } from "jspdf";
-import { fetchAttendanceByDateRange } from '@/util/fetchOperations'
 
 //INFO Buchstaben in Helvetica & Font Size 10 haben ca. eine Zeichenhöhe 7.3 pt
 
@@ -370,8 +369,17 @@ async function createInvoice(filename, dataset) {
   _userInfo = dataset.userInfo;
   _department = dataset.department;
 
-  if (dataset.trainingssessions.length !== 0) {
-    const pages = Math.ceil(dataset.trainingssessions.length / 42);
+  if (dataset.groups.length !== 0) {
+    
+    const _trainingssessions = dataset.groups.map((group) => {
+      const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+      group.trainingssessions.forEach((trainingssession) => {
+        trainingssession.weekday = weekdays[new Date(trainingssession.date).getDay()]
+        trainingssession.groupName = group.name
+        
+      return group.trainingssessions
+    })
+    const pages = dataset.groups.for Math.ceil(dataset.trainingssessions.length / 42);
 
     for (let i = 0; i < pages; i++) {
       pagecount = i + 1;
@@ -416,7 +424,7 @@ async function createInvoice(filename, dataset) {
 
     for(const group of dataset.groups){
       doc.addPage("a4","landscape"); 
-      createList(group, await fetchAttendanceByDateRange(group._id, new Date(dataset.startdate), new Date(dataset.enddate)), dataset.startdate, dataset.enddate, {doc: doc})
+      createList(group, group.attendenceList)
     }
 
   } else {

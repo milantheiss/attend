@@ -68,8 +68,6 @@ const submitInvoice = catchAsync(async (req, res) => {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");
 			}
 
-			console.log(invoice.groups[0].trainingssessions)
-
 			//Set invoice properties
 			invoice.assignedTo = departmentHeadIDs;
 			invoice.status = "pending";
@@ -77,14 +75,12 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.submittedBy = req.user._id;
 			invoice.dateOfLastChange = new Date();
 
-			invoice.groups.forEach(async (val) => {
-				console.log(await attendanceService.getAttendance(req.user));
-
-
+			invoice.groups = await Promise.all(invoice.groups.map(async (val) => {
 				//WARNING Fehler: attendanceService is not defined
-				val.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, val.groupID, invoice.startdate, invoice.enddate);
-			});
-
+				val.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, val._id, invoice.startdate, invoice.enddate);
+				return val;
+			}))
+	
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
 

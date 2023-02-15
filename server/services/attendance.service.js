@@ -316,7 +316,7 @@ const getDataForInvoice = async (user, groupID, startdate, enddate) => {
 }
 
 const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, enddate) => {
-    const result = await attendanceService.getTrainingssessionsByDateRange(user, groupID, startdate, enddate)
+    const result = await getTrainingssessionsByDateRange(user, groupID, startdate, enddate)
 
     let tempList = {
         dates: [],
