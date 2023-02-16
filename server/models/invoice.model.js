@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const { toJSON, paginate } = require('./plugins')
-const { Schema } = require("mongoose");
-const { required } = require('joi');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const invoiceSchema = mongoose.Schema(
     {
@@ -97,6 +96,7 @@ const invoiceSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 invoiceSchema.plugin(toJSON)
 invoiceSchema.plugin(paginate);
+invoiceSchema.plugin(AutoIncrement, {inc_field: 'invoiceNumber'});
 
 /**
  * @typedef Invoice

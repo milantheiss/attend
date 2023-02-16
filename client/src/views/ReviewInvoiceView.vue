@@ -113,7 +113,7 @@
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Stundenanzahl: </p>
                                                 <p class="text-black font-bold text-base md:text-lg text-right">{{
-                                                    convertToReadableTime(trainingsssession.length)
+                                                    convertToReadableTime(trainingsssession.totalHours)
                                                 }}</p>
                                             </div>
                                         </div>

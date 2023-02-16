@@ -28,9 +28,6 @@ class AttendanceListPdf {
     _startdate = new Date(_startdate);
     _enddate = new Date(_enddate);
     
-    console.log("startdate", _startdate);
-    console.log("enddate", _enddate);
-
     posNextLine = 30;
 
     doc
@@ -319,9 +316,6 @@ async function createList(group, attendenceList, options) {
     options.doc = new jsPDF({ unit: "pt", orientation: "landscape", compress: true });
   }
 
-  console.log("sd", _startdate);
-  console.log("ed", _enddate);
-
   _startdate = options.startdate ?? _startdate;
   _enddate = options.enddate ?? _enddate;
 
@@ -395,15 +389,12 @@ async function createInvoice(filename, dataset) {
       return group.trainingssessions
     }).flat()
 
-    console.log("trainingsession", _trainingssessions);
-
     const pages = Math.ceil(_trainingssessions.length / 42);
 
     for (let i = 0; i < pages; i++) {
       pagecount = i + 1;
 
       const splicedArray = _trainingssessions.splice(0, 42);
-      console.log(splicedArray);
 
       InvoicePdf.generatePage(doc, splicedArray);
 

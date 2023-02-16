@@ -65,7 +65,7 @@
                     </svg>
                 </div>
             </div>
-            <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0"
+            <p v-show="typeof allAssignedInvoices === 'undefined' || allAssignedInvoices?.length === 0"
                 class="text-xl md:text-2xl font-normal text-gray-500 text-center">Keine offenen Abrechnungen</p>
         </div>
     </div>

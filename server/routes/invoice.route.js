@@ -16,13 +16,29 @@ router
     .route("/assigned")
     .get(verifyToken, invoiceController.getAllAssignedInvoices)
 
-    
+
 router
     .route("/getOwnInvoices")
     .get(verifyToken, invoiceController.getOwnInvoices)
-    
+
 router
-        .route("/:id")
-        .get(verifyToken, invoiceController.getInvoiceByID)
+    .route("/approve/:id")
+    .post(verifyToken, invoiceController.approveInvoice)
+
+router
+    .route("/reject/:id")
+    .post(verifyToken, invoiceController.rejectInvoice)
+
+router
+    .route("/reopen/:id")
+    .post(verifyToken, invoiceController.reopenInvoice)
+
+router
+    .route("/getPendingInvoices")
+    .get(verifyToken, invoiceController.getPendingInvoices)
+
+router
+    .route("/:id")
+    .get(verifyToken, invoiceController.getInvoiceByID)
 
 module.exports = router;

@@ -31,8 +31,6 @@ const addRecipients = async (notificationID, userID) => {
  * @returns {Promise<[Notification]>}
  */
 const removeRecipient = async (notificationID, userID) => {
-	console.log("🚀 ~ file: notification.service.js:33 ~ removeRecipient ~ notificationID", notificationID);
-	console.log("🚀 ~ file: notification.service.js:33 ~ removeRecipient ~ userID", userID);
 	//TODO FIX THIS
 
 	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: { userID: userID } } }, { new: true });
