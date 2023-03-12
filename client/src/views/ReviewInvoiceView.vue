@@ -37,7 +37,8 @@
 
                     <div class="flex justify-between items-center">
                         <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
-                        <p class="text-black font-medium text-base md:text-lg text-right">{{ convertToReadableTime(invoice.totalHours) }}</p>
+                        <p class="text-black font-medium text-base md:text-lg text-right">{{
+                            convertToReadableTime(invoice.totalHours) }}</p>
                     </div>
                 </div>
 
@@ -50,8 +51,8 @@
                                 <p class="truncate text-xl font-semibold">{{ group.name }}</p>
                             </template>
                             <template #content>
-                                <Card class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions" :ref="`sessionCard${i}`"
-                                    :key="trainingsssession._id" >
+                                <Card class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
+                                    :ref="`sessionCard${i}`" :key="trainingsssession._id">
                                     <template #header>
                                         <h3>{{
                                             new Date(trainingsssession.date).toLocaleDateString("de-DE", {
@@ -64,7 +65,8 @@
                                         <div
                                             class="bg-white px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black overflow-hidden">
                                             <!--Chevron Up-->
-                                            <div class="flex justify-between items-center mb-6" @click="$refs[`sessionCard${i}`][index].togglePanel()">
+                                            <div class="flex justify-between items-center mb-6"
+                                                @click="$refs[`sessionCard${i}`][index].togglePanel()">
                                                 <h3>{{
                                                     new Date(trainingsssession.date).toLocaleDateString("de-DE",
                                                         {
@@ -73,8 +75,7 @@
                                                         })
                                                 }}</h3>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="2" stroke="currentColor" class="w-6 h-6"
-                                                    >
+                                                    stroke-width="2" stroke="currentColor" class="w-6 h-6">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                                                 </svg>
@@ -82,12 +83,12 @@
                                             <div class="flex justify-between items-center mb-3">
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Beginn: </p>
-                                                <p class="text-black font-medium text-base md:text-lg text-right flex items-center">
+                                                <p
+                                                    class="text-black font-medium text-base md:text-lg text-right flex items-center">
                                                     {{ trainingsssession.starttime }}
                                                     <!--Clock Icon-->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="w-6 h-6 ml-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
@@ -97,12 +98,12 @@
                                             <div class="flex justify-between items-center mb-3">
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Ende: </p>
-                                                <p class="text-black font-medium text-base md:text-lg text-right flex items-center">
+                                                <p
+                                                    class="text-black font-medium text-base md:text-lg text-right flex items-center">
                                                     {{ trainingsssession.endtime }}
                                                     <!--Clock Icon-->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="w-6 h-6 ml-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
@@ -128,8 +129,7 @@
                 <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                     <div class="flex items-center">
                         <CheckboxInput class="mr-3"></CheckboxInput>
-                        <p class="text-black font-medium text-base md:text-lg text-left"><span
-                                class="text-orange-600">TODO
+                        <p class="text-black font-medium text-base md:text-lg text-left"><span class="text-orange-600">TODO
                                 Bestätigungsmessage</span>
                         </p>
                     </div>
@@ -403,12 +403,13 @@ export default {
                         element.faultyTimes = true
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
-                        const starttimeNumeric = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60) || 0;
+                        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + Number(element.starttime?.split(":")[1]) || 0;
 
-                        const endtimeNumeric = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60) || 0;
+                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + Number(element.endtime?.split(":")[1]) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric)/100 : 0;
                     }
                 })
             })

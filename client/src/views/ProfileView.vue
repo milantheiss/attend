@@ -18,15 +18,15 @@
                 Sortieren: </p>
             <span class="mx-3 w-[40rem] sm:w-64">
                 <select v-model="sortBy" class="block
-                                        w-full
-                                        pl-2 pb-0.5 
-                                        text-black text-lg md:text-xl align-middle
-                                        focus:ring-0 focus:border-dark-grey
-                                        bg-inherit"
+                                                    w-full
+                                                    pl-2 pb-0.5 
+                                                    text-black text-lg md:text-xl align-middle
+                                                    focus:ring-0 focus:border-dark-grey
+                                                    bg-inherit"
                     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
                     style="background-position: right 0.1rem center;padding-right: 1.9rem;">
                     <option value="date" default>Datum</option>
-                    <option value="read">Ungelesen</option>
+                    <option value="unread">Ungelesen</option>
                     <option value="title">Betreff</option>
                 </select>
             </span>
@@ -78,8 +78,9 @@
         </transition>
 
         <!--NotificationCard-->
-        <div class="flex justify-start items-center bg-white rounded-lg drop-shadow-md py-3 pl-3 pr-2 mb-2"
-            v-for="(notification, index) in dataStore.notifications" :key="notification.id"  @click.self="{ toggleNotification(index); }">
+        <div class="flex justify-start items-center bg-white rounded-lg drop-shadow-md py-3 pl-3 pr-2 mb-2 cursor-pointer"
+            v-for="(notification, index) in dataStore.notifications" :key="notification.id"
+            @click.self="{ toggleNotification(index); }">
             <div class="flex flex-col w-full">
                 <div class="flex items-center w-full">
                     <!--New Notification Dot ~ Blauer Pulsierender Punkt-->
@@ -91,15 +92,15 @@
                         <div class="relative inline-flex rounded-full h-4 w-4 bg-standard-gradient-2"></div>
                     </div>
                     <div class="flex flex-col w-full" @click.self="{ toggleNotification(index); }">
-                        <p class="text-xl font-normal text-black" @click.self="{ toggleNotification(index); }">{{ notification.title }}</p>
+                        <p class="text-xl font-normal text-black" @click.self="{ toggleNotification(index); }">{{
+                            notification.title }}</p>
                         <p class="text-xl font-light text-dark-grey -mt-1" @click.self="{ toggleNotification(index); }">{{
-                            new Date(notification.date).toLocaleDateString('de-DE', {
+                            new Date(notification.date).toLocaleString('de-DE', {
                                 year: 'numeric', month:
-                                    'numeric', day: 'numeric'
+                                    'numeric', day: 'numeric', timeZone: "CET", hour: 'numeric', minute: 'numeric'
                             })
                         }}</p>
                     </div>
-                    <!--Wird angezeigt, wenn ein existierender Teilnehmer bearbeitet werden soll-->
                     <span class="flex justify-end items-center mr-1"
                         v-show="localNotifications[index]?.show && !localNotifications[index]?.selected">
                         <div class="bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 p-1.5 rounded-lg mr-6"
@@ -125,12 +126,12 @@
                     <transition enter-active-class="transition ease-in-out duration-700" enter-from-class="opacity-0"
                         enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500"
                         leave-from-class="opacity-100" leave-to-class="opacity-0">
-                        <CheckboxInput class="ml-4" v-show="showToolbar" @click.stop="true"
+                        <CheckboxInput class="ml-4" v-if="showToolbar" @click.stop="true"
                             v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                 </div>
-                <div class="text-xl font-normal text-[#3f3f3f] mt-2 notificationMessage"
-                    v-show="localNotifications[index]?.show && !localNotifications[index]?.selected"
+                <div class="text-xl font-normal text-[#3f3f3f] mt-2 notificationMessage cursor-text"
+                    v-if="localNotifications[index]?.show && !localNotifications[index]?.selected"
                     v-html="$resolveMarkdown(notification.message)"></div>
 
             </div>
@@ -139,7 +140,7 @@
         <p v-show="typeof dataStore.notifications === 'undefined' || dataStore.notifications?.length === 0"
             class="text-xl md:text-2xl font-normal text-gray-500 text-center">Keine
             Benachrichtigungen</p>
-</div>
+    </div>
 </template>
 
 <script>
@@ -254,29 +255,31 @@ export default {
         async refreshNotifications() {
             this.spin = true
             await this.dataStore.getNotifications()
-            this.setupLocalNotifications()
+            this.sortNotifications()
         },
 
         sortNotifications() {
-            //TODO Fix dass Notifications sortiert werden
-            //Verschieben in setupLocalNotifications?
             this.dataStore.notifications.sort((a, b) => {
                 if (this.sortBy === "date") {
                     return new Date(b.date) - new Date(a.date)
                 } else if (this.sortBy === "title") {
                     return a.title.localeCompare(b.title)
                 } else if (this.sortBy === "unread") {
-                    if (a.read && b.read) {
+                    const aRead = a.recipients.find((r) => r.userID === this.authStore.user._id).read
+                    const bRead = b.recipients.find((r) => r.userID === this.authStore.user._id).read
+
+                    if (aRead && bRead) {
                         return 0
-                    } else if (a.read && !b.read) {
+                    } else if (aRead && !bRead) {
                         return 1
-                    } else if (!a.read && b.read) {
+                    } else if (!aRead && bRead) {
                         return -1
                     }
                 }
             })
 
-            // this.setupLocalNotifications()
+            // Passt LocalNOtifications entsprechend der neuen Sortierung an
+            this.setupLocalNotifications()
         }
     },
     async created() {
@@ -285,11 +288,11 @@ export default {
 
         await this.dataStore.getNotifications()
 
-        this.setupLocalNotifications()
+        this.sortNotifications()
     },
     watch: {
         "dataStore.notifications"() {
-            this.setupLocalNotifications()
+            this.sortNotifications()
         },
         selectAll() {
             for (const notification of this.localNotifications) {
@@ -304,8 +307,13 @@ export default {
 </script>
 
 <style scoped>
-.notificationMessage ::v-deep a {
+.notificationMessage :deep(a) {
     color: #3B82F6;
     text-decoration: underline;
+}
+
+.notificationMessage :deep(a)::after {
+    content: "⚡";
+    text-decoration: none;
 }
 </style>    

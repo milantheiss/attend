@@ -98,7 +98,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 				recipients: departmentHeadIDs.map((val) => {
 					return { userID: val, read: false };
 				}),
-				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/reviewInvoice?id=${invoice._id})↗️`,
+				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/reviewInvoice?id=${invoice._id})`,
 				type: "invoice",
 				data: { invoiceID: invoice._id },
 			});

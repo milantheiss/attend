@@ -194,12 +194,13 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
         session.endtime = sessionBody.endtime
 
         //Formatiert Zeit vom Format 18:45 in 18,75
-        const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) + Number(sessionBody.starttime?.split(":")[1] / 60) ?? null;
+        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+        const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
 
-        const endtimeNumeric = Number(sessionBody.endtime?.split(":")[0]) + Number(sessionBody.endtime?.split(":")[1] / 60) ?? null;
+        const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
 
         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0 ?? null;
+        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
 
         if (!session.participants.some(participant => participant.attended === true)) {
             console.debug("Delete Trainingssession");

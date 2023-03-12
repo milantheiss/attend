@@ -1,22 +1,17 @@
 <template>
     <div class="relative container">
+        <!--Info Wird angezeigt, wenn keine InvoiceData vorhanden-->
         <div
             v-show="(Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) && !status.show">
             <!--Export Settings-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                 <!--TODO WENN Trainer Daten incomplete -> Dialog-->
-                <!--Dateiname-->
-                <div class="flex items-center justify-between mb-4">
-                    <label for="filename"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Dateiname:</label>
-                    <TextInput name="filename" v-model="filename" placeholder="Dateiname"
-                        :showError="error.cause.filenameInput" class="ml-3"></TextInput>
-                </div>
-                <!--Gruppen also collapsable Dropdown-->
+                <!--Gruppen Auswahl-->
                 <div class="flex items-start justify-between mb-4 w-full">
-                    <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
-                    <!--Add Collapsable Container here-->
-                    <CollapsibleContainer class="ml-3" :show="true">
+                    <CollapsibleContainer :show="true">
+                        <template #header>
+                            <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
+                        </template>
                         <template #content>
                             <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
                                 :sortAlphabetically="true" :default="true">
@@ -40,20 +35,36 @@
 
                 <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
 
-                <button @click="getInvoice"
+                <button @click="getInvoiceData"
                     class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
                     :class="error.show ? 'mt-4' : 'mt-8'">
-                    <p class="font-medium font-base md:text-lg">Exportieren</p>
+                    <p class="font-medium font-base md:text-lg">Weiter</p>
                 </button>
             </div>
         </div>
 
         <!--Abrechnungsanzeige-->
         <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
+
             <!--TODO Add ÜL Nummer Prompt-->
             <!--TODO ÜL Info-->
+
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <!--Info Field-->
+                <!--Invoice Info Field-->
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Antragsteller: </p>
+                    <p class="text-black font-medium text-base md:text-lg text-right">
+                        {{ dataStore.invoiceData.userInfo.firstname }} {{ dataStore.invoiceData.userInfo.lastname }}
+                    </p>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
+                    <p class="text-black font-medium text-base md:text-lg text-right">{{
+                        dataStore.invoiceData.department.name
+                    }}</p>
+                </div>
+
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Abrechnung für den Zeitraum: </p>
                     <p class="text-black font-normal text-base md:text-lg text-right"><span class="font-medium">{{
@@ -69,18 +80,7 @@
                             })
                         }}</span></p>
                 </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Name: </p>
-                    <p class="text-black font-normal text-base md:text-lg text-right">
-                        {{ dataStore.invoiceData.userInfo.firstname }} {{ dataStore.invoiceData.userInfo.lastname }}
-                    </p>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
-                    <p class="text-black font-normal text-base md:text-lg text-right">{{
-                        dataStore.invoiceData.department.name
-                    }}</p>
-                </div>
+
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg"> </p>
                 </div>
@@ -102,8 +102,7 @@
                         </template>
                         <template #content>
                             <!--Je Trainingsstunde ein Element-->
-                            <TrainingssessionItem class="mb-4"
-                                v-for="(trainingsssession, index) in group.trainingssessions"
+                            <TrainingssessionItem class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
                                 :key="trainingsssession._id" v-model="group.trainingssessions[index]"
                                 @onClickOnRemove="(session) => removeTrainingssession(session)">
                             </TrainingssessionItem>
@@ -120,6 +119,7 @@
                             Bestätigungsmessage</span>
                     </p>
                 </div>
+                <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
                 <div class="flex justify-around items-center">
                     <button @click="cancel"
                         class="flex items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
@@ -174,10 +174,8 @@
 </template>
 
 <script>
-import { createInvoice } from "@/util/generatePdf"
 import { fetchDataForNewInvoice, fetchGroups, sendInvoice } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
-import TextInput from "@/components/TextInput.vue";
 import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
@@ -208,7 +206,6 @@ export default {
                 show: false,
                 cause: {
                     groupInput: false,
-                    filenameInput: false,
                     noData: false
                 }
             },
@@ -222,7 +219,6 @@ export default {
     },
     components: {
         ErrorMessage,
-        TextInput,
         DateInput,
         CheckboxList,
         CollapsibleContainer,
@@ -230,24 +226,7 @@ export default {
         CheckboxInput
     },
     methods: {
-        /**
-         * Zieht Attendance Daten von der Datenbank und erstellt mit @see createList() ein neues PDF
-         */
-        async exportPDF() {
-            //if (!this.hasAnError()) {
-            //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
-
-            //this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
-            // if (attendance.dates.length === 0) {
-            //     this.error.show = true
-            //     this.error.cause.timespanFaulty = true
-            //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
-            // } else {
-            await createInvoice(this.filename, this.dataStore.invoiceData)
-            // }
-            //}
-        },
-        async getInvoice() {
+        async getInvoiceData() {
             if (!this.hasAnError()) {
                 this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
                 this.dataStore.invoiceData.groups.forEach(group => group.include = true)
@@ -270,16 +249,11 @@ export default {
 
             this.error.show = this.selectedGroups.length === 0 || typeof this.filename !== "string" || this.filename.trim().length === 0;
             this.error.cause.groupInput = this.selectedGroups.length === 0
-            this.error.cause.filenameInput = typeof this.filename !== "string" || this.filename.trim().length === 0
             this.error.cause.noData = false
 
             if (this.error.cause.groupInput) {
                 this.error.message = "Es muss mindesten eine Gruppe ausgewählt sein.";
-            } else if (this.error.cause.filenameInput) {
-                this.error.message = "Es muss ein Dateiname angegeben werden."
-            }
-
-            this.error.message = this.error.cause.groupInput && this.error.cause.filenameInput ? "Mehrere Fehler." : this.error.message
+            } 
 
             return this.error.show;
         },
@@ -291,35 +265,44 @@ export default {
         },
 
         cancel() {
+            this.error.show = false
             this.dataStore.invoiceData = {}
         },
 
         async send() {
+            //Fehlerprüfung: Fehlende Zeiten
+            if (this.dataStore.invoiceData.groups.some(val => val.trainingssessions.some(v => v.faultyTimes === true))) {
+                this.error.message = "Jede Trainingsstunde muss eine Start- und Endzeit haben!"
+                this.error.show = true;
+                return
+            }
+            
+            //Status wird angezeigt
             this.status.show = true
 
             this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
             this.dataStore.invoiceData.groups.forEach(group => delete group.include)
 
-            //TODO Fehlerprävention hinzufügen --> z.B. wenn Zeiten fehlen.
-
             //Send Invoice
+            this.error.show = false
+
             const res = await sendInvoice(this.dataStore.invoiceData)
 
             if (res.status === 200 && await res.text() === "Invoice submitted") {
                 this.status.success = true
                 this.status.processing = false
                 this.status.text = 'Abrechnung erfolgreich versendet!'
-                //Trigger send success
             } else {
                 this.status.success = false
                 this.status.processing = false
                 this.status.text = 'Abrechnung konnte nicht versendet werden!'
-                //Trigger send error
             }
 
             this.dataStore.invoiceData = {}
         },
+
         ok() {
+            // OK Button in Status
             this.status.show = false
             this.status.processing = true
             this.status.success = false
@@ -340,7 +323,7 @@ export default {
     watch: {
         totalHours(newVal) {
             this.dataStore.invoiceData.totalHours = newVal
-        }
+        },
     },
     computed: {
         selectedGroups() {
@@ -355,12 +338,13 @@ export default {
                         element.faultyTimes = true
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
-                        const starttimeNumeric = Number(element.starttime.split(":")[0]) + Number(element.starttime.split(":")[1] / 60) || 0;
+                        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + Number(element.starttime?.split(":")[1]) || 0;
 
-                        const endtimeNumeric = Number(element.endtime.split(":")[0]) + Number(element.endtime.split(":")[1] / 60) || 0;
+                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + Number(element.endtime?.split(":")[1]) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
+                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric)/100 : 0;
                     }
                 })
             })

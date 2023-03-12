@@ -4,22 +4,24 @@
     <div class="flex items-center justify-between mb-8">
       <!--Auswahlelement, um Gruppe auszuwählen-->
       <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
-        class="font-bold text-2xl md:text-3xl mr-3" />
+        class="font-bold text-2xl md:text-3xl"
+        :class="{ 'mr-3': typeof selectedGroup !== 'undefined', 'mx-2': typeof selectedGroup === 'undefined' }" />
 
       <!--Toggelt zwischen TimesBox anzeigen und nicht anzeigen-->
       <button @click="showTimesBox = !showTimesBox"
         :class="showTimesBox ? 'bg-gradient-to-br from-dimmed-gradient-1 to-dimmed-gradient-2' : 'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2'"
-        class="text-white flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2">
+        class="text-white flex items-center px-2.5 md:px-4 py-2.5 rounded-lg drop-shadow-md ml-2"
+        v-show="typeof selectedGroup !== 'undefined'">
         <span class="flex items-center w-6 mr-2">
           <!--Clock Icon-->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
-            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="!showTimesBox">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor"
+            class="w-6 h-6 mx-auto" v-show="!showTimesBox">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
           <!--Close Icon-->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0"
-            stroke="currentColor" class="w-6 h-6 mx-auto" v-show="showTimesBox">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor"
+            class="w-6 h-6 mx-auto" v-show="showTimesBox">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </span>
@@ -28,27 +30,26 @@
     </div>
 
     <!--Trainingszeiten Box-->
-    <div class="mb-8">
-      <div v-show="showTimesBox" class="bg-white px-4 py-4 rounded-lg drop-shadow-md">
-        <div class="flex justify-between items-center mb-3">
-          <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.starttime"
-            min="00:00" :max="attended.endtime" :show-error="attended.starttime === null || attended.starttime === ''"></TimeInput>
-        </div>
-        <div class="flex justify-between items-center mb-3">
-          <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
-          <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.endtime"
-            :min="attended.starttime" max="23:59" :show-error="attended.endtime === null || attended.endtime === ''"></TimeInput>
-        </div>
-        <div class="flex justify-between items-center">
-          <p class="text-gray-700 font-light text-base md:text-lg ">Stundenanzahl: </p>
-          <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
-        </div>
+    <div v-show="showTimesBox" class="bg-white p-6 rounded-lg drop-shadow-md mb-8">
+      <div class="flex justify-between items-center mb-3">
+        <p class="text-gray-700 font-light text-base md:text-lg w-full">Beginn: </p>
+        <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.starttime" min="00:00"
+          :max="attended.endtime" :show-error="attended.starttime === null || attended.starttime === ''"></TimeInput>
+      </div>
+      <div class="flex justify-between items-center mb-3">
+        <p class="text-gray-700 font-light text-base md:text-lg w-full">Ende: </p>
+        <TimeInput class="text-black font-normal text-base md:text-lg text-right" v-model="attended.endtime"
+          :min="attended.starttime" max="23:59" :show-error="attended.endtime === null || attended.endtime === ''">
+        </TimeInput>
+      </div>
+      <div class="flex justify-between items-center">
+        <p class="text-gray-700 font-light text-base md:text-lg ">Stundenanzahl: </p>
+        <p class="text-black font-bold text-base md:text-lg text-right">{{ readableTotalHours }}</p>
       </div>
     </div>
 
     <!--Date Picker: Triggert GargabeCollector, wenn Date verändert wird. Bei Veränderung von Date wird eine neue Attendance List gepullt.-->
-    <div class="mb-12">
+    <div class="mb-12" v-show="typeof selectedGroup !== 'undefined'">
       <DatePicker @onChange="pullAttendance()" v-model="date" ref="datePicker" />
     </div>
 
@@ -59,7 +60,7 @@
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
       <span class="flex justify-center items-center">
         <p v-show="typeof this.attended.participants === 'undefined'"
-          class="text-xl md:text-2xl font-normal text-gray-400">Bitte wähle eine Gruppe</p>
+          class="text-xl md:text-2xl font-normal text-gray-500">Keine Gruppe ausgewählt!</p>
       </span>
     </div>
 

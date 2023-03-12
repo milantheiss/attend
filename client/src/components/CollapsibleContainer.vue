@@ -2,7 +2,7 @@
     <div class="grid grid-cols-1 place-items-end w-full">
         <div class="flex justify-between items-center mb-4 w-full">
             <header class="flex items-center w-full">
-                <slot name="header"></slot>
+                <slot name="header" @click.self="toggleShowContent"></slot>
             </header>
             <div class="color-gray-300 mt-0.5 w-fit justify-items-end" @click="toggleShowContent">
                 <!--Chevron Down-->

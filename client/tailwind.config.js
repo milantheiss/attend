@@ -14,8 +14,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        'standard-gradient-1': 'rgb(88, 100, 224)',
-        'standard-gradient-2': 'rgb(107, 88, 224)',
+        'standard-gradient-1': '#5864e0',
+        'standard-gradient-2': '#6b58e0',
         'unchecked-gradient-1': '#c2beda',
         'unchecked-gradient-2': '#cecfe4',
         'dimmed-gradient-1': '#98A4CD',
@@ -23,7 +23,7 @@ module.exports = {
         'delete-gradient-1': '#DE2C2C',
         'delete-gradient-2': '#D83535',
         'background-graywhite': '#02344a',
-        'dark-grey': '#464646',
+        'dark-grey': '#i',
         'special-red': '#FF1F28',
         "light-gray": "#6C7F8C",
       },
