@@ -69,7 +69,51 @@
     </div>
 
     <div>
-      <AttendanceListComponent :participants="this.attended.trainer" :sortByLastName="true"></AttendanceListComponent>
+      <!--Collapsable Container-->
+
+      <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg drop-shadow-md" :class="{'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 text-white': !trainerBox.showContent, 'transition bg-white text-black': trainerBox.showContent}">
+        <template #header>
+          <p class="font-bold text-xl md:text-2xl">Trainer</p>
+        </template>
+        <template #content>
+          <div v-for="(trainer) in this.attended.trainers" :key="trainer._id" class="mb-4 last:mb-0 transition-none">
+            <!--TODO Vielleicht nicht große Karte sondern nur Name und Checkbox-->
+            <!--TODO Animation fixen-->
+            <!--TODO Spacing zwischen Attandence List und TrainerBox fixen-->
+            <!--Card list -> Trainer opt out-->
+            <!--<div @click="onTrainerAttendanceChange(trainer._id)"
+              :class="trainer.attended ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1' : 'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
+              class="px-3.5 py-3 rounded-lg drop-shadow font-normal text-xl hover:cursor-pointer select-none">
+              <span class="flex items-center justify-between">
+                <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
+                <span class="self-center w-6">-->
+                  <!--Checkmark Icon-->
+                  <!--
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 73.031 55.976" class="text-white"
+                    v-show="trainer.attended">
+                    <path fill="none" stroke="currentColor" stroke-width="9.973"
+                      d="M69.465 3.486 25.048 48.925 3.486 27.847" />
+                  </svg>-->
+                  <!--Checkbox Icon-->
+                  <!--
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80.851 80.851" v-show="!trainer.attended"
+                    class="text-dark-grey">
+                    <path fill="none" stroke="currentColor" stroke-width="7.5"
+                      d="M28.885 3.75h23.08a25.135 25.135 0 0 1 25.136 25.135v23.08a25.135 25.135 0 0 1-25.136 25.136h-23.08A25.135 25.135 0 0 1 3.75 51.966v-23.08A25.135 25.135 0 0 1 28.885 3.75z" />
+                  </svg>
+                </span>
+              </span>
+            </div>-->
+            <div @click="onTrainerAttendanceChange(trainer._id)"
+              class="text-black rounded-lg font-normal text-xl hover:cursor-pointer select-none" :class="{'': !trainerBox.showContent}">
+              <span class="flex items-center justify-between">
+                <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
+                <CheckboxInput v-model="trainer.attended"></CheckboxInput>
+              </span>
+            </div>
+          </div>
+        </template>
+      </CollapsibleContainer>
     </div>
 
     <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)"
@@ -87,13 +131,18 @@ import DatePicker from "@/components/DatePicker.vue";
 import { fetchGroups, fetchAttendanceByDate, updateTrainingssession } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 import TimeInput from "@/components/TimeInput.vue";
+import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
+import { ref } from 'vue'
+import CheckboxInput from "@/components/CheckboxInput.vue";
 
 export default {
   name: "AttendanceListView",
   setup() {
     const dataStore = useDataStore()
+    const trainerBox = ref("")
     return {
-      dataStore
+      dataStore,
+      trainerBox
     }
   },
   data() {
@@ -102,15 +151,17 @@ export default {
       selectedGroup: undefined,
       date: new Date(),
       showTimesBox: false,
-      attended: Object,
+      attended: Object
     }
   },
   components: {
     SelectList,
     AttendanceListComponent,
     DatePicker,
-    TimeInput
-  },
+    TimeInput,
+    CollapsibleContainer,
+    CheckboxInput
+},
   methods: {
     /**
      * Zieht beim aufrufen die Attendance List der in @see SelectList ausgewählten Gruppe für das im @see DatePicker ausgewählte Datum vom Server. 
@@ -144,6 +195,18 @@ export default {
 
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
         this.showTimesBox = true
+      }
+    },
+
+    async onTrainerAttendanceChange(id) {
+      const trainer = this.attended.trainers.find(foo => foo._id == id)
+      trainer.attended = !trainer.attended
+      this.attended.totalHours = this.totalHours
+      
+      if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+        this.showTimesBox = true
+      } else {
+        console.log(await updateTrainingssession(this.selectedGroup.id, this.date, this.attended))
       }
     },
 

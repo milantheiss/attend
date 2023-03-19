@@ -5,7 +5,6 @@ const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
 const { hasAdminRole, hasAccessToGroup } = require('../utils/roleCheck');
-const { translateAliases } = require('../models/attendance.model');
 
 /**
  * Get all attendance lists.
@@ -75,7 +74,7 @@ const getTrainingssession = async (user, groupID, date) => {
             trainers.push({
                 firstname: trainer.firstname,
                 lastname: trainer.lastname,
-                attended: false,
+                attended: true,
                 _id: trainer._id
             })
         })
@@ -170,52 +169,53 @@ const createAttendance = async (user, attendanceBody) => {
  */
 const updateTrainingssession = async (user, groupID, date, sessionBody) => {
     if (hasAccessToGroup(user, groupID)) {
-        const session = await getTrainingssession(user, groupID, new Date(date))
+        if (!sessionBody.date || !sessionBody.participants || !sessionBody.trainers) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "The body is missing required fields")
+        }
 
-        //Gleicht updated SessionBody mit session in DB ab
-        //SessionBody wird nicht direkt in DB übertrage, damit keine anderen Werte, außer attended verändert werden können.
-        sessionBody.participants.forEach(participant => {
-            const temp = session.participants.find(foo => foo._id == participant._id)
-            //Es werden nur Teilnehmer, die in der DB existieren geupdatet. Um neue Participant hinzuzufügen, muss er erst hinzugefügt werden.
-            if (typeof temp !== 'undefined') {
-                temp.attended = participant.attended
-            }
-        })
+        if (!await runGarbageCollector(user, groupID, new Date(date), sessionBody)) {
+            const session = await getTrainingssession(user, groupID, new Date(date))
 
-        sessionBody.trainers.forEach(trainer => {
-            const temp = session.trainers.find(foo => foo._id == trainer._id)
-            //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
-            if (typeof temp !== 'undefined') {
-                temp.attended = trainer.attended
-            }
-        })
+            //Gleicht updated SessionBody mit session in DB ab
+            //SessionBody wird nicht direkt in DB übertrage, damit keine anderen Werte, außer attended verändert werden können.
+            sessionBody.participants.forEach(participant => {
+                const temp = session.participants.find(foo => foo._id == participant._id)
+                //Es werden nur Teilnehmer, die in der DB existieren geupdatet. Um neue Participant hinzuzufügen, muss er erst hinzugefügt werden.
+                if (typeof temp !== 'undefined') {
+                    temp.attended = participant.attended
+                }
+            })
 
-        session.starttime = sessionBody.starttime
-        session.endtime = sessionBody.endtime
+            sessionBody.trainers.forEach(trainer => {
+                const temp = session.trainers.find(foo => foo._id == trainer._id)
+                //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
+                if (typeof temp !== 'undefined') {
+                    temp.attended = trainer.attended
+                }
+            })
 
-        //Formatiert Zeit vom Format 18:45 in 18,75
-        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-        const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
+            session.starttime = sessionBody.starttime
+            session.endtime = sessionBody.endtime
 
-        const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
+            //WARNING Hier ist eine Dopplung --> Frontend berechnet das schon
+            //Formatiert Zeit vom Format 18:45 in 18,75
+            // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+            const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
 
-        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-        session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
+            const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
 
-        if (!session.participants.some(participant => participant.attended === true)) {
-            console.debug("Delete Trainingssession");
-            await runGarbageCollector(user, groupID, date, session)
-        } else {
+            //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+            session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
+
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
                 console.debug('Add new Trainingssession');
-                await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: sessionBody } })
+                return await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: session } }, { new: true })
             } else {
                 console.debug('Update Trainingssession');
-                await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } })
+                return await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })
             }
         }
-        return await getTrainingssession(user, groupID, date)
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
@@ -228,17 +228,21 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
  * @param {*} groupID 
  * @param {*} date 
  * @param {*} sessionBody 
+ * @returns {Boolean} true if trainingssession was deleted
  */
 const runGarbageCollector = async (user, groupID, date, sessionBody = undefined) => {
     if (typeof sessionBody === 'undefined') {
         sessionBody = await getTrainingssession(user, groupID, date)
     }
 
+    //Garbage Collector nicht von Trainern abhängig, da Training stattfinden kann, ohne dass die eingetragenen Trainer anwesend sind
+    //Jedoch nicht ohne Kinder
     if (!sessionBody.participants.some(participant => participant.attended === true)) {
         logger.debug('Garbage Collector - Trainingssession: Deleted a trainingssession')
         await deleteTrainingssession(user, groupID, date)
+        return true
     } else {
-        logger.debug('Garbage Collector - Trainingssession: No trainingssession deleted')
+        return false
     }
 }
 

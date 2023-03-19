@@ -22,7 +22,7 @@ module.exports = {
         'dimmed-gradient-2': '#7C83C3',
         'delete-gradient-1': '#DE2C2C',
         'delete-gradient-2': '#D83535',
-        'background-graywhite': '#02344a',
+        'background-graywhite': '#edf0f2',
         'dark-grey': '#i',
         'special-red': '#FF1F28',
         "light-gray": "#6C7F8C",
