@@ -215,6 +215,8 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
                 console.debug('Update Trainingssession');
                 return await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })
             }
+        } else {
+           return await getTrainingssession(user, groupID, new Date(date))
         }
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")

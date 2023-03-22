@@ -71,7 +71,7 @@
     <div>
       <!--Collapsable Container-->
 
-      <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg drop-shadow-md" :class="{'bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 text-white': !trainerBox.showContent, 'transition bg-white text-black': trainerBox.showContent}">
+      <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg" :class="{'bg-transparent text-black': !trainerBox.showContent, 'transition ease-in-out drop-shadow-md bg-white text-black': trainerBox.showContent}"  v-if="typeof selectedGroup !== 'undefined'">
         <template #header>
           <p class="font-bold text-xl md:text-2xl">Trainer</p>
         </template>

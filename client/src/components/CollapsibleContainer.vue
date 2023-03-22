@@ -20,7 +20,7 @@
         <transition enter-active-class="transition ease-in-out duration-50" enter-from-class="-translate-y-5 opacity-0"
             enter-to-class="translate-y-0 opacity-100"
             leave-active-class="transition ease-in-out duration-100 transform"
-            leave-from-class="translate-y-0 opacity-100" leave-to-class="-translate-y-3 opacity-25">
+            leave-from-class="translate-y-0 opacity-100" leave-to-class="-translate-y-2 opacity-25">
                 <content class="container truncate" v-show="showContent">
                     <slot name="content"></slot>
                 </content>
