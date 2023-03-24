@@ -408,6 +408,28 @@ async function getInvoiceById(id) {
 	);
 }
 
+async function approveInvoice(id) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/approve/${id}`, {
+			method: "POST",
+			credentials: "include",
+			mode: "cors",
+		}),
+		{ raw: true }
+	);
+}
+
+async function rejectInvoice(id) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/reject/${id}`, {
+			method: "POST",
+			credentials: "include",
+			mode: "cors",
+		}),
+		{ raw: true }
+	);
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -432,5 +454,7 @@ export {
 	deleteManyNotifications,
 	setManyNotificationsAsRead,
 	getAllAssignedInvoices,
-	getInvoiceById
+	getInvoiceById,
+	approveInvoice,
+	rejectInvoice
 };

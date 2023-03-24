@@ -2,7 +2,7 @@
     <div class="relative container">
         <div>
             <!--Abrechnungsanzeige-->
-            <div v-if="typeof invoice !== 'undefined'">
+            <div v-if="typeof invoice !== 'undefined' && !this.status.show">
                 <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
                     <!--Info Field-->
                     <div class="flex justify-between items-center">
@@ -38,7 +38,7 @@
                     <div class="flex justify-between items-center">
                         <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
                         <p class="text-black font-medium text-base md:text-lg text-right">{{
-                            convertToReadableTime(invoice.totalHours) }}</p>
+                            convertToReadableTime(totalHours) }}</p>
                     </div>
                 </div>
 
@@ -147,49 +147,48 @@
                     </div>
                 </div>
             </div>
-
             <!--Sendebestätigung-->
             <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md" v-show="status.show">
-                <div class="flex flex-col justify-center items-center">
-                    <div class="mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
-                            v-show="status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
+                    <div class="flex flex-col justify-center items-center">
+                        <div class="mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
+                                v-show="status.processing">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
 
-                        <!--Check Circle-->
-                        <!--TODO Fix Bounce-->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                            stroke="currentColor" class="w-16 h-16 text-lime-600 animate-smaller-bounce"
-                            v-show="status.success && !status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                            <!--Check Circle-->
+                            <!--TODO Fix Bounce-->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                                stroke="currentColor" class="w-16 h-16 text-lime-600 animate-smaller-bounce"
+                                v-show="status.success && !status.processing">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
 
-                        <!--X Circle-->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                            stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
-                            v-show="!status.success && !status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                            <!--X Circle-->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                                stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
+                                v-show="!status.success && !status.processing">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <p class="mb-3 text-lg">{{ status.text }}</p>
+                        <button @click="ok"
+                            class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
+                            <p class="font-medium font-base md:text-lg">Okay</p>
+                        </button>
                     </div>
-                    <p class="mb-3 text-lg">{{ status.text }}</p>
-                    <button @click="ok"
-                        class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
-                        <p class="font-medium font-base md:text-lg">Okay</p>
-                    </button>
                 </div>
-            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { createInvoice } from "@/util/generatePdf"
-import { fetchDataForNewInvoice, getInvoiceById } from '@/util/fetchOperations'
+import { fetchDataForNewInvoice, getInvoiceById, approveInvoice, rejectInvoice } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
@@ -223,8 +222,8 @@ export default {
                 }
             },
             status: {
-                text: 'Abrechnung wird versendet...',
                 show: false,
+                text: "Bitte warten...",
                 processing: true,
                 success: false,
             },
@@ -242,23 +241,6 @@ export default {
         Card
     },
     methods: {
-        /**
-         * Zieht Attendance Daten von der Datenbank und erstellt mit @see createList() ein neues PDF
-         */
-        async exportPDF() {
-            //if (!this.hasAnError()) {
-            //TODO --> Erstelle zwei Abrechnungen für Gruppenauswahl mit zwei Departments
-
-            //this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
-            // if (attendance.dates.length === 0) {
-            //     this.error.show = true
-            //     this.error.cause.timespanFaulty = true
-            //     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
-            // } else {
-            await createInvoice(this.filename, this.dataStore.invoiceData)
-            // }
-            //}
-        },
         async getInvoice() {
             if (!this.hasAnError()) {
                 this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
@@ -302,10 +284,13 @@ export default {
             group.trainingssessions.splice(index, 1)
         },
 
-        reject() {
+        async reject() {
             //Backend: Invoice wird als Rejected gesetzt & Submitter wird benachrichtigt
-            //... Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
+            //TODO Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
+            await rejectInvoice(this.invoice.id)
             this.dataStore.invoiceData = {}
+
+            this.$router.push("/openInvoices")
         },
 
         async approve() {
@@ -315,47 +300,30 @@ export default {
             //In Frontend: Invoice wird als PDF generiert und als Download angeboten
             //... bzw. als Email versendet/mailto Link generiert
 
-            await createInvoice(this.filename, this.invoice)
+            this.invoice.totalHours = this.totalHours
 
-            // this.status.show = true
+            this.status.show = true
 
-            // this.dataStore.invoiceData.groups = this.dataStore.invoiceData.groups.filter(val => val.include)
-            // this.dataStore.invoiceData.groups.forEach(group => delete group.include)
-
-            // //Send Invoice
-            // const res = await sendInvoice(this.dataStore.invoiceData)
-
-            // if (res.status === 200 && await res.text() === "Invoice submitted") {
-            //     this.status.success = true
-            //     this.status.processing = false
-            //     this.status.text = 'Abrechnung erfolgreich versendet!'
-            //     //Trigger send success
-            // } else {
-            //     this.status.success = false
-            //     this.status.processing = false
-            //     this.status.text = 'Abrechnung konnte nicht versendet werden!'
-            //     //Trigger send error
-            // }
-
-            // this.dataStore.invoiceData = {}
+            const res = await approveInvoice(this.invoice.id)
+            if (res.status === 200 && await res.text() === "Invoice approved") {
+                this.status.success = true
+                this.status.processing = false
+                this.status.text = 'Abrechnung genehmigt.'
+                await createInvoice(this.filename, this.invoice)
+            } else {
+                this.status.success = false
+                this.status.processing = false
+                this.status.text = 'Abrechnung konnte nicht genehmigt werden.'
+            }
         },
         ok() {
+            this.$router.push("/openInvoices")
             this.status.show = false
             this.status.processing = true
             this.status.success = false
-            this.status.text = 'Abrechnung wird versendet...'
-        },
-        refresh() {
-            //TODO --> Refresh Invoice
+            this.status.text = 'Bitte warten...'
 
-            this.spin = true
-            setTimeout(() => {
-                this.spin = false
-            }, 1000)
-        },
-        goToInvoice(id) {
-            //TODO --> Go to Invoice by ID
-            console.log(id);
+            this.dataStore.invoiceData = {}
         },
         convertToReadableTime(timeInDecimal) {
             const hh = Math.trunc(timeInDecimal)
@@ -385,11 +353,6 @@ export default {
 
         console.log(this.invoice);
     },
-    watch: {
-        totalHours(newVal) {
-            this.dataStore.invoiceData.totalHours = newVal
-        }
-    },
     computed: {
         selectedGroups() {
             return (this.groups.filter(val => this.$refs.checkboxList.selectedElements.includes(val.name))).map(val => val._id)
@@ -409,7 +372,7 @@ export default {
                         const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + Number(element.endtime?.split(":")[1]) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric)/100 : 0;
+                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
                     }
                 })
             })

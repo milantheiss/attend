@@ -6,7 +6,7 @@ const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
 const { Department, Invoice, Group, User } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
-const { hasTrainerRole, hasAssistantRole } = require("../utils/roleCheck");
+const { hasTrainerRole, hasAssistantRole, hasDepartmentHeadRole } = require("../utils/roleCheck");
 const config = require("../config/config");
 
 const getDatasetForNewInvoice = catchAsync(async (req, res) => {
@@ -118,7 +118,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 
 const getAllAssignedInvoices = catchAsync(async (req, res) => {
 	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
-		const invoices = await Invoice.find({ assignedTo: req.user._id });
+		const invoices = await Invoice.find({ assignedTo: req.user._id, $or: [{status: "pending"}, {status: "reopened"}] });
 
 		if (invoices === null || typeof invoices === "undefined") {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");

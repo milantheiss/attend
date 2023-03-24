@@ -4,8 +4,8 @@
             <div class="flex rounded-lg drop-shadow-md p-1 mb-2 text-dark-grey text-xl font-light px-3 gap-x-2">
                 <div class="basis-5 md:hidden flex flex-none"></div>
                 <p class="basis-[38%] sm:basis-[29%] truncate">Zeitraum</p>
-                <p class="basis-[20%] truncate hidden md:block">Status</p>
-                <p class="basis-[36%] md:basis-[37%] truncate">Ersteller</p>
+                <p class="basis-[38%] truncate">Ersteller</p>
+                <p class="basis-[20%] md:basis-[35%] truncate">Erstellt am</p>
                 <div class="basis-[5%] flex justify-center">
                     <Transition>
                         <!--Refresh Icon-->
@@ -24,11 +24,7 @@
             <!--InvoiceCard-->
             <div class="flex items-center bg-white rounded-lg drop-shadow-md hover:drop-shadow-xl px-3 py-2 mb-2 text-xl font-base text-dark-grey gap-x-2 cursor-pointer group"
                 v-for="invoice in allAssignedInvoices" :key="invoice.id" @click="goToInvoice(invoice.id)">
-                <div class="basis-5 h-5 md:hidden block">
-                    <div class="rounded-full bg-indigo-500 w-full h-full"
-                        :class="{ 'bg-standard-gradient-2 text-white': invoice.status === 'pending', 'bg-green-600': invoice.status === 'accepted' }">
-                    </div>
-                </div>
+                
                 <div class="flex flex-col sm:flex-row basis-[38%] sm:basis-[29%]">
                     <p class="">{{
                         new Date(invoice.startdate).toLocaleDateString('de-DE', {
@@ -44,19 +40,15 @@
                         })
                     }}</p>
                 </div>
-                <!--New Notification Dot ~ Blauer Pulsierender Punkt-->
-                <div class="basis-[20%] hidden md:block">
-                    <div class="rounded-full px-3 bg-indigo-500 flex justify-self-center justify-center items-center w-fit text-base"
-                        :class="{ 'bg-standard-gradient-2 text-white': invoice.status === 'pending', 'bg-green-600': invoice.status === 'accepted' }">
-                        <p class="truncate w-max">{{
-                            invoice.status === 'pending' ? 'Ausstehend' : invoice.status === 'accepted' ?
-                                'Akzeptiert' : 'Abgelehnt'
-                        }}</p>
-                    </div>
-                </div>
                 <p class="text-dark-grey basis-[41%] md:basis-[37%] truncate">{{
                     invoice.submittedBy.firstname + " " + invoice.submittedBy.lastname
                 }}</p>
+                <p class="text-dark-grey basis-[41%] md:basis-[37%] truncate">{{
+                    new Date(invoice.dateOfReceipt).toLocaleDateString('de-DE', {
+                        year: '2-digit', month:
+                            'numeric', day: 'numeric'
+                    })
+                    }}</p>
                 <!--Arrow Icon-->
                 <div class="basis-[5%] flex justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -75,6 +67,8 @@
 import { getAllAssignedInvoices } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
 import { ref } from 'vue';
+
+//TODO Umstellen auf Antrag Seite
 
 export default {
     name: "OpenInvoices",
@@ -98,16 +92,16 @@ export default {
         }
     },
     methods: {
-        refresh() {
-            //TODO --> Refresh Invoice
-
+        async refresh() {
             this.spin = true
             setTimeout(() => {
                 this.spin = false
             }, 1000)
+            console.log('refresh');
+            this.allAssignedInvoices = await getAllAssignedInvoices()
+
         },
         goToInvoice(id) {
-            //TODO --> Go to Invoice by ID
             console.log(id);
             this.$router.push({path: '/reviewInvoice', query: {id: id}})
         }

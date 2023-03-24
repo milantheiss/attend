@@ -320,11 +320,6 @@ export default {
         document.title = 'Erstelle eine Abrechnung - Attend'
         this.dataStore.viewname = "Abrechnung erstellen"
     },
-    watch: {
-        totalHours(newVal) {
-            this.dataStore.invoiceData.totalHours = newVal
-        },
-    },
     computed: {
         selectedGroups() {
             return (this.groups.filter(val => this.$refs.checkboxList.selectedElements.includes(val.name))).map(val => val._id)
