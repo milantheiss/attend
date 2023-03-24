@@ -71,7 +71,8 @@
     <div>
       <!--Collapsable Container-->
 
-      <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg" :class="{'bg-transparent text-black': !trainerBox.showContent, 'transition ease-in-out drop-shadow-md bg-white text-black': trainerBox.showContent}"  v-if="typeof selectedGroup !== 'undefined'">
+      <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg" v-if="typeof selectedGroup !== 'undefined'"
+        :class="{ 'bg-transparent text-black': !trainerBox.showContent, 'transition ease-in-out drop-shadow-md bg-white text-black': trainerBox.showContent }">
         <template #header>
           <p class="font-bold text-xl md:text-2xl">Trainer</p>
         </template>
@@ -81,31 +82,9 @@
             <!--TODO Animation fixen-->
             <!--TODO Spacing zwischen Attandence List und TrainerBox fixen-->
             <!--Card list -> Trainer opt out-->
-            <!--<div @click="onTrainerAttendanceChange(trainer._id)"
-              :class="trainer.attended ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1' : 'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
-              class="px-3.5 py-3 rounded-lg drop-shadow font-normal text-xl hover:cursor-pointer select-none">
-              <span class="flex items-center justify-between">
-                <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
-                <span class="self-center w-6">-->
-                  <!--Checkmark Icon-->
-                  <!--
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 73.031 55.976" class="text-white"
-                    v-show="trainer.attended">
-                    <path fill="none" stroke="currentColor" stroke-width="9.973"
-                      d="M69.465 3.486 25.048 48.925 3.486 27.847" />
-                  </svg>-->
-                  <!--Checkbox Icon-->
-                  <!--
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80.851 80.851" v-show="!trainer.attended"
-                    class="text-dark-grey">
-                    <path fill="none" stroke="currentColor" stroke-width="7.5"
-                      d="M28.885 3.75h23.08a25.135 25.135 0 0 1 25.136 25.135v23.08a25.135 25.135 0 0 1-25.136 25.136h-23.08A25.135 25.135 0 0 1 3.75 51.966v-23.08A25.135 25.135 0 0 1 28.885 3.75z" />
-                  </svg>
-                </span>
-              </span>
-            </div>-->
             <div @click="onTrainerAttendanceChange(trainer._id)"
-              class="text-black rounded-lg font-normal text-xl hover:cursor-pointer select-none" :class="{'': !trainerBox.showContent}">
+              class="text-black rounded-lg font-normal text-xl hover:cursor-pointer select-none"
+              :class="{ '': !trainerBox.showContent }">
               <span class="flex items-center justify-between">
                 <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
                 <CheckboxInput v-model="trainer.attended"></CheckboxInput>
@@ -161,7 +140,7 @@ export default {
     TimeInput,
     CollapsibleContainer,
     CheckboxInput
-},
+  },
   methods: {
     /**
      * Zieht beim aufrufen die Attendance List der in @see SelectList ausgewählten Gruppe für das im @see DatePicker ausgewählte Datum vom Server. 
@@ -198,11 +177,11 @@ export default {
       }
     },
 
-    async onTrainerAttendanceChange(id) {
+    async onTrainerAttendanceChange(id) {     
       const trainer = this.attended.trainers.find(foo => foo._id == id)
       trainer.attended = !trainer.attended
       this.attended.totalHours = this.totalHours
-      
+
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
         this.showTimesBox = true
       } else {
@@ -255,11 +234,15 @@ export default {
 
       document.title = this.selectedGroup.name + ' - Attend'
     },
-    async totalHours() {
-      console.log("🚀 ~ file: AttendanceListView.vue:191 ~ totalHours ~ this.totalHours", this.totalHours)
-
+    async "attend.starttime"() {
+      //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended.totalHours = this.totalHours
+        this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      }
+    },
+    async "attend.endtime"() {
+      //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
+      if (this.attended.participants.some(foo => foo.attended)) {
         this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
       }
     },

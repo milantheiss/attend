@@ -7,7 +7,6 @@ const getAttendance = catchAsync(async (req, res) => {
   const result = await attendanceService.getAttendance(req.user);
   logger.debug('GET - all attendance lists')
   res.send(result);
-
 });
 
 const getAttendanceById = catchAsync(async (req, res) => {

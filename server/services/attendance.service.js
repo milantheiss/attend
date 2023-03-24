@@ -200,24 +200,22 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             //WARNING Hier ist eine Dopplung --> Frontend berechnet das schon
             //Formatiert Zeit vom Format 18:45 in 18,75
             // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-            const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
+            // const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
 
-            const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
+            // const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
 
             //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-            session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
+            // session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
 
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
                 console.debug('Add new Trainingssession');
-                return await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: session } }, { new: true })
+                return (await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             } else {
-                console.debug('Update Trainingssession');
-                return await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })
+                console.debug('Update Trainingssession', date);
+                return (await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             }
-        } else {
-           return await getTrainingssession(user, groupID, new Date(date))
-        }
+        } 
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
