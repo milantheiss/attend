@@ -84,7 +84,7 @@ function generateGroupInfo(doc, group) {
   }
 
   let trainer = ""
-  for (const obj of group.trainer) {
+  for (const obj of group.trainers) {
     trainer = trainer + obj.name + " "
   }
 

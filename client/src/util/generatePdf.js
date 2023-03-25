@@ -48,12 +48,12 @@ class AttendanceListPdf {
     }
 
     let trainer = "";
-    for (const obj of group.trainer.filter((val) => val.position === "trainer")) {
+    for (const obj of group.trainers.filter((val) => val.position === "trainer")) {
       trainer = trainer + obj.firstname + " " + obj.lastname + " ";
     }
 
     let assistant = "";
-    for (const obj of group.trainer.filter((val) => val.position === "assistant")) {
+    for (const obj of group.trainers.filter((val) => val.position === "assistant")) {
       assistant = assistant + obj.firstname + " " + obj.lastname + " ";
     }
 

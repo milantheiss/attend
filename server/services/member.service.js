@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { default: mongoose } = require('mongoose');
 const { Member, Issue } = require('../models');
-const Group = require('../models/group.model');
+const Group = require('../models/old.group.model');
 const User = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 

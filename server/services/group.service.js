@@ -1,9 +1,30 @@
 const httpStatus = require('http-status');
-const { Group, Attendance, Member } = require('../models');
+const { Group, Attendance, Member, User } = require('../models');
 const memberService = require("../services/member.service")
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
-//const { attendanceController } = require('../controllers');
+
+async function getTrainersOfGroup(group) {
+    group.trainers = await Promise.all(group.trainers.map(async (trainer) => {
+        const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
+        trainer._doc.firstname = res.firstname;
+        trainer._doc.lastname = res.lastname;
+        trainer._doc._id = res._id;
+        return trainer;
+    }));
+    return group.trainers
+}
+
+async function getParticipantsOfGroup(group) { 
+    group.participants = await Promise.all(group.participants.map(async (participant) => {
+        const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
+        participant._doc.firstname = res.firstname;
+        participant._doc.lastname = res.lastname;
+        participant._doc._id = res._id;
+        return participant;
+    }));
+    return group.participants   
+}
 
 /**
  * Get all groups accessable be the user
@@ -18,10 +39,15 @@ const getGroups = async (user) => {
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         const groups = await Group.find({ '_id': { $in: user.accessible_groups } })
 
-        if (groups.length === 0) {
+        if (groups.length === 0 || groups === null) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
         }
+
+        groups.forEach(async (group) => {
+            group.trainers = await getTrainersOfGroup(group)
+            group.participants = await getParticipantsOfGroup(group)
+        })
 
         return groups
     } else {
@@ -38,7 +64,16 @@ const getGroupById = async (user, groupID) => {
     if (hasAccessToGroup(user, groupID)) {
         //admin hat Zugriff auf alle Gruppen
         //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
-        return await Group.findById(groupID)
+        const group = await Group.findById(groupID)
+
+        if (!group) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
+        }
+
+        group.trainers = await getTrainersOfGroup(group)
+        group.participants = await getParticipantsOfGroup(group)
+
+        return group
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to this group")
     }
@@ -83,7 +118,7 @@ const updateMember = async (user, groupID, body) => {
             const foo = group.participants.find(e => e._id.equals(body._id))
             oldFirsttraining = foo.firsttraining
 
-            //Lokale Variable group wird geupdatet für den Return
+            //Lokale Variable group wird geupdatet für den Returns
             foo.firstname = body.firstname
             foo.lastname = body.lastname
             foo.firsttraining = body.firsttraining

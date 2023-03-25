@@ -67,7 +67,7 @@ const getTrainingssession = async (user, groupID, date) => {
 
         let trainers = []
 
-        group.trainer.forEach(trainer => {
+        group.trainers.forEach(trainer => {
             trainers.push({
                 attended: true,
                 _id: trainer._id
@@ -226,7 +226,6 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
 
 /**
  * Checks for the given trainingssession. If list is empty, the trainingssession will be deleted
- * WARNING Keine Auth Check
  * @param {*} user 
  * @param {*} groupID 
  * @param {*} date 
@@ -250,20 +249,6 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
 }
 
 /**
- * Delete a attendance list
- * @param attendanceID
- * @returns {Promise<Attendance>}
- */
-//WARNING Wird nicht genutzt --> Kann gelöscht werden
-// const deleteAttendance = async (user, attendanceID) => {
-//     if (user.roles.includes('admin') || (user.roles.includes('trainer') && user.accessible_groups.includes(groupID))) {
-//         return Attendance.findByIdAndDelete(attendanceID)
-//     } else {
-//         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to delete a attendance list")
-//     }
-// };
-
-/**
  * Delete a trainings session
  * @param attendanceID
  * @returns {Promise<Attendance>}
@@ -281,16 +266,29 @@ const deleteTrainingssession = async (user, groupID, date) => {
  */
 const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate) => {
     //INFO Access control by getAttendanceByGroup()
-    const list = await getAttendanceByGroup(user, groupID)
-    let temp = {}
-    temp.group = list.group
+    let list = await getAttendanceByGroup(user, groupID)
 
-    temp.trainingssessions = list.trainingssessions.filter((e) => {
-        //TODO Mit MongoDB Query machen
+    list.trainingssessions = await Promise.all(list.trainingssessions.filter(async(e) => {
         if (e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
+            e.trainers = await Promise.all(e.trainers.map(async (trainer) => {
+                const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+                trainer._doc.firstname = res.firstname;
+                trainer._doc.lastname = res.lastname;
+                trainer._doc._id = res._id;
+                return trainer;
+            }));
+    
+            e.participants = await Promise.all(e.participants.map(async (participant) => {
+                const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+                participant._doc.firstname = res.firstname;
+                participant._doc.lastname = res.lastname;
+                participant._doc._id = res._id;
+                return participant;
+            }));
+
             return e
         }
-    })
+    }))
 
     return temp
 }
@@ -332,6 +330,22 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     }
 
     for (session of result.trainingssessions) {
+        session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
+            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            trainer._doc.firstname = res.firstname;
+            trainer._doc.lastname = res.lastname;
+            trainer._doc._id = res._id;
+            return trainer;
+        }));
+
+        session.participants = await Promise.all(session.participants.map(async (participant) => {
+            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            participant._doc.firstname = res.firstname;
+            participant._doc.lastname = res.lastname;
+            participant._doc._id = res._id;
+            return participant;
+        }));
+
         tempList.dates.push(session.date)
         for (participant of session.participants) {
             const temp = tempList.participants.find(foo => foo._id.equals(participant._id))

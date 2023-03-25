@@ -6,7 +6,8 @@ const attendanceSchema = mongoose.Schema(
     {
         group: {
             type: mongoose.Types.ObjectId,
-            required: true
+            required: true,
+            unique: true
         },
         trainingssessions: {
             type: [
@@ -26,10 +27,24 @@ const attendanceSchema = mongoose.Schema(
                     participants: {
                         type: [
                             {
+                                // INFO userId muss im Updater aus _id gezogen werden
+                                // INFO _id muss im Updater für embedded Object gelöscht werden
                                 memberId: {
                                     type: mongoose.Types.ObjectId,
                                     required: true
                                 },
+
+                                // INFO Das muss im Updater gelöscht werden
+                                firstname: {
+                                    type: String,
+                                    required: false
+                                },
+                                lastname: {
+                                    type: String,
+                                    required: false
+                                },
+
+
                                 attended: {
                                     type: Boolean,
                                     required: true
@@ -40,6 +55,8 @@ const attendanceSchema = mongoose.Schema(
                     trainers: {
                         type: [
                             {
+                                // INFO userId muss im Updater aus _id gezogen werden
+                                // INFO _id muss im Updater für embedded Object gelöscht werden
                                 userId: {
                                     type: mongoose.Types.ObjectId,
                                     required: true

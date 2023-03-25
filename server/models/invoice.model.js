@@ -21,6 +21,7 @@ const invoiceSchema = mongoose.Schema(
         groups: {
             type: [
                 {
+                    // Ist embeded, da es ein Snapshot zu Erstellungszeitpunkt ist
                     asssistent: Array,
                     department: {
                     type: {
@@ -48,6 +49,8 @@ const invoiceSchema = mongoose.Schema(
                            ],
                         required: true
                     },
+                    // Embeded Attendance List muss geladen werden
+                    // TODO: Embeded Attendance List muss geladen werden
                     attendanceList: Object,
                     venue: String
                 }
@@ -55,15 +58,7 @@ const invoiceSchema = mongoose.Schema(
             required: true
         },
         totalHours: Number,
-        userInfo: {
-            type: {
-                userID: mongoose.Types.ObjectId,
-                firstname: String,
-                lastname: String,
-                email: String,
-            },
-            required: true
-        },
+        //MOD userInfo entfernt
         submittedBy: {
             type: mongoose.Types.ObjectId,
             required: true

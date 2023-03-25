@@ -181,6 +181,9 @@ const getOwnInvoices = catchAsync(async (req, res) => {
 
 const approveInvoice = catchAsync(async (req, res) => {
 	if (hasDepartmentHeadRole(req.user)) {
+
+		//TODO Diese Schreibweise häufiger einsetzten
+
 		const invoice = await Invoice.findById(req.params.id);
 
 		if (invoice === null || typeof invoice === "undefined") {
@@ -193,6 +196,7 @@ const approveInvoice = catchAsync(async (req, res) => {
 
 		invoice.status = "approved";
 		invoice.dateOfLastChange = new Date();
+		invoice.reviewer = req.user._id;
 
 		await invoice.save();
 
@@ -218,6 +222,7 @@ const rejectInvoice = catchAsync(async (req, res) => {
 
 		invoice.status = "rejected";
 		invoice.dateOfLastChange = new Date();
+		invoice.reviewer = req.user._id;
 
 		await invoice.save();
 
