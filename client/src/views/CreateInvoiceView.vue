@@ -334,9 +334,9 @@ export default {
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
                         // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + Number(element.starttime?.split(":")[1]) || 0;
+                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + (Number(element.starttime?.split(":")[1])/60*100) || 0;
 
-                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + Number(element.endtime?.split(":")[1]) || 0;
+                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + (Number(element.endtime?.split(":")[1])/60*100) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
                         tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric)/100 : 0;

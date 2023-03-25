@@ -128,9 +128,9 @@ export default {
     computed: {
         totalHours() {
             // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-            const startingTime = Number(this.session.starttime?.split(":")[0]) * 100 + Number(this.session.starttime?.split(":")[1]) || 0;
+            const startingTime = Number(this.session.starttime?.split(":")[0]) * 100 + (Number(this.session.starttime?.split(":")[1])/60*100) || 0;
 
-            const endingTime = Number(this.session.endtime?.split(":")[0]) * 100 + Number(this.session.endtime?.split(":")[1]) || 0;
+            const endingTime = Number(this.session.endtime?.split(":")[0]) * 100 + (Number(this.session.endtime?.split(":")[1])/60*100) || 0;
 
             return endingTime - startingTime > 0 ? (endingTime - startingTime) / 100 : 0;
         },

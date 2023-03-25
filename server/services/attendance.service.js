@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Attendance } = require('../models');
+const { Attendance, User, Member } = require('../models');
 const { groupService } = require('../services');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
@@ -40,7 +40,6 @@ const getAttendance = async (user) => {
 const getTrainingssession = async (user, groupID, date) => {
     //INFO Access control wird von 'getAttendanceByGroup' gehandelt
     const attendance = await getAttendanceByGroup(user, groupID)
-    let session
 
     //Falls es noch gar keine Attendance gibt, 
     try {
@@ -60,8 +59,6 @@ const getTrainingssession = async (user, groupID, date) => {
         group.participants.forEach((participant) => {
             if (date >= participant.firsttraining) {
                 participants.push({
-                    firstname: participant.firstname,
-                    lastname: participant.lastname,
                     attended: false,
                     _id: participant._id
                 })
@@ -72,8 +69,6 @@ const getTrainingssession = async (user, groupID, date) => {
 
         group.trainer.forEach(trainer => {
             trainers.push({
-                firstname: trainer.firstname,
-                lastname: trainer.lastname,
                 attended: true,
                 _id: trainer._id
             })
@@ -88,30 +83,48 @@ const getTrainingssession = async (user, groupID, date) => {
         const starttime = timeInfo?.starttime ?? null;
         const endtime = timeInfo?.endtime ?? null;
 
-        let totalHours = 0;
-
-        if (starttime && endtime) {
-            //Formatiert Zeit vom Format 18:45 in 18,75
-            const starttimeNumeric = Number(timeInfo.starttime.split(":")[0]) + Number(timeInfo.starttime.split(":")[1] / 60) || 0;
-
-            const endtimeNumeric = Number(timeInfo.endtime.split(":")[0]) + Number(timeInfo.endtime.split(":")[1] / 60) || 0;
-
-            totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
-        } else {
-            totalHours = null
-        }
-
         const sessionBody = {
             date: date,
             starttime: starttime,
             endtime: endtime,
-            totalHours: totalHours,
             participants: participants,
             trainers: trainers
         }
 
+        sessionBody.participants = await Promise.all(sessionBody.participants.map(async (participant) => {
+            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            participant.firstname = res.firstname;
+            participant.lastname = res.lastname;
+            participant._id = res._id;
+            return participant;
+        }));
+    
+        sessionBody.trainers = await Promise.all(sessionBody.trainers.map(async (trainer) => {
+            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            trainer.firstname = res.firstname;
+            trainer.lastname = res.lastname;
+            trainer._id = res._id;
+            return trainer;
+        }));
+
         return sessionBody
     } else {
+        session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
+            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            trainer._doc.firstname = res.firstname;
+            trainer._doc.lastname = res.lastname;
+            trainer._doc._id = res._id;
+            return trainer;
+        }));
+
+        session.participants = await Promise.all(session.participants.map(async (participant) => {
+            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            participant._doc.firstname = res.firstname;
+            participant._doc.lastname = res.lastname;
+            participant._doc._id = res._id;
+            return participant;
+        }));
+
         return session
     }
 };
@@ -197,16 +210,6 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             session.starttime = sessionBody.starttime
             session.endtime = sessionBody.endtime
 
-            //WARNING Hier ist eine Dopplung --> Frontend berechnet das schon
-            //Formatiert Zeit vom Format 18:45 in 18,75
-            // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-            // const starttimeNumeric = Number(sessionBody.starttime?.split(":")[0]) * 100 + Number(sessionBody.starttime?.split(":")[1]) || null;
-
-            // const endtimeNumeric = Number(sessionBody.endtime.split(":")[0]) * 100 + Number(sessionBody.endtime.split(":")[1]) || null;
-
-            //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-            // session.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0 ?? null;
-
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
                 console.debug('Add new Trainingssession');
@@ -215,7 +218,7 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
                 console.debug('Update Trainingssession', date);
                 return (await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             }
-        } 
+        }
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }

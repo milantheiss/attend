@@ -67,8 +67,6 @@ export const useAuthStore = defineStore('authStore', {
         useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
       }
 
-      console.log("🚀 ~ file: authStore.js:63 ~ authenticate ~ this.authenticated", this.authenticated)
-
       return this.authenticated
     }
   }
