@@ -1,5 +1,5 @@
 <template>
-  <GroupListItem v-for="participant in this.participantArr" :key="participant._id" :participant="participant"
+  <GroupListItem v-for="participant in this.participantArr" :key="participant.memberId" :participant="participant"
     @onClickOnSave="(participantData) => $emit('onClickOnSave', participantData)"
     @onClickOnDelete="(participantData) => $emit('onClickOnDelete', participantData)" />
     <p v-show="participantArr.length === 0"

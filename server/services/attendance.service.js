@@ -19,7 +19,7 @@ const getAttendance = async (user) => {
     } else if (user.accessible_groups.length > 0) {
         //Wenn user ein Trainer o.ä. ist, wird für alle Attendance Lists die einer Gruppe zugewiesen sind, 
         //auf die der User Zugriff hat
-        const list = await Attendance.find({ 'group._id': { $in: user.accessible_groups } })
+        const list = await Attendance.find({ group: { $in: user.accessible_groups } })
 
         if (!list.length) {
             throw new ApiError(httpStatus.NOT_FOUND, 'No attendance list found for groups to which the user has access')
@@ -47,6 +47,7 @@ const getTrainingssession = async (user, groupID, date) => {
     } catch { }
 
     if (typeof session === 'undefined' && session == null) {
+        console.log("New session");
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
         //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
@@ -60,7 +61,7 @@ const getTrainingssession = async (user, groupID, date) => {
             if (date >= participant.firsttraining) {
                 participants.push({
                     attended: false,
-                    _id: participant._id
+                    memberId: participant.memberId
                 })
             }
         })
@@ -70,7 +71,7 @@ const getTrainingssession = async (user, groupID, date) => {
         group.trainers.forEach(trainer => {
             trainers.push({
                 attended: true,
-                _id: trainer._id
+                userId: trainer.userId
             })
         })
 
@@ -92,25 +93,23 @@ const getTrainingssession = async (user, groupID, date) => {
         }
 
         sessionBody.participants = await Promise.all(sessionBody.participants.map(async (participant) => {
-            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
             participant.firstname = res.firstname;
             participant.lastname = res.lastname;
-            participant._id = res._id;
             return participant;
         }));
     
         sessionBody.trainers = await Promise.all(sessionBody.trainers.map(async (trainer) => {
-            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
             trainer.firstname = res.firstname;
             trainer.lastname = res.lastname;
-            trainer._id = res._id;
             return trainer;
         }));
 
         return sessionBody
     } else {
         session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
-            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
             trainer._doc.firstname = res.firstname;
             trainer._doc.lastname = res.lastname;
             trainer._doc._id = res._id;
@@ -118,7 +117,7 @@ const getTrainingssession = async (user, groupID, date) => {
         }));
 
         session.participants = await Promise.all(session.participants.map(async (participant) => {
-            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
             participant._doc.firstname = res.firstname;
             participant._doc.lastname = res.lastname;
             participant._doc._id = res._id;
@@ -138,16 +137,14 @@ const getAttendanceByGroup = async (user, groupID) => {
     if (hasAccessToGroup(user, groupID)) {
         //Admin kann auf alle Listen zugreifen. Trainer kann nur auf Liste zugreifen, wenn er access auf die Gruppe hat.
         try {
-            const _res = await Attendance.findOne({ 'group._id': groupID })
+            const _res = await Attendance.findOne({ 'group': groupID })
 
             //Wenn noch keine Attendance Document existiert, ist _res null
             if (_res !== null && typeof _res !== 'undefined') {
                 return _res
             } else { //Erstellt neues Attendance Document
                 return Attendance.create({
-                    group: {
-                        _id: new mongoose.Types.ObjectId(groupID)
-                    },
+                    group: new mongoose.Types.ObjectId(groupID),
                     trainingssessions: []
                 })
             }
@@ -192,7 +189,7 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             //Gleicht updated SessionBody mit session in DB ab
             //SessionBody wird nicht direkt in DB übertrage, damit keine anderen Werte, außer attended verändert werden können.
             sessionBody.participants.forEach(participant => {
-                const temp = session.participants.find(foo => foo._id == participant._id)
+                const temp = session.participants.find(foo => foo.memberId == participant.memberId)
                 //Es werden nur Teilnehmer, die in der DB existieren geupdatet. Um neue Participant hinzuzufügen, muss er erst hinzugefügt werden.
                 if (typeof temp !== 'undefined') {
                     temp.attended = participant.attended
@@ -200,7 +197,7 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             })
 
             sessionBody.trainers.forEach(trainer => {
-                const temp = session.trainers.find(foo => foo._id == trainer._id)
+                const temp = session.trainers.find(foo => foo.userId == trainer.userId)
                 //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
                 if (typeof temp !== 'undefined') {
                     temp.attended = trainer.attended
@@ -210,14 +207,35 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             session.starttime = sessionBody.starttime
             session.endtime = sessionBody.endtime
 
+            let updatedSession
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
                 console.debug('Add new Trainingssession');
-                return (await Attendance.findOneAndUpdate({ 'group._id': groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
+                updatedSession = (await Attendance.findOneAndUpdate({ group: groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON()) 
             } else {
                 console.debug('Update Trainingssession', date);
-                return (await Attendance.findOneAndUpdate({ 'group._id': groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
+                updatedSession = (await Attendance.findOneAndUpdate({ group: groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             }
+
+            updatedSession.trainers = await Promise.all(updatedSession.trainers.map(async (trainer) => {
+                const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
+                trainer._doc.firstname = res.firstname;
+                trainer._doc.lastname = res.lastname;
+                trainer._doc._id = res._id;
+                return trainer;
+            }));
+    
+            updatedSession.participants = await Promise.all(updatedSession.participants.map(async (participant) => {
+                const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
+                participant._doc.firstname = res.firstname;
+                participant._doc.lastname = res.lastname;
+                participant._doc._id = res._id;
+                return participant;
+            }));
+
+            return updatedSession
+        } else {
+            return await getTrainingssession(user, groupID, new Date(date))
         }
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
@@ -255,7 +273,7 @@ const runGarbageCollector = async (user, groupID, date, sessionBody = undefined)
  */
 const deleteTrainingssession = async (user, groupID, date) => {
     if (hasAccessToGroup(user, groupID)) {
-        return await Attendance.findOneAndUpdate({ 'group._id': groupID, }, { '$pull': { 'trainingssessions': { 'date': date } } })
+        return await Attendance.findOneAndUpdate({ group: groupID, }, { '$pull': { 'trainingssessions': { 'date': date } } })
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user's role has no access to attendance lists")
     }
@@ -271,7 +289,7 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     list.trainingssessions = await Promise.all(list.trainingssessions.filter(async(e) => {
         if (e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
             e.trainers = await Promise.all(e.trainers.map(async (trainer) => {
-                const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+                const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
                 trainer._doc.firstname = res.firstname;
                 trainer._doc.lastname = res.lastname;
                 trainer._doc._id = res._id;
@@ -279,7 +297,7 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
             }));
     
             e.participants = await Promise.all(e.participants.map(async (participant) => {
-                const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+                const res = await Member.findOne({ _id: participant.userId }, { firstname: 1, lastname: 1, _id: 1 })
                 participant._doc.firstname = res.firstname;
                 participant._doc.lastname = res.lastname;
                 participant._doc._id = res._id;
@@ -331,7 +349,7 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
 
     for (session of result.trainingssessions) {
         session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
-            const res = await User.findOne({ _id: trainer._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
             trainer._doc.firstname = res.firstname;
             trainer._doc.lastname = res.lastname;
             trainer._doc._id = res._id;
@@ -339,7 +357,7 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
         }));
 
         session.participants = await Promise.all(session.participants.map(async (participant) => {
-            const res = await Member.findOne({ _id: participant._id }, { firstname: 1, lastname: 1, _id: 1 })
+            const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
             participant._doc.firstname = res.firstname;
             participant._doc.lastname = res.lastname;
             participant._doc._id = res._id;
@@ -348,7 +366,7 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
 
         tempList.dates.push(session.date)
         for (participant of session.participants) {
-            const temp = tempList.participants.find(foo => foo._id.equals(participant._id))
+            const temp = tempList.participants.find(foo => foo._id.equals(participant.memberId))
             if (typeof temp === 'undefined') {
                 tempList.participants.push({
                     _id: participant._id,

@@ -77,12 +77,12 @@
           <p class="font-bold text-xl md:text-2xl">Trainer</p>
         </template>
         <template #content>
-          <div v-for="(trainer) in this.attended.trainers" :key="trainer._id" class="mb-4 last:mb-0 transition-none">
+          <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0 transition-none">
             <!--TODO Vielleicht nicht große Karte sondern nur Name und Checkbox-->
             <!--TODO Animation fixen-->
             <!--TODO Spacing zwischen Attandence List und TrainerBox fixen-->
             <!--Card list -> Trainer opt out-->
-            <div @click="onTrainerAttendanceChange(trainer._id)"
+            <div @click="onTrainerAttendanceChange(trainer.userId)"
               class="text-black rounded-lg font-normal text-xl hover:cursor-pointer select-none"
               :class="{ '': !trainerBox.showContent }">
               <span class="flex items-center justify-between">
@@ -168,8 +168,8 @@ export default {
      * @param {Boolean} newVal Ob der Teilnehmer teilgenommen hat.
      */
     async attendanceChange(id, newVal) {
-      (this.attended.participants.find(foo => foo._id == id)).attended = newVal
-      this.attended.totalHours = this.totalHours
+      console.log("attendanceChange");
+      (this.attended.participants.find(foo => foo.memberId == id)).attended = newVal
       this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
 
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
@@ -177,8 +177,9 @@ export default {
       }
     },
 
-    async onTrainerAttendanceChange(id) {     
-      const trainer = this.attended.trainers.find(foo => foo._id == id)
+    async onTrainerAttendanceChange(id) {  
+      console.log("onTrainerAttendanceChange");   
+      const trainer = this.attended.trainers.find(foo => foo.userId == id)
       trainer.attended = !trainer.attended
       this.attended.totalHours = this.totalHours
 

@@ -1,8 +1,6 @@
 const httpStatus = require('http-status');
 const { default: mongoose } = require('mongoose');
-const { Member, Issue } = require('../models');
-const Group = require('../models/old.group.model');
-const User = require('../models/user.model');
+const { Member, Issue, Group, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 
@@ -169,6 +167,7 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
                     firstname: members[0].firstname,
                     lastname: members[0].lastname,
                     birthday: members[0].birthday,
+                    //! department id wird in group.department gespeichert --> muss getestet werden, ob Bug auftritt
                     department: group.department._id,
                     groupIDs: [group._id],
                     createdBy: [user._id]

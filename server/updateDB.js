@@ -17,10 +17,11 @@ async function main() {
   for (const g of groups) {
     const group = await Group.findById(g._id)
     for (const trainer of group.trainers) {
+      console.log(trainer.firstname, trainer._id);
       delete trainer.firstname;
       delete trainer.lastname;
       delete trainer.name;
-      trainer.userId = trainer._id;
+      trainer.userId = trainer._doc._id;
       delete trainer._id;
     }
 
@@ -28,17 +29,17 @@ async function main() {
       delete participant.firstname;
       delete participant.lastname;
       delete participant.birthday;
-      participant.memberId = participant._id;
+      participant.memberId = participant._doc._id;
       delete participant._id;
     }
-    await group.save();
-    await Group.updateMany({}, {
-      $unset: {
-        "trainers.$[].firstname": "", "trainers.$[].lastname": "", "trainers.$[].name": "", "trainers.$[]._id": "",
-        "participants.$[].firstname": "", "participants.$[].lastname": "", "participants.$[].birthday": "", "participants.$[]._id": ""
-      }
-    })
+    await Group.findByIdAndUpdate(group._id, group)
   }
+  await Group.updateMany({}, {
+    $unset: {
+      "trainers.$[].firstname": "", "trainers.$[].lastname": "", "trainers.$[].name": "", "trainers.$[]._id": "",
+      "participants.$[].firstname": "", "participants.$[].lastname": "", "participants.$[].birthday": "", "participants.$[]._id": ""
+    }
+  })
 
 
   const attendances = await Attendance.find({});
@@ -56,13 +57,11 @@ async function main() {
       trainingssession.endtime = timeInfo?.endtime ?? null;
 
       if (!trainingssession.starttime || !trainingssession.endtime) {
-        console.log(trainingssession.date);
-        console.log(new Date(trainingssession.date).getDay())
         console.log(`Keine Zeiten für ${attendance._id} Trainingssession#${attendance.trainingssessions.indexOf(trainingssession)}`);
       }
 
       for (const participant of trainingssession.participants) {
-        participant.memberId = participant._id;
+        participant.memberId = participant._doc._id;
         delete participant._id;
         delete participant.firstname;
         delete participant.lastname;
@@ -70,19 +69,19 @@ async function main() {
 
       for (const trainer of trainingssession.trainers) {
         trainer.userId = trainer._id;
-        delete trainer._id;
+        delete trainer._doc._id;
       }
     }
-    await attendance.save();
-    await Attendance.updateMany({}, {
-      $unset: {
-        "trainingssessions.$[].participants.$[].firstname": "", "trainingssessions.$[].participants.$[].lastname": "", "trainingssessions.$[].participants.$[]._id": "",
-        "trainingssessions.$[].trainers.$[]._id": ""
-      }
-    })
-
-    console.log("Done");
+    await Attendance.findByIdAndUpdate(attendance._id, attendance);
   }
+  await Attendance.updateMany({}, {
+    $unset: {
+      "trainingssessions.$[].participants.$[].firstname": "", "trainingssessions.$[].participants.$[].lastname": "", "trainingssessions.$[].participants.$[]._id": "",
+      "trainingssessions.$[].trainers.$[]._id": ""
+    }
+  })
+
+  console.log("Done");
 }
 
 main();

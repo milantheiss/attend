@@ -33,7 +33,7 @@ export default {
   methods: {
     onClick() {
       this.activated = !this.activated
-      this.$emit('onAttendedChange', this.participant._id, this.activated)
+      this.$emit('onAttendedChange', this.participant.memberId, this.activated)
     },
   },
   watch: {

@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Group, Attendance, Member, User } = require('../models');
+const { Group, Attendance, Member, User, Department } = require('../models');
 const memberService = require("../services/member.service")
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
@@ -18,12 +18,21 @@ async function getTrainersOfGroup(group) {
 async function getParticipantsOfGroup(group) { 
     group.participants = await Promise.all(group.participants.map(async (participant) => {
         const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
+        if (res === null) {
+            // console.error(`Member not found ${participant.memberId} in group ${group.name}`);
+            return null;
+        }
         participant._doc.firstname = res.firstname;
         participant._doc.lastname = res.lastname;
         participant._doc._id = res._id;
         return participant;
     }));
     return group.participants   
+}
+
+async function getDepartmentOfGroup(group) {
+    group.department = await Department.findById(group.department, {name: 1, _id: 1})
+    return group.department
 }
 
 /**
@@ -47,6 +56,7 @@ const getGroups = async (user) => {
         groups.forEach(async (group) => {
             group.trainers = await getTrainersOfGroup(group)
             group.participants = await getParticipantsOfGroup(group)
+            group.department = await getDepartmentOfGroup(group)
         })
 
         return groups
@@ -72,6 +82,7 @@ const getGroupById = async (user, groupID) => {
 
         group.trainers = await getTrainersOfGroup(group)
         group.participants = await getParticipantsOfGroup(group)
+        group.department = await getDepartmentOfGroup(group)
 
         return group
     } else {
@@ -134,7 +145,7 @@ const updateMember = async (user, groupID, body) => {
 };
 
 const updateParticipantInTrainingssessions = async (groupID, participantData, oldFirsttraining, newFirsttraining) => {
-    let list = await Attendance.findOne({ 'group._id': groupID });
+    let list = await Attendance.findOne({ group: groupID });
 
     //Wird nur ausgeführt, wenn schon Trainingssession bzw. Attendance Documents existieren
     if (typeof list !== "undefined" && list !== null) {
@@ -224,6 +235,7 @@ const removeMember = async (user, groupID, memberID) => {
 };
 
 const searchGroups = async (user, body) => {
+    // WARNING Es werden nicht die Relationen abgefragt, sondern nur die Gruppen
     if (hasAdminRole(user) || hasTrainerRole(user) || hasAssistantRole(user)) {
         return await Group.find({ $text: { $search: body.query } })
     } else {
