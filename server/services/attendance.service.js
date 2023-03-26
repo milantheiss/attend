@@ -6,6 +6,33 @@ const mongoose = require('mongoose');
 const logger = require('../config/logger');
 const { hasAdminRole, hasAccessToGroup } = require('../utils/roleCheck');
 
+async function getTrainersOfGroup(trainers) {
+    trainers = await Promise.all(trainers.map(async (trainer) => {
+        const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
+        trainer._doc.firstname = res.firstname;
+        trainer._doc.lastname = res.lastname;
+        trainer._doc._id = res._id;
+        return trainer;
+    }));
+    return trainers
+}
+
+async function getParticipantsOfGroup(participants) {
+    participants = await Promise.all(participants.map(async (participant) => {
+        const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
+        try {
+            participant._doc.firstname = res.firstname;
+            participant._doc.lastname = res.lastname;
+            participant._doc._id = res._id;
+        } catch (e) {
+            logger.error(e)
+            console.log(participant.memberId);
+        }
+        return participant;
+    }));
+    return participants
+}
+
 /**
  * Get all attendance lists.
  * @returns {Promise<[Attendance]>}
@@ -47,7 +74,6 @@ const getTrainingssession = async (user, groupID, date) => {
     } catch { }
 
     if (typeof session === 'undefined' && session == null) {
-        console.log("New session");
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
         //Update aufgerufen wird, kann dann der Body in DB erstellt werden --> Erzeugt weniger DB Calls und weniger Garbage
 
@@ -84,6 +110,7 @@ const getTrainingssession = async (user, groupID, date) => {
         const starttime = timeInfo?.starttime ?? null;
         const endtime = timeInfo?.endtime ?? null;
 
+
         const sessionBody = {
             date: date,
             starttime: starttime,
@@ -92,37 +119,34 @@ const getTrainingssession = async (user, groupID, date) => {
             trainers: trainers
         }
 
+        //INFO Hier kann nicht die normale Funktion engesetzt werden, da _doc nicht existiert. --> Nutzung von normaler Funktion führt zu Fehler
+
         sessionBody.participants = await Promise.all(sessionBody.participants.map(async (participant) => {
             const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
-            participant.firstname = res.firstname;
-            participant.lastname = res.lastname;
+            try {
+                participant.firstname = res.firstname;
+                participant.lastname = res.lastname;
+                participant._id = res._id;
+            } catch (e) {
+                logger.error(e)
+                console.log(participant.memberId);
+            }
             return participant;
         }));
-    
+
         sessionBody.trainers = await Promise.all(sessionBody.trainers.map(async (trainer) => {
             const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
             trainer.firstname = res.firstname;
             trainer.lastname = res.lastname;
+            trainer._id = res._id;
             return trainer;
         }));
 
         return sessionBody
     } else {
-        session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
-            const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-            trainer._doc.firstname = res.firstname;
-            trainer._doc.lastname = res.lastname;
-            trainer._doc._id = res._id;
-            return trainer;
-        }));
+        session.trainers = await getTrainersOfGroup(session.trainers)
 
-        session.participants = await Promise.all(session.participants.map(async (participant) => {
-            const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
-            participant._doc.firstname = res.firstname;
-            participant._doc.lastname = res.lastname;
-            participant._doc._id = res._id;
-            return participant;
-        }));
+        session.participants = await getParticipantsOfGroup(session.participants)
 
         return session
     }
@@ -210,28 +234,14 @@ const updateTrainingssession = async (user, groupID, date, sessionBody) => {
             let updatedSession
             //Wenn eine ganz neue Trainingssession erstellt werden muss
             if (typeof session._id === 'undefined') {
-                console.debug('Add new Trainingssession');
-                updatedSession = (await Attendance.findOneAndUpdate({ group: groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON()) 
+                updatedSession = (await Attendance.findOneAndUpdate({ group: groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             } else {
-                console.debug('Update Trainingssession', date);
                 updatedSession = (await Attendance.findOneAndUpdate({ group: groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
             }
 
-            updatedSession.trainers = await Promise.all(updatedSession.trainers.map(async (trainer) => {
-                const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-                trainer._doc.firstname = res.firstname;
-                trainer._doc.lastname = res.lastname;
-                trainer._doc._id = res._id;
-                return trainer;
-            }));
-    
-            updatedSession.participants = await Promise.all(updatedSession.participants.map(async (participant) => {
-                const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
-                participant._doc.firstname = res.firstname;
-                participant._doc.lastname = res.lastname;
-                participant._doc._id = res._id;
-                return participant;
-            }));
+            updatedSession.trainers = await getTrainersOfGroup(updatedSession.trainers)
+
+            updatedSession.participants = await getParticipantsOfGroup(updatedSession.participants)
 
             return updatedSession
         } else {
@@ -286,29 +296,21 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     //INFO Access control by getAttendanceByGroup()
     let list = await getAttendanceByGroup(user, groupID)
 
-    list.trainingssessions = await Promise.all(list.trainingssessions.filter(async(e) => {
+    list.trainingssessions = await Promise.all(list.trainingssessions.filter(async (e) => {
         if (e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
-            e.trainers = await Promise.all(e.trainers.map(async (trainer) => {
-                const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-                trainer._doc.firstname = res.firstname;
-                trainer._doc.lastname = res.lastname;
-                trainer._doc._id = res._id;
-                return trainer;
-            }));
-    
-            e.participants = await Promise.all(e.participants.map(async (participant) => {
-                const res = await Member.findOne({ _id: participant.userId }, { firstname: 1, lastname: 1, _id: 1 })
-                participant._doc.firstname = res.firstname;
-                participant._doc.lastname = res.lastname;
-                participant._doc._id = res._id;
-                return participant;
-            }));
-
             return e
         }
     }))
 
-    return temp
+    list.trainingssessions = await Promise.all(list.trainingssessions.map(async e => {
+        console.log(e.trainers?.length);
+        e.trainers = await getTrainersOfGroup(e.trainers)
+
+        console.log(e.participants?.length);
+        e.participants = await getParticipantsOfGroup(e.participants)
+    }))
+
+    return list
 }
 
 /**

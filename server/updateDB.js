@@ -12,34 +12,26 @@ async function main() {
   //Trainer in alle Trainingssessions hinzufügen
   //User updaten
 
-  const groups = await Group.find({});
+  // const groups = await Group.find({});
 
-  for (const g of groups) {
-    const group = await Group.findById(g._id)
-    for (const trainer of group.trainers) {
-      console.log(trainer.firstname, trainer._id);
-      delete trainer.firstname;
-      delete trainer.lastname;
-      delete trainer.name;
-      trainer.userId = trainer._doc._id;
-      delete trainer._id;
-    }
+  // for (const g of groups) {
+  //   const group = await Group.findById(g._id)
+  //   for (const trainer of group.trainers) {
+  //     console.log(trainer.firstname, trainer._id);
+  //     trainer.userId = trainer._doc._id;
+  //   }
 
-    for (const participant of group.participants) {
-      delete participant.firstname;
-      delete participant.lastname;
-      delete participant.birthday;
-      participant.memberId = participant._doc._id;
-      delete participant._id;
-    }
-    await Group.findByIdAndUpdate(group._id, group)
-  }
-  await Group.updateMany({}, {
-    $unset: {
-      "trainers.$[].firstname": "", "trainers.$[].lastname": "", "trainers.$[].name": "", "trainers.$[]._id": "",
-      "participants.$[].firstname": "", "participants.$[].lastname": "", "participants.$[].birthday": "", "participants.$[]._id": ""
-    }
-  })
+  //   for (const participant of group.participants) {
+  //     participant.memberId = participant._doc._id;
+  //   }
+  //   await Group.findByIdAndUpdate(group._id, group)
+  // }
+  // await Group.updateMany({}, {
+  //   $unset: {
+  //     "trainers.$[].firstname": "", "trainers.$[].lastname": "", "trainers.$[].name": "", "trainers.$[]._id": "",
+  //     "participants.$[].firstname": "", "participants.$[].lastname": "", "participants.$[].birthday": "", "participants.$[]._id": ""
+  //   }
+  // })
 
 
   const attendances = await Attendance.find({});
@@ -62,14 +54,15 @@ async function main() {
 
       for (const participant of trainingssession.participants) {
         participant.memberId = participant._doc._id;
-        delete participant._id;
-        delete participant.firstname;
-        delete participant.lastname;
       }
 
-      for (const trainer of trainingssession.trainers) {
-        trainer.userId = trainer._id;
-        delete trainer._doc._id;
+      // for (const trainer of trainingssession.trainers) {
+      //   trainer.userId = trainer._doc._id;
+      // }
+
+      if (typeof trainingssession.trainers === undefined || trainingssession.trainers === null || trainingssession.trainers.length === 0) {
+        console.log(group.trainers);
+        trainingssession.trainers = group.trainers.map((val) => { return { userId: val._doc.userId, attended: true } });
       }
     }
     await Attendance.findByIdAndUpdate(attendance._id, attendance);

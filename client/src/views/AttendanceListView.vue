@@ -154,6 +154,7 @@ export default {
           // Sollte nicht mehr erreicht werden
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
+          console.log(await res);
           this.attended = await res
           if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
             this.showTimesBox = true

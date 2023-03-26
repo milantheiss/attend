@@ -74,13 +74,12 @@ export default {
     },
     _updateDate(date) {
       this.date = date
-      this.$emit("update:modelValue", new Date(date));
-      this.$emit("onChange");
     }
   },
   watch:{
     date(newVal){
-      this._updateDate(newVal)
+      this.$emit("update:modelValue", new Date(newVal));
+      this.$emit("onChange");
     }
   },  
   components: { DateInput }
