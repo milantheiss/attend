@@ -15,7 +15,7 @@ async function getTrainersOfGroup(trainers) {
             trainer._doc._id = res._id;
         } catch (e) {
             logger.error(e)
-            console.log(participant.memberId);
+            console.log(trainer.memberId);
         }
         return trainer;
     }));
@@ -296,20 +296,13 @@ const deleteTrainingssession = async (user, groupID, date) => {
 
 /**
  * Get all Trainingssessions in Date Range
+ * WARNING Es werden keine Teilnehmer oder Trainer Daten ergänzt
  */
 const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate) => {
     //INFO Access control by getAttendanceByGroup()
     let list = await getAttendanceByGroup(user, groupID)
 
     list.trainingssessions = list.trainingssessions.filter((e) => (e.date >= new Date(startdate) && e.date <= new Date(enddate)))
-
-    list.trainingssessions = await Promise.all(list.trainingssessions.map(async e => {
-        e.trainers = await getTrainersOfGroup(e.trainers)
-
-        e.participants = await getParticipantsOfGroup(e.participants)
-
-        return e
-    }))
 
     return list
 }
@@ -325,7 +318,7 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
 const getDataForInvoice = async (user, groupID, startdate, enddate) => {
     let dataset = (await getTrainingssessionsByDateRange(user, groupID, startdate, enddate)).trainingssessions.filter((e) => {
         //Es werden nur Trainingssessions zurückgeben an denen der Trainer teilgenommen hat.
-        if (e.trainers.some(e => e._id.equals(user._id) && e.attended)) {
+        if (e.trainers.some(e => e.userId.equals(user._id) && e.attended)) {
             //.trainers Property wird nicht mehr benötigt
             delete e._doc.trainers
 
@@ -351,33 +344,23 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     }
 
     for (session of result.trainingssessions) {
-        session.trainers = await Promise.all(session.trainers.map(async (trainer) => {
-            const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-            trainer._doc.firstname = res.firstname;
-            trainer._doc.lastname = res.lastname;
-            trainer._doc._id = res._id;
-            return trainer;
-        }));
-
-        session.participants = await Promise.all(session.participants.map(async (participant) => {
-            const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
-            participant._doc.firstname = res.firstname;
-            participant._doc.lastname = res.lastname;
-            participant._doc._id = res._id;
-            return participant;
-        }));
 
         tempList.dates.push(session.date)
-        for (participant of session.participants) {
-            const temp = tempList.participants.find(foo => foo._id.equals(participant.memberId))
+
+        // console.log("session.participants", session.participants);
+
+        const participants = await getParticipantsOfGroup(session.participants)
+
+        for (participant of participants) {
+            const temp = tempList.participants.find(foo => foo.memberId.equals(participant.memberId))
             if (typeof temp === 'undefined') {
                 tempList.participants.push({
-                    _id: participant._id,
-                    firstname: participant.firstname,
-                    lastname: participant.lastname,
+                    memberId: participant._doc.memberId,
+                    firstname: participant._doc.firstname,
+                    lastname: participant._doc.lastname,
                     attendence: [{
                         date: session.date,
-                        attended: participant.attended
+                        attended: participant._doc.attended
                     }]
                 })
             } else {
@@ -390,7 +373,6 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     }
 
     tempList.dates.sort((a, b) => a - b)
-    console.log(tempList);
     tempList.participants.sort((a, b) => a.lastname.localeCompare(b.lastname))
 
     return tempList

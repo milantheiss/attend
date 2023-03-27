@@ -82,10 +82,11 @@ const submitInvoice = catchAsync(async (req, res) => {
 				return val;
 			}))
 
+			console.log("submit:", invoice);
+			
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
 
-			console.log(invoice);
 
 			if (invoice === null || typeof invoice === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Invoice could not be created");

@@ -5,9 +5,7 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const invoiceSchema = mongoose.Schema(
     {
         department: {
-            type: {
-                name: String
-            },
+            type: mongoose.Types.ObjectId,
             required: true
         },
         startdate: {
@@ -23,11 +21,7 @@ const invoiceSchema = mongoose.Schema(
                 {
                     // Ist embeded, da es ein Snapshot zu Erstellungszeitpunkt ist
                     asssistent: Array,
-                    department: {
-                    type: {
-                        name: String
-                    }
-                    },
+                    department: mongoose.Types.ObjectId,
                     name: {
                         type: String,
                         required: true,
