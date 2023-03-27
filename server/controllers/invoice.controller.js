@@ -63,7 +63,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 		//Invoice is not empty
 		if (invoice !== null && typeof invoice !== "undefined") {
 			//Check if department head exists
-			const departmentHeadIDs = (await Department.findById(invoice.department._id)).head;
+			const departmentHeadIDs = (await Department.findById(invoice.department)).head;
 
 			if (departmentHeadIDs === null || typeof departmentHeadIDs === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");

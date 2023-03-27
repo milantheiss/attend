@@ -9,9 +9,14 @@ const { hasAdminRole, hasAccessToGroup } = require('../utils/roleCheck');
 async function getTrainersOfGroup(trainers) {
     trainers = await Promise.all(trainers.map(async (trainer) => {
         const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-        trainer._doc.firstname = res.firstname;
-        trainer._doc.lastname = res.lastname;
-        trainer._doc._id = res._id;
+        try {
+            trainer._doc.firstname = res.firstname;
+            trainer._doc.lastname = res.lastname;
+            trainer._doc._id = res._id;
+        } catch (e) {
+            logger.error(e)
+            console.log(participant.memberId);
+        }
         return trainer;
     }));
     return trainers
@@ -296,18 +301,14 @@ const getTrainingssessionsByDateRange = async (user, groupID, startdate, enddate
     //INFO Access control by getAttendanceByGroup()
     let list = await getAttendanceByGroup(user, groupID)
 
-    list.trainingssessions = await Promise.all(list.trainingssessions.filter(async (e) => {
-        if (e.date >= new Date(startdate) && e.date <= new Date(enddate)) {
-            return e
-        }
-    }))
+    list.trainingssessions = list.trainingssessions.filter((e) => (e.date >= new Date(startdate) && e.date <= new Date(enddate)))
 
     list.trainingssessions = await Promise.all(list.trainingssessions.map(async e => {
-        console.log(e.trainers?.length);
         e.trainers = await getTrainersOfGroup(e.trainers)
 
-        console.log(e.participants?.length);
         e.participants = await getParticipantsOfGroup(e.participants)
+
+        return e
     }))
 
     return list
@@ -389,6 +390,7 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     }
 
     tempList.dates.sort((a, b) => a - b)
+    console.log(tempList);
     tempList.participants.sort((a, b) => a.lastname.localeCompare(b.lastname))
 
     return tempList

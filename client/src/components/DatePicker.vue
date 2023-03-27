@@ -49,6 +49,8 @@ export default {
       if (typeof this.weekdays !== "undefined") {
         if (isClosestTrainingToday(this.weekdays)) {
           this._updateDate(this.getFormattedDate(new Date()));
+          this.$emit("update:modelValue", new Date());
+          this.$emit("onChange");
         }
         else {
           this.date = new Date()
@@ -76,16 +78,14 @@ export default {
       this.date = date
     }
   },
-  watch:{
-    date(newVal){
+  watch: {
+    date(newVal) {
       this.$emit("update:modelValue", new Date(newVal));
       this.$emit("onChange");
     }
-  },  
+  },
   components: { DateInput }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
