@@ -77,7 +77,7 @@ const groupSchema = mongoose.Schema(
                         trim: true
                     },
 
-                    position: {
+                    role: {
                         type: String,
                         required: true,
                         trim: true

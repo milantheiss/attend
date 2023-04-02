@@ -35,7 +35,7 @@ const groupSchema = mongoose.Schema(
                         type: mongoose.Types.ObjectId,
                         required: true
                     },
-                    position: {
+                    role: {
                         type: String,
                         required: true,
                         trim: true

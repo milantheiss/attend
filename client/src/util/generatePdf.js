@@ -11,7 +11,7 @@ let laufnummer = 0;
 let _startdate;
 let _enddate;
 
-let _userInfo;
+let _submittedBy;
 let _department;
 
 const tableTopMargin = 10;
@@ -48,12 +48,12 @@ class AttendanceListPdf {
     }
 
     let trainer = "";
-    for (const obj of group.trainers.filter((val) => val.position === "trainer")) {
+    for (const obj of group.trainers.filter((val) => val.role === "trainer")) {
       trainer = trainer + obj.firstname + " " + obj.lastname + " ";
     }
 
     let assistant = "";
-    for (const obj of group.trainers.filter((val) => val.position === "assistant")) {
+    for (const obj of group.trainers.filter((val) => val.role === "assistant")) {
       assistant = assistant + obj.firstname + " " + obj.lastname + " ";
     }
 
@@ -215,7 +215,7 @@ class InvoicePdf {
     doc
       .setFont("helvetica", "bold")
       .setFontSize(10)
-      .text(`Name: ${_userInfo.firstname} ${_userInfo.lastname}`, 40, posNextLine, { maxWidth: 350 })
+      .text(`Name: ${_submittedBy.firstname} ${_submittedBy.lastname}`, 40, posNextLine, { maxWidth: 350 })
       .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 });
 
     drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
@@ -366,7 +366,7 @@ async function createInvoice(filename, dataset) {
 
   _startdate = dataset.startdate;
   _enddate = dataset.enddate;
-  _userInfo = dataset.userInfo;
+  _submittedBy = dataset.submittedBy;
   _department = dataset.department;
 
   if (dataset.groups.length !== 0) {

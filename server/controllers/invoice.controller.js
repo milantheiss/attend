@@ -22,7 +22,7 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 		const groupInfos = (await groupService.getGroupInfo(req.user, groupID))._doc;
 
 		if (typeof department === "undefined") {
-			department = groupInfos.department;
+			department = await Department.findById(groupInfos.department, { _id: 1, name: 1});
 		}
 
 		if (department._id.equals(groupInfos.department._id)) {
@@ -42,13 +42,15 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 		}
 	}
 
-	dataset.department = department;
+	dataset.department = {
+		_id: department._id,
+		name: department.name
+	};
 
 	//Hinzufügen --> Get User Info
 
-	dataset.userInfo = {
-		userID: req.user._id,
-		email: req.user.email,
+	dataset.submittedBy = {
+		userId: req.user._id,
 		firstname: req.user.firstname,
 		lastname: req.user.lastname,
 	};
@@ -63,7 +65,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 		//Invoice is not empty
 		if (invoice !== null && typeof invoice !== "undefined") {
 			//Check if department head exists
-			const departmentHeadIDs = (await Department.findById(invoice.department)).head;
+			const departmentHeadIDs = (await Department.findById(invoice.department._id)).head;
 
 			if (departmentHeadIDs === null || typeof departmentHeadIDs === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");
@@ -73,20 +75,25 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.assignedTo = departmentHeadIDs;
 			invoice.status = "pending";
 			invoice.dateOfReceipt = new Date();
-			invoice.submittedBy = req.user._id;
+
+			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1 });
+
+			invoice.submittedBy = {
+				userId: req.user._id,
+				firstname: submitter.firstname,
+				lastname: submitter.lastname
+			};
 			invoice.dateOfLastChange = new Date();
 
 			invoice.groups = await Promise.all(invoice.groups.map(async (val) => {
 				//WARNING Fehler: attendanceService is not defined
 				val.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, val._id, invoice.startdate, invoice.enddate);
+				val.department = invoice.department;
 				return val;
 			}))
-
-			console.log("submit:", invoice);
 			
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
-
 
 			if (invoice === null || typeof invoice === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Invoice could not be created");
@@ -125,24 +132,7 @@ const getAllAssignedInvoices = catchAsync(async (req, res) => {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
 		}
 
-		const i = Promise.all(invoices.map(async (val) => {
-			const obj = {
-				id: val._id,
-				department: val.department,
-				dateOfReceipt: val.dateOfReceipt,
-				status: val.status,
-				submittedBy: undefined,
-				startdate: val.startdate,
-				enddate: val.enddate,
-				submittedBy: await userService.getUserInfo(val.submittedBy)
-			}
-
-			return await obj
-		}));
-
-		console.log(await i);
-
-		res.status(httpStatus.OK).send(await i);
+		res.status(httpStatus.OK).send(await invoices);
 	} else {
 		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
 	}
@@ -168,7 +158,7 @@ const getInvoiceByID = catchAsync(async (req, res) => {
 
 const getOwnInvoices = catchAsync(async (req, res) => {
 	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
-		const invoices = await Invoice.find({ submittedBy: req.user._id });
+		const invoices = await Invoice.find({"submittedBy.userId": req.user._id });
 
 		if (invoices === null || typeof invoices === "undefined") {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
@@ -243,7 +233,7 @@ const reopenInvoice = catchAsync(async (req, res) => {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoice found");
 		}
 
-		if (!invoice.assignedTo.includes(req.user._id) && !invoice.submittedBy.equals(req.user._id)) {
+		if (!invoice.assignedTo.includes(req.user._id) && !invoice.submittedBy.userId.equals(req.user._id)) {
 			throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to reopen invoice");
 		}
 

@@ -54,7 +54,7 @@
                 <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-light text-base md:text-lg">Antragsteller: </p>
                     <p class="text-black font-medium text-base md:text-lg text-right">
-                        {{ dataStore.invoiceData.userInfo.firstname }} {{ dataStore.invoiceData.userInfo.lastname }}
+                        {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname }}
                     </p>
                 </div>
 

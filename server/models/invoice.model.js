@@ -5,7 +5,9 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const invoiceSchema = mongoose.Schema(
     {
         department: {
-            type: mongoose.Types.ObjectId,
+            type: {
+                name: String
+            },
             required: true
         },
         startdate: {
@@ -27,7 +29,7 @@ const invoiceSchema = mongoose.Schema(
                         required: true,
                     },
                     times: Array,
-                    trainer: Array,
+                    trainers: Array,
                     trainingssessions: {
                         type: [
                             {
@@ -54,7 +56,11 @@ const invoiceSchema = mongoose.Schema(
         totalHours: Number,
         //MOD userInfo entfernt
         submittedBy: {
-            type: mongoose.Types.ObjectId,
+            type: {
+                userId: mongoose.Types.ObjectId,
+                firstname: String,
+                lastname: String
+            },
             required: true
         },
         status: {

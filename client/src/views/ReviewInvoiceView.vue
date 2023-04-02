@@ -8,7 +8,7 @@
                     <div class="flex justify-between items-center">
                         <p class="text-gray-700 font-light text-base md:text-lg">Antragsteller: </p>
                         <p class="text-black font-normal text-base md:text-lg text-right">
-                            {{ invoice.userInfo.firstname }} {{ invoice.userInfo.lastname }}
+                            {{ invoice.submittedBy.firstname }} {{ invoice.submittedBy.lastname }}
                         </p>
                     </div>
 
