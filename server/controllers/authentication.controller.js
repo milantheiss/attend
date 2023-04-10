@@ -50,6 +50,8 @@ const login = catchAsync(async (req, res) => {
 			const response = {
 				user: {
 					username: user.username,
+					firstname: user.firstname,
+					lastname: user.lastname,
 					_id: user._id,
 					lengthAccessibleGroups: user.accessible_groups.length 
 				},
@@ -156,6 +158,8 @@ const authenticate = catchAsync(async (req, res) => {
 			const response = {
 				user: {
 					username: user.username,
+					firstname: user.firstname,
+					lastname: user.lastname,
 					_id: user._id,
 					lengthAccessibleGroups: user.accessible_groups.length 
 				},

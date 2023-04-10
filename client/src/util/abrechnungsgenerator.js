@@ -11,7 +11,7 @@ let _enddate
 
 const tableTopMargin = 10
 
-async function createListe(group, attendenceList, filename, startdate, enddate) {
+async function createListe(group, attendanceList, filename, startdate, enddate) {
   let doc = new jsPDF({ unit: 'pt', orientation: "landscape", autoFirstPage: false });
 
   _startdate = startdate
@@ -19,18 +19,18 @@ async function createListe(group, attendenceList, filename, startdate, enddate) 
 
   let splicedArray = {}
 
-  if (attendenceList.dates.length != 0){
-    const pagesForDates = Math.ceil(attendenceList.dates.length / 26)
-    const pagesForParticipants = Math.ceil(attendenceList.participants.length / 31)
+  if (attendanceList.dates.length != 0){
+    const pagesForDates = Math.ceil(attendanceList.dates.length / 26)
+    const pagesForParticipants = Math.ceil(attendanceList.participants.length / 31)
 
     
     pagecount = pagesForDates * pagesForParticipants
 
     for (let i = 0; i < pagesForParticipants; i++) {
-      splicedArray.participants = attendenceList.participants.splice(0, 31)
+      splicedArray.participants = attendanceList.participants.splice(0, 31)
       for (let j = 0; j < pagesForDates; j++) {
         laufnummer = i * 31
-        splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26)
+        splicedArray.dates = attendanceList.dates.slice(j * 26, (j + 1) * 26)
         generatePage(doc, group, splicedArray)
         if ((j + 1) < pagesForDates) doc.addPage({ orientation: "landscape", autoFirstPage: false })
       }
@@ -55,10 +55,10 @@ async function createListe(group, attendenceList, filename, startdate, enddate) 
 //INFO Aufteilung Koordinaten erst Horizontale Verschiebung (x) dann Vertikale (y)
 //INFO Es wird von linker oberer Ecke gemessen
 
-function generatePage(doc, group, attendenceList) {
+function generatePage(doc, group, attendanceList) {
   generateHeader(doc);
   generateGroupInfo(doc, group);
-  generateTable(doc, attendenceList)
+  generateTable(doc, attendanceList)
   generateFooter(doc)
 }
 
@@ -110,10 +110,10 @@ function generateGroupInfo(doc, group) {
   }
 }
 
-function generateTable(doc, attendenceList) {
+function generateTable(doc, attendanceList) {
   generateTableHeader(doc)
-  generateDateRow(doc, attendenceList.dates)
-  generateParticipantRows(doc, attendenceList.dates, attendenceList.participants)
+  generateDateRow(doc, attendanceList.dates)
+  generateParticipantRows(doc, attendanceList.dates, attendanceList.participants)
 }
 
 
@@ -177,7 +177,7 @@ function generateAttendanceBox(doc, dates, participant) {
   let xPos = 249.89
   for (let i = 0; i < dates.length; i++) {
     dates[i] = new Date(dates[i])
-    const temp = participant.attendence.find(foo => {
+    const temp = participant.attendance.find(foo => {
       foo.date = new Date(foo.date)
       if (foo.date.toJSON() === dates[i].toJSON()) {
         return foo

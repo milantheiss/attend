@@ -332,11 +332,15 @@ const getDataForInvoice = async (user, groupID, startdate, enddate) => {
         }
     })
 
+    dataset.sort((a, b) => (a.date > b.date) ? 1 : -1)
+
     return dataset
 }
 
 const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, enddate) => {
     const result = await getTrainingssessionsByDateRange(user, groupID, startdate, enddate)
+
+    console.log(groupID, result)
 
     let tempList = {
         dates: [],
@@ -346,10 +350,11 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     for (session of result.trainingssessions) {
 
         tempList.dates.push(session.date)
-
-        // console.log("session.participants", session.participants);
+        console.log("Pushed date: ", session.date, " to list");
 
         const participants = await getParticipantsOfGroup(session.participants)
+
+        console.log("Participants: ", participants.length);
 
         for (participant of participants) {
             const temp = tempList.participants.find(foo => foo.memberId.equals(participant.memberId))
@@ -358,22 +363,25 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
                     memberId: participant._doc.memberId,
                     firstname: participant._doc.firstname,
                     lastname: participant._doc.lastname,
-                    attendence: [{
+                    attendance: [{
                         date: session.date,
                         attended: participant._doc.attended
                     }]
                 })
             } else {
-                temp.attendence.push({
+                temp.attendance.push({
                     date: session.date,
-                    attended: participant.attended
+                    attended: participant._doc.attended
                 })
             }
+            // console.log("Date pushed to participant: ", participant._doc.lastname, " on date: ", session.date, " with attended: ", participant._doc.attended, "");
         }
     }
 
     tempList.dates.sort((a, b) => a - b)
     tempList.participants.sort((a, b) => a.lastname.localeCompare(b.lastname))
+
+    // console.log("group: ", groupID, tempList.participants[0].attendance)
 
     return tempList
 }

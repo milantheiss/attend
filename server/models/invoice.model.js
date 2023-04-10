@@ -59,7 +59,8 @@ const invoiceSchema = mongoose.Schema(
             type: {
                 userId: mongoose.Types.ObjectId,
                 firstname: String,
-                lastname: String
+                lastname: String,
+                headerData: Object
             },
             required: true
         },

@@ -1,5 +1,5 @@
 const logger = require("../config/logger");
-const { groupService, attendanceService, userService, notificationService } = require("../services");
+const { groupService, attendanceService} = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
@@ -76,21 +76,20 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.status = "pending";
 			invoice.dateOfReceipt = new Date();
 
-			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1 });
+			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1});
 
 			invoice.submittedBy = {
 				userId: req.user._id,
 				firstname: submitter.firstname,
-				lastname: submitter.lastname
+				lastname: submitter.lastname,
+				headerData: submitter.headerData
 			};
 			invoice.dateOfLastChange = new Date();
 
-			invoice.groups = await Promise.all(invoice.groups.map(async (val) => {
-				//WARNING Fehler: attendanceService is not defined
-				val.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, val._id, invoice.startdate, invoice.enddate);
-				val.department = invoice.department;
-				return val;
-			}))
+			for(group of invoice.groups) {
+				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, group._id, invoice.startdate, invoice.enddate);
+				group.department = invoice.department;
+			}
 			
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);

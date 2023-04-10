@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
-const { toJSON, paginate } = require('./plugins')
+const { toJSON, paginate } = require('./plugins');
+const { boolean } = require('joi');
 
 const userSchema = mongoose.Schema(
     {   
@@ -43,6 +44,23 @@ const userSchema = mongoose.Schema(
         readPatchnotes: {
             type: Boolean,
             default: true
+        },
+        headerData: {
+            //Die Daten, werden im Header der Abrechnung genutzt
+            type: {
+                trainerId: {
+                    type: String,
+                    required: false,
+                    unique: true
+                },
+                isTrainer: Boolean,
+                hasLicense: Boolean,
+                specialAgreement: Boolean,
+                hasContract: Boolean,
+                hasAgreedToCodeForChildrenWelfare: Boolean,
+                hasSubmittedCriminalRecordCertificate: Boolean
+            },
+            required: false
         }
     }
 );

@@ -3,7 +3,7 @@
         <transition enter-active-class="transition-opacity ease-in-out delay-400 duration-500 transform "
             enter-from-class="opacity-0" enter-to-class="opacity-100">
             <div @click="showPanel = true"
-                class="px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2 "
+                class="px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2 cursor-pointer"
                 v-if="!showPanel">
                 <div class="flex items-center justify-between">
                     <h3>{{ new Date(modelValue.date).toLocaleDateString("de-DE", {
@@ -32,7 +32,7 @@
                             month: "short", day: "numeric"
                         }) }}</h3>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-6 h-6" @click="showPanel = false">
+                            stroke="currentColor" class="w-6 h-6 cursor-pointer" @click="showPanel = false">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                         </svg>
                     </div>

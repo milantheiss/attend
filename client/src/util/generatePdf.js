@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { jsPDF } from "jspdf";
 
 //INFO Buchstaben in Helvetica & Font Size 10 haben ca. eine Zeichenhöhe 7.3 pt
@@ -13,21 +14,22 @@ let _enddate;
 
 let _submittedBy;
 let _department;
+let _dateOfReceipt;
 
 const tableTopMargin = 10;
 
 class AttendanceListPdf {
-  static generatePage(doc, group, attendenceList) {
+  static generatePage(doc, group, attendanceList) {
     this.generateHeader(doc);
     this.generateGroupInfo(doc, group);
-    this.generateTable(doc, attendenceList);
+    this.generateTable(doc, attendanceList);
     this.generateFooter(doc);
   }
 
   static generateHeader(doc) {
     _startdate = new Date(_startdate);
     _enddate = new Date(_enddate);
-    
+
     posNextLine = 30;
 
     doc
@@ -74,10 +76,10 @@ class AttendanceListPdf {
     }
   }
 
-  static generateTable(doc, attendenceList) {
+  static generateTable(doc, attendanceList) {
     this.generateTableHeader(doc);
-    this.generateDateRow(doc, attendenceList.dates);
-    this.generateParticipantRows(doc, attendenceList.dates, attendenceList.participants);
+    this.generateDateRow(doc, attendanceList.dates);
+    this.generateParticipantRows(doc, attendanceList.dates, attendanceList.participants);
   }
 
   static generateTableHeader(doc) {
@@ -141,7 +143,7 @@ class AttendanceListPdf {
     let xPos = 249.89;
     for (let i = 0; i < dates.length; i++) {
       dates[i] = new Date(dates[i]);
-      const temp = participant.attendence.find((foo) => {
+      const temp = participant.attendance.find((foo) => {
         foo.date = new Date(foo.date);
         if (foo.date.toJSON() === dates[i].toJSON()) {
           return foo;
@@ -216,7 +218,7 @@ class InvoicePdf {
       .setFont("helvetica", "bold")
       .setFontSize(10)
       .text(`Name: ${_submittedBy.firstname} ${_submittedBy.lastname}`, 40, posNextLine, { maxWidth: 350 })
-      .text(`ÜL-Nr: TODO`, 394, posNextLine, { maxWidth: 165.28 });
+      .text(`ÜL-Nr: ${_submittedBy.headerData.trainerId}`, 394, posNextLine, { maxWidth: 165.28 });
 
     drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
     drawBox(doc, 392, posNextLine - tableTopMargin, 169.28, 13.3);
@@ -229,11 +231,73 @@ class InvoicePdf {
       .text(`Abteilung: ${_department.name}`, 40, posNextLine, { maxWidth: 350 });
 
     drawBox(doc, 38, posNextLine - tableTopMargin, 354, 13.3);
+
+    doc
+      .setFont("helvetica", "normal")
+      .setFontSize(10)
+    //posNextLine erhöhen + X Zeichnen
+
+    doc
+      .text(`ÜL-Helfer/ÜL-Assistent(TGO)`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((!_submittedBy.headerData.isTrainer ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`Selbstständiger ÜL ohne Lizenz`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.isTrainer && !_submittedBy.headerData.hasLicense ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`ÜL mit Lizenz`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.isTrainer && _submittedBy.headerData.hasLicense ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`Sondervereinbarung`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.specialAgreement ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`ÜL-Vertrag vorhanden`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.hasContract ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`Ehrenkodex Kindeswohl`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.hasAgreedToCodeForChildrenWelfare ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
+    doc
+      .text(`Erweitertes Führungszeugnis`, 394, posNextLine, { maxWidth: 150.28 })
+      .text((_submittedBy.headerData.hasSubmittedCriminalRecordCertificate ? "X" : ""), 548.28, posNextLine)
+    drawBox(doc, 392, posNextLine - tableTopMargin, 154.28, 13.3);
+    drawBox(doc, 546.28, posNextLine - tableTopMargin, 15, 13.3);
+
+    posNextLine += 13.3;
+
   }
 
   static generateInvoiceTable(doc, trainingssessions) {
     //Übungsleiter Info Tabelle
-    posNextLine += 40;
+    // posNextLine += 20;
 
     //Tabellenkopf
     doc
@@ -311,7 +375,7 @@ class InvoicePdf {
   }
 }
 
-async function createList(group, attendenceList, options) {
+async function createList(group, attendanceList, options) {
   if (typeof options?.doc === "undefined") {
     options.doc = new jsPDF({ unit: "pt", orientation: "landscape", compress: true });
   }
@@ -321,17 +385,17 @@ async function createList(group, attendenceList, options) {
 
   let splicedArray = [];
 
-  if (attendenceList.dates.length != 0) {
-    const pagesForDates = Math.ceil(attendenceList.dates.length / 26);
-    const pagesForParticipants = Math.ceil(attendenceList.participants.length / 31);
+  if (attendanceList.dates.length != 0) {
+    const pagesForDates = Math.ceil(attendanceList.dates.length / 26);
+    const pagesForParticipants = Math.ceil(attendanceList.participants.length / 31);
 
     pagecount = pagesForDates * pagesForParticipants;
 
     for (let i = 0; i < pagesForParticipants; i++) {
-      splicedArray.participants = attendenceList.participants.splice(0, 31);
+      splicedArray.participants = attendanceList.participants.splice(0, 31);
       for (let j = 0; j < pagesForDates; j++) {
         laufnummer = i * 31;
-        splicedArray.dates = attendenceList.dates.slice(j * 26, (j + 1) * 26);
+        splicedArray.dates = attendanceList.dates.slice(j * 26, (j + 1) * 26);
         AttendanceListPdf.generatePage(options.doc, group, splicedArray);
         if (j + 1 < pagesForDates) options.doc.addPage("a4", "landscape");
 
@@ -366,6 +430,7 @@ async function createInvoice(filename, dataset) {
 
   _startdate = dataset.startdate;
   _enddate = dataset.enddate;
+  _dateOfReceipt = dataset.dateOfReceipt;
   _submittedBy = dataset.submittedBy;
   _department = dataset.department;
 
@@ -373,11 +438,11 @@ async function createInvoice(filename, dataset) {
     const _trainingssessions = dataset.groups.map((group) => {
       const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
       group.trainingssessions.forEach((trainingssession) => {
-        
+
         trainingssession.weekday = weekdays[new Date(trainingssession.date).getDay()]
         trainingssession.groupName = group.name
-        
-        if(trainingssession.totalHours === undefined || trainingssession.totalHours === null){
+
+        if (trainingssession.totalHours === undefined || trainingssession.totalHours === null) {
           //Formatiert Zeit vom Format 18:45 in 18,75
           const starttimeNumeric = Number(trainingssession.starttime.split(":")[0]) + Number(trainingssession.starttime.split(":")[1] / 60) || 0;
           const endtimeNumeric = Number(trainingssession.endtime.split(":")[0]) + Number(trainingssession.endtime.split(":")[1] / 60) || 0;
@@ -415,6 +480,34 @@ async function createInvoice(filename, dataset) {
 
         posNextLine = 754.8
 
+        //Unterschrift des Trainers
+        doc
+          .setFont("helvetica", "bold")
+          .setFontSize(10)
+          .text(`${_submittedBy.firstname} ${_submittedBy.lastname}`, 40, posNextLine + 18.5, { maxWidth: 257.64 })
+          .setFont("helvetica", "normal")
+          .setFontSize(8)
+          .text(`Digital unterzeichnet am ${new Date(_dateOfReceipt).toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}`, 40, posNextLine + 26.3, { maxWidth: 257.64 })
+
+        const today = new Date(Date.now()).toLocaleDateString("de-DE", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+
+        //Unterschrift des Kontrolleurs
+        doc
+          .setFont("helvetica", "bold")
+          .setFontSize(10)
+          .text(`${dataset.reviewer.firstname} ${dataset.reviewer.lastname}`, 301.64, posNextLine + 18.5, { maxWidth: 257.64 })
+          .setFont("helvetica", "normal")
+          .setFontSize(8)
+          .text(`Digital unterzeichnet am ${today}`, 301.64, posNextLine + 26.3, { maxWidth: 257.64 })
+
         drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 39.9);
         drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 39.9);
 
@@ -433,7 +526,7 @@ async function createInvoice(filename, dataset) {
 
     for (const group of dataset.groups) {
       doc.addPage("a4", "landscape");
-      createList(group, group.attendanceList, { doc: doc})
+      createList(group, group.attendanceList, { doc: doc })
     }
 
   } else {

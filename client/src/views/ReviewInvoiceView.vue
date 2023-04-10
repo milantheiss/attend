@@ -191,6 +191,7 @@
 import { createInvoice } from "@/util/generatePdf"
 import { getInvoiceById, approveInvoice, rejectInvoice } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
+import { useAuthStore } from "@/store/authStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
@@ -200,10 +201,12 @@ export default {
     name: "ReviewInvoice",
     setup() {
         const dataStore = useDataStore()
+        const authStore = useAuthStore()
         const showCollapsibleContainer = ref(true);
 
         return {
             dataStore,
+            authStore,
             showCollapsibleContainer
         }
     },
@@ -266,6 +269,20 @@ export default {
                 this.status.success = true
                 this.status.processing = false
                 this.status.text = 'Abrechnung genehmigt.'
+
+                if(typeof this.invoice.reviewer === String ) {
+                    this.invoice.reviewer = {
+                        userId: this.invoice.reviewer,
+                        firstname: this.authStore.user.firstname,
+                        lastname: this.authStore.user.lastname
+                    }
+                } else {
+                    this.invoice.reviewer = {
+                        firstname: this.authStore.user.firstname,
+                        lastname: this.authStore.user.lastname
+                    }
+                }
+
                 await createInvoice(this.filename, this.invoice)
             } else {
                 this.status.success = false
