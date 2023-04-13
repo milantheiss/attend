@@ -69,7 +69,7 @@ class AttendanceListPdf {
     posNextLine += 20;
 
     doc
-      .text(`Abteilung: ${group.department.name}`, 20, posNextLine, { maxWidth: 150 })
+      .text(`Abteilung: ${_department.name}`, 20, posNextLine, { maxWidth: 150 })
       .text(`Verantw. ÜL.: ${trainer}`, 170, posNextLine, { maxWidth: 326 });
     if (assistant.length !== 0) {
       doc.text(`Assistent: ${assistant}`, 496, posNextLine, { maxWidth: 326 });
