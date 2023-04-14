@@ -286,8 +286,6 @@ export default {
         document.title = 'Wähle eine Gruppe - Attend'
         this.dataStore.viewname = "Benachrichtigungen"
 
-        await this.dataStore.getNotifications()
-
         this.sortNotifications()
     },
     watch: {
@@ -309,11 +307,9 @@ export default {
 <style scoped>
 .notificationMessage :deep(a) {
     color: #3B82F6;
-    text-decoration: underline;
 }
 
 .notificationMessage :deep(a)::after {
-    content: "⚡";
-    text-decoration: none;
+    content: "↗️";
 }
 </style>    

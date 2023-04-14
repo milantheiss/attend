@@ -17,7 +17,7 @@ const routes = [
     path: '/attendancelist',
     name: 'Attendance',
     component: () => import('../views/AttendanceListView.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresGroup: true }
   },
   {
     path: '/logout',
@@ -28,19 +28,19 @@ const routes = [
     path: '/exportpdf',
     name: 'ExportPdf',
     component: () => import('../views/ExportPdf.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresGroup: true }
   },
   {
     path: '/editgroup',
     name: 'EditGroup',
     component: () => import('../views/EditGroupView.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresGroup: true }
   },
   {
     path: "/createInvoice",
     name: "CreateInvoice",
     component: () => import("../views/CreateInvoiceView.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresGroup: true }
   },
   {
     path: "/profile",
@@ -77,18 +77,33 @@ const router = createRouter({
  */
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (useAuthStore().authenticated) {
+    if (await useAuthStore().authenticate()) {
       await useDataStore().getNotifications()
       next();
       return;
     } else {
-      if (await useAuthStore().authenticate()) {
-        await useDataStore().getNotifications()
-        next()
-        return
-      } else {
-        next("/login");
-      }
+      next("/login");
+    }
+  } else {
+    next();
+  }
+});
+
+/**
+ * Middleware: Wird ausgeführt bevor eine Unterseite aufgerufen wird.
+ * Überprüft, ob für die Unterseite Zugriff auf mindestens eine Gruppe benötigt wird.
+ * Wenn ja, wir überprüft, auf wie viele Gruppen ein User Zugriff hat.
+ *    Wenn > 0, wird Unterseite angezeigt.
+ *    Wenn == 0, wird router zu /profile weitergeleitet.
+ * Wenn nicht, wird angefragte Unterseite angezeigt.
+ */
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresGroup)) {
+    if (useAuthStore().user?.lengthAccessibleGroups > 0) {
+      next();
+      return;
+    } else {
+      next("/profile");
     }
   } else {
     next();
@@ -105,7 +120,7 @@ router.beforeEach(async (to, from, next) => {
  */
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.guest)) {
-    if (useAuthStore().authenticated || await useAuthStore().authenticate()) {
+    if (await useAuthStore().authenticate()) {
       await useDataStore().getNotifications()
       next("/attendancelist");
       return;

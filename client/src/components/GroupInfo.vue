@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3">
+  <div class="px-3" v-if="typeof group !== 'undefined'">
     <div class="flex justify-between items-center" v-if="typeof group.department.name !== 'undefined'">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Abteilung:</p>
@@ -60,10 +60,10 @@ export default {
       type: Object,
       default() {
         return {
-          trainer:
+          trainers:
             [
               {
-                name: ". . .",
+                firstname: ". . .",
                 role: "trainer"
               }
             ],
@@ -91,5 +91,8 @@ export default {
       }
     }
   },
+  created() {
+    console.log(this.group);
+  }
 }
 </script>

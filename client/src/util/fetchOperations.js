@@ -190,21 +190,6 @@ async function removeMemberFromGroup(groupID, memberID) {
 }
 
 /**
- * Authenticates the session and returns the user object
- * @returns {Object} {showPatchNotesDialog: Boolean, user: {username: String, _id: ObjectID}}
- */
-async function authenticateSession() {
-	return (
-		await fetch([import.meta.env.VITE_API_URL, "authenticate"].join("/"), {
-			method: "POST",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		})
-	).json();
-}
-
-/**
  * Fetches the last patch notes from the API
  * @returns {Object} {patchNotes: String, version: String, date: Date, text: String, title: String}
  */
@@ -440,7 +425,6 @@ export {
 	fetchGroupInfo,
 	updateMemberInGroup,
 	removeMemberFromGroup,
-	authenticateSession,
 	getLastPatchNotes,
 	fetchDataForNewInvoice,
 	sendInvoice,

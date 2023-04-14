@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { getNotifications } from "@/util/fetchOperations";
+import { useAuthStore } from "@/store/authStore";
 
 export const useDataStore = defineStore('dateStore', {
   state: () => ({
@@ -23,5 +24,8 @@ export const useDataStore = defineStore('dateStore', {
       const res = await getNotifications()
       this.notifications = res
     },
+    getCountOfUnreadNotifications() {
+      return this.notifications.filter(notification => !notification.recipients.find((r) => r.userID === useAuthStore().user._id).read).length
+    }
   }
 })

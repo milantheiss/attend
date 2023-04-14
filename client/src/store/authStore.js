@@ -3,8 +3,7 @@ import { useDataStore } from "./dataStore";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    //Enthält Name, ID etc. 
-    //Warning Wird im Moment nicht genutzt.
+    //Enthält firstname, lastname, _id, lengthAccessibleGroups & username 
     user: null,
     authenticated: false
   }),
@@ -34,40 +33,42 @@ export const useAuthStore = defineStore('authStore', {
     },
   
     async logOut() {
-      //let user = null;
       const res = await fetch([import.meta.env.VITE_API_URL, "logout"].join('/'), {
         method: 'POST',
         headers: {'Content-type': 'application/json; charset=UTF-8'},
         credentials: 'include',
         mode: 'cors'
       });
-      
-      console.log("🚀 ~ file: authStore.js:39 ~ res ~ res", res)
 
-      this.authenticated = !res.status === 200
-      console.log("🚀 ~ file: authStore.js:48 ~ logOut ~ this.authenticated", this.authenticated)
-
-      
+      this.authenticated = !res.status === 200     
       this.user = undefined
     },
 
+    // Authentifiziert die Session
     async authenticate(){
-      let res = (await fetch([import.meta.env.VITE_API_URL, 'authenticate'].join('/'), {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-        credentials: 'include',
-        mode: 'cors'
-      }))
-
-      this.authenticated = res.status === 200
-      
-      if (this.authenticated) {
-        res = await res.json()
-        this.user = res.user
-        useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
+      // Returnt true, wenn Session bereits authentifiziert ist
+      if(this.authenticated) {
+        return true
+      } else {
+        // Ansonsten wird versucht, Session zu authentifizieren
+        let res = (await fetch([import.meta.env.VITE_API_URL, 'authenticate'].join('/'), {
+          method: 'POST',
+          headers: { 'Content-type': 'application/json; charset=UTF-8' },
+          credentials: 'include',
+          mode: 'cors'
+        }))
+  
+        this.authenticated = res.status === 200
+        
+        if (this.authenticated) {
+          res = await res.json()
+          this.user = res.user
+          useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
+        }
+  
+        // Gibt Ergebnis der Server Anfrage zurück
+        return this.authenticated
       }
-
-      return this.authenticated
     }
   }
 })
