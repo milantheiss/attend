@@ -56,7 +56,12 @@
 			<transition
 				enter-active-class="transition ease-in-out duration-700"
 				enter-from-class="-translate-y-9 opacity-0"
-				enter-to-class="translate-y-0 opacity-100">
+				enter-to-class="translate-y-0 opacity-100"
+				
+				leave-active-class="transition ease-in-out duration-300"
+				leave-from-class="translate-y-0 opacity-100"
+				leave-to-class="-translate-y-5 opacity-0"
+				>
 				<div class="grid mt-2" v-show="showMenu">
 					<router-link
 						@click="showMenu = !showMenu"
@@ -116,15 +121,19 @@
 		<!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
 		<router-view class="font-normal md:max-w-medium-width mx-auto" v-slot="{ Component }">
 			<transition
-				enter-active-class="transition ease-in-out duration-500"
-				enter-from-class="opacity-0"
-				enter-to-class="opacity-100"
-				leave-active-class="transition ease-in-out duration-500 transform"
-				leave-from-class="opacity-100"
-				leave-to-class="opacity-0">
+				enter-active-class="transition ease-in-out duration-[200ms] delay-[240ms]"
+				enter-from-class="opacity-0 translate-y-5"
+				enter-to-class="opacity-100 translate-y-0"
+				leave-active-class="transition ease-in-out duration-[200ms]"
+				leave-from-class="opacity-100 translate-y-0"
+				leave-to-class="opacity-0 -translate-y-5">
 				<component :is="Component" />
 			</transition>
 		</router-view>
+
+		<!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
+		<!-- <router-view class="font-normal md:max-w-medium-width mx-auto">
+		</router-view> -->
 	</div>
 </template>
 
