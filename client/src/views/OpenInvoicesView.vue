@@ -97,12 +97,10 @@ export default {
             setTimeout(() => {
                 this.spin = false
             }, 1000)
-            console.log('refresh');
             this.allAssignedInvoices = await getAllAssignedInvoices()
 
         },
         goToInvoice(id) {
-            console.log(id);
             this.$router.push({path: '/reviewInvoice', query: {id: id}})
         }
     },
@@ -112,7 +110,6 @@ export default {
     },
     async mounted() {
         this.allAssignedInvoices = await getAllAssignedInvoices()
-        console.log(this.allAssignedInvoices);
     }
 };
 </script>

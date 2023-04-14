@@ -107,7 +107,6 @@ export default {
             }
         },
         async onClickOnDelete() {
-            console.log(this.participantData);
             this.$emit("onClickOnDelete", this.participantData);
         },
         async onClickOnCreate() {

@@ -154,7 +154,6 @@ const deleteAllNotificationsOfUser = catchAsync(async (req, res) => {
 
 const markNotificationAsRead = catchAsync(async (req, res) => {
 	const notificationID = req.query.id;
-	console.log("🚀 ~ file: notification.controller.js:108 ~ markNotificationAsRead ~ notificationID", notificationID);
 	if (!notificationID) {
 		logger.debug("No notificationID provided");
 		return res.status(httpStatus.BAD_REQUEST).send("No notificationID provided");

@@ -154,7 +154,6 @@ export default {
           // Sollte nicht mehr erreicht werden
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
-          console.log(await res);
           this.attended = await res
           if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
             this.showTimesBox = true
@@ -169,7 +168,6 @@ export default {
      * @param {Boolean} newVal Ob der Teilnehmer teilgenommen hat.
      */
     async attendanceChange(id, newVal) {
-      console.log("attendanceChange");
       (this.attended.participants.find(foo => foo.memberId == id)).attended = newVal
       this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
 
@@ -179,7 +177,6 @@ export default {
     },
 
     async onTrainerAttendanceChange(id) {  
-      console.log("onTrainerAttendanceChange");   
       const trainer = this.attended.trainers.find(foo => foo.userId == id)
       trainer.attended = !trainer.attended
       this.attended.totalHours = this.totalHours
@@ -187,7 +184,7 @@ export default {
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
         this.showTimesBox = true
       } else {
-        console.log(await updateTrainingssession(this.selectedGroup.id, this.date, this.attended))
+        await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
       }
     },
 
