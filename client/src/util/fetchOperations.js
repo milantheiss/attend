@@ -137,13 +137,13 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 	);
 }
 
-async function fetchGroupInfo(groupID) {
+async function fetchGroupData(groupID) {
 	if(!groupID) throw new Error("No groupID provided")
 	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if(typeof groupID !== "string") throw new Error("group must be a string")
 
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "getInfo"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "getData"].join("/"), {
 			method: "GET",
 			credentials: "include",
 			mode: "cors",
@@ -422,7 +422,7 @@ export {
 	fetchAttendanceByDate,
 	updateTrainingssession,
 	fetchAttendanceByDateRange,
-	fetchGroupInfo,
+	fetchGroupData,
 	updateMemberInGroup,
 	removeMemberFromGroup,
 	getLastPatchNotes,

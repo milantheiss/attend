@@ -35,8 +35,8 @@ router
     .delete(verifyToken, groupController.removeMember)
 
 router
-    .route('/:groupID/getInfo')
-    .get(verifyToken, groupController.getGroupInfo)
+    .route('/:groupID/getData')
+    .get(verifyToken, groupController.getFullData)
 
 
 //TODO Add capability to update members by /:groupID/addmember

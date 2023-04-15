@@ -17,13 +17,14 @@ async function getTrainersOfGroup(group) {
 
 async function getParticipantsOfGroup(group) { 
     group.participants = await Promise.all(group.participants.map(async (participant) => {
-        const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, _id: 1 })
+        const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
         if (res === null) {
             // console.error(`Member not found ${participant.memberId} in group ${group.name}`);
             return null;
         }
         participant._doc.firstname = res.firstname;
         participant._doc.lastname = res.lastname;
+        participant._doc.birthday = res.birthday;
         participant._doc._id = res._id;
         return participant;
     }));
@@ -122,16 +123,14 @@ const updateMember = async (user, groupID, body) => {
             body = await memberService.handleNewMemberEvent(user, await getGroupById(user, groupID), body)
             group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
-
-            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants._id': body._id }, { '$set': { 'participants.$': body } })
+            //Gibt altes Objekt zurück
+            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body._id }, { '$set': { 'participants.$': body } })
 
             //OldFirsttraining wird aus group gezogen
-            const foo = group.participants.find(e => e._id.equals(body._id))
+            const foo = group.participants.find(e => e.memberId.equals(body._id))
             oldFirsttraining = foo.firsttraining
 
             //Lokale Variable group wird geupdatet für den Returns
-            foo.firstname = body.firstname
-            foo.lastname = body.lastname
             foo.firsttraining = body.firsttraining
         }
 
@@ -211,13 +210,14 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
  * @param {ObjectId} groupId
  * @returns {Promise<Group>}
  */
-const getGroupInfo = async (user, groupId) => {
+const getFullData = async (user, groupId) => {
     let group = await getGroupById(user, groupId);
 
-    //Deletes participants; muss ._doc sein für delete sein
-    delete group._doc.participants
+    group.participants = await getParticipantsOfGroup(group)
+    group.trainers = await getTrainersOfGroup(group)
+    group.department = await getDepartmentOfGroup(group)
 
-    return group
+    return await group
 };
 
 /**
@@ -248,7 +248,7 @@ module.exports = {
     getGroups,
     createGroup,
     updateMember,
-    getGroupInfo,
+    getFullData,
     removeMember,
     searchGroups
 };

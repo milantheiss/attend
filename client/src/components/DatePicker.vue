@@ -47,14 +47,20 @@ export default {
   methods: {
     newGroupSelected() {
       if (typeof this.weekdays !== "undefined") {
+        const oldDate = this.date;
+
         if (isClosestTrainingToday(this.weekdays)) {
           this._updateDate(this.getFormattedDate(new Date()));
-          this.$emit("update:modelValue", new Date());
-          this.$emit("onChange");
         }
         else {
+
           this.date = new Date()
           this.getLastDate();
+        }
+        
+        if (this.date === oldDate) {
+          this.$emit("update:modelValue", new Date());
+          this.$emit("onChange");
         }
       }
     },

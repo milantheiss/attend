@@ -11,8 +11,8 @@ const getGroupById = catchAsync(async (req, res) => {
     res.send(await groupService.getGroupById(req.user, req.params.groupID))
 });
 
-const getGroupInfo = catchAsync(async (req, res) => {
-    res.send(await groupService.getGroupInfo(req.user, req.params.groupID))
+const getFullData = catchAsync(async (req, res) => {
+    res.send(await groupService.getFullData(req.user, req.params.groupID))
 });
 
 const createGroup = catchAsync(async (req, res) => {
@@ -38,7 +38,7 @@ module.exports = {
     getGroupById,
     createGroup,
     updateMember,
-    getGroupInfo,
+    getFullData,
     removeMember,
     searchGroups
 }

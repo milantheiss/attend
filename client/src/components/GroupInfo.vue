@@ -10,23 +10,27 @@
       </div>
     </div>
 
-    <div class="flex justify-between items-center" v-if="group.trainers.filter(val => val.role === 'trainer').length.length !== 0">
+    <div class="flex justify-between items-center"
+      v-if="group.trainers.filter(val => val.role === 'trainer').length.length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Trainer:</p>
       </div>
       <div>
         <p class="text-base text-right md:text-lg" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
-          v-for="trainer in group.trainers.filter(val => val.role === 'trainer')" :key="trainer.name">{{ trainer.firstname }} {{ trainer.lastname}}</p>
+          v-for="trainer in group.trainers.filter(val => val.role === 'trainer')" :key="trainer.name">{{ trainer.firstname
+          }} {{ trainer.lastname }}</p>
       </div>
     </div>
 
-    <div class="flex justify-between items-center" v-if="group.trainers.filter(val => val.role === 'assistant').length !== 0">
+    <div class="flex justify-between items-center"
+      v-if="group.trainers.filter(val => val.role === 'assistant').length !== 0">
       <div>
         <p class="text-gray-700 font-light text-base md:text-lg">Assistent:</p>
       </div>
       <div>
         <p class="text-base md:text-lg text-right" :class="group.department.name === '. . .' ? 'pr-0.5' : ''"
-          v-for="assistant in group.trainers.filter(val => val.role === 'assistant')" :key="assistant.name">{{ assistant.firstname }} {{ assistant.lastname}}</p>
+          v-for="assistant in group.trainers.filter(val => val.role === 'assistant')" :key="assistant.name">{{
+            assistant.firstname }} {{ assistant.lastname }}</p>
       </div>
     </div>
 
@@ -60,6 +64,7 @@ export default {
       type: Object,
       default() {
         return {
+
           trainers:
             [
               {

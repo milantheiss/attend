@@ -95,6 +95,7 @@ export default {
                     firstname: "",
                     lastname: "",
                     birthday: "",
+                    memberId: "",
                     firsttraining: (new Date(Date.now()).toJSON()).slice(0, 10)
                 };
             }
@@ -130,7 +131,7 @@ export default {
             // IMPORTANT Wenn neues Attribut zu ParticipantData kommt muss es hier erst übergeben werden --> Sonst ist es undefined
             this.participantData.firstname = newVal.firstname;
             this.participantData.lastname = newVal.lastname;
-            this.participantData._id = newVal._id;
+            this.participantData.memberId = newVal.memberId;
             try {
                 this.participantData.birthday = newVal.birthday.slice(0, 10);
             }

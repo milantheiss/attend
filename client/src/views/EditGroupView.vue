@@ -10,7 +10,7 @@
 
       <!--Gruppen Info-->
       <!--TODO Hier die Gruppen Infos bearbeiten-->
-      <GroupInfo :group="selectedGroup" class="mt-4" />
+      <GroupInfo :group="groupData" class="mt-4" />
     </div>
 
     <!--Liste aller Teilnehmer. OnClick wird ein MemberEditor geöffnet.-->
@@ -32,7 +32,7 @@
 <script>
 import SelectList from "@/components/SelectList.vue";
 import GroupListGomponent from "@/components/GroupListComponent.vue";
-import { fetchGroups, updateMemberInGroup, removeMemberFromGroup } from '@/util/fetchOperations'
+import { fetchGroups, updateMemberInGroup, removeMemberFromGroup, fetchGroupData } from '@/util/fetchOperations'
 import GroupInfo from "@/components/GroupInfo.vue"
 import MemberEditor from "@/components/MemberEditor.vue";
 import { useDataStore } from "@/store/dataStore";
@@ -48,7 +48,8 @@ export default {
   data() {
     return {
       groups: [],
-      selectedGroup: undefined
+      selectedGroup: undefined,
+      groupData: undefined
     }
   },
   components: {
@@ -63,8 +64,8 @@ export default {
      * Wird zur Fehlerprävention eingesetzt.
      */
     getParticipants() {
-      if (typeof this.selectedGroup !== 'undefined') {
-        return this.selectedGroup.participants
+      if (typeof this.groupData !== 'undefined') {
+        return this.groupData.participants
       } else {
         return undefined
       }
@@ -75,7 +76,9 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnSave(participantData) {
-      this.selectedGroup = await updateMemberInGroup(this.selectedGroup.id, participantData)
+      console.log(participantData);
+      
+      this.groupData = await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
     /**
      * Handelt onClickOnDelete Emit aus @see GroupListGomponent und @see MemberEditor 
@@ -83,7 +86,7 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnDelete(participantData) {
-      this.selectedGroup = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
+      this.groupData = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
     }
   },
 
@@ -91,6 +94,20 @@ export default {
     this.groups = await fetchGroups()
     document.title = 'Gruppe bearbeiten - Attend'
     this.dataStore.viewname = "Gruppe bearbeiten"
+  },
+
+  watch: {
+    /**
+     * Watcher für selectedGroup.
+     * Wenn selectedGroup geändert wird, wird der Titel der Seite angepasst.
+     */
+    selectedGroup: async function (newVal) {
+      if (typeof newVal !== 'undefined') {
+        document.title = newVal.name + ' bearbeiten - Attend'
+        
+        this.groupData = await fetchGroupData(newVal.id)
+      }
+    }
   }
 }
 </script>

@@ -130,10 +130,6 @@
 				<component :is="Component" />
 			</transition>
 		</router-view>
-
-		<!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
-		<!-- <router-view class="font-normal md:max-w-medium-width mx-auto">
-		</router-view> -->
 	</div>
 </template>
 
