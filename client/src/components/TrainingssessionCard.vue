@@ -102,6 +102,7 @@ export default {
     methods: {
         onClickOnRemove() {
             //Entfernt Trainingssession 
+            console.log("onClickOnRemove", this.session);
             this.$emit('onClickOnRemove', this.session)
         }
     },
@@ -110,7 +111,6 @@ export default {
     },
     watch: {
         session() {
-            console.log("🚀 ~ file: TrainingssessionItem.vue:62 ~ sessio", this.session)
             this.$emit('update:modelValue', this.session)
         },
         modelValue(newVal) {

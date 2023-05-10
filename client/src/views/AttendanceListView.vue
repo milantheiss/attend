@@ -69,15 +69,14 @@
     </div>
 
     <div>
-      <!--Collapsable Container-->
-
+      <!--TrainerBox-->
       <CollapsibleContainer ref="trainerBox" class="p-3 rounded-lg" v-if="typeof selectedGroup !== 'undefined'"
-        :class="{ 'bg-transparent text-black': !trainerBox.showContent, 'transition ease-in-out drop-shadow-md bg-white text-black': trainerBox.showContent }">
+        :class="{ 'transition ease-in-out duration-[150ms] bg-transparent text-black': !trainerBox.showContent, 'transition ease-in-out duration-[150ms] drop-shadow-md bg-white text-black': trainerBox.showContent }">
         <template #header>
           <p class="font-bold text-xl md:text-2xl">Trainer</p>
         </template>
         <template #content>
-          <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0 transition-none">
+          <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0">
             <!--TODO Vielleicht nicht große Karte sondern nur Name und Checkbox-->
             <!--TODO Animation fixen-->
             <!--TODO Spacing zwischen Attandence List und TrainerBox fixen-->

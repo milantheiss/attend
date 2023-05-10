@@ -94,7 +94,7 @@
                 <!--Je Gruppe ein Container-->
                 <div class="flex justify-between items-center min-w-full" v-for="group in dataStore.invoiceData.groups"
                     :key="group._id">
-                    <CollapsibleContainer :show="group.include" class="mb-4">
+                    <CollapsibleContainer :show="group.include" class="mb-4" :enableClickOnHeader="false">
                         <template #header>
                             <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
                             <p class="truncate text-xl font-semibold"
@@ -102,10 +102,10 @@
                         </template>
                         <template #content>
                             <!--Je Trainingsstunde ein Element-->
-                            <TrainingssessionItem class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
+                            <TrainingssessionCard class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
                                 :key="trainingsssession._id" v-model="group.trainingssessions[index]"
                                 @onClickOnRemove="(session) => removeTrainingssession(session)">
-                            </TrainingssessionItem>
+                            </TrainingssessionCard>
                         </template>
                     </CollapsibleContainer>
                 </div>
@@ -180,7 +180,7 @@ import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
-import TrainingssessionItem from "@/components/TrainingssessionCard.vue"
+import TrainingssessionCard from "@/components/TrainingssessionCard.vue"
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 
@@ -222,7 +222,7 @@ export default {
         DateInput,
         CheckboxList,
         CollapsibleContainer,
-        TrainingssessionItem,
+        TrainingssessionCard,
         CheckboxInput
     },
     methods: {
@@ -253,14 +253,16 @@ export default {
 
             if (this.error.cause.groupInput) {
                 this.error.message = "Es muss mindesten eine Gruppe ausgewählt sein.";
-            } 
+            }
 
             return this.error.show;
         },
 
         removeTrainingssession(session) {
-            const group = this.dataStore.invoiceData.groups.find(val => val._id === session.groupID)
-            const index = group.trainingssessions.indexOf(session)
+            console.log("remove", session);
+            const group = this.dataStore.invoiceData.groups.find(val => val.trainingssessions.some(v => v._id === session._id))
+            const index = group.trainingssessions.findIndex(val => val._id === session._id)
+            console.log("Group von der Entfernt wird", group, index);
             group.trainingssessions.splice(index, 1)
         },
 
@@ -276,7 +278,7 @@ export default {
                 this.error.show = true;
                 return
             }
-            
+
             //Status wird angezeigt
             this.status.show = true
 
@@ -334,12 +336,12 @@ export default {
                     } else {
                         //Formatiert Zeit vom Format 18:45 in 18,75
                         // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + (Number(element.starttime?.split(":")[1])/60*100) || 0;
+                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + (Number(element.starttime?.split(":")[1]) / 60 * 100) || 0;
 
-                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + (Number(element.endtime?.split(":")[1])/60*100) || 0;
+                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + (Number(element.endtime?.split(":")[1]) / 60 * 100) || 0;
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric)/100 : 0;
+                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
                     }
                 })
             })
