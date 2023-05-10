@@ -32,7 +32,7 @@
 <script>
 import SelectList from "@/components/SelectList.vue";
 import GroupListGomponent from "@/components/GroupListComponent.vue";
-import { fetchGroups, updateMemberInGroup, removeMemberFromGroup, fetchGroupData } from '@/util/fetchOperations'
+import { fetchGroups, updateMemberInGroup, removeMemberFromGroup, fetchGroup } from '@/util/fetchOperations'
 import GroupInfo from "@/components/GroupInfo.vue"
 import MemberEditor from "@/components/MemberEditor.vue";
 import { useDataStore } from "@/store/dataStore";
@@ -76,7 +76,18 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnSave(participantData) {
-      this.groupData = await updateMemberInGroup(this.selectedGroup.id, participantData)
+      console.log('ParticipantData: ', participantData);
+
+      //Updated groupData locally damit Change instant ist
+      this.groupData.participants = this.groupData.participants.map(p => {
+        if(p.memberId === participantData.memberId) {
+          return participantData
+        } else {
+          return p
+        }
+      }) 
+
+      await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
     /**
      * Handelt onClickOnDelete Emit aus @see GroupListGomponent und @see MemberEditor 
@@ -102,8 +113,7 @@ export default {
     selectedGroup: async function (newVal) {
       if (typeof newVal !== 'undefined') {
         document.title = newVal.name + ' bearbeiten - Attend'
-        
-        this.groupData = await fetchGroupData(newVal.id)
+        this.groupData = await fetchGroup(newVal.id)
       }
     }
   }

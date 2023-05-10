@@ -84,7 +84,7 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
                     department: group.department._id
                 }
             })
-            memberBody._id = newID
+            memberBody.memberId = newID
             memberBody.openIssue = issue._id
         } else { //Wenn bereits ein Issue oder MultiGroup Issue existiert.
             //Wenn nur ein einzelnes Issue existiert.
@@ -124,7 +124,7 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
                 memberBody.openIssue = openIssue._id
             }
 
-            memberBody._id = openIssue.body.memberID
+            memberBody.memberId = openIssue.body.memberID
         }
     } else if (members.length > 1) { //Wenn es mehr als einen gleichen Member gibt.
         //* --> Issue für Duplicate Conflict wird erstellt.
@@ -175,28 +175,49 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
             })
 
             memberBody.openIssue = openIssue._id
-            memberBody._id = members[0]._id
+            memberBody.memberId = members[0]._id
         } else {
             if (!openIssue.body.groupIDs.includes(group._id)) {
                 await Issue.findByIdAndUpdate(openIssue._id, { $addToSet: { "body.groupIDs": group._id }, $push: { "body.createdBy": user._id } })
             }
 
             memberBody.openIssue = openIssue._id
-            memberBody._id = openIssue.body.memberID
+            memberBody.memberId = openIssue.body.memberID
         }
 
         await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
     } else {//Wenn der Member schon in DB existiert und auch Teil des Departments ist.
         //* --> Member wird der neuen Gruppe ohne Issue hinzugefügt.
         await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
-        memberBody._id = members[0]._id
+        memberBody.memberId = members[0]._id
     }
 
     return memberBody
 }
 
+const updateMember = async (memberBody) => {
+
+    const id = memberBody._id || memberBody.memberId
+
+    //INFO Dates müssen als Date Objekt gespeichert werden. Wenn der MemberBody direkt aus einer Request kommt, sind Daten ein String.
+
+    if(typeof memberBody.birthday !== undefined) {
+        memberBody.birthday = new Date(memberBody.birthday)
+    }
+
+    let member = await Member.findOne({ _id: id })
+
+    member.overwrite(memberBody)
+    
+    await member.save()
+
+    return member
+}
+
+
 module.exports = {
     getMembers,
     getMemberById,
-    handleNewMemberEvent
+    handleNewMemberEvent,
+    updateMember
 };

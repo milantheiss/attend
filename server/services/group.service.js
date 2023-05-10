@@ -54,12 +54,6 @@ const getGroups = async (user) => {
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
         }
 
-        groups.forEach(async (group) => {
-            group.trainers = await getTrainersOfGroup(group)
-            group.participants = await getParticipantsOfGroup(group)
-            group.department = await getDepartmentOfGroup(group)
-        })
-
         return groups
     } else {
         throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to a groups")
@@ -111,33 +105,34 @@ const createGroup = async (user, groupBody) => {
  * Wenn existiert, dann wird in /member modifiziert und in [participants]
  * Wenn er nicht existiert, dann wird er in /member erstellt und in [participants] hinzugefügt.
  * @param {Object} groupBody
- * @returns {Promise<Group>}
+ * @returns {boolean} true if successful
  */
 const updateMember = async (user, groupID, body) => {
     if (hasAccessToGroup(user, groupID)) {
-        let group
         let oldFirsttraining
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
-        if (typeof body._id === 'undefined') {
+        if (typeof body.memberId === 'undefined') {
             body = await memberService.handleNewMemberEvent(user, await getGroupById(user, groupID), body)
-            group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: { participants: body } }, { new: true })
-        } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet
+            await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: body }, { new: true })
+        } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet"
+            //WARNING Im Moment kann jeder Trainer einfach über die Gruppe den Namen eines Kindes ändern
+
+            //Member wird geupdatet
+            await memberService.updateMember(body)
+
             //Gibt altes Objekt zurück
-            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body._id }, { '$set': { 'participants.$': body } })
+            const group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body.memberId }, { '$set': { 'participants.$': body } })
 
             //OldFirsttraining wird aus group gezogen
-            const foo = group.participants.find(e => e.memberId.equals(body._id))
+            const foo = group.participants.find(e => e.memberId.equals(body.memberId))
             oldFirsttraining = foo.firsttraining
-
-            //Lokale Variable group wird geupdatet für den Returns
-            foo.firsttraining = body.firsttraining
         }
 
         //Attendance wird geupdatet
         await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
 
-        return group
+        return true
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
