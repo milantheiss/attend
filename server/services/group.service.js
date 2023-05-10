@@ -206,21 +206,6 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
 }
 
 /**
- * Get a group by ID and return only info.
- * @param {ObjectId} groupId
- * @returns {Promise<Group>}
- */
-const getFullData = async (user, groupId) => {
-    let group = await getGroupById(user, groupId);
-
-    group.participants = await getParticipantsOfGroup(group)
-    group.trainers = await getTrainersOfGroup(group)
-    group.department = await getDepartmentOfGroup(group)
-
-    return await group
-};
-
-/**
  * Remove Member out of group
  * @param {ObjectId} groupID
  * @returns {Promise<Group>}0
@@ -248,7 +233,6 @@ module.exports = {
     getGroups,
     createGroup,
     updateMember,
-    getFullData,
     removeMember,
     searchGroups
 };

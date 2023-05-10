@@ -11,10 +11,6 @@ const getGroupById = catchAsync(async (req, res) => {
     res.send(await groupService.getGroupById(req.user, req.params.groupID))
 });
 
-const getFullData = catchAsync(async (req, res) => {
-    res.send(await groupService.getFullData(req.user, req.params.groupID))
-});
-
 const createGroup = catchAsync(async (req, res) => {
     //WARNING Nur Admins können Gruppen erstellen
     const result = await groupService.createGroup(req.user, req.body);
@@ -38,7 +34,6 @@ module.exports = {
     getGroupById,
     createGroup,
     updateMember,
-    getFullData,
     removeMember,
     searchGroups
 }

@@ -178,7 +178,7 @@ const getAttendanceByGroup = async (user, groupID) => {
             console.log(e)
         }
     } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to attendance lists")
+        throw new ApiError(httpStatus.UNAUTHORIZED, `The user has no access to attendance lists`)
     }
 };
 

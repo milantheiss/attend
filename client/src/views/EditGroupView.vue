@@ -76,8 +76,6 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnSave(participantData) {
-      console.log(participantData);
-      
       this.groupData = await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
     /**

@@ -1,4 +1,3 @@
-const logger = require("../config/logger");
 const { groupService, attendanceService} = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
@@ -19,26 +18,15 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 	let department;
 
 	for (groupID of req.query.groups) {
-		const groupInfos = (await groupService.getGroupInfo(req.user, groupID))._doc;
-
+		const groupInfos = await Group.findById(groupID, { _id: 1, name: 1, department: 1, venue: 1 });
+		
 		if (typeof department === "undefined") {
-			department = await Department.findById(groupInfos.department, { _id: 1, name: 1});
+			department = await Department.findById(groupInfos._doc.department, { _id: 1, name: 1});
 		}
 
-		if (department._id.equals(groupInfos.department._id)) {
-			dataset.groups.push(groupInfos);
-
-			//TODO Ändern für Attendance List
-			let trainingssessions = await attendanceService.getDataForInvoice(req.user, groupID, dataset.startdate, dataset.enddate);
-
-			dataset.groups.find((val) => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions = [];
-
-			for (session of trainingssessions) {
-				session._doc.venue = groupInfos.venue
-				session._doc.groupID = groupID
-
-				dataset.groups.find((val) => val._id.equals(new mongoose.Types.ObjectId(groupID))).trainingssessions.push(session._doc);
-			}
+		if (department._id.equals(groupInfos._doc.department)) {
+			groupInfos._doc.trainingssessions = await attendanceService.getDataForInvoice(req.user, groupID, dataset.startdate, dataset.enddate);
+			dataset.groups.push(await groupInfos);
 		}
 	}
 
@@ -55,7 +43,7 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 		lastname: req.user.lastname,
 	};
 
-	await res.status(httpStatus.OK).send(dataset);
+	await res.status(httpStatus.OK).send(await dataset);
 });
 
 const submitInvoice = catchAsync(async (req, res) => {
@@ -87,7 +75,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.dateOfLastChange = new Date();
 
 			for(group of invoice.groups) {
-				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, group._id, invoice.startdate, invoice.enddate);
+				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, group.id, invoice.startdate, invoice.enddate);
 				group.department = invoice.department;
 			}
 			
