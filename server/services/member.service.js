@@ -43,156 +43,99 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
 
     /*
     Wenn keine gleichen Member gefunden wurden, heißt ein neuer Member hinzugefügt wurde. 
-    Der Member wird vorerst nur in der Gruppe erstellt.
-    Es wird ein Issue erstellt, damit ein Sachbearbeiter den User verifizieren kann.
+    Wird der Member in der DB angelegt, damit die Daten abgespeichert sind, jedoch wird ein Issue erstellt, damit ein Sachbearbeiter den User verifizieren kann.
     */
     if (members.length === 0) {
-        let openIssue = await Issue.findOne({
-            $or: [
-                {
-                    $and: [
-                        { tag: "newMember" },
-                        { "body.firstname": memberBody.firstname },
-                        { "body.lastname": memberBody.lastname },
-                        { "body.birthday": memberBody.birthday }
-                    ]
-                },
-                {
-                    $and: [
-                        { tag: "newMemberInMultipleGroups" },
-                        { "body.firstname": memberBody.firstname },
-                        { "body.lastname": memberBody.lastname },
-                        { "body.birthday": memberBody.birthday }
-                    ]
-                }
-            ]
-        })
+        //Der neue Member wird erstellt
 
-        //Wenn kein Issue existiert.
-        if (openIssue === null || typeof openIssue === "undefined") {
-            const newID = new mongoose.Types.ObjectId()
-            const issue = await Issue.create({
-                tag: 'newMember',
-                date: new Date(),
-                body: {
-                    groupID: group._id,
-                    memberID: newID,
-                    createdBy: user._id,
-                    firstname: memberBody.firstname,
-                    lastname: memberBody.lastname,
-                    birthday: memberBody.birthday,
-                    department: group.department._id
-                }
-            })
-            memberBody.memberId = newID
-            memberBody.openIssue = issue._id
-        } else { //Wenn bereits ein Issue oder MultiGroup Issue existiert.
-            //Wenn nur ein einzelnes Issue existiert.
-            if (openIssue.tag === "newMember") {
-                //Stellt sicher, dass kein MultiGroupIssue für einen Member erstellt wird, der zwei Mal in die gleiche Gruppe hinzugefügt wird.
-                if (!openIssue.body.groupID.equals(group._id)) {
-                    await Issue.deleteOne({ _id: openIssue._id })
-
-                    //Gibt Array zurück. b wird nur dem Array hinzugefügt, wenn er sich vom a unterscheidet. --> entspricht $addToSet von MongoDB 
-                    //Schützt vor Duplication Conflict
-                    //INFO Funktioniert nur mit mongoose.ObjectID
-                    const _addToSet = (a, b) => {
-                        return (a.equals(b)) ? [a] : [a, b]
-                    }
-
-                    const multiGroupIssue = await Issue.create({
-                        tag: 'newMemberInMultipleGroups',
-                        date: openIssue.date,
-                        body: {
-                            groupIDs: [openIssue.body.groupID, group._id],
-                            memberID: openIssue.body.memberID,
-                            createdBy: [openIssue.body.createdBy, user._id],
-                            firstname: memberBody.firstname,
-                            lastname: memberBody.lastname,
-                            birthday: memberBody.birthday,
-                            department: _addToSet(openIssue.body.department, group.department._id)
-                        },
-                        _id: openIssue._id
-                    })
-                    memberBody.openIssue = multiGroupIssue._id
-                }
-            } else { //Wenn schon ein MultiGroupIssue existiert.
-                //Schützt vor Duplication Conflict.
-                if (!openIssue.body.groupIDs.includes(group._id)) {
-                    openIssue = await Issue.findByIdAndUpdate(openIssue._id, { $addToSet: { "body.groupIDs": group._id, "body.department": group.department._id }, $push: { "body.createdBy": user._id } })
-                }
-                memberBody.openIssue = openIssue._id
-            }
-
-            memberBody.memberId = openIssue.body.memberID
+        memberBody = {
+            ...memberBody,
+            departments: [group.department],
+            groups: [group._id],
+            openIssues: [new mongoose.Types.ObjectId()]
         }
-    } else if (members.length > 1) { //Wenn es mehr als einen gleichen Member gibt.
-        //* --> Issue für Duplicate Conflict wird erstellt.
-        const issueBody = {
-            tag: "duplicateMemberInDB",
+
+        const newMember = await Member.create(memberBody);
+
+        await Issue.create({
+            _id: newMember.openIssues[0],
+            tag: 'newMember',
             date: new Date(),
             body: {
-                memberIDs: [],
-                firstname: members[0].firstname,
-                lastname: members[0].lastname,
-                birthday: members[0].birthday,
+                groupID: group._id,
+                memberID: newID,
+                createdBy: user._id,
+                firstname: newMember.firstname,
+                lastname: newMember.lastname,
+                birthday: newMember.birthday,
+                department: group.department
             }
-        }
-
-        members.forEach(val => issueBody.body.memberIDs.push(val._id))
-
-        const openIssue = await Issue.create(issueBody)
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Internal database error detected: The database contains several members with the same basic data. The system has created a ticket with the ID ${openIssue._id}. Please contact a system administrator.`)
-    } else if (!members[0].departments.some(v => v.equals(group.department._id))) { //Wenn Member in DB schon existiert, aber noch nicht Teil des Department ist. 
-        //* --> Issue zum hinzufügen zur Abteilung wird erstellt.
-
-        //WARNING Im Moment wird dem Member zwar die GroupID hinzugefügt, jedoch nicht die Id des Departments
-        //TODO Überarbeiten 
-
-
-        let openIssue = await Issue.findOne({
-            $and: [
-                { tag: "addMemberToDepartment" },
-                { "body.memberID": members[0]._id },
-                { "body.department": group.department._id }
-            ]
         })
 
-        if (openIssue === null || typeof openIssue === "undefined") {
-            let openIssue = await Issue.create({
-                tag: "addMemberToDepartment",
+        newMember.memberId = newMember._id
+
+        return newMember
+    } else {
+        //Wenn es mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.    
+        //TODO Hier sollte eine Whitelist hinzugefügt werden, sodass diese Member ignoriert werden, sollte die Dopplung kein Fehler sein.
+        if (members.length > 1) {
+            const issue = await Issue.create({
+                tag: "duplicateMemberInDB",
+                date: new Date(),
+                body: {
+                    memberIDs: members.map(val => val._id),
+                    firstname: members[0].firstname,
+                    lastname: members[0].lastname,
+                    birthday: members[0].birthday,
+                }
+            })
+
+            members.forEach(async (member) => {
+                member.openIssues.push(issue._id)
+                if (!member.groups.includes(group._id)) {
+                    member.groups.push(group._id)
+                }
+            })
+            
+            await members.save()
+            return members
+        }
+
+        //Wenn bereits ein Member existiert, wird ein Issue erstellt, dass der Member zu einer Gruppe hinzugefügt wurde.
+        members[0].memberId = members[0]._id
+
+        //Wenn der Member bereits in der Gruppe ist, wird kein Issue erstellt und einfach nur der Member zurückgeben.
+        if (members[0].groups.includes(group._id)) {
+            return members[0]
+        }
+
+        //Wenn der Member noch nicht dem Department zugeordnet ist zu der die Gruppe gehört, wird ein Issue erstellt, dass der Member dem Department hinzugefügt wurde.
+        //INFO Dieses Issues muss nicht erstellt werden. Es wird nur zum Tracken von Veränderungen erstellt
+        if (!members[0].departments.includes(group.department)) {
+            let issue = await Issue.create({
+                tag: "memberWasAddedToDepartment",
                 date: new Date(),
                 body: {
                     memberID: members[0]._id,
                     firstname: members[0].firstname,
                     lastname: members[0].lastname,
                     birthday: members[0].birthday,
-                    //! department id wird in group.department gespeichert --> muss getestet werden, ob Bug auftritt
-                    department: group.department._id,
-                    groupIDs: [group._id],
-                    createdBy: [user._id]
+                    department: group.department,
+                    groupID: group._id,
+                    createdBy: user._id
                 }
             })
 
-            memberBody.openIssue = openIssue._id
-            memberBody.memberId = members[0]._id
-        } else {
-            if (!openIssue.body.groupIDs.includes(group._id)) {
-                await Issue.findByIdAndUpdate(openIssue._id, { $addToSet: { "body.groupIDs": group._id }, $push: { "body.createdBy": user._id } })
-            }
-
-            memberBody.openIssue = openIssue._id
-            memberBody.memberId = openIssue.body.memberID
+            members[0]._doc.openIssues = [...members[0], issue._id]
         }
 
-        await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
-    } else {//Wenn der Member schon in DB existiert und auch Teil des Departments ist.
-        //* --> Member wird der neuen Gruppe ohne Issue hinzugefügt.
-        await Member.findByIdAndUpdate(members[0]._id, { $addToSet: { groups: group._id } })
-        memberBody.memberId = members[0]._id
-    }
+        //Member wird der Gruppe hinzugefügt
+        members[0].push(group._id)
 
-    return memberBody
+        await members.save()
+
+        return members[0]
+    }
 }
 
 const updateMember = async (memberBody) => {
@@ -201,14 +144,14 @@ const updateMember = async (memberBody) => {
 
     //INFO Dates müssen als Date Objekt gespeichert werden. Wenn der MemberBody direkt aus einer Request kommt, sind Daten ein String.
 
-    if(typeof memberBody.birthday !== undefined) {
+    if (typeof memberBody.birthday !== undefined) {
         memberBody.birthday = new Date(memberBody.birthday)
     }
 
     let member = await Member.findOne({ _id: id })
 
     member.overwrite(memberBody)
-    
+
     await member.save()
 
     return member

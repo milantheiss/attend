@@ -110,34 +110,36 @@ const createGroup = async (user, groupBody) => {
 const updateMember = async (user, groupID, body) => {
     if (hasAccessToGroup(user, groupID)) {
         let oldFirsttraining
-        let group
+        let group = await Group.findById(groupID)
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body.memberId === 'undefined') {
-            body = await memberService.handleNewMemberEvent(user, await getGroupById(user, groupID), body)
-            group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: body }, { new: true })
-        } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet"
+            if (!group.participants.some(e => e.memberId.equals(body.memberId))) {
+                //Wenn der Member noch nicht Teil der Gruppe ist, wird er hinzugefügt
+                body = await memberService.handleNewMemberEvent(user, group, body)
+                group._doc.participants.push(body)
+            }
+        } else { 
+            //Wenn Participant bereits existiert, wird er geupdatet
             //WARNING Im Moment kann jeder Trainer einfach über die Gruppe den Namen eines Kindes ändern
 
             //Member wird geupdatet
+            //TODO Hier sollte eine Namens Validierung stattfinden
             await memberService.updateMember(body)
-
-            //Gibt altes Objekt zurück
-            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body.memberId }, { '$set': { 'participants.$': body } })
-
+          
             //OldFirsttraining wird aus group gezogen & group lokal geupdatet, damit es zurückgeben werden kann
             group._doc.participants = group._doc.participants.map(e => {
                 if (e.memberId.equals(body.memberId)) {
-        
                     oldFirsttraining = e.firsttraining
                     return body
                 }
                 return e
             })
         }
-
         //Attendance wird geupdatet
         await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
+
+        await group.save()
 
         return group
     } else {

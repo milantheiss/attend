@@ -92,10 +92,9 @@ export default {
             required: false,
             default() {
                 return {
-                    firstname: "",
+                    firstname: "", 
                     lastname: "",
                     birthday: "",
-                    memberId: "",
                     firsttraining: (new Date(Date.now()).toJSON()).slice(0, 10)
                 };
             }
@@ -112,6 +111,9 @@ export default {
         },
         async onClickOnCreate() {
             if (!this.hasAnError()) {
+                //Wird auf undefined gesetzt, da sonst nicht ein neuer Teilnehmer erstellt wird, sondern das Backend versucht einen Teilnehmer mit der ID "" zu suchen
+                this.participantData.memberId = undefined
+
                 this.$emit("onClickOnCreate", this.participantData);
                 //Reset participantData
                 this.participantData = {
