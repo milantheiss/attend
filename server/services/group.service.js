@@ -110,11 +110,12 @@ const createGroup = async (user, groupBody) => {
 const updateMember = async (user, groupID, body) => {
     if (hasAccessToGroup(user, groupID)) {
         let oldFirsttraining
+        let group
 
         //Wenn Participant noch nicht existiert, wird er neu erstellt
         if (typeof body.memberId === 'undefined') {
             body = await memberService.handleNewMemberEvent(user, await getGroupById(user, groupID), body)
-            await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: body }, { new: true })
+            group = await Group.findByIdAndUpdate({ '_id': groupID }, { $addToSet: body }, { new: true })
         } else { //Wenn Participant bereits existiert, wird er in Gruppe geupdatet"
             //WARNING Im Moment kann jeder Trainer einfach über die Gruppe den Namen eines Kindes ändern
 
@@ -122,17 +123,23 @@ const updateMember = async (user, groupID, body) => {
             await memberService.updateMember(body)
 
             //Gibt altes Objekt zurück
-            const group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body.memberId }, { '$set': { 'participants.$': body } })
+            group = await Group.findOneAndUpdate({ '_id': groupID, 'participants.memberId': body.memberId }, { '$set': { 'participants.$': body } })
 
-            //OldFirsttraining wird aus group gezogen
-            const foo = group.participants.find(e => e.memberId.equals(body.memberId))
-            oldFirsttraining = foo.firsttraining
+            //OldFirsttraining wird aus group gezogen & group lokal geupdatet, damit es zurückgeben werden kann
+            group._doc.participants = group._doc.participants.map(e => {
+                if (e.memberId.equals(body.memberId)) {
+        
+                    oldFirsttraining = e.firsttraining
+                    return body
+                }
+                return e
+            })
         }
 
         //Attendance wird geupdatet
         await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
 
-        return true
+        return group
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }
@@ -203,10 +210,11 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
 /**
  * Remove Member out of group
  * @param {ObjectId} groupID
- * @returns {Promise<Group>}0
+ * @returns {Promise<Group>} Updated Group
  */
 const removeMember = async (user, groupID, memberID) => {
     if (hasAccessToGroup(user, groupID)) {
+        //Der Member wird nicht gelöscht, sondern nur aus der Gruppe entfernt
         await Member.findByIdAndUpdate(memberID, {$pull: {groups: groupID}})
         return await Group.findOneAndUpdate({ '_id': groupID, }, { '$pull': { 'participants': { '_id': memberID } } }, { new: true })
     } else {

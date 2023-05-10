@@ -76,8 +76,9 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnSave(participantData) {
-      console.log('ParticipantData: ', participantData);
-
+      //Update DB
+      await updateMemberInGroup(this.selectedGroup.id, participantData)
+      
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.map(p => {
         if(p.memberId === participantData.memberId) {
@@ -86,8 +87,6 @@ export default {
           return p
         }
       }) 
-
-      await updateMemberInGroup(this.selectedGroup.id, participantData)
     },
     /**
      * Handelt onClickOnDelete Emit aus @see GroupListGomponent und @see MemberEditor 
@@ -95,7 +94,11 @@ export default {
      * @param {Object} participantData 
      */
     async onClickOnDelete(participantData) {
-      this.groupData = await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
+      //Update DB
+      await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
+      
+      //Updated groupData locally damit Change instant ist
+      this.groupData.participants = this.groupData.participants.filter(p => p.memberId !== participantData.memberId)
     }
   },
 
