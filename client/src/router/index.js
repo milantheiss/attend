@@ -59,6 +59,12 @@ const routes = [
     name: "ReviewInvoice",
     component: () => import("../views/ReviewInvoiceView.vue"),
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/downloadInvoice",
+    name: "DownloadInvoice",
+    component: () => import("../views/DownloadInvoiceView.vue"),
+    meta: { requiresAuth: true }
   }
 ]
 

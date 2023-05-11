@@ -112,23 +112,17 @@
             </div>
 
             <!--Bestätigungsfeld-->
-            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <div class="flex items-center">
-                    <CheckboxInput class="mr-3"></CheckboxInput>
-                    <p class="text-black font-medium text-base md:text-lg text-left"><span class="text-orange-600">TODO
-                            Bestätigungsmessage</span>
-                    </p>
-                </div>
+            <div class="bg-white py-4 rounded-lg drop-shadow-md">
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
-                <div class="flex justify-around items-center">
+                <div class="flex justify-between items-center">
                     <button @click="cancel"
-                        class="flex items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
-                        :class="error.show ? 'mt-4' : 'mt-8'">
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 w-full md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5 rounded-lg drop-shadow-md"
+                        :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
                     <button @click="send"
-                        class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
-                        :class="error.show ? 'mt-4' : 'mt-8'">
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 w-full md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 rounded-lg drop-shadow-md"
+                        :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Senden</p>
                     </button>
                 </div>

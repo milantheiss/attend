@@ -127,21 +127,21 @@
                 </div>
 
                 <!--Bestätigungsfeld-->
-                <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+                <div class="bg-white py-5 rounded-lg drop-shadow-md">
                     <div class="flex items-center">
                         <CheckboxInput class="mr-3"></CheckboxInput>
                         <p class="text-black font-medium text-base md:text-lg text-left"><span class="text-orange-600">TODO
                                 Bestätigungsmessage</span>
                         </p>
                     </div>
-                    <div class="flex justify-around items-center">
+                    <div class="flex justify-between items-center">
                         <button @click="reject"
-                            class="flex items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
+                            class="flex justify-center items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 w-full md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5 rounded-lg drop-shadow-md"
                             :class="error.show ? 'mt-4' : 'mt-8'">
                             <p class="font-medium font-base md:text-lg">Ablehnen</p>
                         </button>
                         <button @click="approve"
-                            class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 rounded-lg drop-shadow-md"
+                            class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 w-full md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 rounded-lg drop-shadow-md"
                             :class="error.show ? 'mt-4' : 'mt-8'">
                             <p class="font-medium font-base md:text-lg">Bestätigen</p>
                         </button>
@@ -270,18 +270,7 @@ export default {
                 this.status.processing = false
                 this.status.text = 'Abrechnung genehmigt.'
 
-                if(typeof this.invoice.reviewer === String ) {
-                    this.invoice.reviewer = {
-                        userId: this.invoice.reviewer,
-                        firstname: this.authStore.user.firstname,
-                        lastname: this.authStore.user.lastname
-                    }
-                } else {
-                    this.invoice.reviewer = {
-                        firstname: this.authStore.user.firstname,
-                        lastname: this.authStore.user.lastname
-                    }
-                }
+                this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
                 await createInvoice(this.filename, this.invoice)
             } else {

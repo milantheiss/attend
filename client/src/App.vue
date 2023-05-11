@@ -30,7 +30,7 @@
 				</button>
 
 				<!--Seitentitel-->
-				<h2 class="font-semibold text-xl md:text-2xl">{{ dataStore.viewname }}</h2>
+				<h2 class="font-semibold text-lg sm:text-xl md:text-2xl truncate mx-2">{{ dataStore.viewname }}</h2>
 
 				<!--Profile Avatar-->
 				<!--TODO Custom Avatar jenach User-->

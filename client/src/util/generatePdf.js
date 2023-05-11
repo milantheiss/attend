@@ -503,10 +503,16 @@ async function createInvoice(filename, dataset) {
         doc
           .setFont("helvetica", "bold")
           .setFontSize(10)
-          .text(`${dataset.reviewer.firstname} ${dataset.reviewer.lastname}`, 301.64, posNextLine + 18.5, { maxWidth: 257.64 })
-          .setFont("helvetica", "normal")
-          .setFontSize(8)
-          .text(`Digital unterzeichnet am ${today}`, 301.64, posNextLine + 26.3, { maxWidth: 257.64 })
+
+        if (typeof dataset.reviewer !== "undefined") {
+          if (typeof dataset.reviewer.firstname !== "undefined" && typeof dataset.reviewer.lastname !== "undefined") {
+            doc
+              .text(`${dataset.reviewer.firstname} ${dataset.reviewer.lastname}`, 301.64, posNextLine + 18.5, { maxWidth: 257.64 })
+              .setFont("helvetica", "normal")
+              .setFontSize(8)
+              .text(`Digital unterzeichnet am ${today}`, 301.64, posNextLine + 26.3, { maxWidth: 257.64 })
+          }
+        }
 
         drawBox(doc, 38, posNextLine - tableTopMargin, 261.64, 39.9);
         drawBox(doc, 299.64, posNextLine - tableTopMargin, 261.64, 39.9);

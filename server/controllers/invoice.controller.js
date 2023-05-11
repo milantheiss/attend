@@ -1,9 +1,9 @@
-const { groupService, attendanceService} = require("../services");
+const { groupService, attendanceService } = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
-const { Department, Invoice, Group, User } = require("../models");
+const { Department, Invoice, Group, User, Notification } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole, hasDepartmentHeadRole } = require("../utils/roleCheck");
 const config = require("../config/config");
@@ -19,9 +19,9 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 
 	for (groupID of req.query.groups) {
 		const groupInfos = await Group.findById(groupID, { _id: 1, name: 1, department: 1, venue: 1 });
-		
+
 		if (typeof department === "undefined") {
-			department = await Department.findById(groupInfos._doc.department, { _id: 1, name: 1});
+			department = await Department.findById(groupInfos._doc.department, { _id: 1, name: 1 });
 		}
 
 		if (department._id.equals(groupInfos._doc.department)) {
@@ -64,7 +64,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.status = "pending";
 			invoice.dateOfReceipt = new Date();
 
-			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1});
+			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1 });
 
 			invoice.submittedBy = {
 				userId: req.user._id,
@@ -74,11 +74,11 @@ const submitInvoice = catchAsync(async (req, res) => {
 			};
 			invoice.dateOfLastChange = new Date();
 
-			for(group of invoice.groups) {
+			for (group of invoice.groups) {
 				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, group.id, invoice.startdate, invoice.enddate);
 				group.department = invoice.department;
 			}
-			
+
 			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
 
@@ -113,7 +113,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 
 const getAllAssignedInvoices = catchAsync(async (req, res) => {
 	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
-		const invoices = await Invoice.find({ assignedTo: req.user._id, $or: [{status: "pending"}, {status: "reopened"}] });
+		const invoices = await Invoice.find({ assignedTo: req.user._id, $or: [{ status: "pending" }, { status: "reopened" }] });
 
 		if (invoices === null || typeof invoices === "undefined") {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
@@ -133,8 +133,8 @@ const getInvoiceByID = catchAsync(async (req, res) => {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoice found");
 		}
 
-		if (!invoice.assignedTo.includes(req.user._id)) {
-			throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+		if (!invoice.assignedTo.includes(req.user._id) && !invoice.submittedBy.userId.equals(req.user._id)) {
+			throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to view this invoice");
 		}
 
 		await res.status(httpStatus.OK).send(invoice);
@@ -145,7 +145,7 @@ const getInvoiceByID = catchAsync(async (req, res) => {
 
 const getOwnInvoices = catchAsync(async (req, res) => {
 	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
-		const invoices = await Invoice.find({"submittedBy.userId": req.user._id });
+		const invoices = await Invoice.find({ "submittedBy.userId": req.user._id });
 
 		if (invoices === null || typeof invoices === "undefined") {
 			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
@@ -174,11 +174,33 @@ const approveInvoice = catchAsync(async (req, res) => {
 
 		invoice.status = "approved";
 		invoice.dateOfLastChange = new Date();
-		invoice.reviewer = req.user._id;
+		invoice.reviewer = {
+			userId: req.user._id,
+			firstname: req.user.firstname,
+			lastname: req.user.lastname
+		};
 
 		await invoice.save();
 
-		//TODO Send notification to submitter
+		//Notification an Kontrolleure wird gelöscht
+		await Notification.findOneAndDelete({
+			$and: [
+				{ "data.invoiceID": invoice._id },
+				{ "recipients.$.userID": req.user._id },
+				{ "type": "invoice" },
+				{ "from": invoice.submittedBy.userId }
+			]
+		});
+
+		await addNewNotification({
+			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} genehmigt`,
+			priority: "normal",
+			from: req.user._id,
+			recipients: [{userID: invoice.submittedBy.userId, read: false}],
+			message: `Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/downloadInvoice?id=${invoice._id})`,
+			type: "invoice",
+			data: { invoiceID: invoice._id },
+		});
 
 		await res.status(httpStatus.OK).send("Invoice approved");
 	} else {
@@ -204,8 +226,26 @@ const rejectInvoice = catchAsync(async (req, res) => {
 
 		await invoice.save();
 
-		//TODO Send notification to submitter
+		//Notification an Kontrolleure wird gelöscht
+		await Notification.findOneAndDelete({
+			$and: [
+				{ "data.invoiceID": invoice._id },
+				{ "recipients.$.userID": req.user._id },
+				{ "type": "invoice" },
+				{ "from": invoice.submittedBy.userId }
+			]
+		});
 
+		//TODO Add Reject Message
+		await addNewNotification({
+			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} abgelehnt`,
+			priority: "normal",
+			from: req.user._id,
+			recipients: [{userID: invoice.submittedBy.userId, read: false}],
+			message: `Es wurden keine Informationen hinterlassen`,
+			type: "invoice",
+			data: { invoiceID: invoice._id },
+		});
 		await res.status(httpStatus.OK).send("Invoice rejected");
 	} else {
 		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to reject invoice");
@@ -227,11 +267,11 @@ const reopenInvoice = catchAsync(async (req, res) => {
 		invoice.status = "pending";
 		invoice.dateOfLastChange = new Date();
 
-		await addNewNotification( {
+		await addNewNotification({
 			title: `Abrechnung #${invoice.invoiceNumber} wieder geöffnet`,
 			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](${config.origin}) wieder geöffnet`,
 			from: req.user._id,
-			recipients: invoice.assignedTo,
+			recipients: [{userID: invoice.assignedTo, read: false}],
 			type: "invoice",
 			date: new Date(),
 			data: {

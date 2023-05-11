@@ -74,7 +74,11 @@ const invoiceSchema = mongoose.Schema(
             required: false
         },
         reviewer: {
-            type: mongoose.Types.ObjectId,
+            type: {
+                firstname: String,
+                lastname: String,
+                userId: mongoose.Types.ObjectId,
+            },
             required: false
         },
         dateOfReceipt: {
