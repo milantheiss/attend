@@ -15,7 +15,7 @@ async function getTrainersOfGroup(group) {
     return group.trainers
 }
 
-async function getParticipantsOfGroup(group) { 
+async function getParticipantsOfGroup(group) {
     group.participants = await Promise.all(group.participants.map(async (participant) => {
         const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
         if (res === null) {
@@ -28,11 +28,11 @@ async function getParticipantsOfGroup(group) {
         participant._doc._id = res._id;
         return participant;
     }));
-    return group.participants   
+    return group.participants
 }
 
 async function getDepartmentOfGroup(group) {
-    group.department = await Department.findById(group.department, {name: 1, _id: 1})
+    group.department = await Department.findById(group.department, { name: 1, _id: 1 })
     return group.department
 }
 
@@ -116,17 +116,19 @@ const updateMember = async (user, groupID, body) => {
         if (typeof body.memberId === 'undefined') {
             if (!group.participants.some(e => e.memberId.equals(body.memberId))) {
                 //Wenn der Member noch nicht Teil der Gruppe ist, wird er hinzugefügt
-                body = await memberService.handleNewMemberEvent(user, group, body)
+                body = { ...body, ...await memberService.handleNewMemberEvent(user, group, body) }
+                body.memberId = body._id
                 group._doc.participants.push(body)
             }
-        } else { 
+        } else {
             //Wenn Participant bereits existiert, wird er geupdatet
             //WARNING Im Moment kann jeder Trainer einfach über die Gruppe den Namen eines Kindes ändern
 
             //Member wird geupdatet
             //TODO Hier sollte eine Namens Validierung stattfinden
-            await memberService.updateMember(body)
-          
+            body = { ...body, ... await memberService.updateMember(body) }
+            body.memberId = body._id
+
             //OldFirsttraining wird aus group gezogen & group lokal geupdatet, damit es zurückgeben werden kann
             group._doc.participants = group._doc.participants.map(e => {
                 if (e.memberId.equals(body.memberId)) {
@@ -154,7 +156,7 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
     if (typeof list !== "undefined" && list !== null) {
         newFirsttraining = new Date(newFirsttraining)
 
-        //Wenn der Participant geupdatet wird
+        //Wenn der Datum Firsttraining verändert wurde, muss der Participant geupdatet werden
         if (typeof oldFirsttraining !== 'undefined') {
             oldFirsttraining = new Date(oldFirsttraining)
 
@@ -164,30 +166,22 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
                     //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
                     if (session.date >= newFirsttraining) {
                         participant = session.participants.find(foo => foo._id.equals(participantData._id))
-
-                        if (typeof participant !== 'undefined') {
-                            participant.firstname = participantData.firstname
-                            participant.lastname = participantData.lastname
-                        } else { //Wenn Participant noch nicht in Trainingssession existiert
+                        //Wenn Participant noch nicht in Trainingssession existiert
+                        if (typeof participant === 'undefined') {
                             session.participants.push({
-                                firstname: participantData.firstname,
-                                lastname: participantData.lastname,
+                                memberId: participantData._id,
                                 attended: false,
                                 _id: participantData._id
                             })
                         }
                     }
                 }
-            } else { //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
+            } else {
+                //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
                 for (const session of list.trainingssessions) {
-                    //In allen Trainingssessions, die jünger sind als newFirsttraining, wird Participant geupdatet
-                    if (session.date >= newFirsttraining) {
-                        participant = session.participants.find(foo => foo._id.equals(participantData._id))
-                        participant.firstname = participantData.firstname
-                        participant.lastname = participantData.lastname
-                    } else if (session.date >= oldFirsttraining) { //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
-                        participant = session.participants.find(foo => foo._id.equals(participantData._id))
-                        session.participants.splice(session.participants.indexOf(participant), 1)
+                    //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
+                    if (session.date >= oldFirsttraining) {
+                        session.participants = session.participants.filter(foo => !foo._id.equals(participantData._id))
                     }
                 }
             }
@@ -196,8 +190,7 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
                 //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
                 if (session.date >= newFirsttraining) {
                     session.participants.push({
-                        firstname: participantData.firstname,
-                        lastname: participantData.lastname,
+                        memberId: participantData._id,
                         attended: false,
                         _id: participantData._id
                     })
@@ -205,7 +198,9 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
             }
         }
 
-        await Attendance.findOneAndUpdate({ '_id': list._id }, { '$set': { 'trainingssessions': list.trainingssessions } })
+        await list.save()
+    } else {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Attendance not found')
     }
 }
 
@@ -217,8 +212,8 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
 const removeMember = async (user, groupID, memberID) => {
     if (hasAccessToGroup(user, groupID)) {
         //Der Member wird nicht gelöscht, sondern nur aus der Gruppe entfernt
-        await Member.findByIdAndUpdate(memberID, {$pull: {groups: groupID}})
-        return await Group.findOneAndUpdate({ '_id': groupID, }, { '$pull': { 'participants': { '_id': memberID } } }, { new: true })
+        await Member.findByIdAndUpdate(memberID, { $pull: { groups: groupID } })
+        return await Group.findOneAndUpdate({ '_id': groupID, }, { '$pull': { 'participants': { 'memberId': memberID } } }, { new: true })
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to add members to group")
     }

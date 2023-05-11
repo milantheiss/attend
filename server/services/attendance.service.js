@@ -29,7 +29,7 @@ async function getParticipantsOfGroup(participants) {
             participant._doc.lastname = res.lastname;
             participant._doc._id = res._id;
         } catch (e) {
-            logger.error(e)
+            logger.error(e, res)
         }
         return participant;
     }));

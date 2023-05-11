@@ -59,11 +59,11 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
 
         await Issue.create({
             _id: newMember.openIssues[0],
-            tag: 'newMember',
+            tag: 'newMemberCreated',
             date: new Date(),
             body: {
                 groupID: group._id,
-                memberID: newID,
+                memberID: newMember._id,
                 createdBy: user._id,
                 firstname: newMember.firstname,
                 lastname: newMember.lastname,
@@ -74,7 +74,8 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
 
         newMember.memberId = newMember._id
 
-        return newMember
+        //Es muss doc zurückgegeben werden, da sonst die Daten noch verschachtelt sind
+        return newMember._doc
     } else {
         //Wenn es mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.    
         //TODO Hier sollte eine Whitelist hinzugefügt werden, sodass diese Member ignoriert werden, sollte die Dopplung kein Fehler sein.
@@ -91,22 +92,22 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
             })
 
             members.forEach(async (member) => {
-                member.openIssues.push(issue._id)
+                member._doc.openIssues.push(issue._id)
                 if (!member.groups.includes(group._id)) {
-                    member.groups.push(group._id)
+                    member._doc.groups.push(group._id)
                 }
+                await member.save()
             })
-            
-            await members.save()
+
             return members
         }
 
         //Wenn bereits ein Member existiert, wird ein Issue erstellt, dass der Member zu einer Gruppe hinzugefügt wurde.
-        members[0].memberId = members[0]._id
+        members[0]._doc.memberId = members[0]._id
 
         //Wenn der Member bereits in der Gruppe ist, wird kein Issue erstellt und einfach nur der Member zurückgeben.
         if (members[0].groups.includes(group._id)) {
-            return members[0]
+            return members[0]._doc
         }
 
         //Wenn der Member noch nicht dem Department zugeordnet ist zu der die Gruppe gehört, wird ein Issue erstellt, dass der Member dem Department hinzugefügt wurde.
@@ -130,11 +131,12 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
         }
 
         //Member wird der Gruppe hinzugefügt
-        members[0].push(group._id)
+        members[0]._doc.groups.push(group._id)
 
-        await members.save()
-
-        return members[0]
+        await members[0].save()
+        
+        //Hier muss _doc zurückgegeben werden, da die Daten sonst verschachtelt sind
+        return members[0]._doc
     }
 }
 

@@ -87,15 +87,19 @@ export default {
           return p
         }
       }) 
+
+      if(!this.groupData.participants.some(p => p.memberId === participantData.memberId)) {
+        this.groupData.participants.push(participantData)
+      }
     },
     /**
      * Handelt onClickOnDelete Emit aus @see GroupListGomponent und @see MemberEditor 
      * Callt Fetch Methode und löscht Participant aus Backend.
      * @param {Object} participantData 
      */
-    async onClickOnDelete(participantData) {
+    async onClickOnDelete(participantData) {      
       //Update DB
-      await removeMemberFromGroup(this.selectedGroup.id, participantData._id)
+      await removeMemberFromGroup(this.selectedGroup.id, participantData.memberId)
       
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.filter(p => p.memberId !== participantData.memberId)
