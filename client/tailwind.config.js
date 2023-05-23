@@ -16,8 +16,8 @@ module.exports = {
       colors: {
         'standard-gradient-1': '#5864e0',
         'standard-gradient-2': '#6b58e0',
-        'unchecked-gradient-1': '#c2beda',
-        'unchecked-gradient-2': '#cecfe4',
+        'unchecked-gradient-1': '#D7D9EA',
+        'unchecked-gradient-2': '#C9C6DB',
         'dimmed-gradient-1': '#98A4CD',
         'dimmed-gradient-2': '#7C83C3',
         'delete-gradient-1': '#DE2C2C',

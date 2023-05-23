@@ -6,15 +6,15 @@
                 <div class="flex">
                     <slot name="header"></slot>
                 </div>
-                <div class="color-gray-300 mt-0.5 w-fit justify-items-end" @click="enableClickOnHeader ? undefined : toggleShowContent">
+                <div class="color-gray-300 mt-0.5 w-fit justify-items-end" @click="enableClickOnHeader ? undefined : toggleShowContent()">
                     <!--Chevron Down-->
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" class="w-6 h-6" v-if="!showContent">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                        stroke="currentColor" class="w-7 h-7" v-if="!showContent">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                     </svg>
                     <!--Chevron Up-->
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" class="w-6 h-6" v-if="showContent">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                        stroke="currentColor" class="w-7 h-7" v-if="showContent">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                     </svg>
                 </div>

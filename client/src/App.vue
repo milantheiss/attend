@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-40 m-4 font-ubuntu">
+	<div class="mb-40 m-4 font-ubuntu text-[#111827] md:text-xl text-lg">
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
 		<nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-2" v-if="auth.authenticated">
 			<div class="flex justify-between justify-content-center items-center">

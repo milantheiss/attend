@@ -49,97 +49,101 @@
             <!--TODO Add ÜL Nummer Prompt-->
             <!--TODO ÜL Info-->
 
-            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <!--Invoice Info Field-->
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Antragsteller: </p>
-                    <p class="text-black font-medium text-base md:text-lg text-right">
+            <!--Invoice Info Field-->
+            <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
+                <div class="flex justify-between items-baseline">
+                    <p class="text-[#6B7280] font-normal">Antragsteller: </p>
+                    <p class="font-medium text-right">
                         {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname }}
                     </p>
                 </div>
 
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
-                    <p class="text-black font-medium text-base md:text-lg text-right">{{
+                <div class="flex justify-between items-baseline">
+                    <p class="text-[#6B7280] font-normal">Abteilung: </p>
+                    <p class="font-medium text-right">{{
                         dataStore.invoiceData.department.name
                     }}</p>
                 </div>
 
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Abrechnung für den Zeitraum: </p>
-                    <p class="text-black font-normal text-base md:text-lg text-right"><span class="font-medium">{{
-                        new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
-                            year: "numeric",
-                            month: "short", day: "numeric"
-                        })
-                    }}</span>
-                        bis <span class="font-medium">{{
+                <div class="flex justify-between items-baseline">
+                    <p class="text-[#6B7280] font-normal">Abrechnungszeitraum: </p>
+                    <p class="font-normal text-right">
+                        <span class="font-medium">{{
+                            new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
+                                year: "numeric",
+                                month: "numeric", day: "numeric"
+                            })
+                        }}</span>
+                        bis
+                        <span class="font-medium">{{
                             new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
                                 year: "numeric",
-                                month: "short", day: "numeric"
+                                month: "numeric", day: "numeric"
                             })
-                        }}</span></p>
+                        }}</span>
+                    </p>
                 </div>
-
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg"> </p>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
-                    <p class="text-black font-medium text-base md:text-lg text-right">{{ readableTotalHours }}</p>
+                <div class="flex justify-between items-baseline">
+                    <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
+                    <p class="font-medium text-right">{{ readableTotalHours }}</p>
                 </div>
             </div>
 
-            <div class="mt-8">
+            <!--Alle Gruppe, der Invoice-->
+            <div class="my-7 flex flex-col gap-5">
                 <!--Je Gruppe ein Container-->
-                <div class="flex justify-between items-center min-w-full" v-for="group in dataStore.invoiceData.groups"
-                    :key="group._id">
-                    <CollapsibleContainer :show="group.include" class="mb-4" :enableClickOnHeader="false">
-                        <template #header>
-                            <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
-                            <p class="truncate text-xl font-semibold"
-                                :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
-                        </template>
-                        <template #content>
-                            <!--Je Trainingsstunde ein Element-->
-                            <TrainingssessionCard class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
+
+                <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md" :show="false"
+                    :enableClickOnHeader="false" v-for="(group, index) in dataStore.invoiceData.groups" ref="groupCards"
+                    :key="group._id"
+                    :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
+                    <template #header>
+                        <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
+                        <p class="truncate text-xl font-semibold"
+                            :class="!group.include ? 'text-[#6B7280] line-through' : ''">{{ group.name }}</p>
+                    </template>
+                    <template #content>
+                        <!--Je Trainingsstunde ein Element-->
+                        <div class="flex flex-col gap-2">
+                            <TrainingssessionCard v-for="(trainingsssession, index) in group.trainingssessions"
                                 :key="trainingsssession._id" v-model="group.trainingssessions[index]"
                                 @onClickOnRemove="(session) => removeTrainingssession(session)">
                             </TrainingssessionCard>
-                        </template>
-                    </CollapsibleContainer>
-                </div>
+                        </div>
+                    </template>
+                </CollapsibleContainer>
             </div>
 
             <!--Bestätigungsfeld-->
-            <div class="bg-white py-4 rounded-lg drop-shadow-md">
+            <div class="">
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center gap-7">
+                    <!--md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5-->
                     <button @click="cancel"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 w-full md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5 rounded-lg drop-shadow-md"
+                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-xl px-3.5 md:px-7 py-3.5"
                         :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
+                    <!--md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 -->
                     <button @click="send"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 w-full md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 rounded-lg drop-shadow-md"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-xl drop-shadow-md w-full px-3.5 md:px-7 py-4"
                         :class="error.show ? 'mt-4' : ''">
-                        <p class="font-medium font-base md:text-lg">Senden</p>
+                        <p class="font-medium font-base md:text-lg">Versenden</p>
                     </button>
                 </div>
             </div>
         </div>
 
         <!--Sendebestätigung-->
-        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md" v-show="status.show">
-            <div class="flex flex-col justify-center items-center">
-                <div class="mb-3">
+        <ModalDialog :show="status.show" :hasHeader="false" :hasSubheader="false">
+            <template #content>
+                <div class="flex justify-center items-center w-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
-                        v-show="status.processing">
+                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]" v-show="status.processing">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
-
+    
                     <!--Check Circle-->
                     <!--TODO Fix Bounce-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
@@ -148,7 +152,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-
+    
                     <!--X Circle-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
                         stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
@@ -157,13 +161,15 @@
                             d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <p class="mb-3 text-lg text-center">{{ status.text }}</p>
-                <button @click="ok"
-                    class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
-                    <p class="font-medium font-base md:text-lg">Okay</p>
+                <p class="font-medium text-lg md:text-xl text-center mt-2">{{ status.text }}</p>
+            </template>
+            <template #footer>
+                <button @click="status.show = false"
+                    class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                    <p class="font-medium md:text-xl text-lg">Fertig</p>
                 </button>
-            </div>
-        </div>
+            </template>
+        </ModalDialog>
     </div>
 </template>
 
@@ -177,14 +183,17 @@ import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import TrainingssessionCard from "@/components/TrainingssessionCard.vue"
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
+import ModalDialog from '@/components/ModalDialog.vue';
 
 export default {
     name: "CreateInvoice",
     setup() {
         const dataStore = useDataStore()
         const showCollapsibleContainer = ref(true);
+        const groupCards = ref([]);
 
         return {
+            groupCards,
             dataStore,
             showCollapsibleContainer
         }
@@ -217,7 +226,8 @@ export default {
         CheckboxList,
         CollapsibleContainer,
         TrainingssessionCard,
-        CheckboxInput
+        CheckboxInput,
+        ModalDialog
     },
     methods: {
         async getInvoiceData() {
@@ -346,7 +356,27 @@ export default {
             const hh = Math.trunc(this.totalHours)
             const mm = Math.round(60 * (this.totalHours - hh))
             return `${hh} Std ${mm} Min`
+        },
+        showGroupCard() {
+            //INFO Das konditionelle Styling funktioniert in diesem Fall nur, wenn die Refs in 'setup' aufgesetzt werden.
+
+            //Wenn Ref initialisiert wurde, dann soll der Wert von showContent zurückgegeben werden
+            if (typeof this.groupCards !== "undefined" && this.groupCards?.length > 0) {
+                return this.groupCards.map(val => val.showContent)
+            } else {
+                //Wenn Ref noch nicht initialisiert ist, dann wird als default false zurückgegeben
+                return this.dataStore.invoiceData.groups.map(() => false)
+            }
         }
     }
 };
 </script>
+<style scoped>
+.cancel {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border: 2px solid #6B7280;
+}
+</style>
+```
