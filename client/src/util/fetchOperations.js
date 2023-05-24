@@ -415,6 +415,20 @@ async function rejectInvoice(id) {
 	);
 }
 
+async function getAllInvoicesInYear(year) {
+	if(typeof year === "undefined") throw new Error("year must be defined")
+
+	if(typeof year === Number) throw new Error("Year must be a number");
+
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/getAllInYear/${year}`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -440,5 +454,6 @@ export {
 	getAllAssignedInvoices,
 	getInvoiceById,
 	approveInvoice,
-	rejectInvoice
+	rejectInvoice,
+	getAllInvoicesInYear
 };

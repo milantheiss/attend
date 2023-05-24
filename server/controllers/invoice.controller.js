@@ -196,7 +196,7 @@ const approveInvoice = catchAsync(async (req, res) => {
 			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} genehmigt`,
 			priority: "normal",
 			from: req.user._id,
-			recipients: [{userID: invoice.submittedBy.userId, read: false}],
+			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
 			message: `Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/downloadInvoice?id=${invoice._id})`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
@@ -241,7 +241,7 @@ const rejectInvoice = catchAsync(async (req, res) => {
 			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} abgelehnt`,
 			priority: "normal",
 			from: req.user._id,
-			recipients: [{userID: invoice.submittedBy.userId, read: false}],
+			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
 			message: `Es wurden keine Informationen hinterlassen`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
@@ -271,7 +271,7 @@ const reopenInvoice = catchAsync(async (req, res) => {
 			title: `Abrechnung #${invoice.invoiceNumber} wieder geöffnet`,
 			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](${config.origin}) wieder geöffnet`,
 			from: req.user._id,
-			recipients: [{userID: invoice.assignedTo, read: false}],
+			recipients: [{ userID: invoice.assignedTo, read: false }],
 			type: "invoice",
 			date: new Date(),
 			data: {
@@ -301,6 +301,14 @@ const getPendingInvoices = catchAsync(async (req, res) => {
 	}
 });
 
+const getAllInYear = catchAsync(async (req, res) => {
+	const start = new Date(req.params.year, 0, 1);
+	const end = new Date(Number(req.params.year) + 1, 0, 1);
+
+	await res.status(httpStatus.OK).send(await Invoice.find({ "submittedBy.userId": req.user._id, dateOfReceipt: { $gte: new Date(start), $lt: new Date(end) } }));
+});
+
+
 module.exports = {
 	getDatasetForNewInvoice,
 	submitInvoice,
@@ -310,5 +318,6 @@ module.exports = {
 	approveInvoice,
 	rejectInvoice,
 	getPendingInvoices,
-	reopenInvoice
+	reopenInvoice,
+	getAllInYear
 };

@@ -22,21 +22,25 @@ router
     .get(verifyToken, invoiceController.getOwnInvoices)
 
 router
+        .route("/getPendingInvoices")
+        .get(verifyToken, invoiceController.getPendingInvoices)
+
+router
+    .route("/getAllInYear/:year")
+    .get(verifyToken, invoiceController.getAllInYear)
+
+router    
     .route("/approve/:id")
     .post(verifyToken, invoiceController.approveInvoice)
 
-router
+router    
     .route("/reject/:id")
     .post(verifyToken, invoiceController.rejectInvoice)
 
-router
+router    
     .route("/reopen/:id")
     .post(verifyToken, invoiceController.reopenInvoice)
-
-router
-    .route("/getPendingInvoices")
-    .get(verifyToken, invoiceController.getPendingInvoices)
-
+    
 router
     .route("/:id")
     .get(verifyToken, invoiceController.getInvoiceByID)

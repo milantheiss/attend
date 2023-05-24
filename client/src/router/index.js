@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/store/authStore';
-import { useDataStore } from '@/store/dataStore';
+import { useAuthStore } from '../store/authStore.js';
+import { useDataStore } from '../store/dataStore.js';
 
 const routes = [
   {
@@ -49,9 +49,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: "/openInvoices",
-    name: "OpenInvoices",
-    component: () => import("../views/OpenInvoicesView.vue"),
+    path: "/invoices",
+    name: "Invoices",
+    component: () => import("../views/InvoiceOverviewView.vue"),
     meta: { requiresAuth: true }
   },
   {
@@ -70,7 +70,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes: routes
 })
 
 /**

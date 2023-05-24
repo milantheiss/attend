@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="flex justify-between items-center">
-                        <p class="text-gray-700 font-light text-base md:text-lg">Abrechnung für den Zeitraum: </p>
+                        <p class="text-gray-700 font-light text-base md:text-lg">Abrechnungszeitraum: </p>
                         <p class="text-black font-normal text-base md:text-lg text-right"><span class="font-medium">{{
                             new Date(invoice.startdate).toLocaleDateString("de-DE", {
                                 year: "numeric",
