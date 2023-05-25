@@ -8,8 +8,8 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
       </svg>
     </button>
-    <DateInput class="text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
-      :max="getFormattedDate(new Date())"></DateInput>
+    <DateInput class="w-full text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
+      :max="getFormattedDate(new Date())" :enableStyleOverride="true"></DateInput>
     <button @click="getNextDate"
       class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
       <!--Right Chevron Icon-->
@@ -88,6 +88,9 @@ export default {
     date(newVal) {
       this.$emit("update:modelValue", new Date(newVal));
       this.$emit("onChange");
+    },
+    modelValue(newVal) {
+      this.date = this.getFormattedDate(newVal);
     }
   },
   components: { DateInput }

@@ -129,7 +129,9 @@ export default {
       selectedGroup: undefined,
       date: new Date(),
       showTimesBox: false,
-      attended: Object
+      attended: Object,
+      blockSelectedGroupWatcher: false,
+      pullingByQueryString: false
     }
   },
   components: {
@@ -147,7 +149,7 @@ export default {
      * Wenn der Server mit einem Fehler antwortet, wird dieser in der Console ausgegeben.
      */
     async pullAttendance() {
-      if (typeof this.selectedGroup !== 'undefined' && typeof this.date !== 'undefined') {
+      if (typeof this.selectedGroup !== 'undefined' && typeof this.date !== 'undefined' && !this.pullingByQueryString) {
         const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
@@ -175,7 +177,7 @@ export default {
       }
     },
 
-    async onTrainerAttendanceChange(id) {  
+    async onTrainerAttendanceChange(id) {
       const trainer = this.attended.trainers.find(foo => foo.userId == id)
       trainer.attended = !trainer.attended
       this.attended.totalHours = this.totalHours
@@ -212,23 +214,60 @@ export default {
         }
       }
       return count > 0 ? count : "Keine"
-    }
+    },
+
+    //Wird von Select List getriggert, wenn eine neue Gruppe ausgewählt wird.
+    newGroupSelected() {
+      
+    },
   },
   async created() {
-    //Zieht sich alle Namen und IDs der Gruppen auf die der Nutzer zugreifen kann.
-    this.groups = await fetchGroups()
-
     //Setzt Tab- und Seitenname
     document.title = 'Wähle eine Gruppe'
     this.dataStore.viewname = "Anwesenheitsliste"
   },
+  async mounted() {
+    //Zieht sich alle Namen und IDs der Gruppen auf die der Nutzer zugreifen kann.
+    this.groups = await fetchGroups()
+    const groupId = this.$route.query.groupId
+    const date = this.$route.query.date
+
+    console.log(groupId, date);
+
+    if (typeof groupId !== 'undefined' && typeof date !== "undefined") {
+      //Siehe Attandance
+      const res = await fetchAttendanceByDate(groupId, date)
+      if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
+        // Sollte nicht mehr erreicht werden
+        console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
+      } else {
+        this.blockSelectedGroupWatcher = true
+        this.pullingByQueryString = true
+        this.selectedGroup = this.groups.find(foo => foo.id == groupId)
+        this.date = new Date(date)
+        this.attended = await res
+
+        if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+          this.showTimesBox = true
+        }
+
+        this.blockSelectedGroupWatcher = false
+        this.pullingByQueryString = false
+        console.log(this.date);
+      }
+    }
+  },
   watch: {
-    //Wenn neue Gruppe ausgewählt wird...
+    //Wenn eine neue Gruppe ausgewählt wird,...
     selectedGroup() {
       //Wochentage werden an Datepicker übergeben, damit man über Buttons zum nächsten Training springen kann.
       this.$refs.datePicker.weekdays = this.getWeekdays(this.selectedGroup)
-      //Aktualisiert Date
-      this.$refs.datePicker.newGroupSelected()
+
+      //Darf manchmal nicht ausgeführt werden, da dies einen Date Change triggert und die aktuellste Trainingssession geladen wird. --> Z.B. bei Attendance Pull über Query Parameter
+      if(!this.blockSelectedGroupWatcher) {
+        //Aktualisiert Date
+        this.$refs.datePicker.newGroupSelected()
+      }
 
       document.title = this.selectedGroup.name + ' - Attend'
     },
@@ -260,7 +299,7 @@ export default {
     readableTotalHours() {
       const hh = Math.trunc(this.totalHours) ?? 0
       const mm = ("0" + Math.round(60 * (this.totalHours - hh))).slice(-2)
-            return `${hh}:${mm} Std`
+      return `${hh}:${mm} Std`
     }
   }
 }

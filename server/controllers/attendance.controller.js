@@ -9,13 +9,6 @@ const getAttendance = catchAsync(async (req, res) => {
   res.send(result);
 });
 
-const getAttendanceById = catchAsync(async (req, res) => {
-  const result = await attendanceService.getAttendanceById(req.user, req.params.attendanceID);
-  logger.debug(`GET - attendance list by id ${req.params.attendanceID}`)
-  res.send(result);
-
-});
-
 const createAttendance = catchAsync(async (req, res) => {
   const result = await attendanceService.createAttendance(req.user, req.body);
   logger.debug('CREATED - new attendance list')
@@ -66,7 +59,6 @@ const getFormattedList = catchAsync(async (req, res) => {
 
 module.exports = {
   getAttendance,
-  getAttendanceById,
   createAttendance,
   updateTrainingssession,
   deleteAttendance,

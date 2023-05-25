@@ -133,6 +133,7 @@ function getFormattedDateString(date) {
  * @returns {String} Das Datum im Format YYYY-MM-DD
  */
 function getShortenedJSONDate(date) {
+    date = new Date(date)
     return date.toJSON().substring(0, 10)
 }
 

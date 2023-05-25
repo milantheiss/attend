@@ -51,11 +51,11 @@
                                 <p class="truncate text-xl font-semibold">{{ group.name }}</p>
                             </template>
                             <template #content>
-                                <Card class="mb-4" v-for="(trainingsssession, index) in group.trainingssessions"
-                                    :ref="`sessionCard${i}`" :key="trainingsssession._id">
+                                <Card class="mb-4" v-for="(trainingssession, index) in group.trainingssessions"
+                                    :ref="`sessionCard${i}`" :key="trainingssession._id">
                                     <template #header>
                                         <h3>{{
-                                            new Date(trainingsssession.date).toLocaleDateString("de-DE", {
+                                            new Date(trainingssession.date).toLocaleDateString("de-DE", {
                                                 weekday:
                                                     "short", year: "numeric", month: "short", day: "numeric"
                                             })
@@ -68,7 +68,7 @@
                                             <div class="flex justify-between items-center mb-6"
                                                 @click="$refs[`sessionCard${i}`][index].togglePanel()">
                                                 <h3>{{
-                                                    new Date(trainingsssession.date).toLocaleDateString("de-DE",
+                                                    new Date(trainingssession.date).toLocaleDateString("de-DE",
                                                         {
                                                             weekday: "short", year: "numeric", month: "short", day:
                                                                 "numeric"
@@ -85,7 +85,7 @@
                                                     Beginn: </p>
                                                 <p
                                                     class="text-black font-medium text-base md:text-lg text-right flex items-center">
-                                                    {{ trainingsssession.starttime }}
+                                                    {{ trainingssession.starttime }}
                                                     <!--Clock Icon-->
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
@@ -100,7 +100,7 @@
                                                     Ende: </p>
                                                 <p
                                                     class="text-black font-medium text-base md:text-lg text-right flex items-center">
-                                                    {{ trainingsssession.endtime }}
+                                                    {{ trainingssession.endtime }}
                                                     <!--Clock Icon-->
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
@@ -114,8 +114,8 @@
                                                 <p class="text-gray-700 font-light text-base md:text-lg w-full">
                                                     Stundenanzahl: </p>
                                                 <p class="text-black font-bold text-base md:text-lg text-right">{{
-                                                    convertToReadableTime(calcTime(trainingsssession.starttime,
-                                                        trainingsssession.endtime))
+                                                    convertToReadableTime(calcTime(trainingssession.starttime,
+                                                        trainingssession.endtime))
                                                 }}</p>
                                             </div>
                                         </div>

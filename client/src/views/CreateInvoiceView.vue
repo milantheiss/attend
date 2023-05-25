@@ -41,7 +41,7 @@
                         class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-2xl px-3.5 md:px-7 my-0.5">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
-                    <button @click="getInvoiceData"
+                    <button @click="getInvoiceData(startdate, enddate)"
                         class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
                         <p class="font-medium font-base md:text-lg">Weiter</p>
                     </button>
@@ -120,16 +120,16 @@
                             </thead>
                             <tbody>
                                 <!--TODO Implement Click Action zu Trainingssession-->
-                                <tr v-for="(trainingsssession) in group.trainingssessions" :key="trainingsssession._id"
-                                    @click="" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                                <tr v-for="(trainingssession) in group.trainingssessions" :key="trainingssession._id"
+                                    @click="goToTrainingssession(group.id, trainingssession.date)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                                     <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
-                                        {{ new Date(trainingsssession.date).toLocaleDateString("de-DE", {
+                                        {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
                                             weekday: "short", year: "numeric",
                                             month: "2-digit", day: "2-digit"
                                         }) }}
                                     </td>
                                     <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                        <p class="text-[#6B7280]">{{ readableTotalHours(calcTime(trainingsssession.starttime, trainingsssession.endtime)) }}</p>
+                                        <p class="text-[#6B7280]">{{ readableTotalHours(calcTime(trainingssession.starttime, trainingssession.endtime)) }}</p>
                                     </td>
                                     <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
                                         <!--Arrow Right-->
@@ -260,9 +260,9 @@ export default {
         ModalDialog
     },
     methods: {
-        async getInvoiceData() {
+        async getInvoiceData(startdate, enddate) {
             if (!this.hasAnError()) {
-                this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(this.startdate), new Date(this.enddate))
+                this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(startdate), new Date(enddate))
                 this.dataStore.invoiceData.groups.forEach(group => group.include = true)
 
                 if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
@@ -354,6 +354,12 @@ export default {
 
                         //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
                         return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
+        },
+
+        goToTrainingssession(groupId, date){
+            date = date.slice(0, 10)
+
+            this.$router.push({ path: `/attendancelist`, query: {groupId: groupId, date: date} })
         }
     },
     async created() {
@@ -364,8 +370,14 @@ export default {
                 _id: val.id
             }
         })
+
         document.title = 'Erstelle eine Abrechnung - Attend'
         this.dataStore.viewname = "Abrechnung erstellen"
+    },
+    mounted() {
+        if(typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof  this.dataStore.invoiceData?.enddate !== "undefined"){
+            this.getInvoiceData(this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
+        }
     },
     computed: {
         selectedGroups() {

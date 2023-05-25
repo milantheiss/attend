@@ -11,9 +11,6 @@ router
     .get(verifyToken, attendanceController.getAttendance)
     .post(verifyToken, attendanceController.createAttendance)
 
-// router
-//     .route('/:attendanceID')
-//     .delete(verifyToken, attendanceController.deleteAttendance)
 
 router
     .route('/byGroupID/:groupID')
