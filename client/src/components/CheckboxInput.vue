@@ -1,7 +1,7 @@
  <template>
     <input type="checkbox" :name="name" v-model="input" :placeholder="placeholder" class="
     w-7 h-7 text-standard-gradient-1
-    rounded-full border-gray-300  border-2
+    rounded-full border-[#9ea3ae]  border-2
     focus:ring-blue-500 focus:ring-0 focus:ring-transparent
     focus:ring-offset-0
     bg-checkmark

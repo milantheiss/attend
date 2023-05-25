@@ -259,8 +259,8 @@ export default {
     },
     readableTotalHours() {
       const hh = Math.trunc(this.totalHours) ?? 0
-      const mm = Math.round(60 * (this.totalHours - hh)) ?? 0
-      return `${hh} Std ${mm} Min`
+      const mm = ("0" + Math.round(60 * (this.totalHours - hh))).slice(-2)
+            return `${hh}:${mm} Std`
     }
   }
 }

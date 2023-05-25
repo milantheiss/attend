@@ -1,14 +1,15 @@
 
 <template>
     <input class='block
-            w-full
+            w-[134px] md:w-[145px]
             pl-1.5 py-0.5
             font-medium text-lg md:text-xl
             focus:ring-0 focus:border-dark-grey
             bg-inherit text-left
-            form-input'
-        :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
-        type='date' :name="name" v-model="input" :max='max' :min='min'/>
+            form-input
+            focus:border-standard-gradient-1'
+        :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
+        type='date' :name="name" v-model="input" :max='max' :min='min' />
 </template>
 
 <script>

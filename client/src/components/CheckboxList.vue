@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-for="element of formattedList" :key="element.text" class="flex items-center justify-between mb-2">
-            <p class="font-medium text-lg truncate">{{ element.text }}</p>
+            <p class="font-medium truncate">{{ element.text }}</p>
             <CheckboxInput v-model="element.checked" class="color-standard-gradient-1 ml-6"></CheckboxInput>
         </div>
     </div>

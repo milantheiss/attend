@@ -6,19 +6,19 @@
             <!--Backdrop-->
             <div ref="modal-backdrop" class="fixed z-30 inset-0 overflow-y-auto bg-black bg-opacity-50" v-if="showModal">
                 <!--Elementfenster-->
-                <div class="flex items-start justify-center min-h-screen pt-8 md:pt-24 text-center">
-                    <div class="w-5/6 md:max-w-medium-width p-5 bg-white rounded-lg overflow-hidden drop-shadow-md "
+                <div class="flex items-start justify-center min-h-screen pt-12 md:pt-32 text-center">
+                    <div class="flex flex-col gap-4 overflow-hidden w-5/6 md:max-w-medium-width px-3.5 md:px-7 py-4 bg-white rounded-lg drop-shadow-md text-lg md:text-xl"
                         role="dialog" ref="modal" aria-modal="true" aria-labelledby="modal-headline">
                         <!--Header-->
-                        <div class="text-left font-bold text-gray-700" v-show="hasHeader">
+                        <div class="text-left font-bold" v-show="hasHeader">
                             <slot name="header"></slot>
                         </div>
                         <!--Subheader-->
-                        <div class="text-left font-normal text-gray-500" v-show="hasSubheader">
+                        <div class="text-left font-normal" v-show="hasSubheader">
                             <slot name="subheader"></slot>
                         </div>
                         <!--Content-->
-                        <div class="text-left my-4" v-show="hasContent">
+                        <div class="text-left" v-show="hasContent">
                             <slot name="content"></slot>
                         </div>
                         <!--Footer-->
@@ -33,13 +33,14 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import useClickOutside from '@/util/useClickOutside';
 
 const modal = ref(null);
 const { onClickOutside } = useClickOutside();
 const showModal = ref(false);
 
+// eslint-disable-next-line no-undef
 const props = defineProps({
     show: {
         type: Boolean,
@@ -60,6 +61,10 @@ const props = defineProps({
     hasFooter: {
         type: Boolean,
         default: true,
+    },
+    disableClickOutside: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -68,15 +73,19 @@ function closeModal() {
 }
 
 onClickOutside(modal, () => {
-    if (showModal.value === true) {
+    if (showModal.value === true && !props.disableClickOutside) {
         closeModal();
     }
 });
 
+onMounted(() => {
+    showModal.value = props.show;
+});
 
 watch(
     () => props.show,
     show => {
+        console.log(show);
         showModal.value = show;
     },
 );

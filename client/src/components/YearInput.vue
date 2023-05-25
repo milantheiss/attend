@@ -3,8 +3,9 @@
         text-lg md:text-xl
         focus:ring-0 focus:border-dark-grey
         w-[49px] md:w-[54px]
-        bg-inherit text-left'
-        :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-gray-300 rounded-none'"
+        bg-inherit text-left
+        focus:border-standard-gradient-1'
+        :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
         type='number' :name="name" v-model="input" :max='new Date().getFullYear()' :min='2010' step="1" />
 </template>
 

@@ -31,7 +31,7 @@
                 <!--INFO Jede Zeile ist clickbar, um die Invoice zu downloaden-->
                 <table class="table-auto w-full text-left">
                     <thead>
-                        <tr>
+                        <tr class="border-b border-[#D1D5DB]">
                             <th scope="col" class="pb-2.5 font-medium">Zeitraum</th>
                             <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium">Status</th>
                             <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium">Download</th>
@@ -77,7 +77,7 @@
                             <td class="px-3 md:px-4 w-fit sm:w-full py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 <!--Status Badge-->
                                 <div v-show="invoice.status === 'pending'"
-                                    class="rounded-full bg-[#7B7C8F] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
+                                    class="rounded-full bg-[#6B7280] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
                                     <p class="text-white text-base md:text-lg">Ausstehend</p>
                                 </div>
                                 <div v-show="invoice.status === 'approved'"
@@ -139,7 +139,7 @@
                             <td class="hidden ty:table-cell w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 pl-6 md:pl-12">
                                 <!--Arrow Icon-->
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                    stroke="currentColor" class="w-6 h-6 transition group-hover:translate-x-0.5">
+                                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                                 </svg>

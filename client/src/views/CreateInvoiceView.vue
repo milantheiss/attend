@@ -1,16 +1,16 @@
 <template>
     <div class="relative container">
-        <!--Info Wird angezeigt, wenn keine InvoiceData vorhanden-->
-        <div
-            v-show="(Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) && !status.show">
-            <!--Export Settings-->
-            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                <!--TODO WENN Trainer Daten incomplete -> Dialog-->
-                <!--Gruppen Auswahl-->
-                <div class="flex items-start justify-between mb-4 w-full">
+        <!--Pull Invoice Data Modal Dialog-->
+        <!--Wird angezeigt, wenn keine Daten vorhanden sind-->
+        <ModalDialog
+            :show="(Object.keys(dataStore?.invoiceData).length === 0 || !dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) && !status.show && showPullDataModal"
+            :hasHeader="false" :hasSubheader="false" :disableClickOutside="true">
+            <template #content>
+                <div class="flex flex-col gap-4">
+                    <!--Gruppen Auswahl-->
                     <CollapsibleContainer :show="true">
                         <template #header>
-                            <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
+                            <p class="text-[#6B7280]">Gruppe:</p>
                         </template>
                         <template #content>
                             <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
@@ -18,30 +18,36 @@
                             </CheckboxList>
                         </template>
                     </CollapsibleContainer>
-                </div>
-                <!--Timespan-->
-                <div class="flex items-center justify-between mb-4">
-                    <label for="startdate"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full">Anfang:</label>
-                    <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
-                </div>
+                    <!--Timespan-->
+                    <div class="flex items-center justify-between">
+                        <label for="startdate" class="text-[#6B7280]">Anfang:</label>
+                        <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
+                    </div>
 
-                <div class="flex items-center justify-between mb-4">
-                    <label for="enddate"
-                        class="text-gray-700 font-normal md:font-light text-base md:text-lg w-full text-left">Ende:</label>
-                    <DateInput v-model="enddate" name="enddate" class="ml-3"
-                        :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
+                    <div class="flex items-center justify-between">
+                        <label for="enddate" class="text-[#6B7280]">Ende:</label>
+                        <DateInput v-model="enddate" name="enddate" class="ml-3"
+                            :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
+                    </div>
+
+                    <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
                 </div>
+            </template>
 
-                <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
-
-                <button @click="getInvoiceData"
-                    class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
-                    :class="error.show ? 'mt-4' : 'mt-8'">
-                    <p class="font-medium font-base md:text-lg">Weiter</p>
-                </button>
-            </div>
-        </div>
+            <template #footer>
+                <div class="flex gap-4">
+                    <!--INFO Margin auf cancle Btn gleicht Offset von Outline aus-->
+                    <button @click="cancel"
+                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-2xl px-3.5 md:px-7 my-0.5">
+                        <p class="font-medium font-base md:text-lg">Abbrechen</p>
+                    </button>
+                    <button @click="getInvoiceData"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                        <p class="font-medium font-base md:text-lg">Weiter</p>
+                    </button>
+                </div>
+            </template>
+        </ModalDialog>
 
         <!--Abrechnungsanzeige-->
         <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
@@ -85,7 +91,7 @@
                 </div>
                 <div class="flex justify-between items-baseline">
                     <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
-                    <p class="font-medium text-right">{{ readableTotalHours }}</p>
+                    <p class="font-medium text-right">{{ readableTotalHours(totalHours) }}</p>
                 </div>
             </div>
 
@@ -103,13 +109,39 @@
                             :class="!group.include ? 'text-[#6B7280] line-through' : ''">{{ group.name }}</p>
                     </template>
                     <template #content>
-                        <!--Je Trainingsstunde ein Element-->
-                        <div class="flex flex-col gap-2">
-                            <TrainingssessionCard v-for="(trainingsssession, index) in group.trainingssessions"
-                                :key="trainingsssession._id" v-model="group.trainingssessions[index]"
-                                @onClickOnRemove="(session) => removeTrainingssession(session)">
-                            </TrainingssessionCard>
-                        </div>
+                        <table class="table-auto w-full text-left">
+                            <thead>
+                                <tr class="border-b border-[#D1D5DB]">
+                                    <th scope="col" class="pb-2.5 font-medium w-fit">Datum</th>
+                                    <th scope="col" class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium">Länge
+                                    </th>
+                                    <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--TODO Implement Click Action zu Trainingssession-->
+                                <tr v-for="(trainingsssession) in group.trainingssessions" :key="trainingsssession._id"
+                                    @click="" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                                    <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                        {{ new Date(trainingsssession.date).toLocaleDateString("de-DE", {
+                                            weekday: "short", year: "numeric",
+                                            month: "2-digit", day: "2-digit"
+                                        }) }}
+                                    </td>
+                                    <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
+                                        <p class="text-[#6B7280]">{{ readableTotalHours(calcTime(trainingsssession.starttime, trainingsssession.endtime)) }}</p>
+                                    </td>
+                                    <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                                        <!--Arrow Right-->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="3" stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                        </svg>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </template>
                 </CollapsibleContainer>
             </div>
@@ -118,15 +150,13 @@
             <div class="">
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
                 <div class="flex justify-between items-center gap-7">
-                    <!--md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5-->
                     <button @click="cancel"
-                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-xl px-3.5 md:px-7 py-3.5"
+                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-2xl px-3.5 md:px-7 py-3.5"
                         :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
-                    <!--md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 -->
                     <button @click="send"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-xl drop-shadow-md w-full px-3.5 md:px-7 py-4"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4"
                         :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Versenden</p>
                     </button>
@@ -139,11 +169,12 @@
             <template #content>
                 <div class="flex justify-center items-center w-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]" v-show="status.processing">
+                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
+                        v-show="status.processing">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
-    
+
                     <!--Check Circle-->
                     <!--TODO Fix Bounce-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
@@ -152,7 +183,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-    
+
                     <!--X Circle-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
                         stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
@@ -180,7 +211,6 @@ import DateInput from "@/components/DateInput.vue";
 import { useDataStore } from "@/store/dataStore";
 import CheckboxList from "@/components/CheckboxList.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
-import TrainingssessionCard from "@/components/TrainingssessionCard.vue"
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
@@ -217,7 +247,8 @@ export default {
                 show: false,
                 processing: true,
                 success: false,
-            }
+            },
+            showPullDataModal: true
         }
     },
     components: {
@@ -225,7 +256,6 @@ export default {
         DateInput,
         CheckboxList,
         CollapsibleContainer,
-        TrainingssessionCard,
         CheckboxInput,
         ModalDialog
     },
@@ -262,15 +292,9 @@ export default {
             return this.error.show;
         },
 
-        removeTrainingssession(session) {
-            console.log("remove", session);
-            const group = this.dataStore.invoiceData.groups.find(val => val.trainingssessions.some(v => v._id === session._id))
-            const index = group.trainingssessions.findIndex(val => val._id === session._id)
-            console.log("Group von der Entfernt wird", group, index);
-            group.trainingssessions.splice(index, 1)
-        },
-
         cancel() {
+            this.showPullDataModal = false
+            this.$router.push({ path: "/invoices" })
             this.error.show = false
             this.dataStore.invoiceData = {}
         },
@@ -313,6 +337,23 @@ export default {
             this.status.processing = true
             this.status.success = false
             this.status.text = 'Abrechnung wird versendet...'
+        },
+
+        readableTotalHours(timeNumberic) {
+            const hh = Math.trunc(timeNumberic)
+            const mm = ("0" + Math.round(60 * (timeNumberic - hh))).slice(-2)
+            return `${hh}:${mm} Std`
+        },
+
+        calcTime(starttime, endtime){
+            //Formatiert Zeit vom Format 18:45 in 18,75
+                        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+                        const starttimeNumeric = Number(starttime.split(":")[0]) * 100 + (Number(starttime.split(":")[1]) / 60 * 100) || 0;
+
+                        const endtimeNumeric = Number(endtime.split(":")[0]) * 100 + (Number(endtime.split(":")[1]) / 60 * 100) || 0;
+
+                        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+                        return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
         }
     },
     async created() {
@@ -338,24 +379,12 @@ export default {
                     if (typeof element.starttime !== "string" || typeof element.endtime !== "string" || element.starttime === "" || element.endtime === "") {
                         element.faultyTimes = true
                     } else {
-                        //Formatiert Zeit vom Format 18:45 in 18,75
-                        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-                        const starttimeNumeric = Number(element.starttime?.split(":")[0]) * 100 + (Number(element.starttime?.split(":")[1]) / 60 * 100) || 0;
-
-                        const endtimeNumeric = Number(element.endtime?.split(":")[0]) * 100 + (Number(element.endtime?.split(":")[1]) / 60 * 100) || 0;
-
-                        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        tHours += endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
+                        tHours += this.calcTime(element.starttime, element.endtime);
                     }
                 })
             })
 
             return tHours
-        },
-        readableTotalHours() {
-            const hh = Math.trunc(this.totalHours)
-            const mm = Math.round(60 * (this.totalHours - hh))
-            return `${hh} Std ${mm} Min`
         },
         showGroupCard() {
             //INFO Das konditionelle Styling funktioniert in diesem Fall nur, wenn die Refs in 'setup' aufgesetzt werden.

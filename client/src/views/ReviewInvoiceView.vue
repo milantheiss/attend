@@ -288,8 +288,8 @@ export default {
         },
         convertToReadableTime(timeInDecimal) {
             const hh = Math.trunc(timeInDecimal)
-            const mm = Math.round(60 * (timeInDecimal - hh))
-            return `${hh} Std ${mm} Min`
+            const mm = ("0" + Math.round(60 * (this.totalHours - hh))).slice(-2)
+            return `${hh}:${mm} Std`
         },
         calcTime(startingTime, endingTime) {
             //Formatiert Zeit vom Format 18:45 in 18,75
