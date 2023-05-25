@@ -56,7 +56,7 @@
 						Anwesenheitsliste
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
-							class="w-6 h-6 ml-2 -translate-x-5 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
@@ -67,7 +67,7 @@
 						Abrechnung erstellen
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
-							class="w-6 h-6 ml-2 -translate-x-5 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
@@ -78,7 +78,7 @@
 						Gruppe bearbeiten
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
-							class="w-6 h-6 ml-2 -translate-x-5 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
@@ -89,7 +89,7 @@
 						Liste exportieren
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
-							class="w-6 h-6 ml-2 -translate-x-5 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
@@ -99,7 +99,7 @@
 						Logout
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
 							stroke="currentColor"
-							class="w-7 h-7 ml-2 -translate-x-5 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+							class="w-7 h-7 ml-2 -translate-x-2 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
 						</svg>

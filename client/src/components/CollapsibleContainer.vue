@@ -1,12 +1,13 @@
 <template>
     <div class="grid grid-cols-1 place-items-end w-full">
         <div class="flex justify-between items-center w-full" :class="{ 'mb-4': showContent }">
-            <header class="flex items-center w-full cursor-pointer justify-between"
+            <header class="flex items-center w-full justify-between" :class="{ 'cursor-pointer': enableClickOnHeader }"
                 @click="enableClickOnHeader ? toggleShowContent() : undefined">
                 <div class="flex">
                     <slot name="header"></slot>
                 </div>
-                <div class="color-gray-300 mt-0.5 w-fit justify-items-end" @click="enableClickOnHeader ? undefined : toggleShowContent()">
+                <div class="color-gray-300 mt-0.5 w-fit justify-items-end cursor-pointer"
+                    @click="enableClickOnHeader ? undefined : toggleShowContent()">
                     <!--Chevron Down-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                         stroke="currentColor" class="w-7 h-7" v-if="!showContent">

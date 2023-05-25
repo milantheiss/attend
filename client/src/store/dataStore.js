@@ -25,7 +25,8 @@ export const useDataStore = defineStore('dateStore', {
       this.notifications = res
     },
     getCountOfUnreadNotifications() {
-      return this.notifications.filter(notification => !notification.recipients.find((r) => r.userID === useAuthStore().user._id).read).length
+      if(useAuthStore().user === null || typeof useAuthStore().user === "undefined") return 0
+      return this.notifications.filter(notification => !notification.recipients.find((r) => r.userID === useAuthStore().user?._id).read).length
     }
   }
 })

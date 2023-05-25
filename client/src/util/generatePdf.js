@@ -1,5 +1,6 @@
 /* eslint-disable no-constant-condition */
 import { jsPDF } from "jspdf";
+import { getInvoiceById } from "./fetchOperations";
 
 //INFO Buchstaben in Helvetica & Font Size 10 haben ca. eine Zeichenhöhe 7.3 pt
 
@@ -428,6 +429,8 @@ async function createList(group, attendanceList, options) {
 async function createInvoice(filename, dataset) {
   let doc = new jsPDF({ unit: "pt", compress: true });
 
+  const rowsPerPage = 38;
+
   _startdate = dataset.startdate;
   _enddate = dataset.enddate;
   _dateOfReceipt = dataset.dateOfReceipt;
@@ -454,12 +457,12 @@ async function createInvoice(filename, dataset) {
       return group.trainingssessions
     }).flat()
 
-    const pages = Math.ceil(_trainingssessions.length / 42);
+    const pages = Math.ceil(_trainingssessions.length / rowsPerPage);
 
     for (let i = 0; i < pages; i++) {
       pagecount = i + 1;
 
-      const splicedArray = _trainingssessions.splice(0, 42);
+      const splicedArray = _trainingssessions.splice(0, rowsPerPage);
 
       InvoicePdf.generatePage(doc, splicedArray);
 
@@ -557,4 +560,37 @@ function drawBox(doc, x, y, width, height) {
   doc.setDrawColor("#000000").rect(x, y, width, height);
 }
 
-export { createList, createInvoice };
+async function downloadInvoice(invoiceId, filename = undefined) {
+  const invoice = await getInvoiceById(invoiceId)
+  
+  invoice.totalHours = totalHours(invoice)
+
+  filename = filename ?? `Abrechnung_${invoice.submittedBy.lastname}_${invoice.submittedBy.firstname}_${new Date(invoice.dateOfReceipt).toJSON().split("T")[0]}`
+
+  await createInvoice(filename, invoice)
+}
+
+function calcTime(startingTime, endingTime) {
+  //Formatiert Zeit vom Format 18:45 in 18,75
+  // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+  const starttimeNumeric = Number(startingTime?.split(":")[0]) * 100 + (Number(startingTime?.split(":")[1]) / 60 * 100) || 0;
+
+  const endtimeNumeric = Number(endingTime?.split(":")[0]) * 100 + (Number(endingTime?.split(":")[1]) / 60 * 100) || 0;
+
+  //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+  return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
+}
+
+function totalHours(invoice) {
+  let tHours = 0
+
+  invoice.groups.forEach(val => {
+    val.trainingssessions.forEach(element => {
+      tHours += calcTime(element.starttime, element.endtime)
+    })
+  })
+
+  return tHours
+}
+
+export { createList, createInvoice, downloadInvoice };

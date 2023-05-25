@@ -15,28 +15,33 @@
                 </span>
             </Transition>
             <!--Erstellen Button-->
-            <Button @click="createNewInvoice">Erstellen</Button>
+            <Button @click="createNewInvoice()">Erstellen</Button>
         </div>
 
         <!--Eigene Abrechnungen-->
-        <CollapsibleContainer class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col gap-1">
+        <CollapsibleContainer :enableClickOnHeader="false" :show="true"
+            class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
             <template #header>
-                <p class="font-medium">Eigene Abrechnungen</p>
+                <p class="font-semibold flex items-baseline">Abrechnungen in <YearInput v-model="selectedYear" class="ml-1 font-semibold">
+                    </YearInput>
+                </p>
             </template>
             <template #content>
+                <!--Invoice Tabelle-->
+                <!--INFO Jede Zeile ist clickbar, um die Invoice zu downloaden-->
                 <table class="table-auto w-full text-left">
                     <thead>
                         <tr>
-                            <th scope="col" class="">Zeitraum</th>
-                            <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4">Status</th>
-                            <th scope="col" class="invisible sm:visible">Download</th>
+                            <th scope="col" class="pb-2.5 font-medium">Zeitraum</th>
+                            <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium">Status</th>
+                            <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium">Download</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="invoice in allInvoicesInYear" :key="invoice.id" @click="downloadInvoice(invoice.id)"
-                            class="border-b border-[#E5E7EB] last:border-0">
-                            <td class="truncate py-2.5">
-                                <div class="hidden md:flex">
+                            class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                            <td class="truncate">
+                                <div class="hidden md:flex py-2.5 group-last:pt-2.5 group-last:pb-0">
                                     <p class="">{{
                                         new Date(invoice.startdate).toLocaleDateString('de-DE', {
                                             year: '2-digit', month:
@@ -69,22 +74,22 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-3 md:px-4 py-2.5 w-fit sm:w-full ">
+                            <td class="px-3 md:px-4 w-fit sm:w-full py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 <!--Status Badge-->
                                 <div v-show="invoice.status === 'pending'"
-                                    class="rounded-full bg-[#7B7C8F] w-[112px] sm:w-[132px] md:w-[152px] h-[32px] md:h-[36px] flex justify-center items-center">
+                                    class="rounded-full bg-[#7B7C8F] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
                                     <p class="text-white text-base md:text-lg">Ausstehend</p>
                                 </div>
                                 <div v-show="invoice.status === 'approved'"
-                                    class="rounded-full bg-[#4BB84B] w-[112px] sm:w-[132px] md:w-[152px] h-[32px] md:h-[36px] flex justify-center items-center">
+                                    class="rounded-full bg-[#4BB84B] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
                                     <p class="text-white text-base md:text-lg">Genehmigt</p>
                                 </div>
                                 <div v-show="invoice.status === 'rejected'"
-                                    class="rounded-full bg-[#D95454] w-[112px] sm:w-[132px] md:w-[152px] h-[32px] md:h-[36px] flex justify-center items-center">
+                                    class="rounded-full bg-[#D95454] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
                                     <p class="text-white text-base md:text-lg">Abgelehnt</p>
                                 </div>
                             </td>
-                            <td class="py-2.5 hidden ty:inline">
+                            <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 <!--Download Icon-->
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                                     stroke="currentColor" class="w-8 h-8 mx-auto">
@@ -102,37 +107,39 @@
         </CollapsibleContainer>
 
         <!--Zu prüfen-->
-        <CollapsibleContainer class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col gap-1">
+        <CollapsibleContainer v-if="typeof allAssignedInvoices !== 'undefined' && allAssignedInvoices?.length > 0"
+            :show="true" class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
             <template #header>
-                <p class="font-medium">Zu prüfen</p>
+                <p class="font-semibold">Zu prüfen</p>
             </template>
             <template #content>
-                <table class="table-auto w-full text-left "
-                    v-if="typeof allAssignedInvoices !== 'undefined' && allAssignedInvoices?.length > 0">
+                <table class="table-auto w-full text-left ">
                     <thead>
                         <tr class="border-b border-[#D1D5DB]">
-                            <th scope="col" class="w-full ">Ersteller</th>
-                            <th scope="col" class="px-2 md:px-4 ">Datum</th>
-                            <th scope="col" class="text-right w-fit "></th>
+                            <th scope="col" class="w-full pb-2.5 font-medium">Ersteller</th>
+                            <th scope="col" class="pl-2 md:pl-4 w-[108px] md:w-[132px] pb-2.5 font-medium">Datum</th>
+                            <th scope="col" class="hidden ty:table-cell text-right w-fit pb-2.5 pl-6 md:pl-12"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="invoice in allAssignedInvoices" :key="invoice.id" @click="goToInvoice(invoice.id)"
-                            class="border-b border-[#E5E7EB] last:border-0">
-                            <td class="w-full truncate py-2.5">
+                            class="border-b border-[#E5E7EB] last:border-0 group cursor-pointer">
+                            <td class="w-full truncate py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 {{ invoice.submittedBy.firstname + " " + invoice.submittedBy.lastname }}
 
                             </td>
-                            <td class="text-[#6B7280] w-fit px-2 md:px-4 py-2.5">{{
-                                new Date(invoice.dateOfReceipt).toLocaleDateString('de-DE', {
-                                    year: 'numeric', month:
-                                        '2-digit', day: '2-digit'
-                                })
-                            }}</td>
-                            <td class="w-fit py-2.5">
+                            <td
+                                class="text-[#6B7280] pl-2 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[108px] md:w-[132px]">
+                                {{
+                                    new Date(invoice.dateOfReceipt).toLocaleDateString('de-DE', {
+                                        year: 'numeric', month:
+                                            '2-digit', day: '2-digit'
+                                    })
+                                }}</td>
+                            <td class="hidden ty:table-cell w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 pl-6 md:pl-12">
                                 <!--Arrow Icon-->
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                    stroke="currentColor" class="w-6 h-6 transition group-hover:translate-x-2">
+                                    stroke="currentColor" class="w-6 h-6 transition group-hover:translate-x-0.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                                 </svg>
@@ -140,8 +147,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <p v-show="typeof allAssignedInvoices === 'undefined' || allAssignedInvoices?.length === 0"
-                    class="font-medium text-gray-500 text-center">Keine offenen Abrechnungen</p>
             </template>
         </CollapsibleContainer>
     </div>
@@ -149,10 +154,12 @@
 
 <script>
 import { getAllAssignedInvoices, getAllInvoicesInYear } from '@/util/fetchOperations'
+import { downloadInvoice } from '@/util/generatePdf';
 import { useDataStore } from "@/store/dataStore";
 import { ref } from 'vue';
 import Button from '@/components/Button.vue';
 import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
+import YearInput from '@/components/YearInput.vue';
 
 //TODO Umstellen auf Antrag Seite
 
@@ -172,7 +179,8 @@ export default {
             allInvoicesInYear: [],
             spin: false,
             //TODO sort by values in array eintragen
-            sortBy: []
+            sortBy: [],
+            selectedYear: new Date().getFullYear()
         };
     },
     methods: {
@@ -182,7 +190,7 @@ export default {
                 this.spin = false;
             }, 1000);
             this.allAssignedInvoices = await getAllAssignedInvoices();
-            this.allInvoicesInYear = await getAllInvoicesInYear(2023);
+            this.allInvoicesInYear = await getAllInvoicesInYear(this.selectedYear);
         },
         goToInvoice(id) {
             this.$router.push({ path: "/reviewInvoice", query: { id: id } });
@@ -191,18 +199,22 @@ export default {
             this.$router.push({ path: "/createInvoice" });
         },
         downloadInvoice(id) {
-            console.log(id);
-            //TODO download invoice
+            downloadInvoice(id)
         }
     },
     async created() {
         document.title = "Abrechnung - Attend";
         this.dataStore.viewname = "Abrechnungen";
     },
+    watch: {
+        selectedYear: async function (newVal) {
+            this.allInvoicesInYear = await getAllInvoicesInYear(newVal);
+        }
+    },
     async mounted() {
         this.allAssignedInvoices = await getAllAssignedInvoices();
-        this.allInvoicesInYear = await getAllInvoicesInYear(2023);
+        this.allInvoicesInYear = await getAllInvoicesInYear(this.selectedYear);
     },
-    components: { Button, CollapsibleContainer }
+    components: { Button, CollapsibleContainer, YearInput }
 };
 </script>
