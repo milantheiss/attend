@@ -304,9 +304,9 @@ export default {
                 this.error.cause.noData = true
                 this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
                 this.dataStore.invoiceData = {}
+            } else {
+                this.showPullDataModal = false
             }
-
-            this.showPullDataModal = false
         },
 
         /**
