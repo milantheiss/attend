@@ -2,7 +2,7 @@
 	<div class="mb-40 mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
 		
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
-		<nav class="mx-auto md:max-w-medium-width pt-6 md:pt-12 mb-3 pb-2.5 md:pb-6 px-3.5 md:px-7 bg-background-graywhite outline outline-[4px] outline-background-graywhite"
+		<nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
 			v-if="auth.authenticated">
 			<div class="flex justify-between items-center">
 				<!--Menu Icon-->
@@ -21,7 +21,7 @@
 				</button>
 
 				<!--Seitentitel-->
-				<h2 class="font-semibold text-xl sm:text-2xl md:text-3xl truncate mx-2" @click="test">{{ dataStore.viewname }}</h2>
+				<h2 class="font-semibold text-xl sm:text-2xl md:text-3xl truncate mx-2">{{ dataStore.viewname }}</h2>
 
 				<!--Profile Avatar-->
 				<!--TODO Custom Avatar jenach User-->
