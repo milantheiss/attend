@@ -66,14 +66,23 @@
                             <table class="table-auto w-full text-left">
                                 <thead>
                                     <tr class="border-b border-[#D1D5DB]">
-                                        <th scope="col" class="pb-2.5 font-medium w-fit">Datum</th>
-                                        <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium">Länge
+                                        <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer" @click="onClickOnDate()">
+                                            <span class="flex items-center gap-1">
+                                            <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                            Datum
+                                        </span>    
+                                        </th>
+                                        <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer" @click="onClickOnLength()">
+                                            <span class="flex items-center gap-1">
+                                            <SortIconLength :index="indexSortButtonLength"></SortIconLength>
+                                            Länge
+                                        </span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <!--TODO Implement Click Action zu Trainingssession-->
-                                    <tr v-for="(trainingssession) in group.trainingssessions" :key="trainingssession._id"
+                                    <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)" :key="trainingssession._id"
                                         class="border-b border-[#E5E7EB] last:border-0 group">
                                         <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
                                             {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
@@ -117,6 +126,8 @@ import { useDataStore } from "@/store/dataStore";
 import { useAuthStore } from "@/store/authStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
+import SortIconDate from '@/components/SortIconDate.vue';
+import SortIconLength from '@/components/SortIconLength.vue';
 
 export default {
     name: "ReviewInvoice",
@@ -150,23 +161,27 @@ export default {
             },
             showToolbar: false,
             spin: false,
-            //TODO sort by values in array eintragen
-            sortBy: [
-
-            ]
+            //Möglich: date_ascending, date_descending, weekday, length_ascending & length_descending
+            //Standard: date_descending
+            //Wenn ein anderer Wert als die hier aufgeführten übergeben wird, wird der Standardwert verwendet
+            sortMode: "length_descending",
+            indexSortButtonDate: 0,
+            indexSortButtonLength: 0,
         }
     },
     components: {
-        CollapsibleContainer
+        CollapsibleContainer,
+        SortIconDate,
+        SortIconLength
     },
     methods: {
         async reject() {
             //Backend: Invoice wird als Rejected gesetzt & Submitter wird benachrichtigt
             //TODO Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
-            await rejectInvoice(this.invoice.id)
-            
-
-            this.$router.push({ path: "/invoices" })
+            const res = await rejectInvoice(this.invoice.id)
+            if (res.status === 200 && await res.text() === "Invoice rejected") {
+                this.$router.push({ path: "/invoices" })
+            }
         },
 
         async approve() {
@@ -183,6 +198,7 @@ export default {
                 this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
                 await createInvoice(this.filename, this.invoice)
+                this.$router.push({ path: "/invoices" })
             }
         },
         convertToReadableTime(timeNumberic) {
@@ -200,7 +216,45 @@ export default {
 
             //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
             return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
-        }
+        },
+
+        //Sortiert eine gegebene Liste nach dem Sortiermodus
+        getSortedTrainingssessionlist(trainingssessions) {
+            if (this.sortMode === "date_descending") {
+                return trainingssessions.sort((a, b) => {
+                    return new Date(b.date) - new Date(a.date)
+                })
+            } else if (this.sortMode === "weekday") {
+                return trainingssessions.sort((a, b) => {
+                    return new Date(a.date).getDay() - new Date(b.date).getDay()
+                })
+            } else if (this.sortMode === "length_ascending") {
+                return trainingssessions.sort((a, b) => {
+                    return this.calcTime(a.starttime, a.endtime) - this.calcTime(b.starttime, b.endtime)
+                })
+            } else if (this.sortMode === "length_descending") {
+                return trainingssessions.sort((a, b) => {
+                    return this.calcTime(b.starttime, b.endtime) - this.calcTime(a.starttime, a.endtime)
+                })
+            } else {
+                //INFO Sort Mode date_ascending ist default. Wenn Sort Mode string invalid, wird nach Datum aufsteigend sortiert
+                return trainingssessions.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date)
+                })
+            }
+        },
+
+        onClickOnDate() {
+            const sortModes = ["date_ascending", "date_descending", "weekday"]
+            this.indexSortButtonDate = (this.indexSortButtonDate + 1) % sortModes.length
+            this.sortMode = sortModes[this.indexSortButtonDate]
+        },
+
+        onClickOnLength() {
+            const sortModes = ["length_ascending", "length_descending"]
+            this.indexSortButtonLength = (this.indexSortButtonLength + 1) % sortModes.length
+            this.sortMode = sortModes[this.indexSortButtonLength]
+        },
     },
     async created() {
         document.title = 'Abrechnung prüfen - Attend'

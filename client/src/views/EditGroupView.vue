@@ -21,7 +21,7 @@
         @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
       <!--Text wird angezeigt, wenn keine Gruppe ausgewählt ist.-->
       <p v-show="typeof getParticipants() === 'undefined'"
-        class="text-xl md:text-2xl font-normal text-gray-400 mx-auto">Bitte wähle eine Gruppe</p>
+        class="text-xl md:text-2xl font-medium text-[#6B7280] mx-auto">Bitte wähle eine Gruppe</p>
     </div>
     <!--MemberEditor wird immer angezeigt. Über diesen MemberEditor kann ein neuer Member hinzugefügt werden.-->
     <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)"

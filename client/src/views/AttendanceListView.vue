@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-8">
       <!--Auswahlelement, um Gruppe auszuwählen-->
       <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
-        class="font-bold text-2xl md:text-3xl"
+      class="font-bold text-2xl md:text-3xl"
         :class="{ 'mr-3': typeof selectedGroup !== 'undefined', 'mx-2': typeof selectedGroup === 'undefined' }" />
 
       <!--Toggelt zwischen TimesBox anzeigen und nicht anzeigen-->
@@ -60,7 +60,7 @@
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
       <span class="flex justify-center items-center">
         <p v-show="typeof this.attended.participants === 'undefined'"
-          class="text-xl md:text-2xl font-normal text-gray-500">Keine Gruppe ausgewählt!</p>
+          class="text-xl md:text-2xl font-medium text-[#6B7280]">Keine Gruppe ausgewählt!</p>
       </span>
     </div>
 

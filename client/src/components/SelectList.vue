@@ -8,7 +8,7 @@
     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
     style="background-position: right 0.1rem center;padding-right: 1.9rem;">
     <option disabled :value="defaultValue">{{ defaultValue }}</option>
-    <option v-for="element in options" :key="element.id" :value="element">
+    <option v-for="element in computedOptions" :key="element.id" :value="element">
       {{ element.name }}
     </option>
   </select>
@@ -30,7 +30,11 @@ export default {
       default: "Wähle",
     },
     options: Array,
-    showError: Boolean
+    showError: Boolean,
+    sortAlphabetically: {
+      type: Boolean,
+      default: false
+    },
   },
   watch: {
     selected() {
@@ -43,10 +47,20 @@ export default {
         this.selected = newVal;
       }
     }
-  }
+  },
+  computed: {
+    computedOptions() {
+      if (this.sortAlphabetically) {
+        let options = this.options;
+        options.sort((a, b) => a.name.localeCompare(b.name));
+        console.log(options)
+        return options
+      } else {
+        return this.options;
+      }
+    }
+  },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

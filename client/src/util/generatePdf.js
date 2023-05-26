@@ -427,6 +427,8 @@ async function createList(group, attendanceList, options) {
  * @param {Object} dataset Dataset, dass vom Backend generiert wird
  */
 async function createInvoice(filename, dataset) {
+  filename = filename ?? `Abrechnung_${dataset.submittedBy.lastname}_${dataset.submittedBy.firstname}_${new Date(dataset.dateOfReceipt).toJSON().split("T")[0]}`
+
   let doc = new jsPDF({ unit: "pt", compress: true });
 
   const rowsPerPage = 38;

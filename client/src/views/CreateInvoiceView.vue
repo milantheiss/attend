@@ -110,17 +110,31 @@
                     <template #content>
                         <table class="table-auto w-full text-left">
                             <thead>
-                                <tr class="border-b border-[#D1D5DB]">
-                                    <th scope="col" class="pb-2.5 font-medium w-fit">Datum</th>
-                                    <th scope="col" class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium">Länge
+                                <tr class="border-b border-[#D1D5DB] ">
+                                    <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
+                                        @click="onClickOnDate()">
+                                        <span class="flex items-center gap-1">
+                                            <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                            Datum
+                                        </span>
+                                    </th>
+                                    <th scope="col"
+                                        class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
+                                        @click="onClickOnLength()">
+                                        <span class="flex items-center gap-1">
+                                            <SortIconLength :index="indexSortButtonLength"></SortIconLength>
+                                            Länge
+                                        </span>
                                     </th>
                                     <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <!--TODO Implement Click Action zu Trainingssession-->
-                                <tr v-for="(trainingssession) in group.trainingssessions" :key="trainingssession._id"
-                                    @click="goToTrainingssession(group.id, trainingssession.date)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                                <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
+                                    :key="trainingssession._id"
+                                    @click="goToTrainingssession(group.id, trainingssession.date)"
+                                    class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                                     <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
                                         {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
                                             weekday: "short", year: "numeric",
@@ -128,12 +142,16 @@
                                         }) }}
                                     </td>
                                     <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                        <p class="text-[#6B7280]">{{ convertToReadableTime(calcTime(trainingssession.starttime, trainingssession.endtime)) }}</p>
+                                        <p class="text-[#6B7280]">{{
+                                            convertToReadableTime(calcTime(trainingssession.starttime,
+                                                trainingssession.endtime)) }}</p>
                                     </td>
-                                    <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                                    <td
+                                        class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
                                         <!--Arrow Right-->
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="3" stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                                            stroke-width="3" stroke="currentColor"
+                                            class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
                                         </svg>
@@ -174,7 +192,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
-    
+
                         <!--Check Circle-->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                             stroke="currentColor" class="w-16 h-16 text-lime-600"
@@ -182,7 +200,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-    
+
                         <!--X Circle-->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                             stroke="currentColor" class="w-16 h-16 text-delete-gradient-1"
@@ -214,6 +232,8 @@ import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
+import SortIconDate from '@/components/SortIconDate.vue';
+import SortIconLength from '@/components/SortIconLength.vue';
 
 export default {
     name: "CreateInvoice",
@@ -248,7 +268,13 @@ export default {
                 processing: true,
                 success: false,
             },
-            showPullDataModal: true
+            showPullDataModal: true,
+            //Möglich: date_ascending, date_descending, weekday, length_ascending & length_descending
+            //Standard: date_ascending
+            //Wenn ein anderer Wert als die hier aufgeführten übergeben wird, wird der Standardwert verwendet
+            sortMode: "date_asceding",
+            indexSortButtonDate: 0,
+            indexSortButtonLength: 0,
         }
     },
     components: {
@@ -257,7 +283,9 @@ export default {
         CheckboxList,
         CollapsibleContainer,
         CheckboxInput,
-        ModalDialog
+        ModalDialog,
+        SortIconDate,
+        SortIconLength
     },
     methods: {
         async getInvoiceData(startdate, enddate) {
@@ -266,17 +294,17 @@ export default {
                 this.pullInvoiceData(this.selectedGroups, startdate, enddate)
             }
         },
-        
-        async pullInvoiceData(selectedGroups, startdate,enddate){
+
+        async pullInvoiceData(selectedGroups, startdate, enddate) {
             this.dataStore.invoiceData = await fetchDataForNewInvoice(selectedGroups, new Date(startdate), new Date(enddate))
             this.dataStore.invoiceData.groups.forEach(group => group.include = true)
-    
+
             if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
                 this.error.show = true
                 this.error.cause.noData = true
                 this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
                 this.dataStore.invoiceData = {}
-            }            
+            }
 
             this.showPullDataModal = false
         },
@@ -352,22 +380,66 @@ export default {
             return `${hh}:${mm} Std`
         },
 
-        calcTime(starttime, endtime){
+        calcTime(starttime, endtime) {
             //Formatiert Zeit vom Format 18:45 in 18,75
-                        // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-                        const starttimeNumeric = Number(starttime.split(":")[0]) * 100 + (Number(starttime.split(":")[1]) / 60 * 100) || 0;
+            // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
+            const starttimeNumeric = Number(starttime.split(":")[0]) * 100 + (Number(starttime.split(":")[1]) / 60 * 100) || 0;
 
-                        const endtimeNumeric = Number(endtime.split(":")[0]) * 100 + (Number(endtime.split(":")[1]) / 60 * 100) || 0;
+            const endtimeNumeric = Number(endtime.split(":")[0]) * 100 + (Number(endtime.split(":")[1]) / 60 * 100) || 0;
 
-                        //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
-                        return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
+            //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
+            return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
         },
 
-        goToTrainingssession(groupId, date){
+        goToTrainingssession(groupId, date) {
             date = date.slice(0, 10)
 
-            this.$router.push({ path: `/attendancelist`, query: {groupId: groupId, date: date} })
-        }
+            this.$router.push({ path: `/attendancelist`, query: { groupId: groupId, date: date } })
+        },
+
+        //Sortiert eine gegebene Liste nach dem Sortiermodus
+        getSortedTrainingssessionlist(trainingssessions) {
+            if (this.sortMode === "date_descending") {
+                return trainingssessions.sort((a, b) => {
+                    return new Date(b.date) - new Date(a.date)
+                })
+            } else if (this.sortMode === "weekday") {
+                //Make deep copy of trainingssessions
+                let t = JSON.parse(JSON.stringify(trainingssessions))
+
+                t.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date)
+                })
+                return t.sort((a, b) => {
+                    return new Date(a.date).getDay() - new Date(b.date).getDay()
+                })
+            } else if (this.sortMode === "length_ascending") {
+                return trainingssessions.sort((a, b) => {
+                    return this.calcTime(a.starttime, a.endtime) - this.calcTime(b.starttime, b.endtime)
+                })
+            } else if (this.sortMode === "length_descending") {
+                return trainingssessions.sort((a, b) => {
+                    return this.calcTime(b.starttime, b.endtime) - this.calcTime(a.starttime, a.endtime)
+                })
+            } else {
+                //INFO Sort Mode date_ascending ist default. Wenn Sort Mode string invalid, wird nach Datum aufsteigend sortiert
+                return trainingssessions.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date)
+                })
+            }
+        },
+
+        onClickOnDate() {
+            const sortModes = ["date_ascending", "date_descending", "weekday"]
+            this.indexSortButtonDate = (this.indexSortButtonDate + 1) % sortModes.length
+            this.sortMode = sortModes[this.indexSortButtonDate]
+        },
+
+        onClickOnLength() {
+            const sortModes = ["length_ascending", "length_descending"]
+            this.indexSortButtonLength = (this.indexSortButtonLength + 1) % sortModes.length
+            this.sortMode = sortModes[this.indexSortButtonLength]
+        },
     },
     async created() {
         const res = await fetchGroups()
@@ -382,7 +454,7 @@ export default {
         this.dataStore.viewname = "Abrechnung erstellen"
     },
     async mounted() {
-        if(typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof  this.dataStore.invoiceData?.enddate !== "undefined"){
+        if (typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof this.dataStore.invoiceData?.enddate !== "undefined") {
             const groups = this.dataStore.invoiceData.groups.map(val => val.id)
             await this.pullInvoiceData(groups, this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
         }

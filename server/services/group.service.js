@@ -26,7 +26,7 @@ async function getParticipantsOfGroup(group) {
         participant._doc.lastname = res.lastname;
         participant._doc.birthday = res.birthday;
         participant._doc._id = res._id;
-        return participant;
+        return participant; 
     }));
     return group.participants
 }
@@ -44,15 +44,20 @@ async function getDepartmentOfGroup(group) {
 const getGroups = async (user) => {
     if (hasAdminRole(user)) {
         //admin hat Zugriff auf alle Gruppen
-        return await Group.find({})
+        let groups = await Group.find({})
+        groups.sort((a, b) => a.name.localeCompare(b.name))
+        return groups
     } else if (user.accessible_groups.length > 0) { //Oder z.B. Assistent
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
-        const groups = await Group.find({ '_id': { $in: user.accessible_groups } })
+        let groups = await Group.find({ '_id': { $in: user.accessible_groups } })
 
         if (groups.length === 0 || groups === null) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
         }
+
+        //Sortieren nach Name
+        groups.sort((a, b) => a.name.localeCompare(b.name))
 
         return groups
     } else {
@@ -222,7 +227,9 @@ const removeMember = async (user, groupID, memberID) => {
 const searchGroups = async (user, body) => {
     // WARNING Es werden nicht die Relationen abgefragt, sondern nur die Gruppen
     if (hasAdminRole(user) || hasTrainerRole(user) || hasAssistantRole(user)) {
-        return await Group.find({ $text: { $search: body.query } })
+        let groups = await Group.find({ $text: { $search: body.query } })
+        groups.sort((a, b) => a.name.localeCompare(b.name))
+        return groups
     } else {
         throw new ApiError(httpStatus.FORBIDDEN, "The user has no permission to search")
     }

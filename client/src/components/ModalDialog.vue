@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, defineEmits, } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import useClickOutside from '@/util/useClickOutside';
 
 const modal = ref(null);
@@ -68,6 +68,7 @@ const props = defineProps({
     }
 });
 
+// eslint-disable-next-line no-undef
 const emit = defineEmits(['onOpen', 'onClose', 'onClickOutside']);
 
 function closeModal() {

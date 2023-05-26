@@ -98,6 +98,30 @@ const submitInvoice = catchAsync(async (req, res) => {
 				data: { invoiceID: invoice._id },
 			});
 
+			//Sortiere Group nach Gruppenname
+			invoice.groups.sort((a, b) => {
+				if (a.name < b.name) {
+					return -1;
+				}
+				if (a.name > b.name) {
+					return 1;
+				}
+				return 0;
+			});
+
+			//Sortiere Trainingssessions nach Datum
+			for (group of invoice.groups) {
+				group.trainingssessions.sort((a, b) => {
+					if (a.date < b.date) {
+						return -1;
+					}
+					if (a.date > b.date) {
+						return 1;
+					}
+					return 0;
+				});
+			}
+
 			if (notification === null || typeof notification === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Notification could not be created");
 			}
