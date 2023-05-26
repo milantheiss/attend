@@ -2,184 +2,107 @@
     <div class="relative container">
         <div>
             <!--Abrechnungsanzeige-->
-            <div v-if="typeof invoice !== 'undefined' && !this.status.show">
-                <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
-                    <!--Info Field-->
-                    <div class="flex justify-between items-center">
-                        <p class="text-gray-700 font-light text-base md:text-lg">Antragsteller: </p>
-                        <p class="text-black font-normal text-base md:text-lg text-right">
+            <div v-if="typeof invoice !== 'undefined'" class="flex flex-col gap-7">
+                <!--Invoice Info Field-->
+                <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-[#6B7280] font-normal">Antragsteller: </p>
+                        <p class="font-medium text-right">
                             {{ invoice.submittedBy.firstname }} {{ invoice.submittedBy.lastname }}
                         </p>
                     </div>
 
-                    <div class="flex justify-between items-center">
-                        <p class="text-gray-700 font-light text-base md:text-lg">Abteilung: </p>
-                        <p class="text-black font-normal text-base md:text-lg text-right">{{
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-[#6B7280] font-normal">Abteilung: </p>
+                        <p class="font-medium text-right">{{
                             invoice.department.name
                         }}</p>
                     </div>
 
-                    <div class="flex justify-between items-center">
-                        <p class="text-gray-700 font-light text-base md:text-lg">Abrechnungszeitraum: </p>
-                        <p class="text-black font-normal text-base md:text-lg text-right"><span class="font-medium">{{
-                            new Date(invoice.startdate).toLocaleDateString("de-DE", {
-                                year: "numeric",
-                                month: "short", day: "numeric"
-                            })
-                        }}</span>
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-[#6B7280] font-normal truncate">Zeitraum: </p>
+                        <p class="font-normal text-right">
+                            <span class="font-medium">{{
+                                new Date(invoice.startdate).toLocaleDateString("de-DE", {
+                                    year: "numeric",
+                                    month: "2-digit", day: "2-digit"
+                                })
+                            }}</span>
                             bis <span class="font-medium">{{
                                 new Date(invoice.enddate).toLocaleDateString("de-DE", {
                                     year: "numeric",
-                                    month: "short", day: "numeric"
+                                    month: "2-digit", day: "2-digit"
                                 })
-                            }}</span></p>
+                            }}</span>
+                        </p>
                     </div>
 
-                    <div class="flex justify-between items-center">
-                        <p class="text-gray-700 font-light text-base md:text-lg">Stundenanzahl gesamt: </p>
-                        <p class="text-black font-medium text-base md:text-lg text-right">{{
-                            convertToReadableTime(totalHours) }}</p>
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
+                        <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
+                    </div>
+
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-[#6B7280] font-normal truncate">Erstellungsdatum: </p>
+                        <p class="font-medium text-right">
+                            {{ new Date(invoice.dateOfReceipt).toLocaleDateString("de-DE", {
+                                year: "numeric",
+                                month: "2-digit", day: "2-digit"
+                            }) }}
+                        </p>
                     </div>
                 </div>
 
-                <div class="mt-8">
+                <div class="flex flex-col gap-4">
                     <!--Je Gruppe ein Container-->
-                    <div class="flex justify-between items-center min-w-full" v-for="(group, i) in invoice.groups"
-                        :key="group._id">
-                        <CollapsibleContainer :show="true" class="mb-4">
-                            <template #header>
-                                <p class="truncate text-xl font-semibold">{{ group.name }}</p>
-                            </template>
-                            <template #content>
-                                <Card class="mb-4" v-for="(trainingssession, index) in group.trainingssessions"
-                                    :ref="`sessionCard${i}`" :key="trainingssession._id">
-                                    <template #header>
-                                        <h3>{{
-                                            new Date(trainingssession.date).toLocaleDateString("de-DE", {
-                                                weekday:
-                                                    "short", year: "numeric", month: "short", day: "numeric"
-                                            })
-                                        }}</h3>
-                                    </template>
-                                    <template #content>
-                                        <div
-                                            class="bg-white px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black overflow-hidden">
-                                            <!--Chevron Up-->
-                                            <div class="flex justify-between items-center mb-6"
-                                                @click="$refs[`sessionCard${i}`][index].togglePanel()">
-                                                <h3>{{
-                                                    new Date(trainingssession.date).toLocaleDateString("de-DE",
-                                                        {
-                                                            weekday: "short", year: "numeric", month: "short", day:
-                                                                "numeric"
-                                                        })
-                                                }}</h3>
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                                </svg>
-                                            </div>
-                                            <div class="flex justify-between items-center mb-3">
-                                                <p class="text-gray-700 font-light text-base md:text-lg w-full">
-                                                    Beginn: </p>
-                                                <p
-                                                    class="text-black font-medium text-base md:text-lg text-right flex items-center">
-                                                    {{ trainingssession.starttime }}
-                                                    <!--Clock Icon-->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-
-                                                </p>
-                                            </div>
-                                            <div class="flex justify-between items-center mb-3">
-                                                <p class="text-gray-700 font-light text-base md:text-lg w-full">
-                                                    Ende: </p>
-                                                <p
-                                                    class="text-black font-medium text-base md:text-lg text-right flex items-center">
-                                                    {{ trainingssession.endtime }}
-                                                    <!--Clock Icon-->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="2" stroke="currentColor" class="w-6 h-6 ml-2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-
-                                                </p>
-                                            </div>
-                                            <div class="flex justify-between items-center mb-3">
-                                                <p class="text-gray-700 font-light text-base md:text-lg w-full">
-                                                    Stundenanzahl: </p>
-                                                <p class="text-black font-bold text-base md:text-lg text-right">{{
-                                                    convertToReadableTime(calcTime(trainingssession.starttime,
-                                                        trainingssession.endtime))
-                                                }}</p>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </Card>
-                            </template>
-                        </CollapsibleContainer>
-                    </div>
+                    <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md"
+                        :show="false" :enableClickOnHeader="false" v-for="(group, index) in invoice.groups" :key="group._id"
+                        ref="groupCards"
+                        :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
+                        <template #header>
+                            <p class="truncate text-xl font-semibold">{{ group.name }}</p>
+                        </template>
+                        <template #content>
+                            <table class="table-auto w-full text-left">
+                                <thead>
+                                    <tr class="border-b border-[#D1D5DB]">
+                                        <th scope="col" class="pb-2.5 font-medium w-fit">Datum</th>
+                                        <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium">Länge
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--TODO Implement Click Action zu Trainingssession-->
+                                    <tr v-for="(trainingssession) in group.trainingssessions" :key="trainingssession._id"
+                                        class="border-b border-[#E5E7EB] last:border-0 group">
+                                        <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                            {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
+                                                weekday: "short", year: "numeric",
+                                                month: "2-digit", day: "2-digit"
+                                            }) }}
+                                        </td>
+                                        <td
+                                            class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
+                                            <p class="text-[#6B7280]">{{
+                                                convertToReadableTime(calcTime(trainingssession.starttime,
+                                                    trainingssession.endtime)) }}</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </CollapsibleContainer>
                 </div>
 
                 <!--Bestätigungsfeld-->
-                <div class="bg-white py-5 rounded-lg drop-shadow-md">
-                    <div class="flex items-center">
-                        <CheckboxInput class="mr-3"></CheckboxInput>
-                        <p class="text-black font-medium text-base md:text-lg text-left"><span class="text-orange-600">TODO
-                                Bestätigungsmessage</span>
-                        </p>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <button @click="reject"
-                            class="flex justify-center items-center text-white bg-gradient-to-br from-slate-400 to-slate-500 px-5 md:px-6 py-2 w-full md:ml-16 ty:ml-4 ml-1 md:mr-8 ty:mr-2 mr-0.5 rounded-lg drop-shadow-md"
-                            :class="error.show ? 'mt-4' : 'mt-8'">
-                            <p class="font-medium font-base md:text-lg">Ablehnen</p>
-                        </button>
-                        <button @click="approve"
-                            class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-5 md:px-6 py-2 w-full md:ml-8 ty:ml-2 ml-0.5 md:mr-16 ty:mr-4 mr-1 rounded-lg drop-shadow-md"
-                            :class="error.show ? 'mt-4' : 'mt-8'">
-                            <p class="font-medium font-base md:text-lg">Bestätigen</p>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!--Sendebestätigung-->
-            <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md" v-show="status.show">
-                <div class="flex flex-col justify-center items-center">
-                    <div class="mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
-                            v-show="status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
-
-                        <!--Check Circle-->
-                        <!--TODO Fix Bounce-->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                            stroke="currentColor" class="w-16 h-16 text-lime-600 animate-smaller-bounce"
-                            v-show="status.success && !status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-
-                        <!--X Circle-->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                            stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
-                            v-show="!status.success && !status.processing">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <p class="mb-3 text-lg">{{ status.text }}</p>
-                    <button @click="ok"
-                        class="flex items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-4 md:px-5 py-1.5 rounded-lg drop-shadow-md">
-                        <p class="font-medium font-base md:text-lg">Okay</p>
+                <div class="flex justify-between items-center gap-7">
+                    <button @click="reject"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                        <p class="font-medium font-base md:text-lg">Ablehnen</p>
+                    </button>
+                    <button @click="approve"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                        <p class="font-medium font-base md:text-lg">Genehmigen</p>
                     </button>
                 </div>
             </div>
@@ -194,8 +117,6 @@ import { useDataStore } from "@/store/dataStore";
 import { useAuthStore } from "@/store/authStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
-import CheckboxInput from "@/components/CheckboxInput.vue";
-import Card from "@/components/Card.vue";
 
 export default {
     name: "ReviewInvoice",
@@ -203,11 +124,13 @@ export default {
         const dataStore = useDataStore()
         const authStore = useAuthStore()
         const showCollapsibleContainer = ref(true);
+        const groupCards = ref([]);
 
         return {
             dataStore,
             authStore,
-            showCollapsibleContainer
+            showCollapsibleContainer,
+            groupCards
         }
     },
     data() {
@@ -225,12 +148,6 @@ export default {
                     noData: false
                 }
             },
-            status: {
-                show: false,
-                text: "Bitte warten...",
-                processing: true,
-                success: false,
-            },
             showToolbar: false,
             spin: false,
             //TODO sort by values in array eintragen
@@ -240,17 +157,16 @@ export default {
         }
     },
     components: {
-        CollapsibleContainer,
-        CheckboxInput,
-        Card
+        CollapsibleContainer
     },
     methods: {
         async reject() {
             //Backend: Invoice wird als Rejected gesetzt & Submitter wird benachrichtigt
             //TODO Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
             await rejectInvoice(this.invoice.id)
+            
 
-            this.$router.push("/openInvoices")
+            this.$router.push({ path: "/invoices" })
         },
 
         async approve() {
@@ -262,41 +178,25 @@ export default {
 
             this.invoice.totalHours = this.totalHours
 
-            this.status.show = true
-
             const res = await approveInvoice(this.invoice.id)
             if (res.status === 200 && await res.text() === "Invoice approved") {
-                this.status.success = true
-                this.status.processing = false
-                this.status.text = 'Abrechnung genehmigt.'
-
                 this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
                 await createInvoice(this.filename, this.invoice)
-            } else {
-                this.status.success = false
-                this.status.processing = false
-                this.status.text = 'Abrechnung konnte nicht genehmigt werden.'
             }
         },
-        ok() {
-            this.$router.push("/openInvoices")
-            this.status.show = false
-            this.status.processing = true
-            this.status.success = false
-            this.status.text = 'Bitte warten...'
-        },
-        convertToReadableTime(timeInDecimal) {
-            const hh = Math.trunc(timeInDecimal)
-            const mm = ("0" + Math.round(60 * (this.totalHours - hh))).slice(-2)
+        convertToReadableTime(timeNumberic) {
+            const hh = Math.trunc(timeNumberic)
+            const mm = ("0" + Math.round(60 * (timeNumberic - hh))).slice(-2)
             return `${hh}:${mm} Std`
         },
-        calcTime(startingTime, endingTime) {
+
+        calcTime(starttime, endtime) {
             //Formatiert Zeit vom Format 18:45 in 18,75
             // Wird mit 100 multipliziert, um Floating Point Fehler zu vermeiden
-            const starttimeNumeric = Number(startingTime?.split(":")[0]) * 100 + (Number(startingTime?.split(":")[1]) / 60 * 100) || 0;
+            const starttimeNumeric = Number(starttime.split(":")[0]) * 100 + (Number(starttime.split(":")[1]) / 60 * 100) || 0;
 
-            const endtimeNumeric = Number(endingTime?.split(":")[0]) * 100 + (Number(endingTime?.split(":")[1]) / 60 * 100) || 0;
+            const endtimeNumeric = Number(endtime.split(":")[0]) * 100 + (Number(endtime.split(":")[1]) / 60 * 100) || 0;
 
             //Berechnet Länge des Trainings. Bsp: Für 1 Std 30 min --> 1,5
             return endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? (endtimeNumeric - starttimeNumeric) / 100 : 0;
@@ -331,6 +231,17 @@ export default {
             })
 
             return tHours
+        },
+        showGroupCard() {
+            //INFO Das konditionelle Styling funktioniert in diesem Fall nur, wenn die Refs in 'setup' aufgesetzt werden.
+
+            //Wenn Ref initialisiert wurde, dann soll der Wert von showContent zurückgegeben werden
+            if (typeof this.groupCards !== "undefined" && this.groupCards?.length > 0) {
+                return this.groupCards.map(val => val.showContent)
+            } else {
+                //Wenn Ref noch nicht initialisiert ist, dann wird als default false zurückgegeben
+                return this.invoice.groups.map(() => false)
+            }
         }
     }
 };

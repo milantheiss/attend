@@ -38,6 +38,7 @@ export default {
                         this.input = oldVal
                     } else {
                         this.$emit('update:modelValue', this.input)
+                        this.$emit('onChange', this.input)
                     }
                 }
             }

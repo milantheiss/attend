@@ -214,12 +214,7 @@ export default {
         }
       }
       return count > 0 ? count : "Keine"
-    },
-
-    //Wird von Select List getriggert, wenn eine neue Gruppe ausgewählt wird.
-    newGroupSelected() {
-      
-    },
+    }
   },
   async created() {
     //Setzt Tab- und Seitenname
@@ -232,10 +227,8 @@ export default {
     const groupId = this.$route.query.groupId
     const date = this.$route.query.date
 
-    console.log(groupId, date);
-
     if (typeof groupId !== 'undefined' && typeof date !== "undefined") {
-      //Siehe Attandance
+      //Siehe Attendance, wenn eine GroupId & ein Date über Query String übergeben wird
       const res = await fetchAttendanceByDate(groupId, date)
       if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
         // Sollte nicht mehr erreicht werden
@@ -253,7 +246,6 @@ export default {
 
         this.blockSelectedGroupWatcher = false
         this.pullingByQueryString = false
-        console.log(this.date);
       }
     }
   },
@@ -271,13 +263,13 @@ export default {
 
       document.title = this.selectedGroup.name + ' - Attend'
     },
-    async "attend.starttime"() {
+    async "attended.starttime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
         this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
       }
     },
-    async "attend.endtime"() {
+    async "attended.endtime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
         this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)

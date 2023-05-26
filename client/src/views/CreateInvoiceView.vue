@@ -77,28 +77,27 @@
                         <span class="font-medium">{{
                             new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
                                 year: "numeric",
-                                month: "numeric", day: "numeric"
+                                month: "2-digit", day: "2-digit"
                             })
                         }}</span>
                         bis
                         <span class="font-medium">{{
                             new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
                                 year: "numeric",
-                                month: "numeric", day: "numeric"
+                                month: "2-digit", day: "2-digit"
                             })
                         }}</span>
                     </p>
                 </div>
                 <div class="flex justify-between items-baseline">
                     <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
-                    <p class="font-medium text-right">{{ readableTotalHours(totalHours) }}</p>
+                    <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
                 </div>
             </div>
 
-            <!--Alle Gruppe, der Invoice-->
+            <!--Group Cards: Alle Gruppe, der Invoice-->
             <div class="my-7 flex flex-col gap-5">
                 <!--Je Gruppe ein Container-->
-
                 <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md" :show="false"
                     :enableClickOnHeader="false" v-for="(group, index) in dataStore.invoiceData.groups" ref="groupCards"
                     :key="group._id"
@@ -129,7 +128,7 @@
                                         }) }}
                                     </td>
                                     <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                        <p class="text-[#6B7280]">{{ readableTotalHours(calcTime(trainingssession.starttime, trainingssession.endtime)) }}</p>
+                                        <p class="text-[#6B7280]">{{ convertToReadableTime(calcTime(trainingssession.starttime, trainingssession.endtime)) }}</p>
                                     </td>
                                     <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
                                         <!--Arrow Right-->
@@ -271,8 +270,6 @@ export default {
         async pullInvoiceData(selectedGroups, startdate,enddate){
             this.dataStore.invoiceData = await fetchDataForNewInvoice(selectedGroups, new Date(startdate), new Date(enddate))
             this.dataStore.invoiceData.groups.forEach(group => group.include = true)
-
-            console.log(this.dataStore.invoiceData);
     
             if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
                 this.error.show = true
@@ -349,7 +346,7 @@ export default {
             this.status.text = 'Abrechnung wird versendet...'
         },
 
-        readableTotalHours(timeNumberic) {
+        convertToReadableTime(timeNumberic) {
             const hh = Math.trunc(timeNumberic)
             const mm = ("0" + Math.round(60 * (timeNumberic - hh))).slice(-2)
             return `${hh}:${mm} Std`
@@ -386,9 +383,7 @@ export default {
     },
     async mounted() {
         if(typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof  this.dataStore.invoiceData?.enddate !== "undefined"){
-            console.log(this.dataStore.invoiceData);
             const groups = this.dataStore.invoiceData.groups.map(val => val.id)
-            console.log(groups);
             await this.pullInvoiceData(groups, this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
         }
     },

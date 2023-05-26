@@ -31,7 +31,7 @@
                 <!--INFO Jede Zeile ist clickbar, um die Invoice zu downloaden-->
                 <table class="table-auto w-full text-left">
                     <thead>
-                        <tr class="border-b border-[#D1D5DB]">
+                        <tr :class="{'border-b border-[#D1D5DB]': typeof allInvoicesInYear !== 'undefined' && allInvoicesInYear?.length > 0}">
                             <th scope="col" class="pb-2.5 font-medium">Zeitraum</th>
                             <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium">Status</th>
                             <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium">Download</th>
