@@ -6,7 +6,7 @@
             <!--Backdrop-->
             <div ref="modal-backdrop" class="fixed z-30 inset-0 overflow-y-auto bg-black bg-opacity-50" v-if="showModal">
                 <!--Elementfenster-->
-                <div class="flex items-start justify-center min-h-screen pt-12 md:pt-32 text-center">
+                <div class="flex items-start justify-center min-h-screen pt-28 md:pt-38 text-center">
                     <div class="flex flex-col gap-4 overflow-hidden w-5/6 md:max-w-medium-width px-3.5 md:px-7 py-4 bg-white rounded-lg drop-shadow-md text-lg md:text-xl"
                         role="dialog" ref="modal" aria-modal="true" aria-labelledby="modal-headline">
                         <!--Header-->
@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, defineEmits, } from 'vue';
 import useClickOutside from '@/util/useClickOutside';
 
 const modal = ref(null);
@@ -68,6 +68,8 @@ const props = defineProps({
     }
 });
 
+const emit = defineEmits(['onOpen', 'onClose', 'onClickOutside']);
+
 function closeModal() {
     showModal.value = false;
 }
@@ -75,6 +77,7 @@ function closeModal() {
 onClickOutside(modal, () => {
     if (showModal.value === true && !props.disableClickOutside) {
         closeModal();
+        emit('onClickOutside');
     }
 });
 
@@ -84,9 +87,19 @@ onMounted(() => {
 
 watch(
     () => props.show,
-    show => {
-        console.log(show);
-        showModal.value = show;
-    },
+    newVal => {
+        showModal.value = newVal;
+    }
 );
+
+watch(
+    showModal,
+    newVal => {
+        if(newVal) {
+            emit('onOpen')
+        } else if(!newVal) {
+            emit('onClose')
+        }
+    }
+)
 </script>

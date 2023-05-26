@@ -165,39 +165,40 @@
         </div>
 
         <!--Sendebestätigung-->
-        <ModalDialog :show="status.show" :hasHeader="false" :hasSubheader="false">
+        <ModalDialog :show="status.show" :hasHeader="false" :hasSubheader="false" @onClose="cancel">
             <template #content>
-                <div class="flex justify-center items-center w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
-                        v-show="status.processing">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                    </svg>
-
-                    <!--Check Circle-->
-                    <!--TODO Fix Bounce-->
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                        stroke="currentColor" class="w-16 h-16 text-lime-600 animate-smaller-bounce"
-                        v-show="status.success && !status.processing">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-
-                    <!--X Circle-->
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
-                        stroke="currentColor" class="w-16 h-16 text-delete-gradient-1 animate-wiggle"
-                        v-show="!status.success && !status.processing">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="flex flex-col justify-center items-center gap-4">
+                    <div class="flex justify-center items-center w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-14 h-14 animate-[spin_1s_linear_infinite]"
+                            v-show="status.processing">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+    
+                        <!--Check Circle-->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-16 h-16 text-lime-600"
+                            v-show="status.success && !status.processing">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+    
+                        <!--X Circle-->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-16 h-16 text-delete-gradient-1"
+                            v-show="!status.success && !status.processing">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="font-semibold text-center">{{ status.text }}</p>
                 </div>
-                <p class="font-medium text-lg md:text-xl text-center mt-2">{{ status.text }}</p>
             </template>
             <template #footer>
-                <button @click="status.show = false"
-                    class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-                    <p class="font-medium md:text-xl text-lg">Fertig</p>
+                <button @click="cancel"
+                    class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                    <p class="font-medium">Fertig</p>
                 </button>
             </template>
         </ModalDialog>
@@ -262,16 +263,25 @@ export default {
     methods: {
         async getInvoiceData(startdate, enddate) {
             if (!this.hasAnError()) {
-                this.dataStore.invoiceData = await fetchDataForNewInvoice(this.selectedGroups, new Date(startdate), new Date(enddate))
-                this.dataStore.invoiceData.groups.forEach(group => group.include = true)
-
-                if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
-                    this.error.show = true
-                    this.error.cause.noData = true
-                    this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
-                    this.dataStore.invoiceData = {}
-                }
+                //Diese Methode muss aufgeteilt werden, da sonst der InvoiceData Reload nicht funktioniert, da selectedGroups Computed ist und checkboxList.selectedElements nicht gesetzt ist, wenn das Pull Data Modal übersprungen wird
+                this.pullInvoiceData(this.selectedGroups, startdate, enddate)
             }
+        },
+        
+        async pullInvoiceData(selectedGroups, startdate,enddate){
+            this.dataStore.invoiceData = await fetchDataForNewInvoice(selectedGroups, new Date(startdate), new Date(enddate))
+            this.dataStore.invoiceData.groups.forEach(group => group.include = true)
+
+            console.log(this.dataStore.invoiceData);
+    
+            if (!this.dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0)) {
+                this.error.show = true
+                this.error.cause.noData = true
+                this.error.message = 'Es konnten keine abrechenbare Trainingsstunden gefunden werden!\nBitte kontrolliere, dass du die richtige Zeitspanne und Gruppen ausgewählt hast.'
+                this.dataStore.invoiceData = {}
+            }            
+
+            this.showPullDataModal = false
         },
 
         /**
@@ -374,9 +384,12 @@ export default {
         document.title = 'Erstelle eine Abrechnung - Attend'
         this.dataStore.viewname = "Abrechnung erstellen"
     },
-    mounted() {
+    async mounted() {
         if(typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof  this.dataStore.invoiceData?.enddate !== "undefined"){
-            this.getInvoiceData(this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
+            console.log(this.dataStore.invoiceData);
+            const groups = this.dataStore.invoiceData.groups.map(val => val.id)
+            console.log(groups);
+            await this.pullInvoiceData(groups, this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
         }
     },
     computed: {
