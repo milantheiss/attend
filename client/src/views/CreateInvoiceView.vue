@@ -10,7 +10,7 @@
                     <!--Gruppen Auswahl-->
                     <CollapsibleContainer :show="true">
                         <template #header>
-                            <p class="text-[#6B7280]">Gruppe:</p>
+                            <p class="text-light-gray">Gruppe:</p>
                         </template>
                         <template #content>
                             <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
@@ -20,12 +20,12 @@
                     </CollapsibleContainer>
                     <!--Timespan-->
                     <div class="flex items-center justify-between">
-                        <label for="startdate" class="text-[#6B7280]">Anfang:</label>
+                        <label for="startdate" class="text-light-gray">Anfang:</label>
                         <DateInput v-model="startdate" name="startdate" :max="enddate" class="ml-3"></DateInput>
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <label for="enddate" class="text-[#6B7280]">Ende:</label>
+                        <label for="enddate" class="text-light-gray">Ende:</label>
                         <DateInput v-model="enddate" name="enddate" class="ml-3"
                             :max="(new Date(Date.now()).toJSON()).slice(0, 10)" :min="startdate"></DateInput>
                     </div>
@@ -38,7 +38,7 @@
                 <div class="flex gap-4">
                     <!--INFO Margin auf cancle Btn gleicht Offset von Outline aus-->
                     <button @click="cancel"
-                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-2xl px-3.5 md:px-7 my-0.5">
+                        class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 my-0.5">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
                     <button @click="getInvoiceData(startdate, enddate)"
@@ -58,21 +58,21 @@
             <!--Invoice Info Field-->
             <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
                 <div class="flex justify-between items-baseline">
-                    <p class="text-[#6B7280] font-normal">Antragsteller: </p>
+                    <p class="text-light-gray font-normal">Antragsteller: </p>
                     <p class="font-medium text-right">
                         {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname }}
                     </p>
                 </div>
 
                 <div class="flex justify-between items-baseline">
-                    <p class="text-[#6B7280] font-normal">Abteilung: </p>
+                    <p class="text-light-gray font-normal">Abteilung: </p>
                     <p class="font-medium text-right">{{
                         dataStore.invoiceData.department.name
                     }}</p>
                 </div>
 
                 <div class="flex justify-between items-baseline">
-                    <p class="text-[#6B7280] font-normal">Abrechnungszeitraum: </p>
+                    <p class="text-light-gray font-normal">Abrechnungszeitraum: </p>
                     <p class="font-normal text-right">
                         <span class="font-medium">{{
                             new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
@@ -90,7 +90,7 @@
                     </p>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
+                    <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
                     <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@
                     <template #header>
                         <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
                         <p class="truncate text-xl font-semibold"
-                            :class="!group.include ? 'text-[#6B7280] line-through' : ''">{{ group.name }}</p>
+                            :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
                     </template>
                     <template #content>
                         <table class="table-auto w-full text-left">
@@ -122,7 +122,7 @@
                                         class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
                                         @click="onClickOnLength()">
                                         <span class="flex items-center gap-1">
-                                            <SortIconLength :index="indexSortButtonLength"></SortIconLength>
+                                            <SortIcon :index="indexSortButtonLength"></SortIcon>
                                             Länge
                                         </span>
                                     </th>
@@ -142,7 +142,7 @@
                                         }) }}
                                     </td>
                                     <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                        <p class="text-[#6B7280]">{{
+                                        <p class="text-light-gray">{{
                                             convertToReadableTime(calcTime(trainingssession.starttime,
                                                 trainingssession.endtime)) }}</p>
                                     </td>
@@ -168,7 +168,7 @@
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
                 <div class="flex justify-between items-center gap-7">
                     <button @click="cancel"
-                        class="flex items-center text-[#6B7280] outline outline-2 outline-[#6B7280] rounded-2xl px-3.5 md:px-7 py-3.5"
+                        class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
                         :class="error.show ? 'mt-4' : ''">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
@@ -233,7 +233,7 @@ import { ref } from 'vue';
 import CheckboxInput from "@/components/CheckboxInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
 import SortIconDate from '@/components/SortIconDate.vue';
-import SortIconLength from '@/components/SortIconLength.vue';
+import SortIcon from '@/components/SortIcon.vue';
 
 export default {
     name: "CreateInvoice",
@@ -285,7 +285,7 @@ export default {
         CheckboxInput,
         ModalDialog,
         SortIconDate,
-        SortIconLength
+        SortIcon
     },
     methods: {
         async getInvoiceData(startdate, enddate) {

@@ -1,23 +1,19 @@
 <template>
   <div @click="onClick"
-    :class="this.activated ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1':'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
-    class="px-3.5 py-3 rounded-lg drop-shadow mb-4 font-normal text-xl hover:cursor-pointer select-none">
+    :class="this.activated ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1' : 'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
+    class="px-3.5 md:px-7 py-4 rounded-xl drop-shadow font-medium text-xl hover:cursor-pointer select-none">
     <span class="flex items-center justify-between">
-      <h3>{{ participant.lastname }}, {{ participant.firstname }}</h3>
-      <span class="self-center w-6">
-        <!--Checkmark Icon-->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 73.031 55.976" class="text-white" v-show="activated">
-          <path fill="none" stroke="currentColor" stroke-width="9.973" d="M69.465 3.486 25.048 48.925 3.486 27.847" />
-        </svg>
-        <!--Checkbox Icon-->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80.851 80.851" v-show="!activated" class="text-dark-grey">
-          <path fill="none" stroke="currentColor" stroke-width="7.5"
-            d="M28.885 3.75h23.08a25.135 25.135 0 0 1 25.136 25.135v23.08a25.135 25.135 0 0 1-25.136 25.136h-23.08A25.135 25.135 0 0 1 3.75 51.966v-23.08A25.135 25.135 0 0 1 28.885 3.75z" />
-        </svg>
-      </span>
+      <h3 class="w-full">{{ participant.lastname }}, {{ participant.firstname }}</h3>
+      <!--Checkmark Icon-->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"
+        class="w-8 h-8" v-show="activated">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+      <!--Rect Icon-->
+      <div v-show="!activated" class="min-w-[32px] min-h-[32px] border-[3px] border-light-gray rounded-xl"></div>
     </span>
   </div>
-</template>
+</template> 
 
 <script>
 export default {
@@ -47,6 +43,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

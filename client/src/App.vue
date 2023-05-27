@@ -1,6 +1,6 @@
 <template>
 	<div class="mb-40 mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
-		
+
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
 		<nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
 			v-if="auth.authenticated">
@@ -8,12 +8,12 @@
 				<!--Menu Icon-->
 				<button @click="showMenu = !showMenu" class="pr-2 py-2 -mr-2 -mx-1">
 					<span>
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
 							stroke="currentColor" class="w-10 h-10" v-show="!showMenu">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
 						</svg>
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
 							stroke="currentColor" class="w-10 h-10" v-show="showMenu">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 						</svg>
@@ -33,13 +33,12 @@
 					</div>
 					<div
 						class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0 drop-shadow-md">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49.548 47.707"
-							class="text-white w-14 h-14  md:w-14 md:h-14 p-3 md:p-4">
-							<g fill="none" stroke="currentColor" stroke-width="6.649"
-								transform="translate(-93.958 -82.631)">
+						<svg xmlns="http://www.w3.org/2000/svg" width="188.262" height="189.375"
+							viewBox="0 0 49.811 50.106" class="text-white w-14 h-14  md:w-14 md:h-14 p-3 md:p-4">
+							<g fill="none" stroke="#ffffff" stroke-width="6.649" transform="translate(-93.826 -82.631)">
 								<ellipse cx="118.732" cy="96.016" rx="10.439" ry="10.061" />
-								<path
-									d="M97.15 129.409a22.145 17.563 0 0 1 21.581-13.623 22.145 17.563 0 0 1 21.582 13.626" />
+								<path stroke-linecap="round"
+									d="M97.15 129.409c3.931-6.868 11.266-10.902 21.582-10.902 10.318 0 17.652 4.12 21.58 10.905" />
 							</g>
 						</svg>
 					</div>
@@ -113,7 +112,7 @@
 					<div v-html="patchNotes.text"></div>
 				</template>
 				<template #footer><button @click="dataStore.readPatchNotes()"
-						class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-6 ty:px-10 sm:px-12 py-1.5 rounded-lg drop-shadow-md">
+						class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-6 ty:px-10 sm:px-12 py-1.5 rounded-xl drop-shadow-md">
 						<p class="font-medium text-base md:text-lg">Gelesen</p>
 					</button></template>
 			</ModalDialog>

@@ -25,7 +25,7 @@ module.exports = {
         'background-graywhite': '#E8EBED',
         'dark-grey': '#i',
         'special-red': '#FF1F28',
-        "light-gray": "#6C7F8C",
+        "light-gray": "#6B7280",
       },
       fontFamily:{
         'ubuntu': ['Ubuntu', 'sans-serif']

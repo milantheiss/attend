@@ -1,8 +1,7 @@
 <template>
-  <!--pl-3.5 py-2 rounded-lg drop-shadow mb-3 font-normal text-xl-->
   <span class="mb-4">
     <div @click="showEditPanel = true"
-      class="px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2"
+      class="px-3.5 py-3 rounded-xl drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2"
       v-show="!showEditPanel">
       <span class="flex items-center justify-between">
         <h3>{{ participant.lastname }}, {{ participant.firstname }}</h3>

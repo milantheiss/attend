@@ -6,21 +6,21 @@
                 <!--Invoice Info Field-->
                 <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
                     <div class="flex justify-between items-baseline">
-                        <p class="text-[#6B7280] font-normal">Antragsteller: </p>
+                        <p class="text-light-gray font-normal">Antragsteller: </p>
                         <p class="font-medium text-right">
                             {{ invoice.submittedBy.firstname }} {{ invoice.submittedBy.lastname }}
                         </p>
                     </div>
 
                     <div class="flex justify-between items-baseline">
-                        <p class="text-[#6B7280] font-normal">Abteilung: </p>
+                        <p class="text-light-gray font-normal">Abteilung: </p>
                         <p class="font-medium text-right">{{
                             invoice.department.name
                         }}</p>
                     </div>
 
                     <div class="flex justify-between items-baseline">
-                        <p class="text-[#6B7280] font-normal truncate">Zeitraum: </p>
+                        <p class="text-light-gray font-normal truncate">Zeitraum: </p>
                         <p class="font-normal text-right">
                             <span class="font-medium">{{
                                 new Date(invoice.startdate).toLocaleDateString("de-DE", {
@@ -38,12 +38,12 @@
                     </div>
 
                     <div class="flex justify-between items-baseline">
-                        <p class="text-[#6B7280] font-normal">Stundenanzahl gesamt: </p>
+                        <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
                         <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
                     </div>
 
                     <div class="flex justify-between items-baseline">
-                        <p class="text-[#6B7280] font-normal truncate">Erstellungsdatum: </p>
+                        <p class="text-light-gray font-normal truncate">Erstellungsdatum: </p>
                         <p class="font-medium text-right">
                             {{ new Date(invoice.dateOfReceipt).toLocaleDateString("de-DE", {
                                 year: "numeric",
@@ -74,7 +74,7 @@
                                         </th>
                                         <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer" @click="onClickOnLength()">
                                             <span class="flex items-center gap-1">
-                                            <SortIconLength :index="indexSortButtonLength"></SortIconLength>
+                                            <SortIcon :index="indexSortButtonLength"></SortIcon>
                                             Länge
                                         </span>
                                         </th>
@@ -92,7 +92,7 @@
                                         </td>
                                         <td
                                             class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
-                                            <p class="text-[#6B7280]">{{
+                                            <p class="text-light-gray">{{
                                                 convertToReadableTime(calcTime(trainingssession.starttime,
                                                     trainingssession.endtime)) }}</p>
                                         </td>
@@ -127,7 +127,7 @@ import { useAuthStore } from "@/store/authStore";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import { ref } from 'vue';
 import SortIconDate from '@/components/SortIconDate.vue';
-import SortIconLength from '@/components/SortIconLength.vue';
+import SortIcon from '@/components/SortIcon.vue';
 
 export default {
     name: "ReviewInvoice",
@@ -172,7 +172,7 @@ export default {
     components: {
         CollapsibleContainer,
         SortIconDate,
-        SortIconLength
+        SortIcon
     },
     methods: {
         async reject() {

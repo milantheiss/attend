@@ -22,7 +22,8 @@
         <CollapsibleContainer :enableClickOnHeader="false" :show="true"
             class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
             <template #header>
-                <p class="font-semibold flex items-baseline">Abrechnungen in <YearInput v-model="selectedYear" class="ml-1 font-semibold">
+                <p class="font-semibold flex items-baseline">Abrechnungen in <YearInput v-model="selectedYear"
+                        class="ml-1 font-semibold">
                     </YearInput>
                 </p>
             </template>
@@ -31,9 +32,21 @@
                 <!--INFO Jede Zeile ist clickbar, um die Invoice zu downloaden-->
                 <table class="table-auto w-full text-left">
                     <thead>
-                        <tr :class="{'border-b border-[#D1D5DB]': typeof allInvoicesInYear !== 'undefined' && allInvoicesInYear?.length > 0}">
-                            <th scope="col" class="pb-2.5 font-medium">Zeitraum</th>
-                            <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium">Status</th>
+                        <tr
+                            :class="{ 'border-b border-[#D1D5DB]': typeof allInvoicesInYear !== 'undefined' && allInvoicesInYear?.length > 0 }">
+                            <th scope="col" class="pb-2.5 font-medium" @click="onClickOnTimespan">
+                                <span class="flex items-center gap-1">
+                                    <SortIcon :index="indexSortButtonTimespan"></SortIcon>
+                                    Zeitraum
+                                </span>
+                            </th>
+                            <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
+                                @click="onClickOnStatus">
+                                <span class="flex items-center gap-1">
+                                    <SortIcon :index="indexSortButtonStatus"></SortIcon>
+                                    Status
+                                </span>
+                            </th>
                             <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium">Download</th>
                         </tr>
                     </thead>
@@ -77,7 +90,7 @@
                             <td class="px-3 md:px-4 w-fit sm:w-full py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 <!--Status Badge-->
                                 <div v-show="invoice.status === 'pending'"
-                                    class="rounded-full bg-[#6B7280] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
+                                    class="rounded-full bg-light-gray w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
                                     <p class="text-white text-base md:text-lg">Ausstehend</p>
                                 </div>
                                 <div v-show="invoice.status === 'approved'"
@@ -116,8 +129,19 @@
                 <table class="table-auto w-full text-left ">
                     <thead>
                         <tr class="border-b border-[#D1D5DB]">
-                            <th scope="col" class="w-full pb-2.5 font-medium">Ersteller</th>
-                            <th scope="col" class="pl-2 md:pl-4 w-[108px] md:w-[132px] pb-2.5 font-medium">Datum</th>
+                            <th scope="col" class="w-full pb-2.5 font-medium" @click="onClickOnSubmitter">
+                                <span class="flex items-center gap-1">
+                                    <SortIcon :index="indexSortButtonSubmitter"></SortIcon>
+                                    Ersteller
+                                </span>
+                            </th>
+                            <th scope="col" class="pl-2 md:pl-4 w-[108px] md:w-[132px] pb-2.5 font-medium"
+                                @click="onClickOnDate">
+                                <span class="flex items-center gap-1">
+                                    <SortIcon :index="indexSortButtonDate"></SortIcon>
+                                    Datum
+                                </span>
+                            </th>
                             <th scope="col" class="hidden ty:table-cell text-right w-fit pb-2.5 pl-6 md:pl-12"></th>
                         </tr>
                     </thead>
@@ -129,7 +153,7 @@
 
                             </td>
                             <td
-                                class="text-[#6B7280] pl-2 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[108px] md:w-[132px]">
+                                class="text-light-gray pl-2 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[108px] md:w-[132px]">
                                 {{
                                     new Date(invoice.dateOfReceipt).toLocaleDateString('de-DE', {
                                         year: 'numeric', month:
@@ -139,7 +163,8 @@
                             <td class="hidden ty:table-cell w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 pl-6 md:pl-12">
                                 <!--Arrow Icon-->
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                                    stroke="currentColor"
+                                    class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                                 </svg>
@@ -160,6 +185,7 @@ import { ref } from 'vue';
 import Button from '@/components/Button.vue';
 import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
 import YearInput from '@/components/YearInput.vue';
+import SortIcon from '@/components/SortIcon.vue';
 
 //TODO Umstellen auf Antrag Seite
 
@@ -180,7 +206,11 @@ export default {
             spin: false,
             //TODO sort by values in array eintragen
             sortBy: [],
-            selectedYear: new Date().getFullYear()
+            selectedYear: new Date().getFullYear(),
+            indexSortButtonStatus: 0,
+            indexSortButtonTimespan: 0,
+            indexSortButtonSubmitter: 0,
+            indexSortButtonDate: 0,
         };
     },
     methods: {
@@ -200,6 +230,58 @@ export default {
         },
         downloadInvoice(id) {
             downloadInvoice(id)
+        },
+        onClickOnStatus() {
+            this.indexSortButtonStatus = (this.indexSortButtonStatus + 1) % 2;
+            if (this.indexSortButtonStatus == 0) {
+                this.allInvoicesInYear.sort((a, b) => b.status.localeCompare(a.status))
+            } else {
+                this.allInvoicesInYear.sort((a, b) => a.status.localeCompare(b.status))
+            }
+        },
+        onClickOnTimespan() {
+            this.indexSortButtonTimespan = (this.indexSortButtonTimespan + 1) % 2;
+            if (this.indexSortButtonTimespan == 0) {
+                this.allInvoicesInYear.sort((a, b) => {
+                    if (new Date(a.startdate) - new Date(b.startdate) === 0) {
+                        return new Date(a.enddate) - new Date(b.enddate);
+                    } else {
+                        return new Date(a.startdate) - new Date(b.startdate);
+                    }
+                })
+            } else {
+                this.allInvoicesInYear.sort((a, b) => {
+                    if (new Date(a.startdate) - new Date(b.startdate) === 0) {
+                        return new Date(b.enddate) - new Date(a.enddate);
+                    } else {
+                        return new Date(b.startdate) - new Date(a.startdate);
+                    }
+                })
+            }
+        },
+        onClickOnSubmitter() {
+            this.indexSortButtonSubmitter = (this.indexSortButtonSubmitter + 1) % 2;
+            if (this.indexSortButtonSubmitter == 0) {
+                this.allInvoicesInYear.sort((a, b) => {
+                    return a.submittedBy.lastname.localeCompare(b.submittedBy.lastname)
+                })
+            } else {
+                this.allInvoicesInYear.sort((a, b) => {
+                    return b.submittedBy.lastname.localeCompare(a.submittedBy.lastname)
+                })
+            }
+        },
+        onClickOnDate() {
+            this.indexSortButtonDate = (this.indexSortButtonDate + 1) % 2;
+            if (this.indexSortButtonDate == 0) {
+                this.allInvoicesInYear.sort((a, b) => {
+                    return new Date(a.dateOfReceipt) - new Date(b.dateOfReceipt);
+                })
+            } else {
+                this.allInvoicesInYear.sort((a, b) => {
+                    return new Date(b.dateOfReceipt) - new Date(a.dateOfReceipt);
+                })
+            }
         }
     },
     async created() {
@@ -213,8 +295,28 @@ export default {
     },
     async mounted() {
         this.allAssignedInvoices = await getAllAssignedInvoices();
+
+        if (this.indexSortButtonTimespan == 0) {
+            this.allInvoicesInYear.sort((a, b) => {
+                if (new Date(a.startdate) - new Date(b.startdate) === 0) {
+                    return new Date(a.enddate) - new Date(b.enddate);
+                } else {
+                    return new Date(a.startdate) - new Date(b.startdate);
+                }
+            })
+        } else {
+            this.allInvoicesInYear.sort((a, b) => {
+                if (new Date(a.startdate) - new Date(b.startdate) === 0) {
+                    return new Date(b.enddate) - new Date(a.enddate);
+                } else {
+                    return new Date(b.startdate) - new Date(a.startdate);
+                }
+            })
+        }
+
         this.allInvoicesInYear = await getAllInvoicesInYear(this.selectedYear);
     },
-    components: { Button, CollapsibleContainer, YearInput }
+    components: { Button, CollapsibleContainer, YearInput, SortIcon }
+
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="relative container">
     <!--Selector um Gruppe auszuwählen-->
-    <div class="bg-white px-3 py-4 rounded-lg drop-shadow-md mb-6">
+    <div class="bg-white px-3 py-4 rounded-xl drop-shadow-md mb-6">
       <div class="flex justify-between items-center ml-3 mr-3">
         <p class="text-gray-700 font-light text-base md:text-lg">Gruppe:</p>
         <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
@@ -21,7 +21,7 @@
         @onClickOnDelete="(participantData) => onClickOnDelete(participantData)" />
       <!--Text wird angezeigt, wenn keine Gruppe ausgewählt ist.-->
       <p v-show="typeof getParticipants() === 'undefined'"
-        class="text-xl md:text-2xl font-medium text-[#6B7280] mx-auto">Bitte wähle eine Gruppe</p>
+        class="text-xl md:text-2xl font-medium text-light-gray mx-auto">Bitte wähle eine Gruppe</p>
     </div>
     <!--MemberEditor wird immer angezeigt. Über diesen MemberEditor kann ein neuer Member hinzugefügt werden.-->
     <MemberEditor :createsNewMember="true" @onClickOnCreate="(participantData) => onClickOnSave(participantData)"

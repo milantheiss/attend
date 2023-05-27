@@ -1,7 +1,7 @@
 <template>
     <div class="relative container">
         <!--Export Settings-->
-        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+        <div class="bg-white px-6 py-5 rounded-xl drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
@@ -29,7 +29,7 @@
             <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
 
             <button @click="exportPDF"
-                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
+                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-2xl drop-shadow-md"
                 :class="error.show ? 'mt-4' : 'mt-8'">
                 <p class="font-medium font-base md:text-lg">Exportieren</p>
             </button>

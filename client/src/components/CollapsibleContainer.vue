@@ -6,7 +6,7 @@
                 <div class="flex">
                     <slot name="header"></slot>
                 </div>
-                <div class="color-gray-300 mt-0.5 w-fit justify-items-end cursor-pointer"
+                <div class="cursor-pointer"
                     @click="enableClickOnHeader ? undefined : toggleShowContent()">
                     <!--Chevron Down-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"

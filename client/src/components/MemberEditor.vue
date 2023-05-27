@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white px-3 rounded-lg drop-shadow-md" :class="!createsNewMember ? 'pt-0 pb-5' : 'py-5'">
+    <div class="bg-white px-3 rounded-xl drop-shadow-md" :class="!createsNewMember ? 'pt-0 pb-5' : 'py-5'">
         <div class="grid place-items-end mr-1 pt-2" v-show="!createsNewMember">
             <!--Closing X Icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -44,12 +44,12 @@
         <!--Wird angezeigt, wenn ein existierender Teilnehmer bearbeitet werden soll-->
         <div class="flex items-center justify-between" v-if="!createsNewMember">
             <button @click="onClickOnDelete()"
-                class="mx-auto text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
+                class="mx-auto text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-2xl drop-shadow-md">
                 <p class="font-medium text-base md:text-lg">Entfernen</p>
             </button>
 
             <button @click="onClickOnSave()"
-                class="mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
+                class="mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-2xl drop-shadow-md">
                 <p class="font-medium text-base md:text-lg">Speichern</p>
             </button>
         </div>
@@ -57,7 +57,7 @@
         <!--Wird angezeigt, wenn ein neuer Teilnehmer erstellt werden soll-->
         <div class="flex justify-center items-center" v-if="createsNewMember">
             <button @click="onClickOnCreate()"
-                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-lg drop-shadow-md">
+                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3 ty:px-6 sm:px-8 md:px-9 py-2 rounded-2xl drop-shadow-md">
                 <p class="font-medium text-base md:text-lg">Hinzufügen</p>
             </button>
         </div>

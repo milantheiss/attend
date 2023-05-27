@@ -3,7 +3,7 @@
         <transition enter-active-class="transition-opacity ease-in-out delay-400 duration-500 transform "
             enter-from-class="opacity-0" enter-to-class="opacity-100">
             <div @click="togglePanel"
-                class="px-3.5 py-3 rounded-lg drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2 "
+                class="px-3.5 py-3 rounded-xl drop-shadow-md font-normal text-lg md:text-xl text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2 "
                 v-if="!showPanel">
                 <div class="flex items-center justify-between">
                     <slot name="header"></slot>

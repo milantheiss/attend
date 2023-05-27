@@ -1,20 +1,20 @@
 <template>
-  <div class="flex justify-between items-center">
+  <div class="flex justify-between items-center gap-4 md:gap-12">
     <button @click="getLastDate"
-      class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
+      class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-2xl p-2.5 flex justify-center items-center">
       <!--Left Chevron Icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
-        class="w-6 md:w-7 h-6 md:h-7 text-white">
+        class="w-8 h-8 text-white">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
       </svg>
     </button>
-    <DateInput class="w-full text-2xl md:text-3xl font-medium text-center mx-4 md:mx-12" v-model="date"
+    <DateInput class="w-full text-2xl md:text-3xl font-medium text-center" v-model="date"
       :max="getFormattedDate(new Date())" :enableStyleOverride="true"></DateInput>
     <button @click="getNextDate"
-      class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-lg p-2 md:p-2.5">
+      class="bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 drop-shadow-md rounded-2xl p-2.5 flex justify-center items-center">
       <!--Right Chevron Icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.0" stroke="currentColor"
-        class="w-6 md:w-7 h-6 md:h-7 text-white">
+        class="w-8 h-8 text-white">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </button>

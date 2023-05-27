@@ -1,10 +1,12 @@
 <template>
-  <AttendanceListItem v-for="participant in this.participantArr" :key="participant.memberId" :participant="participant"
-    @onAttendedChange="(id, bool) => $emit('onAttendedChange', id, bool)" />
-  <span class="flex justify-center items-center">
-    <p v-show="participantArr.length === 0" class="text-xl md:text-2xl font-normal text-gray-400 mx-auto">Liste ist leer
-    </p>
-  </span>
+  <div class="flex flex-col gap-4">
+    <AttendanceListItem v-for="participant in this.participantArr" :key="participant.memberId" :participant="participant"
+      @onAttendedChange="(id, bool) => $emit('onAttendedChange', id, bool)" />
+    <span class="flex justify-center items-center w-full">
+      <p v-show="participantArr.length === 0" class="text-xl md:text-2xl font-medium text-light-gray mx-auto">Liste ist leer
+      </p>
+    </span>
+  </div>
 </template>
 
 <script>
