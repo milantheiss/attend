@@ -47,7 +47,7 @@
                                     Status
                                 </span>
                             </th>
-                            <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium">Download</th>
+                            <th scope="col" class="hidden md:table-cell pb-2.5 font-medium">Download</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,16 +90,16 @@
                             <td class="px-3 md:px-4 w-fit sm:w-full py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 <!--Status Badge-->
                                 <div v-show="invoice.status === 'pending'"
-                                    class="rounded-full bg-light-gray w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
-                                    <p class="text-white text-base md:text-lg">Ausstehend</p>
+                                    class="rounded-full bg-light-gray bg-opacity-20 w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
+                                    <p class="text-base md:text-lg font-medium text-[#3F4550]">Ausstehend</p>
                                 </div>
                                 <div v-show="invoice.status === 'approved'"
-                                    class="rounded-full bg-[#4BB84B] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
-                                    <p class="text-white text-base md:text-lg">Genehmigt</p>
+                                    class="rounded-full bg-[#59D10D] bg-opacity-20 w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
+                                    <p class="text-[#087E00] font-medium text-base md:text-lg">Genehmigt</p>
                                 </div>
                                 <div v-show="invoice.status === 'rejected'"
-                                    class="rounded-full bg-[#D95454] w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
-                                    <p class="text-white text-base md:text-lg">Abgelehnt</p>
+                                    class="rounded-full bg-[#D95454] bg-opacity-20 w-[112px] sm:w-[132px] md:w-[142px] h-[32px] md:h-[34px] flex justify-center items-center">
+                                    <p class="text-[#B73939] font-medium text-base md:text-lg">Abgelehnt</p>
                                 </div>
                             </td>
                             <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
