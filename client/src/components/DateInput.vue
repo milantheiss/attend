@@ -1,4 +1,3 @@
-
 <template>
     <input class='block
             pl-1.5 py-0.5
@@ -6,7 +5,7 @@
             bg-transparent text-left form-input
             focus:border-standard-gradient-1'
         :class="{'border-2 rounded-lg border-special-red': showError, 'border-0 border-b-2 border-[#9ea3ae] rounded-none': !showError, 'w-[134px] md:w-[145px] font-medium text-lg md:text-xl': !enableStyleOverride}"
-        type='date' :name="name" v-model="input" :max='max' :min='min' />
+        type='date' :name="name" v-model="input" :max='max' :min='min'/>
 </template>
 
 <script>

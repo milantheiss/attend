@@ -22,7 +22,7 @@
                             <slot name="content"></slot>
                         </div>
                         <!--Footer-->
-                        <div class="text-left font-semibold" v-show="hasFooter">
+                        <div class="text-left font-semibold mt-4" v-show="hasFooter">
                             <slot name="footer"></slot>
                         </div>
                     </div>

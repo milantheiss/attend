@@ -1,99 +1,155 @@
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-4 px-3.5 md:px-7">
-      <div class="flex gap-4 justify-end items-center ">
-        <button @click="newMember"
-          class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-fit px-3.5 md:px-7 py-3.5 z-10">
-          <p class="font-medium font-base md:text-lg">Neues Mitglied</p>
-        </button>
-        <button @click="showSearchBar = !showSearchBar"
-          class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
-            class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-          </svg>
-        </button>
-      </div>
-      <transition enter-active-class="transition ease-linear duration-200" enter-from-class="-translate-y-9"
-        enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
-        leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
-        <div class="flex items-center gap-4" v-show="showSearchBar">
-          <TextInput name="firstname" placeholder="Suche..." :showError="searchError"
-            @onChange="(str) => search(str)" ref="searchBar">
-          </TextInput>
-          <div class="px-3.5 py-3.5" @click="$refs.searchBar.input = ''">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
-              class="w-8 h-8" >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+  <div>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 px-3.5 md:px-7">
+        <div class="flex gap-4 justify-end items-center ">
+          <button @click="showCreateMemberModal = true"
+            class="hidden ty:flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-fit px-3.5 md:px-7 py-3.5 z-10">
+            <p class="font-medium font-base md:text-lg">Neues Mitglied</p>
+          </button>
+          <button @click="showCreateMemberModal = true"
+            class="flex ty:hidden justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+              stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-          </div>
-          </div>
-      </transition>
-    </div>
-    <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
-      <table class="table-auto w-full text-left">
-        <thead>
-          <tr :class="{ 'border-b border-[#D1D5DB]': typeof allMembers !== 'undefined' && allMembers?.length > 0 }">
-            <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium" @click="onClickOnSortByLastname">
-              <span class="flex items-center gap-1">
-                <SortIcon :index="indexSort.lastname"></SortIcon>
-                Name
-              </span>
-            </th>
-            <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
-              @click="onClickOnSortByFirstname">
-              <span class="flex items-center gap-1">
-                <SortIcon :index="indexSort.firstname"></SortIcon>
-                Vorname
-              </span>
-            </th>
-            <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
-              <span class="hidden md:flex items-center gap-1 ">
-                <SortIcon :index="indexSort.birthday"></SortIcon>
-                Geburtstag
-              </span>
-              <span class="flex md:hidden items-center gap-1 ">
-                <SortIcon :index="indexSort.birthday"></SortIcon>
-                Geb.
-              </span>
-            </th>
-            <th scope="col" class="pb-2.5 font-medium w-full"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="member in searchResults" :key="member.id" @click="openEditMember(member.id)"
-            class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-            <!--Lastname-->
-            <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
-              <p class="">{{ member.lastname }}</p>
-            </td>
-            <!--Firstname-->
-            <td class="px-3 md:px-4 w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-              <p class="">{{ member.firstname }}</p>
-            </td>
-            <!--Birthday-->
-            <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
-              <p class="text-light-gray">{{
-                new Date(member.birthday).toLocaleDateString('de-DE', {
-                  year: '2-digit', month:
-                    '2-digit', day: '2-digit'
-                })
-              }}</p>
-            </td>
-            <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
-              <!--Arrow Right-->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+          </button>
+          <button @click="showSearchBar = !showSearchBar"
+            class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+              stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+          </button>
+        </div>
+        <transition enter-active-class="transition ease-linear duration-200" enter-from-class="-translate-y-9"
+          enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
+          leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
+          <div class="flex items-center gap-4" v-show="showSearchBar">
+            <TextInput name="firstname" placeholder="Suche..." :showError="searchError" @onChange="(str) => search(str)"
+              ref="searchBar">
+            </TextInput>
+            <div class="px-3.5 py-3.5" @click="$refs.searchBar.input = ''">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
-        class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+            </div>
+          </div>
+        </transition>
+      </div>
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+        <table class="table-auto w-full text-left">
+          <thead>
+            <tr :class="{ 'border-b border-[#D1D5DB]': typeof allMembers !== 'undefined' && allMembers?.length > 0 }">
+              <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium" @click="onClickOnSortByLastname">
+                <span class="flex items-center gap-1">
+                  <SortIcon :index="indexSort.lastname"></SortIcon>
+                  Name
+                </span>
+              </th>
+              <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
+                @click="onClickOnSortByFirstname">
+                <span class="flex items-center gap-1">
+                  <SortIcon :index="indexSort.firstname"></SortIcon>
+                  Vorname
+                </span>
+              </th>
+              <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
+                <span class="hidden md:flex items-center gap-1 ">
+                  <SortIcon :index="indexSort.birthday"></SortIcon>
+                  Geburtstag
+                </span>
+                <span class="flex md:hidden items-center gap-1 ">
+                  <SortIcon :index="indexSort.birthday"></SortIcon>
+                  Geb.
+                </span>
+              </th>
+              <th scope="col" class="pb-2.5 font-medium w-full"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="member in searchResults" :key="member.id" @click="openEditMember(member.id)"
+              class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+              <!--Lastname-->
+              <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
+                <p class="">{{ member.lastname }}</p>
+              </td>
+              <!--Firstname-->
+              <td class="px-3 md:px-4 w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                <p class="">{{ member.firstname }}</p>
+              </td>
+              <!--Birthday-->
+              <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
+                <p class="text-light-gray">{{
+                  new Date(member.birthday).toLocaleDateString('de-DE', {
+                    year: '2-digit', month:
+                      '2-digit', day: '2-digit'
+                  })
+                }}</p>
+              </td>
+              <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                <!--Arrow Right-->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                  stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                </svg>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
+          class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+      </div>
     </div>
+    <ModalDialog :show="showCreateMemberModal" :hasSubheader="false" @onClose="cancel">
+      <template #header>
+        <p class="text-xl md:text-2xl">Neuen Teilnehmer</p>
+      </template>
+      <template #content>
+        <div class="flex flex-col justify-center items-center gap-4">
+
+          <!--Vorname des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="firstname" class="hidden sm:block">Vorname:</label>
+            <TextInput name="firstname" v-model="newMember.firstname" placeholder="Vorname" :showError="error.cause.firstnameInput"
+              class="md:w-96"></TextInput>
+          </div>
+
+          <!--Nachname des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="lastname" class="hidden sm:block">Nachname:</label>
+            <TextInput name="lastname" v-model="newMember.lastname" placeholder="Nachname" :showError="error.cause.lastnameInput"
+              class="md:w-96"></TextInput>
+          </div>
+
+          <!--Geburtstag des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="birthday" class=""><span class="hidden sm:block">Geburtstag:</span><span
+                class="block sm:hidden">Geb.:</span></label>
+            <DateInput v-model="newMember.birthday" name="birthday" :max="new Date().toJSON().slice(0, 10)"
+              class="font-medium md:w-96" :showError="error.cause.birthdayInput">
+            </DateInput>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-4">
+                <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+                <div class="flex justify-between items-center gap-6 ">
+                    <button @click="cancel"
+                        class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
+                        <p class="font-medium font-base md:text-lg">Abbrechen</p>
+                    </button>
+                    <button @click="createNewMEmber"
+                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                        <p class="font-medium font-base md:text-lg">Erstellen</p>
+                    </button>
+                </div>
+            </div>
+      </template>
+    </ModalDialog>
   </div>
 </template>
   
@@ -102,6 +158,9 @@ import { fetchGroups, updateMemberInGroup, removeMemberFromGroup, fetchGroup } f
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
+import ModalDialog from '@/components/ModalDialog.vue';
+import DateInput from '@/components/DateInput.vue';
+import ErrorMessage from '@/components/ErrorMessage.vue';
 
 export default {
   name: "EditMembersView",
@@ -245,11 +304,29 @@ export default {
         birthday: 0
       },
       showSearchBar: false,
+      showCreateMemberModal: false,
+      newMember: {
+        firstname: '',
+        lastname: '',
+        birthday: ''
+      },
+      error: {
+        message: '',
+        show: false,
+        cause: {
+          firstnameInput: false,
+          lastnameInput: false,
+          birthdayInput: false
+        }
+      }
     }
   },
   components: {
     SortIcon,
-    TextInput
+    TextInput,
+    ModalDialog,
+    DateInput,
+    ErrorMessage
   },
   methods: {
     //^ Start alter Funktionen
@@ -362,6 +439,15 @@ export default {
         } else {
           this.searchResults = this.allMembers
         }
+      }
+    },
+
+    cancel(){
+      this.showCreateMemberModal = false
+      this.newMember = {
+        firstname: '',
+        lastname: '',
+        birthday: ''
       }
     }
   },
