@@ -223,10 +223,10 @@ export default {
             this.allInvoicesInYear = await getAllInvoicesInYear(this.selectedYear);
         },
         goToInvoice(id) {
-            this.$router.push({ path: "/reviewInvoice", query: { id: id } });
+            this.$router.push({ path: "/review-invoice", query: { id: id } });
         },
         createNewInvoice() {
-            this.$router.push({ path: "/createInvoice" });
+            this.$router.push({ path: "/create-invoice" });
         },
         downloadInvoice(id) {
             downloadInvoice(id)

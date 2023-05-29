@@ -93,7 +93,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 				recipients: departmentHeadIDs.map((val) => {
 					return { userID: val, read: false };
 				}),
-				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/reviewInvoice?id=${invoice._id})`,
+				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/review-invoice?id=${invoice._id})`,
 				type: "invoice",
 				data: { invoiceID: invoice._id },
 			});
@@ -221,7 +221,7 @@ const approveInvoice = catchAsync(async (req, res) => {
 			priority: "normal",
 			from: req.user._id,
 			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
-			message: `Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/downloadInvoice?id=${invoice._id})`,
+			message: `Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id})`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});

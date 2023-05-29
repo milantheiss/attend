@@ -2,7 +2,7 @@
 	<div class="mb-40 mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
 
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
-		<nav class="relative container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
+		<nav class="mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
 			v-if="auth.authenticated">
 			<div class="flex justify-between items-center">
 				<!--Menu Icon-->
@@ -71,10 +71,9 @@
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
 					</router-link>
-					<router-link @click="showMenu = !showMenu" to="/editgroup"
-						class="text-left font-medium md:text-2xl text-xl flex items-center group"
-						v-if="auth.user?.lengthAccessibleGroups > 0">
-						Gruppe bearbeiten
+					<router-link @click="showMenu = !showMenu" to="/administration"
+						class="text-left font-medium md:text-2xl text-xl flex items-center group">
+						Verwaltung
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
 							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">

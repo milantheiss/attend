@@ -25,19 +25,7 @@ const routes = [
     component: () => import('../views/LogoutView.vue'),
   },
   {
-    path: '/exportpdf',
-    name: 'ExportPdf',
-    component: () => import('../views/ExportPdf.vue'),
-    meta: { requiresAuth: true, requiresGroup: true }
-  },
-  {
-    path: '/editgroup',
-    name: 'EditGroup',
-    component: () => import('../views/EditGroupView.vue'),
-    meta: { requiresAuth: true, requiresGroup: true }
-  },
-  {
-    path: "/createInvoice",
+    path: "/create-invoice",
     name: "CreateInvoice",
     component: () => import("../views/CreateInvoiceView.vue"),
     meta: { requiresAuth: true, requiresGroup: true }
@@ -55,15 +43,45 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: "/reviewInvoice",
+    path: "/review-invoice",
     name: "ReviewInvoice",
     component: () => import("../views/ReviewInvoiceView.vue"),
     meta: { requiresAuth: true }
   },
   {
-    path: "/downloadInvoice",
+    path: "/download-invoice",
     name: "DownloadInvoice",
     component: () => import("../views/DownloadInvoiceView.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/administration",
+    component: () => import("../views/AdministrationView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/administration/members",
+    component: () => import("../views/EditMembersView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/administration/groups",
+    component: () => import("../views/EditGroupsView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/administration/users",
+    component: () => import("../views/EditUsersView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/administration/issues-overview",
+    component: () => import("../views/IssuesOverviewView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/editgroup",
+    component: () => import("../views/EditGroupView.vue"),
     meta: { requiresAuth: true }
   }
 ]

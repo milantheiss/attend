@@ -1,8 +1,8 @@
 <template>
     <input class="block
                         w-full
-                        px-1.5 py-0.5
-                        text-inherit text-lg md:text-xl
+                        px-1.5 bg-inherit
+                        text-lg md:text-xl
                         focus:ring-0 focus:border-standard-gradient-1
                         focus:transition-none
                         ease-in-out duration-200"
@@ -36,10 +36,18 @@ export default {
     watch: {
         input() {
             this.$emit('update:modelValue', this.input)
+            this.$emit('onChange', this.input)
         },
         modelValue(newVal) {
             this.input = newVal
         }
-    }
+    },
+    expose: ["input"]
 };
 </script>
+<style scoped>
+input{
+    padding-bottom: 0.25rem;
+    line-height: 0rem;
+}
+</style>
