@@ -1,5 +1,6 @@
 const express = require('express');
 const groupRoute = require('./group.route');
+const membersRoute = require('./members.route');
 const memberRoute = require('./member.route');
 const attendanceRoute = require('./attendance.route')
 const loginRoute = require('./login.route')
@@ -16,12 +17,13 @@ const defaultRoutes = [
         path: '/groups',
         route: groupRoute,
     },
-
-    //WARNING Unused
-    //TODO Auth und Access Controll hinzufügen
+    {
+        path: '/member',
+        route: memberRoute,
+    },
     {
         path: '/members',
-        route: memberRoute,
+        route: membersRoute,
     },
     {
         path: '/attendance',

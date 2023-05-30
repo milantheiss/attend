@@ -134,7 +134,7 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
         members[0]._doc.groups.push(group._id)
 
         await members[0].save()
-        
+
         //Hier muss _doc zurückgegeben werden, da die Daten sonst verschachtelt sind
         return members[0]._doc
     }
@@ -153,10 +153,30 @@ const updateMember = async (memberBody) => {
     return member
 }
 
+const createMember = async (memberBody) => {
+    memberBody = {
+        ...memberBody,
+        birthday: new Date(memberBody.birthday),
+        openIssues: [],
+        groups: [],
+        departments: []
+    }
+
+    const member = await Member.create(memberBody)
+
+    return member
+}
+
+const deleteMember = async (id) => {
+    const member = await Member.findByIdAndDelete(id)
+    return member
+}
 
 module.exports = {
     getMembers,
     getMemberById,
     handleNewMemberEvent,
-    updateMember
+    updateMember,
+    createMember,
+    deleteMember
 };

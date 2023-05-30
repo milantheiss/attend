@@ -170,13 +170,47 @@ async function updateMemberInGroup(groupID, body) {
 	);
 }
 
+async function createNewMember(body){
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "member"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), {raw: true}
+	);
+	
+	return {status: res.status, body: await res.json()}
+}
+
+async function deleteMember(memberId){
+	if (!memberId) throw new Error("No memberId provided")
+	if (typeof memberId === "undefined") throw new Error("memberId must be defined")
+	if (typeof memberId !== "string") throw new Error("memberId must be a string")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "member", memberId].join("/"), {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), {raw: true}
+	);
+
+	return {status: res.status, body: await res.json()}
+}
+
 async function updateMember(body) {
 	if (typeof body === "undefined") throw new Error("body must be defined")
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "members", "update"].join("/"), {
-			method: "POST",
+		fetch([import.meta.env.VITE_API_URL, "member"].join("/"), {
+			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),
 			credentials: "include",
@@ -489,5 +523,7 @@ export {
 	rejectInvoice,
 	getAllInvoicesInYear,
 	getAllMembers,
-	updateMember
+	updateMember,
+	createNewMember,
+	deleteMember
 };

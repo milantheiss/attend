@@ -190,7 +190,7 @@
                 <p>Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in  editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
+                <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
@@ -200,6 +200,17 @@
                 </div>
               </template>
             </CollapsibleContainer>
+          </div>
+          <div class="w-full flex items-center justify-between gap-4 mt-4">
+            <p class="">Mitglied löschen:</p>
+            <button @click="showDeleteButton = true" v-show="!showDeleteButton"
+              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3">
+              <p class="font-medium font-base md:text-lg">Löschen</p>
+            </button>
+            <button @click="deleteMember(editMember.id)"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3" v-show="showDeleteButton">
+              <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
+            </button>
           </div>
         </div>
       </template>
@@ -223,7 +234,7 @@
 </template>
   
 <script>
-import { getAllMembers, updateMember, removeMemberFromGroup, getGroupName } from '@/util/fetchOperations'
+import { getAllMembers, updateMember, deleteMember, getGroupName, createNewMember } from '@/util/fetchOperations'
 import _ from "lodash"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
@@ -273,7 +284,8 @@ export default {
           lastnameInput: false,
           birthdayInput: false
         }
-      }
+      },
+      showDeleteButton: false
     }
   },
   components: {
@@ -326,7 +338,7 @@ export default {
      */
     async onClickOnDelete(participantData) {
       //Update DB
-      await removeMemberFromGroup(this.selectedGroup.id, participantData.memberId)
+      // await removeMemberFromGroup(this.selectedGroup.id, participantData.memberId)
 
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.filter(p => p.memberId !== participantData.memberId)
@@ -401,11 +413,14 @@ export default {
     cancel() {
       this.showCreateMemberModal = false
       this.showEditMemberModal = false
+      this.showDeleteButton = false
+
       this.newMember = {
         firstname: '',
         lastname: '',
         birthday: ''
       }
+
       this.editMember = {
         firstname: '',
         lastname: '',
@@ -413,6 +428,7 @@ export default {
         id: '',
         groups: []
       }
+
       this.resetError()
     },
 
@@ -440,21 +456,29 @@ export default {
 
       if (!this.error.show) {
         //Create Member --> POST
+        //TODO Implement POST request
+        const res = await createNewMember(this.newMember)
+        if (res.status === 201) {
+          //Update Member --> PUT
+          this.getAllMembers()
+          this.resetError()
 
-        this.getAllMembers()
-
-        this.resetError()
+          this.showCreateMemberModal = false
+        } else {
+          this.error.message = 'Es ist ein Fehler aufgetreten.'
+          this.error.show = true
+        }
       }
     },
 
     async saveEditedMember() {
       this.resetError()
 
-      // if (this.editMember.firstname.trim().length === 0) {
-      //   this.error.message = 'Bitte gebe einen Vornamen ein.'
-      //   this.error.show = true
-      //   this.error.cause.firstnameInput = true
-      // }
+      if (this.editMember.firstname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
       if (this.editMember.lastname.trim().length === 0) {
         this.error.message = 'Bitte gebe einen Nachnamen ein.'
         this.error.show = true
@@ -480,7 +504,7 @@ export default {
             ...this.editMember,
             groups: this.editMember.groups.map(g => g.id)
           })
-          if(res.status === 200){
+          if (res.status === 200) {
             //Update Member --> PUT
             this.getAllMembers()
             this.resetError()
@@ -491,6 +515,18 @@ export default {
             this.error.show = true
           }
         }
+      }
+    },
+
+    async deleteMember(id) {
+      const res = await deleteMember(id)
+      if (res.status === 200) {
+        //Update Member --> PUT
+        this.getAllMembers()
+        this.cancel()
+      } else {
+        this.error.message = 'Es ist ein Fehler aufgetreten.'
+        this.error.show = true
       }
     },
 
@@ -512,7 +548,7 @@ export default {
       this.allMembers = (await getAllMembers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
     },
 
-    resetError(){
+    resetError() {
       this.error.show = false
       this.error.cause.firstnameInput = false
       this.error.cause.lastnameInput = false
