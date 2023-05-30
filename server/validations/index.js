@@ -1,0 +1,1 @@
+module.exports.memberValidation = require('./member.validation');

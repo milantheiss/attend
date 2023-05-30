@@ -3,6 +3,7 @@ const trainer = "trainer"
 const assistant = "assistant"
 const developer = "developer"
 const departmentHead = "head"
+const staff = "staff"
 
 /**
  * Checks if user has access to group.
@@ -36,11 +37,16 @@ function hasDepartmentHeadRole(user){
     return user.roles.includes(departmentHead)
 }
 
+function hasStaffAccess(user){
+    return hasAdminRole(user) || user.roles.includes(staff)
+}
+
 module.exports = {
     hasAccessToGroup,
     hasAdminRole,
     hasTrainerRole,
     hasAssistantRole,
     hasDeveloperRole,
-    hasDepartmentHeadRole
+    hasDepartmentHeadRole,
+    hasStaffAccess
 }

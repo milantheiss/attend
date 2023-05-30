@@ -1,4 +1,5 @@
 const logger = require('../config/logger')
+const Group = require('../models/group.model')
 const {groupService} = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
@@ -29,12 +30,18 @@ const searchGroups = catchAsync(async (req, res) => {
     res.send(await groupService.searchGroups(req.user, req.body))
 })
 
+const getGroupName = catchAsync(async (req, res) => {
+    const group = await Group.findById(req.params.groupID, {name: 1})
+    res.send(group)
+})
+
 module.exports = {
     getGroups,
     getGroupById,
     createGroup,
     updateMember,
     removeMember,
-    searchGroups
+    searchGroups,
+    getGroupName
 }
 

@@ -9,8 +9,8 @@
           </button>
           <button @click="showCreateMemberModal = true"
             class="flex ty:hidden justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-              stroke="currentColor" class="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"
+              class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </button>
@@ -27,8 +27,7 @@
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="firstname" placeholder="Suche..." :showError="searchError" @onChange="(str) => search(str)"
-              ref="searchBar">
+            <TextInput name="firstname" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
             </TextInput>
             <div class="px-3.5 py-3.5" @click="$refs.searchBar.input = ''">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -103,6 +102,8 @@
           class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
       </div>
     </div>
+
+    <!-- Create New Member Modal -->
     <ModalDialog :show="showCreateMemberModal" :hasSubheader="false" @onClose="cancel">
       <template #header>
         <p class="text-xl md:text-2xl">Neuen Teilnehmer</p>
@@ -113,15 +114,15 @@
           <!--Vorname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
             <label for="firstname" class="hidden sm:block">Vorname:</label>
-            <TextInput name="firstname" v-model="newMember.firstname" placeholder="Vorname" :showError="error.cause.firstnameInput"
-              class="md:w-96"></TextInput>
+            <TextInput name="firstname" v-model="newMember.firstname" placeholder="Vorname"
+              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Nachname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
             <label for="lastname" class="hidden sm:block">Nachname:</label>
-            <TextInput name="lastname" v-model="newMember.lastname" placeholder="Nachname" :showError="error.cause.lastnameInput"
-              class="md:w-96"></TextInput>
+            <TextInput name="lastname" v-model="newMember.lastname" placeholder="Nachname"
+              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Geburtstag des Teilnehmers-->
@@ -136,31 +137,101 @@
       </template>
       <template #footer>
         <div class="flex flex-col gap-4">
-                <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
-                <div class="flex justify-between items-center gap-6 ">
-                    <button @click="cancel"
-                        class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
-                        <p class="font-medium font-base md:text-lg">Abbrechen</p>
-                    </button>
-                    <button @click="createNewMEmber"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-                        <p class="font-medium font-base md:text-lg">Erstellen</p>
-                    </button>
+          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+          <div class="flex justify-between items-center gap-6 ">
+            <button @click="cancel"
+              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
+              <p class="font-medium font-base md:text-lg">Abbrechen</p>
+            </button>
+            <button @click="createNewMember"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+              <p class="font-medium font-base md:text-lg">Erstellen</p>
+            </button>
+          </div>
+        </div>
+      </template>
+    </ModalDialog>
+
+    <!-- Edit Member Modal -->
+    <ModalDialog :show="showEditMemberModal" :hasSubheader="false" @onClose="cancel">
+      <template #header>
+        <p class="text-xl md:text-2xl">Bearbeiten</p>
+      </template>
+      <template #content>
+        <div class="flex flex-col justify-center items-center gap-4">
+
+          <!--Vorname des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="firstname" class="hidden sm:block">Vorname:</label>
+            <TextInput name="firstname" v-model="editMember.firstname" placeholder="Vorname"
+              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
+          </div>
+
+          <!--Nachname des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="lastname" class="hidden sm:block">Nachname:</label>
+            <TextInput name="lastname" v-model="editMember.lastname" placeholder="Nachname"
+              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
+          </div>
+
+          <!--Geburtstag des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="birthday" class=""><span class="hidden sm:block">Geburtstag:</span><span
+                class="block sm:hidden">Geb.:</span></label>
+            <DateInput v-model="editMember.birthday" name="birthday" :max="new Date().toJSON().slice(0, 10)"
+              class="font-medium md:w-96" :showError="error.cause.birthdayInput">
+            </DateInput>
+          </div>
+
+          <!--Gruppen des Teilnehmers-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <CollapsibleContainer>
+              <template #header>
+                <p>Gruppen</p>
+              </template>
+              <template #content>
+                <div v-for="group in  editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
+                  <p>{{ group.name }}</p>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor" class="w-8 h-8 -mr-[2px]"
+                    @click="editMember.groups = editMember.groups.filter(e => e.id !== group.id)">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </div>
-            </div>
+              </template>
+            </CollapsibleContainer>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-4">
+          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+          <div class="flex justify-between items-center gap-6 ">
+            <button @click="cancel"
+              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
+              <p class="font-medium font-base md:text-lg">Abbrechen</p>
+            </button>
+            <button @click="saveEditedMember"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+              <p class="font-medium font-base md:text-lg">Speichern</p>
+            </button>
+          </div>
+        </div>
       </template>
     </ModalDialog>
   </div>
 </template>
   
 <script>
-import { fetchGroups, updateMemberInGroup, removeMemberFromGroup, fetchGroup } from '@/util/fetchOperations'
+import { getAllMembers, updateMember, removeMemberFromGroup, getGroupName } from '@/util/fetchOperations'
+import _ from "lodash"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
 import DateInput from '@/components/DateInput.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
+import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
 
 export default {
   name: "EditMembersView",
@@ -172,131 +243,7 @@ export default {
   },
   data() {
     return {
-      allMembers: [
-        {
-          _id: "62a20277c0176cd5bb8cfe84",
-          firstname: "Paula",
-          lastname: "Reichert",
-          birthday: "2012-09-21T00:00:00.000Z",
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "62c5c117b71ac26b2896f683"
-          ,
-          firstname: "Anna",
-          lastname: "Achilles",
-          birthday: "2013-04-09T00:00:00.000Z",
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "62c5d144b07b3633590e92ce"
-          ,
-          firstname: "Marlene",
-          lastname: "Rübsamen",
-          birthday: "2013-03-02T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "62c5d144b07b3633590e92ca"
-          ,
-          firstname: "Johanna",
-          lastname: "Habenicht",
-          birthday: "2012-12-15T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "62c5d144b07b3633590e92d0"
-          ,
-          firstname: "Pauline",
-          lastname: "Steiger",
-          birthday: "2012-06-09T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "6335c735da8f102d11c7bbe1"
-          ,
-          firstname: "Paula",
-          lastname: "Schmitt",
-          birthday: "2012-03-29T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "636416053bab0b03effe2427"
-          ,
-          firstname: "Jannis",
-          lastname: "Löffler",
-          birthday: "2013-12-11T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "636416383bab0b03effe24c1"
-          ,
-          firstname: "Mina",
-          lastname: "Schäfer",
-          birthday: "2013-04-28T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        },
-        {
-          _id: "6384dd9859313c453afc648b"
-          ,
-          firstname: "Maha",
-          lastname: "Dahbi",
-          birthday: "2013-09-03T00:00:00.000Z"
-          ,
-          departments: [
-            "62a61af829e45c479f708601"
-          ],
-          groups: [
-            "62a2022bc0176cd5bb8cfe80"
-          ]
-        }
-      ],
+      allMembers: [],
       searchResults: [],
       indexSort: {
         lastname: 0,
@@ -305,10 +252,18 @@ export default {
       },
       showSearchBar: false,
       showCreateMemberModal: false,
+      showEditMemberModal: false,
       newMember: {
         firstname: '',
         lastname: '',
         birthday: ''
+      },
+      editMember: {
+        firstname: '',
+        lastname: '',
+        birthday: '',
+        id: '',
+        groups: []
       },
       error: {
         message: '',
@@ -326,7 +281,8 @@ export default {
     TextInput,
     ModalDialog,
     DateInput,
-    ErrorMessage
+    ErrorMessage,
+    CollapsibleContainer
   },
   methods: {
     //^ Start alter Funktionen
@@ -348,7 +304,7 @@ export default {
      */
     async onClickOnSave(participantData) {
       //Update DB
-      await updateMemberInGroup(this.selectedGroup.id, participantData)
+      // await updateMemberInGroup(this.selectedGroup.id, participantData)
 
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.map(p => {
@@ -442,34 +398,139 @@ export default {
       }
     },
 
-    cancel(){
+    cancel() {
       this.showCreateMemberModal = false
+      this.showEditMemberModal = false
       this.newMember = {
         firstname: '',
         lastname: '',
         birthday: ''
       }
+      this.editMember = {
+        firstname: '',
+        lastname: '',
+        birthday: '',
+        id: '',
+        groups: []
+      }
+      this.resetError()
+    },
+
+    async createNewMember() {
+      this.resetError()
+
+      if (this.newMember.firstname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
+      if (this.newMember.lastname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+      if (this.newMember.birthday.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Geburtstag ein.'
+        this.error.show = true
+        this.error.cause.birthdayInput = true
+      }
+      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (!this.error.show) {
+        //Create Member --> POST
+
+        this.getAllMembers()
+
+        this.resetError()
+      }
+    },
+
+    async saveEditedMember() {
+      this.resetError()
+
+      // if (this.editMember.firstname.trim().length === 0) {
+      //   this.error.message = 'Bitte gebe einen Vornamen ein.'
+      //   this.error.show = true
+      //   this.error.cause.firstnameInput = true
+      // }
+      if (this.editMember.lastname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+      if (this.editMember.birthday.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Geburtstag ein.'
+        this.error.show = true
+        this.error.cause.birthdayInput = true
+      }
+      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (!this.error.show) {
+        const oldEntry = this.allMembers.find(m => m.id === this.editMember.id)
+
+        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname && this.editMember.birthday === oldEntry.birthday.slice(0, 10) && this.editMember.groups.length === oldEntry.groups.length) {
+          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
+          this.error.show = true
+        } else {
+          const res = await updateMember({
+            ...this.editMember,
+            groups: this.editMember.groups.map(g => g.id)
+          })
+          if(res.status === 200){
+            //Update Member --> PUT
+            this.getAllMembers()
+            this.resetError()
+
+            this.showEditMemberModal = false
+          } else {
+            this.error.message = 'Es ist ein Fehler aufgetreten.'
+            this.error.show = true
+          }
+        }
+      }
+    },
+
+    async openEditMember(id) {
+      //Deep Copy, damit Änderungen nicht direkt übernommen werden
+      this.editMember = _.cloneDeep(this.allMembers.find(m => m.id === id))
+
+      this.editMember.birthday = this.editMember.birthday.slice(0, 10)
+
+      this.editMember.groups = await Promise.all(this.editMember.groups.map(async g => {
+        //GET getGroupName fetch request
+        return getGroupName(g)
+      }))
+
+      this.showEditMemberModal = true
+    },
+
+    async getAllMembers() {
+      this.allMembers = (await getAllMembers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
+    },
+
+    resetError(){
+      this.error.show = false
+      this.error.cause.firstnameInput = false
+      this.error.cause.lastnameInput = false
+      this.error.cause.birthdayInput = false
+      this.error.message = ''
     }
   },
 
   async created() {
-    this.groups = await fetchGroups()
     document.title = 'Mitglieder bearbeiten - Attend'
     this.dataStore.viewname = "Mitglieder bearbeiten"
 
-    this.searchResults = this.allMembers
+    this.getAllMembers()
   },
 
   watch: {
-    /**
-     * Watcher für selectedGroup.
-     * Wenn selectedGroup geändert wird, wird der Titel der Seite angepasst.
-     */
-    selectedGroup: async function (newVal) {
-      if (typeof newVal !== 'undefined') {
-        document.title = newVal.name + ' bearbeiten - Attend'
-        this.groupData = await fetchGroup(newVal.id)
-      }
+    allMembers() {
+      this.searchResults = this.allMembers
     }
   }
 }

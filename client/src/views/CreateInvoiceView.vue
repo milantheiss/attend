@@ -223,6 +223,7 @@
 </template>
 
 <script>
+import _ from "lodash"
 import { fetchDataForNewInvoice, fetchGroups, sendInvoice } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import DateInput from "@/components/DateInput.vue";
@@ -405,7 +406,7 @@ export default {
                 })
             } else if (this.sortMode === "weekday") {
                 //Make deep copy of trainingssessions
-                let t = JSON.parse(JSON.stringify(trainingssessions))
+                let t = _.cloneDeep(trainingssessions)
 
                 t.sort((a, b) => {
                     return new Date(a.date) - new Date(b.date)

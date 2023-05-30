@@ -141,19 +141,13 @@ const handleNewMemberEvent = async (user, group, memberBody) => {
 }
 
 const updateMember = async (memberBody) => {
+    let member = await Member.findById(memberBody.id)
 
-    const id = memberBody._id || memberBody.memberId
+    member.firstname = memberBody.firstname
+    member.lastname = memberBody.lastname
+    member.birthday = new Date(memberBody.birthday)
 
-    //INFO Dates müssen als Date Objekt gespeichert werden. Wenn der MemberBody direkt aus einer Request kommt, sind Daten ein String.
-
-    if (typeof memberBody.birthday !== undefined) {
-        memberBody.birthday = new Date(memberBody.birthday)
-    }
-
-    let member = await Member.findOne({ _id: id })
-
-    member.overwrite(memberBody)
-
+    //TODO Überprüfen ob eine Gruppe entfernt/hinzugefügt wurde --> Dann Member in Gruppe hinzu/entfernen
     await member.save()
 
     return member

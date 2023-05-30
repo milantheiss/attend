@@ -47,6 +47,7 @@ export default {
 </script>
 <style scoped>
 input{
+    padding-top: 0.25rem;
     padding-bottom: 0.25rem;
     line-height: 0rem;
 }

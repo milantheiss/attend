@@ -28,9 +28,9 @@ async function fetchGroups() {
 }
 
 async function fetchGroup(groupID) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "groups", groupID].join("/"), {
@@ -41,9 +41,9 @@ async function fetchGroup(groupID) {
 }
 
 async function fetchAttendance(groupID) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID].join("/"), {
@@ -54,12 +54,12 @@ async function fetchAttendance(groupID) {
 }
 
 async function fetchAttendanceByDate(groupID, date) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
-	if(!date) throw new Error("No date provided")
-	if(typeof date === "undefined") throw new Error("date must be defined")
+	if (!date) throw new Error("No date provided")
+	if (typeof date === "undefined") throw new Error("date must be defined")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
@@ -70,15 +70,15 @@ async function fetchAttendanceByDate(groupID, date) {
 }
 
 async function updateTrainingssession(groupID, date, body) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
-	if(!date) throw new Error("No date provided")
-	if(typeof date === "undefined") throw new Error("date must be defined")
-	
-	if(typeof body === "undefined") throw new Error("body must be defined")
-	if(Object.keys(body).length === 0) throw new Error("body must not be empty")
+	if (!date) throw new Error("No date provided")
+	if (typeof date === "undefined") throw new Error("date must be defined")
+
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join("/"), {
@@ -113,15 +113,15 @@ async function updateTrainingssession(groupID, date, body) {
 // }
 
 async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
-	if(!startdate) throw new Error("No startdate provided")
-	if(typeof startdate === "undefined") throw new Error("startdate must be defined")
+	if (!startdate) throw new Error("No startdate provided")
+	if (typeof startdate === "undefined") throw new Error("startdate must be defined")
 
-	if(!enddate) throw new Error("No enddate provided")
-	if(typeof enddate === "undefined") throw new Error("enddate must be defined")
+	if (!enddate) throw new Error("No enddate provided")
+	if (typeof enddate === "undefined") throw new Error("enddate must be defined")
 
 	return await watchForRedirects(
 		fetch(
@@ -137,13 +137,13 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 	);
 }
 
-async function fetchGroupData(groupID) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("group must be a string")
+async function getGroupName(groupID) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("groupID must be a string")
 
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "getData"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "getGroupName"].join("/"), {
 			method: "GET",
 			credentials: "include",
 			mode: "cors",
@@ -152,12 +152,12 @@ async function fetchGroupData(groupID) {
 }
 
 async function updateMemberInGroup(groupID, body) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
-	
-	if(typeof body === "undefined") throw new Error("body must be defined")
-	if(Object.keys(body).length === 0) throw new Error("body must not be empty")
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "updateMember"].join("/"), {
@@ -170,14 +170,31 @@ async function updateMemberInGroup(groupID, body) {
 	);
 }
 
-async function removeMemberFromGroup(groupID, memberID) {
-	if(!groupID) throw new Error("No groupID provided")
-	if(typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if(typeof groupID !== "string") throw new Error("notificationID must be a string")
+async function updateMember(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
-	if(!memberID) throw new Error("No memberID provided")
-	if(typeof memberID === "undefined") throw new Error("memberID must be defined")
-	if(typeof memberID !== "string") throw new Error("notificationID must be a string")
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "members", "update"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), {raw: true}
+	);
+	
+	return {status: res.status, body: await res.json()}
+}
+
+async function removeMemberFromGroup(groupID, memberID) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	if (!memberID) throw new Error("No memberID provided")
+	if (typeof memberID === "undefined") throw new Error("memberID must be defined")
+	if (typeof memberID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "removeMember", memberID].join("/"), {
@@ -212,14 +229,14 @@ async function getLastPatchNotes() {
  * @returns
  */
 async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
-	if(typeof groupIDs === "undefined") throw new Error("groupIDs must be defined")
-	if(groupIDs.length === 0) throw new Error("No groupIDs provided")
-	
-	if(!startdate) throw new Error("No startdate provided")
-	if(typeof startdate === "undefined") throw new Error("startdate must be defined")
+	if (typeof groupIDs === "undefined") throw new Error("groupIDs must be defined")
+	if (groupIDs.length === 0) throw new Error("No groupIDs provided")
 
-	if(!enddate) throw new Error("No enddate provided")
-	if(typeof enddate === "undefined") throw new Error("enddate must be defined")
+	if (!startdate) throw new Error("No startdate provided")
+	if (typeof startdate === "undefined") throw new Error("startdate must be defined")
+
+	if (!enddate) throw new Error("No enddate provided")
+	if (typeof enddate === "undefined") throw new Error("enddate must be defined")
 
 	const res = await watchForRedirects(
 		fetch(
@@ -243,8 +260,8 @@ async function fetchDataForNewInvoice(groupIDs, startdate, enddate) {
  * @returns
  */
 async function sendInvoice(body) {
-	if(typeof body === "undefined") throw new Error("body must be defined")
-	if(Object.keys(body).length === 0) throw new Error("body must not be empty")
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/invoice/submit`, {
@@ -269,9 +286,9 @@ async function getNotifications() {
 }
 
 async function setNotificationAsRead(notificationID) {
-	if(!notificationID) throw new Error("No notificationID provided")
-	if(typeof notificationID === "undefined") throw new Error("notificationID must be defined")
-	if(typeof notificationID !== "string") throw new Error("notificationID must be a string")
+	if (!notificationID) throw new Error("No notificationID provided")
+	if (typeof notificationID === "undefined") throw new Error("notificationID must be defined")
+	if (typeof notificationID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/notification/read?id=${notificationID}`, {
@@ -293,9 +310,9 @@ async function setAllNotificationsAsRead() {
 }
 
 async function deleteNotification(notificationID) {
-	if(!notificationID) throw new Error("No notificationID provided")
-	if(typeof notificationID === "undefined") throw new Error("notificationID must be defined")
-	if(typeof notificationID !== "string") throw new Error("notificationID must be a string")
+	if (!notificationID) throw new Error("No notificationID provided")
+	if (typeof notificationID === "undefined") throw new Error("notificationID must be defined")
+	if (typeof notificationID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/notification/delete?id=${notificationID}`, {
@@ -317,9 +334,9 @@ async function deleteAllNotifications() {
 }
 
 async function setNotificationAsUnread(notificationID) {
-	if(!notificationID) throw new Error("No notificationID provided")
-	if(typeof notificationID === "undefined") throw new Error("notificationID must be defined")
-	if(typeof notificationID !== "string") throw new Error("notificationID must be a string")
+	if (!notificationID) throw new Error("No notificationID provided")
+	if (typeof notificationID === "undefined") throw new Error("notificationID must be defined")
+	if (typeof notificationID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/notification/unread?id=${notificationID}`, {
@@ -340,9 +357,9 @@ async function setAllNotificationsAsUnread() {
 	);
 }
 
-async function deleteManyNotifications(notificationIDs){
-	if(typeof notificationIDs === "undefined") throw new Error("notificationIDs must be defined")
-	if(notificationIDs.length === 0) throw new Error("No notificationIDs provided")
+async function deleteManyNotifications(notificationIDs) {
+	if (typeof notificationIDs === "undefined") throw new Error("notificationIDs must be defined")
+	if (notificationIDs.length === 0) throw new Error("No notificationIDs provided")
 
 	let ids = notificationIDs.join("&ids[]=");
 
@@ -358,9 +375,9 @@ async function deleteManyNotifications(notificationIDs){
 }
 
 async function setManyNotificationsAsRead(notificationIDs) {
-	if(typeof notificationIDs === "undefined") throw new Error("notificationIDs must be defined")
+	if (typeof notificationIDs === "undefined") throw new Error("notificationIDs must be defined")
 
-	if(notificationIDs.length === 0) throw new Error("No notificationIDs provided");
+	if (notificationIDs.length === 0) throw new Error("No notificationIDs provided");
 
 	let ids = notificationIDs.join("&ids[]=");
 
@@ -416,9 +433,9 @@ async function rejectInvoice(id) {
 }
 
 async function getAllInvoicesInYear(year) {
-	if(typeof year === "undefined") throw new Error("year must be defined")
+	if (typeof year === "undefined") throw new Error("year must be defined")
 
-	if(typeof year === Number) throw new Error("Year must be a number");
+	if (typeof year === Number) throw new Error("Year must be a number");
 
 	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/invoice/getAllInYear/${year}`, {
@@ -429,6 +446,21 @@ async function getAllInvoicesInYear(year) {
 	);
 }
 
+async function getAllMembers() {
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/members`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	)
+	if (res.status === 403) {
+		return []	
+	} else {
+		return res.json()
+	}
+}
+
 export {
 	fetchGroup,
 	fetchGroups,
@@ -436,7 +468,7 @@ export {
 	fetchAttendanceByDate,
 	updateTrainingssession,
 	fetchAttendanceByDateRange,
-	fetchGroupData,
+	getGroupName,
 	updateMemberInGroup,
 	removeMemberFromGroup,
 	getLastPatchNotes,
@@ -455,5 +487,7 @@ export {
 	getInvoiceById,
 	approveInvoice,
 	rejectInvoice,
-	getAllInvoicesInYear
+	getAllInvoicesInYear,
+	getAllMembers,
+	updateMember
 };

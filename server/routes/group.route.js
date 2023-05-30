@@ -31,6 +31,10 @@ router
     .patch(verifyToken, groupController.updateMember)
 
 router
+    .route('/:groupID/getGroupName')
+    .get(verifyToken, groupController.getGroupName)
+
+router
     .route('/:groupID/removeMember/:memberID')
     .delete(verifyToken, groupController.removeMember)
 
