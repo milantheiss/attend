@@ -9,14 +9,14 @@ const router = express.Router();
 //TODO Add was geschehen soll wenn gewisse URL mit verschiedenen CRUD Operations angesprochen werden
 router
     .route('/')
-    .put(verifyToken, validate(memberValidation.updateMember), memberController.updateMember)
     //WARNING Nimmt nur Firstname, Lastname und Birthday an
     .post(verifyToken, validate(memberValidation.createMember), memberController.createMember)
-
-
-router
+    
+    
+    router
     .route('/:id')
     .delete(verifyToken, validate(memberValidation.deleteMember), memberController.deleteMember)
+    .put(verifyToken, validate(memberValidation.updateMember), memberController.updateMember)
     .patch(verifyToken, validate(memberValidation.updateMember), memberController.updateMember)
 
 module.exports = router;

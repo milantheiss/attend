@@ -3,6 +3,7 @@ const Group = require('../models/group.model')
 const {groupService} = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
+const { hasStaffAccess, hasTrainerRole, hasAccessToGroup } = require('../utils/roleCheck');
 
 const getGroups = catchAsync(async (req, res) => {
     res.send(await groupService.getGroups(req.user))
@@ -19,11 +20,19 @@ const createGroup = catchAsync(async (req, res) => {
 });
 
 const updateMember = catchAsync(async (req, res) => {
-    res.send(await groupService.updateMember(req.user, req.params.groupID, req.body))
+    if(!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
+        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this group"})
+    }
+    const result = await groupService.updateMember(req.params.groupID, req.body)
+    res.status(httpStatus.OK).send(result)
 })
 
 const removeMember = catchAsync(async (req, res) => {
-    res.send(await groupService.removeMember(req.user, req.params.groupID, req.params.memberID))
+    if(!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
+        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this group"})
+    }
+    const result = await groupService.removeMember(req.params.groupID, req.params.memberID)
+    res.status(httpStatus.OK).send(result)
 })
 
 const searchGroups = catchAsync(async (req, res) => {
@@ -35,6 +44,11 @@ const getGroupName = catchAsync(async (req, res) => {
     res.send(group)
 })
 
+const addMember = catchAsync(async (req, res) => {
+    const result = await groupService.addMember(req.params.groupID, req.body)
+    res.status(httpStatus.OK).send(result)
+})
+
 module.exports = {
     getGroups,
     getGroupById,
@@ -42,6 +56,7 @@ module.exports = {
     updateMember,
     removeMember,
     searchGroups,
-    getGroupName
+    getGroupName,
+    addMember
 }
 

@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const { Attendance, User, Member } = require('../models');
-const { groupService } = require('../services');
+const { groupService } = require('.');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
@@ -163,11 +163,11 @@ const getAttendanceByGroup = async (user, groupID) => {
     if (hasAccessToGroup(user, groupID)) {
         //Admin kann auf alle Listen zugreifen. Trainer kann nur auf Liste zugreifen, wenn er access auf die Gruppe hat.
         try {
-            const _res = await Attendance.findOne({ 'group': groupID })
+            const res = await Attendance.findOne({ 'group': groupID })
 
             //Wenn noch keine Attendance Document existiert, ist _res null
-            if (_res !== null && typeof _res !== 'undefined') {
-                return _res
+            if (res !== null && typeof res !== 'undefined') {
+                return res
             } else { //Erstellt neues Attendance Document
                 return Attendance.create({
                     group: new mongoose.Types.ObjectId(groupID),
@@ -375,6 +375,18 @@ const getFormattedListForAttendanceListPDF = async (user, groupID, startdate, en
     return tempList
 }
 
+const removeMemberFromAttendanceList = async (user, groupID, memberID) => {
+    const attendance = await getAttendanceByGroup(user, groupID)
+
+    attendance.trainingssessions.forEach(session => {
+        session.participants = session.participants.filter(participant => !participant.memberId.equals(memberID))
+    })
+
+    //TODO Implement Garbage Collector
+
+    await attendance.save()
+}
+
 module.exports = {
     getAttendance,
     getAttendanceByGroup,
@@ -385,5 +397,6 @@ module.exports = {
     getTrainingssessionsByDateRange,
     runGarbageCollector,
     getDataForInvoice,
-    getFormattedListForAttendanceListPDF
+    getFormattedListForAttendanceListPDF,
+    removeMemberFromAttendanceList
 };

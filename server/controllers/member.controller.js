@@ -19,7 +19,7 @@ const updateMember = catchAsync(async (req, res) => {
         logger.debug('POST - update member - no access')
         return {status: httpStatus.FORBIDDEN, message: "You have no access to this resource"}
     } 
-    const result = await memberService.updateMember(req.body)
+    const result = await memberService.updateMember(req.params.id, req.body)
 
     res.status(httpStatus.OK).send(result)
 })

@@ -209,7 +209,7 @@ async function updateMember(body) {
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "member"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "member", body.id].join("/"), {
 			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),

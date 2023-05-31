@@ -3,21 +3,21 @@
 const express = require('express');
 const { groupController } = require('../controllers');
 const verifyToken = require('../middlewares/auth');
+const validate = require('../middlewares/validate');
+const { groupValidation } = require('../validations');
 
 const router = express.Router();
 
 router
     .route('/')
-    .get(verifyToken, groupController.getGroups)
-    .post(verifyToken, groupController.createGroup)
-
-router
-    .route("/search")
-    .get(verifyToken, groupController.searchGroups)
+    //WARNING Noch nicht implementiert mit id aus Body
+    // .patch(verifyToken, validate(groupValidation.updateGroup), groupController.updateGroup)
+    .post(verifyToken, validate(groupValidation.createGroup), groupController.createGroup)
 
 router
     .route('/:groupID')
-    .get(verifyToken, groupController.getGroupById)
+    //TODO Query String hinzufügen um nur bestimmte Felder zu bekommen
+    .get(verifyToken, validate(groupValidation.getGroupById), groupController.getGroupById)
 
 //TODO Auth adden + In Service/Controller die returnten Daten auf Permission beschränken
 /*
@@ -27,19 +27,13 @@ router
 */
 
 router
-    .route('/:groupID/updateMember')
-    .patch(verifyToken, groupController.updateMember)
+    .route('/:groupID/member')
+    .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
+    .patch(verifyToken, validate(groupValidation.updateMember), groupController.updateMember)
 
 router
-    .route('/:groupID/getGroupName')
-    .get(verifyToken, groupController.getGroupName)
-
-router
-    .route('/:groupID/removeMember/:memberID')
-    .delete(verifyToken, groupController.removeMember)
-
-//TODO Add capability to update members by /:groupID/addmember
-//Backend soll Teilnehmer Liste ziehen und den neuen Teilnehmer anhängen und dann neue Liste in DB pushen
+    .route('/:groupID/member/:memberID')
+    .delete(verifyToken, validate(groupValidation.removeMember), groupController.removeMember)
 
 module.exports = router;
 

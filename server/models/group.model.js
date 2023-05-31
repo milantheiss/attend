@@ -63,7 +63,8 @@ const groupSchema = mongoose.Schema(
                         trim: true
                     }
                 }
-            ]
+            ],
+            required: true
         },
         venue: {
             type: String,

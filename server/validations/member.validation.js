@@ -1,6 +1,10 @@
 const Joi = require('joi');
 
 const updateMember = {
+  params: Joi.object().keys({
+    //String as ObjectId is required when id is not given in body
+    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+  }),
   body: Joi.object().keys({
     //Es sind alle Groß und Kleinbuchstaben erlaubt
     firstname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
@@ -11,7 +15,7 @@ const updateMember = {
     //Array aus ObjectIds Not required
     groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
     //String als ObjectId
-    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //Array aus ObjectIds Not required
     openIssues: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
     //Array aus ObjectIds Not required Can be empty
