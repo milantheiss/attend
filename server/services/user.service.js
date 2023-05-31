@@ -3,6 +3,7 @@ const { default: mongoose } = require("mongoose");
 const { User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const nanoid = require("nanoid");
+const { groupService } = require(".");
 
 /**
  * Get all members.
@@ -61,6 +62,21 @@ const updateUser = async (userID, updateBody) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
 	}
 
+
+    if (user.accessible_groups.length > updateBody.accessible_groups.length) {
+        //Remove Member from Group
+        const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group))
+        for (groupId of removedGroups) {
+            await groupService.removeTrainer(groupId, user._id)
+        }
+    } else if (user.accessible_groups.length < updateBody.accessible_groups.length) {
+        //Add Member to Group
+        const newGroups = updateBody.accessible_groups.filter(group => !user.accessible_groups.includes(group))
+        for (groupId of newGroups) {
+            await groupService.addTrainer(groupId, {id: user._id, role: user.roles.includes("trainer") ? "trainer" : "assistant"})
+        }
+    }
+
 	Object.assign(user, updateBody);
 	await user.save();
 	return user;
@@ -73,6 +89,10 @@ const deleteUser = async (userID) => {
 	}
 
 	//TODO Delete all groups,notifications, invoices where user is involved
+	for (groupID of user.accessible_groups) {
+		await groupService.deleteTrainer(groupID, userID);
+	}
+
 	await user.remove();
 	return user;
 };

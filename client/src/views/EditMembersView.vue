@@ -55,7 +55,7 @@
                   Vorname
                 </span>
               </th>
-              <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
+              <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
                 <span class="hidden md:flex items-center gap-1 ">
                   <SortIcon :index="indexSort.birthday"></SortIcon>
                   Geburtstag
@@ -80,7 +80,7 @@
                 <p class="">{{ member.firstname }}</p>
               </td>
               <!--Birthday-->
-              <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
+              <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
                 <p class="text-light-gray">{{
                   new Date(member.birthday).toLocaleDateString('de-DE', {
                     year: '2-digit', month:
@@ -187,7 +187,7 @@
           <div class="w-full flex items-center justify-between gap-4">
             <CollapsibleContainer>
               <template #header>
-                <p>Gruppen</p>
+                <p class="font-medium">Gruppen</p>
               </template>
               <template #content>
                 <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
@@ -411,9 +411,7 @@ export default {
         if (res.status === 201) {
           //Update Member --> PUT
           this.getAllMembers()
-          this.resetError()
-
-          this.showCreateMemberModal = false
+          this.cancel()
         } else {
           this.error.message = 'Es ist ein Fehler aufgetreten.'
           this.error.show = true
@@ -446,7 +444,7 @@ export default {
       if (!this.error.show) {
         const oldEntry = this.allMembers.find(m => m.id === this.editMember.id)
 
-        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname && this.editMember.birthday === oldEntry.birthday.slice(0, 10) && this.editMember.groups.length === oldEntry.groups.length) {
+        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname && this.editMember.birthday === oldEntry.birthday.slice(0, 10) && _.isEqual(this.editMember.groups.map(g => g.id), oldEntry.groups)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         } else {
@@ -457,9 +455,7 @@ export default {
           if (res.status === 200) {
             //Update Member
             this.getAllMembers()
-            this.resetError()
-
-            this.showEditMemberModal = false
+            this.cancel()
           } else {
             this.error.message = 'Es ist ein Fehler aufgetreten.'
             this.error.show = true
@@ -486,9 +482,7 @@ export default {
 
       this.editMember.birthday = this.editMember.birthday.slice(0, 10)
 
-      this.editMember.groups = await Promise.all(this.editMember.groups.map(async g => {
-        return getGroupName(g)
-      }))
+      this.editMember.groups = await Promise.all(this.editMember.groups.map(async g => getGroupName(g)))
 
       this.showEditMemberModal = true
     },

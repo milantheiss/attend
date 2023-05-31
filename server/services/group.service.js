@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const { Group, Attendance, Member, User, Department } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
+const { attendanceService } = require('.');
 
 async function getTrainersOfGroup(group) {
     group.trainers = await Promise.all(group.trainers.map(async (trainer) => {
@@ -269,6 +270,58 @@ const searchGroups = async (user, body) => {
     }
 }
 
+/**
+ * 
+ * @param {*} groupID 
+ * @param {{id: String, role: String}} trainerBody 
+ */
+const addTrainer = async (groupID, trainerBody) => {
+    if (typeof trainerBody === 'undefined') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No trainerID given')
+    }
+
+    if (typeof groupID === 'undefined') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No groupID given')
+    }
+
+    const group = await Group.findById(groupID)
+
+    if (group.trainers.some(e => e.userId.equals(trainerBody.id))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Trainer already in group')
+    }
+
+    group.trainers.push(trainerBody)
+    await group.save()
+}
+
+const removeTrainer = async (groupID, trainerID) => {
+    if (typeof trainerID === 'undefined') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No trainerID given')
+    }
+
+    if (typeof groupID === 'undefined') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No groupID given')
+    }
+
+    const group = await Group.findById(groupID)
+
+    group.trainers = group.trainers.filter(e => !e.userId.equals(trainerID))
+
+    await group.save()
+}
+
+/**
+ * Completely deletes a trainer from the group (So that there is no ref to the user object)
+ * @param {*} groupID 
+ * @param {*} trainerID 
+ */
+const deleteTrainer = async (groupID, trainerID) => {
+    removeTrainer(groupID, trainerID)
+
+    await attendanceService.removeTrainerFromAttendanceList(groupID, trainerID)
+}
+
+
 module.exports = {
     getGroupById,
     getGroups,
@@ -276,5 +329,8 @@ module.exports = {
     updateMember,
     removeMember,
     searchGroups,
-    addMember
+    addMember,
+    addTrainer,
+    removeTrainer,
+    deleteTrainer
 };

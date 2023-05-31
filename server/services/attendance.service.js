@@ -387,6 +387,17 @@ const removeMemberFromAttendanceList = async (user, groupID, memberID) => {
     await attendance.save()
 }
 
+const removeTrainerFromAttendanceList = async (groupID, trainerID) => {
+    const attendance = await Attendance.findOne({ group: groupID })
+
+    attendance.trainingssessions.forEach(session => {
+        session.trainers = session.trainers.filter(trainer => !trainer.userId.equals(trainerID))
+    })
+
+    await attendance.save()
+}
+
+
 module.exports = {
     getAttendance,
     getAttendanceByGroup,
@@ -398,5 +409,6 @@ module.exports = {
     runGarbageCollector,
     getDataForInvoice,
     getFormattedListForAttendanceListPDF,
-    removeMemberFromAttendanceList
+    removeMemberFromAttendanceList,
+    removeTrainerFromAttendanceList
 };
