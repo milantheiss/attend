@@ -170,7 +170,7 @@ async function updateMemberInGroup(groupID, body) {
 	);
 }
 
-async function createNewMember(body){
+async function createNewMember(body) {
 	if (typeof body === "undefined") throw new Error("body must be defined")
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
@@ -181,13 +181,13 @@ async function createNewMember(body){
 			body: JSON.stringify(body),
 			credentials: "include",
 			mode: "cors",
-		}), {raw: true}
+		}), { raw: true }
 	);
-	
-	return {status: res.status, body: await res.json()}
+
+	return { status: res.status, body: await res.json() }
 }
 
-async function deleteMember(memberId){
+async function deleteMember(memberId) {
 	if (!memberId) throw new Error("No memberId provided")
 	if (typeof memberId === "undefined") throw new Error("memberId must be defined")
 	if (typeof memberId !== "string") throw new Error("memberId must be a string")
@@ -198,10 +198,10 @@ async function deleteMember(memberId){
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
 			mode: "cors",
-		}), {raw: true}
+		}), { raw: true }
 	);
 
-	return {status: res.status, body: await res.json()}
+	return { status: res.status, body: await res.json() }
 }
 
 async function updateMember(body) {
@@ -215,10 +215,10 @@ async function updateMember(body) {
 			body: JSON.stringify(body),
 			credentials: "include",
 			mode: "cors",
-		}), {raw: true}
+		}), { raw: true }
 	);
-	
-	return {status: res.status, body: await res.json()}
+
+	return { status: res.status, body: await res.json() }
 }
 
 async function removeMemberFromGroup(groupID, memberID) {
@@ -238,6 +238,66 @@ async function removeMemberFromGroup(groupID, memberID) {
 			mode: "cors",
 		})
 	);
+}
+
+async function getAllUsers() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/users`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function createNewUser(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user`, {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { status: res.status, body: await res.json() }
+}
+
+async function updateUser(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${body.id}`, {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { status: res.status, body: await res.json() }
+}
+
+async function deleteUser(userID) {
+	if (!userID) throw new Error("No userID provided")
+	if (typeof userID === "undefined") throw new Error("userID must be defined")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}`, {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { status: res.status, body: await res.json() }
 }
 
 /**
@@ -489,7 +549,7 @@ async function getAllMembers() {
 		}), { raw: true }
 	)
 	if (res.status === 403) {
-		return []	
+		return []
 	} else {
 		return res.json()
 	}
@@ -525,5 +585,9 @@ export {
 	getAllMembers,
 	updateMember,
 	createNewMember,
-	deleteMember
+	deleteMember,
+	createNewUser,
+	getAllUsers,
+	updateUser,
+	deleteUser
 };

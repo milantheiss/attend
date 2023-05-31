@@ -21,7 +21,6 @@ router
 
 //TODO Auth adden + In Service/Controller die returnten Daten auf Permission beschränken
 /*
-.put(groupController.updateGroup)
 .patch(groupController.updateGroup)
 .delete(groupController.deleteGroup)
 */

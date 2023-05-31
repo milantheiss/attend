@@ -3,6 +3,8 @@ const groupRoute = require('./group.route');
 const groupsRoute = require('./groups.route');
 const memberRoute = require('./member.route');
 const membersRoute = require('./members.route');
+const userRoute = require('./user.route');
+const usersRoute = require('./users.route');
 const attendanceRoute = require('./attendance.route')
 const loginRoute = require('./login.route')
 const logoutRoute = require('./logout.route')
@@ -29,6 +31,14 @@ const defaultRoutes = [
     {
         path: '/members',
         route: membersRoute,
+    },
+    {
+        path: '/user',
+        route: userRoute,
+    },
+    {
+        path: '/users',
+        route: usersRoute,
     },
     {
         path: '/attendance',

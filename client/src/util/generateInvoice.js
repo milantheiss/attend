@@ -88,9 +88,9 @@ function generateGroupInfo(doc, group) {
     trainer = trainer + obj.name + " "
   }
 
-  let assistent = ""
-  for (const obj of group.assistent) {
-    assistent = assistent + obj.name + " "
+  let assistant = ""
+  for (const obj of group.assistant) {
+    assistant = assistant + obj.name + " "
   }
 
   doc
@@ -105,8 +105,8 @@ function generateGroupInfo(doc, group) {
   doc
     .text(`Abteilung: ${group.department.name}`, 20, posNextLine, { maxWidth: 150 })
     .text(`Verantw. ÜL.: ${trainer}`, 170, posNextLine, { maxWidth: 326 })
-  if (assistent.length !== 0){
-    doc.text(`Assistent: ${assistent}`, 496, posNextLine, { maxWidth: 326 })
+  if (assistant.length !== 0){
+    doc.text(`Assistent: ${assistant}`, 496, posNextLine, { maxWidth: 326 })
   }
 }
 

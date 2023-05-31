@@ -16,7 +16,6 @@ router
     router
     .route('/:id')
     .delete(verifyToken, validate(memberValidation.deleteMember), memberController.deleteMember)
-    .put(verifyToken, validate(memberValidation.updateMember), memberController.updateMember)
     .patch(verifyToken, validate(memberValidation.updateMember), memberController.updateMember)
 
 module.exports = router;

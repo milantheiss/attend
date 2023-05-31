@@ -203,7 +203,7 @@
           </div>
           <div class="w-full flex items-center justify-between gap-4 mt-4">
             <p class="">Mitglied löschen:</p>
-            <button @click="showDeleteButton = true" v-show="!showDeleteButton"
+            <button @click="() => {showDeleteButton = true; error.message = 'Das Mitglied wird aus allen Gruppen und dazu gehörige Listen entfernt!'; error.show = true;}" v-show="!showDeleteButton"
               class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3">
               <p class="font-medium font-base md:text-lg">Löschen</p>
             </button>
@@ -297,56 +297,6 @@ export default {
     CollapsibleContainer
   },
   methods: {
-    //^ Start alter Funktionen
-    /**
-     * Isoliert Participant Array aus selectedGroup.
-     * Wird zur Fehlerprävention eingesetzt.
-     */
-    getParticipants() {
-      if (typeof this.groupData !== 'undefined') {
-        return this.groupData.participants
-      } else {
-        return undefined
-      }
-    },
-    /**
-     * Handelt onClickOnSave Emit aus @see GroupListGomponent und @see MemberEditor 
-     * Callt Fetch Methode und updatet ParticipantData im Backend
-     * @param {Object} participantData 
-     */
-    async onClickOnSave(participantData) {
-      //Update DB
-      // await updateMemberInGroup(this.selectedGroup.id, participantData)
-
-      //Updated groupData locally damit Change instant ist
-      this.groupData.participants = this.groupData.participants.map(p => {
-        if (p.memberId === participantData.memberId) {
-          return participantData
-        } else {
-          return p
-        }
-      })
-
-      if (!this.groupData.participants.some(p => p.memberId === participantData.memberId)) {
-        this.groupData.participants.push(participantData)
-      }
-    },
-    /**
-     * Handelt onClickOnDelete Emit aus @see GroupListGomponent und @see MemberEditor 
-     * Callt Fetch Methode und löscht Participant aus Backend.
-     * @param {Object} participantData 
-     */
-    async onClickOnDelete(participantData) {
-      //Update DB
-      // await removeMemberFromGroup(this.selectedGroup.id, participantData.memberId)
-
-      //Updated groupData locally damit Change instant ist
-      this.groupData.participants = this.groupData.participants.filter(p => p.memberId !== participantData.memberId)
-    },
-
-    //^ Ende alter Funktionen
-
-
     onClickOnSortByLastname() {
       this.indexSort.lastname = (this.indexSort.lastname + 1) % 2
       if (this.indexSort.lastname === 1) {
@@ -505,7 +455,7 @@ export default {
             groups: this.editMember.groups.map(g => g.id)
           })
           if (res.status === 200) {
-            //Update Member --> PUT
+            //Update Member
             this.getAllMembers()
             this.resetError()
 
@@ -521,7 +471,7 @@ export default {
     async deleteMember(id) {
       const res = await deleteMember(id)
       if (res.status === 200) {
-        //Update Member --> PUT
+        //Update Member
         this.getAllMembers()
         this.cancel()
       } else {
@@ -537,7 +487,6 @@ export default {
       this.editMember.birthday = this.editMember.birthday.slice(0, 10)
 
       this.editMember.groups = await Promise.all(this.editMember.groups.map(async g => {
-        //GET getGroupName fetch request
         return getGroupName(g)
       }))
 
