@@ -65,7 +65,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in searchResults" :key="user.id" @click="openEditMember(user.id)"
+            <tr v-for="user in searchResults" :key="user.id" @click="openEditUser(user.id)"
               class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
               <!--Lastname-->
               <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
@@ -77,7 +77,7 @@
               </td>
               <!--Höchste Rolle-->
               <td class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
-                <p class="text-light-gray">{{ getHighstRole(user.roles) }}</p>
+                <p class="text-light-gray">{{ getHighestRole(user.roles) }}</p>
               </td>
               <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
                 <!--Arrow Right-->
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Create New Member Modal -->
+    <!-- Create New User Modal -->
     <ModalDialog :show="showCreateUserModal" :hasSubheader="false" @onClose="cancel">
       <template #header>
         <p class="text-xl md:text-2xl">Neuen Teilnehmer</p>
@@ -154,7 +154,7 @@
       </template>
     </ModalDialog>
 
-    <!-- Edit Member Modal -->
+    <!-- Edit User Modal -->
     <ModalDialog :show="showEditUserModal" :hasSubheader="false" @onClose="cancel">
       <template #header>
         <p class="text-xl md:text-2xl">Bearbeiten</p>
@@ -198,23 +198,23 @@
           </div>
 
           <!--Gruppen des Teilnehmers-->
-          <div class="w-full flex items-center justify-between gap-4">
+          <!-- <div class="w-full flex items-center justify-between gap-4">
             <CollapsibleContainer>
               <template #header>
                 <p>Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
+                <div v-for="group in editUser.groups " :key="group.id" class="flex justify-between items-center gap-2">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
-                    @click="editMember.groups = editMember.groups.filter(e => e.id !== group.id)">
+                    @click="editUser.groups = editUser.groups.filter(e => e.id !== group.id)">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
               </template>
             </CollapsibleContainer>
-          </div>
+          </div> -->
           <div class="w-full flex items-center justify-between gap-4 mt-4">
             <p class="">Benutzer löschen:</p>
             <button
@@ -252,13 +252,12 @@
   
 <script>
 import _ from "lodash"
-import { getAllUsers, createNewUser, updateUser, getGroupName, deleteUser } from "@/util/fetchOperations"
+import { getAllUsers, createNewUser, updateUser, deleteUser } from "@/util/fetchOperations"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
-import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
 
 export default {
   name: "EditUsersView",
@@ -287,7 +286,7 @@ export default {
         email: '',
         roles: []
       },
-      editMember: {
+      editUser: {
         firstname: '',
         lastname: '',
         username: '',
@@ -310,8 +309,7 @@ export default {
     SortIcon,
     TextInput,
     ModalDialog,
-    ErrorMessage,
-    CollapsibleContainer
+    ErrorMessage
   },
   methods: {
     onClickOnSortByLastname() {
@@ -346,7 +344,7 @@ export default {
         // this.showSearchBar = false
         if (searchString !== '') {
           this.searchResults = this.allUsers.filter(user => {
-            return user.firstname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || user.lastname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || this.getHighstRole(user.roles).toLowerCase().indexOf(searchString.toLowerCase()) > -1
+            return user.firstname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || user.lastname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || this.getHighestRole(user.roles).toLowerCase().indexOf(searchString.toLowerCase()) > -1
           })
         } else {
           this.searchResults = this.allUsers
@@ -355,11 +353,11 @@ export default {
     },
 
     cancel() {
-      this.showCreateMemberModal = false
-      this.showEditMemberModal = false
+      this.showCreateUserModal = false
+      this.showEditUserModal = false
       this.showDeleteButton = false
 
-      this.newMember = {
+      this.newUser = {
         firstname: '',
         lastname: '',
         username: '',
@@ -367,7 +365,7 @@ export default {
         roles: []
       }
 
-      this.editMember = {
+      this.editUser = {
         firstname: '',
         lastname: '',
         username: '',
@@ -391,25 +389,21 @@ export default {
         this.error.show = true
         this.error.cause.lastnameInput = true
       }
-      if (this.newUser.birthday.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Geburtstag ein.'
-        this.error.show = true
-        this.error.cause.birthdayInput = true
-      }
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
+      //TODO Fehler abfangen für Role
+      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.roleInput].filter(x => x === true).length >= 2) {
         this.error.message = 'Mehrere Fehler.'
       }
 
       if (!this.error.show) {
-        //Create Member --> POST
+        //Create User --> POST
         //TODO Implement POST request
         const res = await createNewUser(this.newUser)
         if (res.status === 201) {
-          //Update Member --> PUT
+          //Update User --> PUT
           this.getAllUsers()
           this.resetError()
 
-          this.showCreateMemberModal = false
+          this.showCreateUserModal = false
         } else {
           this.error.message = 'Es ist ein Fehler aufgetreten.'
           this.error.show = true
@@ -420,42 +414,38 @@ export default {
     async saveEditedUser() {
       this.resetError()
 
-      if (this.editMember.firstname.trim().length === 0) {
+      if (this.editUser.firstname.trim().length === 0) {
         this.error.message = 'Bitte gebe einen Vornamen ein.'
         this.error.show = true
         this.error.cause.firstnameInput = true
       }
-      if (this.editMember.lastname.trim().length === 0) {
+      if (this.editUser.lastname.trim().length === 0) {
         this.error.message = 'Bitte gebe einen Nachnamen ein.'
         this.error.show = true
         this.error.cause.lastnameInput = true
       }
-      if (this.editMember.birthday.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Geburtstag ein.'
-        this.error.show = true
-        this.error.cause.birthdayInput = true
-      }
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
+      //TODO Fehler abfangen für Role
+      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.roleInput].filter(x => x === true).length >= 2) {
         this.error.message = 'Mehrere Fehler.'
       }
 
       if (!this.error.show) {
-        const oldEntry = this.allUsers.find(m => m.id === this.editMember.id)
+        const oldEntry = this.allUsers.find(m => m.id === this.editUser.id)
 
-        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname && this.editMember.birthday === oldEntry.birthday.slice(0, 10) && this.editMember.groups.length === oldEntry.groups.length) {
+        if (this.editUser.firstname === oldEntry.firstname && this.editUser.lastname === oldEntry.lastname && this.editUser.roles === oldEntry.roles) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         } else {
           const res = await updateUser({
-            ...this.editMember,
-            groups: this.editMember.groups.map(g => g.id)
+            ...this.editUser,
+            groups: this.editUser.groups.map(g => g.id)
           })
           if (res.status === 200) {
-            //Update Member
+            //Update User
             this.getAllUsers()
             this.resetError()
 
-            this.showEditMemberModal = false
+            this.showEditUserModal = false
           } else {
             this.error.message = 'Es ist ein Fehler aufgetreten.'
             this.error.show = true
@@ -464,10 +454,10 @@ export default {
       }
     },
 
-    async deleteMember(id) {
+    async deleteUser(id) {
       const res = await deleteUser(id)
       if (res.status === 200) {
-        //Update Member
+        //Update User
         this.getAllUsers()
         this.cancel()
       } else {
@@ -476,32 +466,26 @@ export default {
       }
     },
 
-    async openEditMember(id) {
+    async openEditUser(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editMember = _.cloneDeep(this.allUsers.find(m => m.id === id))
+      this.editUser = _.cloneDeep(this.allUsers.find(m => m.id === id))
 
-      this.editMember.birthday = this.editMember.birthday.slice(0, 10)
-
-      this.editMember.groups = await Promise.all(this.editMember.groups.map(async g => {
-        return getGroupName(g)
-      }))
-
-      this.showEditMemberModal = true
+      this.showEditUserModal = true
     },
 
-    async getAllMembers() {
-      this.allMembers = (await getAllUsers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
+    async getAllUsers() {
+      this.allUsers = (await getAllUsers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
     },
 
     resetError() {
       this.error.show = false
       this.error.cause.firstnameInput = false
       this.error.cause.lastnameInput = false
-      this.error.cause.birthdayInput = false
+      this.error.cause.roleInput = false
       this.error.message = ''
     },
 
-    getHighstRole(roles) {
+    getHighestRole(roles) {
       if (roles.includes('admin')) {
         return 'Admin'
       } else if (roles.includes('staff')) {
