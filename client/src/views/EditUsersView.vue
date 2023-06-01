@@ -65,7 +65,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in searchResults" :key="user.id" @click="openEditUser(user.id)"
+            <tr v-for="user in searchResults" :key="user._id" @click="openEditUser(user._id)"
               class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
               <!--Lastname-->
               <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
@@ -252,7 +252,7 @@
                 <p class="font-medium">Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in editUser.accessible_groups " :key="group.id"
+                <div v-for="group in editUser.accessible_groups " :key="group._id"
                   v-show="editUser.accessible_groups.length !== 0" class="flex justify-between items-center gap-2">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -268,7 +268,7 @@
 
           <div class="w-full flex items-center justify-between gap-4 mt-4">
             <p class="">Passwort neu senden:</p>
-            <button @click="resendPassword(editUser.id)"
+            <button @click="resendPassword(editUser._id)"
               class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-[92px] md:w-[116px] py-3">
               <p class="font-medium font-base md:text-lg">Senden</p>
             </button>
@@ -282,7 +282,7 @@
               class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-[90px] md:w-[114px] py-3">
               <p class="font-medium font-base md:text-lg">Löschen</p>
             </button>
-            <button @click="deleteUser(editUser.id)"
+            <button @click="deleteUser(editUser._id)"
               class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-[7px] md:px-6 py-1.5"
               v-show="showDeleteButton">
               <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
@@ -476,7 +476,7 @@ export default {
       if (!this.error.show) {
         delete this.editUser.readPatchnotes
 
-        this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g.id)
+        this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g._id)
 
         const res = await updateUser(this.editUser)
         if (res.ok) {
@@ -502,7 +502,7 @@ export default {
 
     async openEditUser(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editUser = _.cloneDeep(this.allUsers.find(m => m.id === id))
+      this.editUser = _.cloneDeep(this.allUsers.find(m => m._id === id))
 
       this.editUser.accessible_groups = await Promise.all(this.editUser.accessible_groups.map(async g => getGroupName(g)))
 
@@ -583,11 +583,11 @@ export default {
         this.error.message = 'Mehrere Fehler.'
       }
 
-      if (typeof inputs.id !== 'undefined') {
-        const oldEntry = this.allUsers.find(m => m.id === inputs.id)
+      if (typeof inputs._id !== 'undefined') {
+        const oldEntry = this.allUsers.find(m => m._id === inputs._id)
         if (_.isEqual(this.editUser.firstname, oldEntry.firstname) && _.isEqual(this.editUser.lastname, oldEntry.lastname)
           && _.isEqual(this.editUser.username, oldEntry.username) && _.isEqual(this.editUser.email, oldEntry.email)
-          && _.isEqual(this.editUser.accessible_groups.map(g => g.id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
+          && _.isEqual(this.editUser.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }

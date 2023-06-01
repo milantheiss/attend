@@ -149,7 +149,7 @@ export default {
      */
     async pullAttendance() {
       if (typeof this.selectedGroup !== 'undefined' && typeof this.date !== 'undefined' && !this.pullingByQueryString) {
-        const res = await fetchAttendanceByDate(this.selectedGroup.id, this.date)
+        const res = await fetchAttendanceByDate(this.selectedGroup._id, this.date)
         if (res.code === 404 && res.message === 'Requested Trainingssession not found') {
           // Sollte nicht mehr erreicht werden
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
@@ -169,7 +169,7 @@ export default {
      */
     async attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo.memberId == id)).attended = newVal
-      this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+      this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
 
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
         this.showTimesBox = true
@@ -184,7 +184,7 @@ export default {
       if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
         this.showTimesBox = true
       } else {
-        await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+        await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
 
@@ -235,7 +235,7 @@ export default {
       } else {
         this.blockSelectedGroupWatcher = true
         this.pullingByQueryString = true
-        this.selectedGroup = this.groups.find(foo => foo.id == groupId)
+        this.selectedGroup = this.groups.find(foo => foo._id == groupId)
         this.date = new Date(date)
         this.attended = await res
 
@@ -265,13 +265,13 @@ export default {
     async "attended.starttime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+        this.attended = await updateTrainingssession(this.selectedGroup_id, this.date, this.attended)
       }
     },
     async "attended.endtime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup.id, this.date, this.attended)
+        this.attended = await updateTrainingssession(this.selectedGroup_id, this.date, this.attended)
       }
     },
   },

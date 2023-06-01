@@ -177,7 +177,7 @@ export default {
         async reject() {
             //Backend: Invoice wird als Rejected gesetzt & Submitter wird benachrichtigt
             //TODO Reviewer bekommt Message Prompt angezeigt um Rejection zu begründen
-            const res = await rejectInvoice(this.invoice.id)
+            const res = await rejectInvoice(this.invoice._id)
             if (res.status === 200 && await res.text() === "Invoice rejected") {
                 this.$router.push({ path: "/invoices" })
             }
@@ -192,7 +192,7 @@ export default {
 
             this.invoice.totalHours = this.totalHours
 
-            const res = await approveInvoice(this.invoice.id)
+            const res = await approveInvoice(this.invoice._id)
             if (res.status === 200 && await res.text() === "Invoice approved") {
                 this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 

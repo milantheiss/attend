@@ -40,12 +40,12 @@
         </transition>
       </div>
       <!--TODO Collapsible für jedes Department-->
-      <div v-for="department in this.departments" :key="department.id">
+      <div v-for="department in this.departments" :key="department._id">
         <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-[73vh]">
           <table class="table-auto w-full text-left">
             <thead>
               <tr
-                :class="{ 'border-b border-[#D1D5DB]': typeof this.searchResults.filter(g => g.department.id === department.id) !== 'undefined' && this.searchResults.filter(g => g.department.id === department.id)?.length > 0 }">
+                :class="{ 'border-b border-[#D1D5DB]': typeof this.searchResults.filter(g => g.department._id === department._id) !== 'undefined' && this.searchResults.filter(g => g.department._id === department._id)?.length > 0 }">
                 <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByGroupname">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.groupname"></SortIcon>
@@ -56,8 +56,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="group in this.searchResults.filter(g => g.department.id === department.id)" :key="group.id"
-                @click="openEditGroup(group.id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+              <tr v-for="group in this.searchResults.filter(g => g.department._id === department._id)" :key="group._id"
+                @click="openEditGroup(group._id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                 <!--Gruppenbezeichnung-->
                 <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
                   <p class="">{{ group.name }}</p>
@@ -74,7 +74,7 @@
               </tr>
             </tbody>
           </table>
-          <p v-show="typeof this.searchResults.filter(g => g.department.id === department.id) === 'undefined' || this.searchResults.filter(g => g.department.id === department.id)?.length === 0"
+          <p v-show="typeof this.searchResults.filter(g => g.department._id === department._id) === 'undefined' || this.searchResults.filter(g => g.department._id === department._id)?.length === 0"
             class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
         </div>
       </div>
@@ -181,7 +181,7 @@
                 <p class="font-medium">Teilnehmer</p>
               </template>
               <template #content>
-                <div v-for="participant in editGroup.participants " :key="participant.id"
+                <div v-for="participant in editGroup.participants " :key="participant._id"
                   v-show="editGroup.participants.length !== 0" class="flex justify-between items-center gap-2">
                   <!--TODO Ordentliche Liste-->
                   <p>{{ participant.name }}</p>
@@ -204,7 +204,7 @@
                 <p class="font-medium">Trainer</p>
               </template>
               <template #content>
-                <div v-for="trainer in editGroup.trainers " :key="trainer.id" v-show="editGroup.trainers.length !== 0"
+                <div v-for="trainer in editGroup.trainers " :key="trainer._id" v-show="editGroup.trainers.length !== 0"
                   class="flex justify-between items-center gap-2">
                   <!--TODO Ordentliche Liste-->
                   <p>{{ trainer.name }}</p>
@@ -228,7 +228,7 @@
               class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-[90px] md:w-[114px] py-3">
               <p class="font-medium font-base md:text-lg">Löschen</p>
             </button>
-            <button @click="deleteGroup(editGroup.id)"
+            <button @click="deleteGroup(editGroup._id)"
               class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-[7px] md:px-6 py-1.5"
               v-show="showDeleteButton">
               <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
@@ -383,7 +383,7 @@ export default {
       this.validateInputs(this.editGroup)
 
       if (!this.error.show) {
-        this.editGroup.department = this.editGroup.department.id
+        this.editGroup.department = this.editGroup.department._id
 
         const res = await updateGroup(this.editGroup)
         if (res.ok) {
@@ -409,9 +409,9 @@ export default {
 
     async openEditGroup(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editGroup = _.cloneDeep(this.allGroups.find(m => m.id === id))
+      this.editGroup = _.cloneDeep(this.allGroups.find(m => m._id === id))
 
-      this.editGroup.department = this.departments.find(d => d.id === this.editGroup.department)
+      this.editGroup.department = this.departments.find(d => d._id === this.editGroup.department)
 
       this.showEditGroupModal = true
     },
@@ -468,11 +468,11 @@ export default {
         this.error.message = 'Mehrere Fehler.'
       }
 
-      if (typeof inputs.id !== 'undefined') {
-        const oldEntry = this.allGroups.find(m => m.id === inputs.id)
+      if (typeof inputs._id !== 'undefined') {
+        const oldEntry = this.allGroups.find(m => m._id === inputs._id)
         if (_.isEqual(this.editGroup.firstname, oldEntry.firstname) && _.isEqual(this.editGroup.venue, oldEntry.lastname)
           && _.isEqual(this.editGroup.username, oldEntry.username) && _.isEqual(this.editGroup.email, oldEntry.email)
-          && _.isEqual(this.editGroup.accessible_groups.map(g => g.id), oldEntry.accessible_groups) && _.isEqual(this.editGroup.roles, oldEntry.roles)) {
+          && _.isEqual(this.editGroup.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editGroup.roles, oldEntry.roles)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }

@@ -51,7 +51,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="invoice in allInvoicesInYear" :key="invoice.id" @click="downloadInvoice(invoice.id)"
+                        <tr v-for="invoice in allInvoicesInYear" :key="invoice._id" @click="downloadInvoice(invoice._id)"
                             class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                             <td class="truncate">
                                 <div class="hidden md:flex py-2.5 group-last:pt-2.5 group-last:pb-0">
@@ -146,7 +146,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="invoice in allAssignedInvoices" :key="invoice.id" @click="goToInvoice(invoice.id)"
+                        <tr v-for="invoice in allAssignedInvoices" :key="invoice._id" @click="goToInvoice(invoice._id)"
                             class="border-b border-[#E5E7EB] last:border-0 group cursor-pointer">
                             <td class="w-full truncate py-2.5 group-last:pt-2.5 group-last:pb-0">
                                 {{ invoice.submittedBy.firstname + " " + invoice.submittedBy.lastname }}

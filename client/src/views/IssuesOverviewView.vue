@@ -77,7 +77,7 @@ export default {
      */
     async onClickOnSave(participantData) {
       //Update DB
-      await updateMemberInGroup(this.selectedGroup.id, participantData)
+      await updateMemberInGroup(this.selectedGroup._id, participantData)
       
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.map(p => {
@@ -99,7 +99,7 @@ export default {
      */
     async onClickOnDelete(participantData) {      
       //Update DB
-      await removeMemberFromGroup(this.selectedGroup.id, participantData.memberId)
+      await removeMemberFromGroup(this.selectedGroup._id, participantData.memberId)
       
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.filter(p => p.memberId !== participantData.memberId)
@@ -120,7 +120,7 @@ export default {
     selectedGroup: async function (newVal) {
       if (typeof newVal !== 'undefined') {
         document.title = newVal.name + ' bearbeiten - Attend'
-        this.groupData = await fetchGroup(newVal.id)
+        this.groupData = await fetchGroup(newVal._id)
       }
     }
   }

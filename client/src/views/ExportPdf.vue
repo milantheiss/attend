@@ -85,7 +85,7 @@ export default {
          */
         async exportPDF() {
             if (!this.hasAnError()) {
-                const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                const attendance = await fetchAttendanceByDateRange(this.selectedGroup._id, new Date(this.startdate), new Date(this.enddate))
                 if (attendance.dates.length === 0) {
                     this.error.show = true
                     this.error.cause.timespanFaulty = true

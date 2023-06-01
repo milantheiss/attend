@@ -70,7 +70,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="member in searchResults" :key="member.id" @click="openEditMember(member.id)"
+            <tr v-for="member in searchResults" :key="member._id" @click="openEditMember(member._id)"
               class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
               <!--Lastname-->
               <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
@@ -191,12 +191,12 @@
                 <p class="font-medium">Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2"
+                <div v-for="group in editMember.groups " :key="group._id" class="flex justify-between items-center gap-2"
                   v-show="editMember.groups.length !== 0">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
-                    @click="editMember.groups = editMember.groups.filter(e => e.id !== group.id)">
+                    @click="editMember.groups = editMember.groups.filter(e => e._id !== group._id)">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
@@ -212,7 +212,7 @@
               class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3">
               <p class="font-medium font-base md:text-lg">Löschen</p>
             </button>
-            <button @click="deleteMember(editMember.id)"
+            <button @click="deleteMember(editMember._id)"
               class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3"
               v-show="showDeleteButton">
               <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
@@ -409,7 +409,7 @@ export default {
       if (!this.error.show) {
         const res = await updateMember({
           ...this.editMember,
-          groups: this.editMember.groups.map(g => g.id)
+          groups: this.editMember.groups.map(g => g._id)
         })
         if (res.status === 200) {
           this.getAllMembers()
@@ -434,7 +434,7 @@ export default {
 
     async openEditMember(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editMember = _.cloneDeep(this.allMembers.find(m => m.id === id))
+      this.editMember = _.cloneDeep(this.allMembers.find(m => m._id === id))
 
       this.editMember.birthday = this.editMember.birthday.slice(0, 10)
 
@@ -481,11 +481,11 @@ export default {
         this.error.message = 'Mehrere Fehler.'
       }
 
-      if (typeof inputs.id !== 'undefined') {
-        const oldEntry = this.allMembers.find(m => m.id === this.editMember.id)
+      if (typeof inputs._id !== 'undefined') {
+        const oldEntry = this.allMembers.find(m => m._id === this.editMember._id)
         if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname
           && this.editMember.birthday === oldEntry.birthday.slice(0, 10)
-          && _.isEqual(this.editMember.groups.map(g => g.id), oldEntry.groups)) {
+          && _.isEqual(this.editMember.groups.map(g => g._id), oldEntry.groups)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }

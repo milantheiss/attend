@@ -161,7 +161,7 @@ const updateMember = async (user, groupID, body) => {
 
 const addMember = async (groupID, memberBody) => {
     if (typeof memberBody.memberId === 'undefined') {
-        memberBody.memberId = memberBody.id
+        memberBody.memberId = memberBody._id
     }
 
     const group = await Group.findById(groupID)

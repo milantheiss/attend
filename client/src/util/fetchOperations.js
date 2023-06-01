@@ -400,7 +400,7 @@ async function updateMember(body) {
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "member", body.id].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "member", body._id].join("/"), {
 			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),
@@ -612,7 +612,7 @@ async function updateUser(body) {
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/user/${body.id}`, {
+		fetch(`${import.meta.env.VITE_API_URL}/user/${body._id}`, {
 			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),

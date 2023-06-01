@@ -58,7 +58,7 @@
         <!--NotificationCard-->
         <div class="flex flex-col gap-4">
             <div class="bg-white rounded-xl drop-shadow-md px-3.5 md:px-7 py-4 cursor-pointer w-full flex flex-col gap-4"
-                v-for="(notification, index) in dataStore.notifications" :key="notification.id">
+                v-for="(notification, index) in dataStore.notifications" :key="notification._id">
                 <div class="flex justify-between items-center gap-3.5" @click.self="{ toggleNotification(index); }">
                     <!--New Notification Dot ~ Blauer Pulsierender Punkt-->
                     <div class="flex h-4 w-4" @click.self="{ toggleNotification(index); }"
@@ -106,7 +106,7 @@
                 <div class="notificationMessage cursor-text" v-if="localNotifications[index]?.show"
                     v-html="$resolveMarkdown(notification.message)">
                 </div>
-                <button @click="onClickDelete(notification.id)" v-if="localNotifications[index]?.show"
+                <button @click="onClickDelete(notification._id)" v-if="localNotifications[index]?.show"
                     class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-8 py-3 mx-auto">
                     <p class="font-medium font-base md:text-lg">Löschen</p>
                 </button>
@@ -151,7 +151,7 @@ export default {
         async toggleNotification(index) {
             if (!this.dataStore.notifications[index].recipients.find((r) => r.userID === this.authStore.user._id).read && !this.localNotifications[index].show) {
                 const notification = this.dataStore.notifications[index]
-                const res = await setNotificationAsRead(notification.id)
+                const res = await setNotificationAsRead(notification._id)
                 this.dataStore.notifications[index].recipients = res.recipients
             }
             this.localNotifications[index].show = !this.localNotifications[index].show
@@ -161,12 +161,12 @@ export default {
             const oldShow = this.localNotifications
             this.localNotifications = []
             for (const notification of this.dataStore.notifications) {
-                const oldNotification = oldShow.find((n) => n.id === notification.id)
+                const oldNotification = oldShow.find((n) => n._id === notification._id)
                 if (oldNotification) {
                     this.localNotifications.push(oldNotification)
                 } else {
                     this.localNotifications.push({
-                        id: notification.id,
+                        id: notification._id,
                         show: false,
                         selected: false
                     })
@@ -179,11 +179,11 @@ export default {
         async deleteSelected() {
             const selectedNotification = this.localNotifications.filter((n) => n.selected)
 
-            const res = await deleteManyNotifications(selectedNotification.map((n) => n.id))
+            const res = await deleteManyNotifications(selectedNotification.map((n) => n._id))
 
             if (res.status === 200) {
                 this.localNotifications.filter((n) => n.selected).forEach((n) => {
-                    this.dataStore.notifications = this.dataStore.notifications.filter((n2) => n2.id !== n.id)
+                    this.dataStore.notifications = this.dataStore.notifications.filter((n2) => n2._id !== n._id)
                 })
                 this.localNotifications = this.localNotifications.filter((n) => !n.selected)
             }
@@ -195,11 +195,11 @@ export default {
             const selectedNotification = this.localNotifications.filter((n) => n.selected)
 
 
-            const res = await setManyNotificationsAsRead(selectedNotification.map((n) => n.id))
+            const res = await setManyNotificationsAsRead(selectedNotification.map((n) => n._id))
 
             if (res.status === 200) {
                 this.localNotifications.filter((n) => n.selected).forEach((n) => {
-                    this.dataStore.notifications.find((n2) => n2.id === n.id).recipients.find((r) => r.userID === this.authStore.user._id).read = true
+                    this.dataStore.notifications.find((n2) => n2._id === n._id).recipients.find((r) => r.userID === this.authStore.user._id).read = true
                     n.selected = false
                 })
             }
@@ -211,8 +211,8 @@ export default {
             const res = await deleteNotification(notificationID)
 
             if (res.status === 200) {
-                this.dataStore.notifications = this.dataStore.notifications.filter((n2) => n2.id !== notificationID)
-                this.localNotifications = this.localNotifications.filter((n) => n.id !== notificationID)
+                this.dataStore.notifications = this.dataStore.notifications.filter((n2) => n2._id !== notificationID)
+                this.localNotifications = this.localNotifications.filter((n) => n._id !== notificationID)
             }
 
         },
@@ -221,7 +221,7 @@ export default {
             const res = await setNotificationAsUnread(notificationID)
 
             if (res.status === 200) {
-                this.dataStore.notifications.find((n2) => n2.id === notificationID).recipients.find((r) => r.userID === this.authStore.user._id).read = false
+                this.dataStore.notifications.find((n2) => n2._id === notificationID).recipients.find((r) => r.userID === this.authStore.user._id).read = false
             }
         },
 

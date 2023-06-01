@@ -132,7 +132,7 @@
                             <tbody>
                                 <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
                                     :key="trainingssession._id"
-                                    @click="goToTrainingssession(group.id, trainingssession.date)"
+                                    @click="goToTrainingssession(group._id, trainingssession.date)"
                                     class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                                     <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
                                         {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
@@ -446,7 +446,7 @@ export default {
         this.groups = (res).map(val => {
             return {
                 name: val.name,
-                _id: val.id
+                _id: val._id
             }
         })
 
@@ -455,7 +455,7 @@ export default {
     },
     async mounted() {
         if (typeof this.dataStore.invoiceData?.startdate !== "undefined" && typeof this.dataStore.invoiceData?.enddate !== "undefined") {
-            const groups = this.dataStore.invoiceData.groups.map(val => val.id)
+            const groups = this.dataStore.invoiceData.groups.map(val => val._id)
             await this.pullInvoiceData(groups, this.dataStore.invoiceData.startdate, this.dataStore.invoiceData.enddate)
         }
     },
