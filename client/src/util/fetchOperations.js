@@ -184,7 +184,7 @@ async function createNewMember(body) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function deleteMember(memberId) {
@@ -201,7 +201,7 @@ async function deleteMember(memberId) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function updateMember(body) {
@@ -218,7 +218,7 @@ async function updateMember(body) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function removeMemberFromGroup(groupID, memberID) {
@@ -241,13 +241,18 @@ async function removeMemberFromGroup(groupID, memberID) {
 }
 
 async function getAllUsers() {
-	return await watchForRedirects(
+	const res = await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/users`, {
 			method: "GET",
 			credentials: "include",
 			mode: "cors",
-		})
-	);
+		}), { raw: true }
+	)
+	if (res.ok) {
+		return res.json()
+	} else {
+		return []
+	}
 }
 
 async function createNewUser(body) {
@@ -264,7 +269,7 @@ async function createNewUser(body) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function updateUser(body) {
@@ -281,7 +286,7 @@ async function updateUser(body) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function deleteUser(userID) {
@@ -297,7 +302,23 @@ async function deleteUser(userID) {
 		}), { raw: true }
 	);
 
-	return { status: res.status, body: await res.json() }
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function resendPassword(userID) {
+	if (!userID) throw new Error("No userID provided")
+	if (typeof userID === "undefined") throw new Error("userID must be defined")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}/resend-password`, {
+			method: "GET",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
 }
 
 /**
@@ -548,10 +569,10 @@ async function getAllMembers() {
 			mode: "cors",
 		}), { raw: true }
 	)
-	if (res.status === 403) {
-		return []
-	} else {
+	if (res.ok) {
 		return res.json()
+	} else {
+		return []
 	}
 }
 
@@ -589,5 +610,6 @@ export {
 	createNewUser,
 	getAllUsers,
 	updateUser,
-	deleteUser
+	deleteUser,
+	resendPassword
 };

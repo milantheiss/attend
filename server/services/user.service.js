@@ -97,11 +97,28 @@ const deleteUser = async (userID) => {
 	return user;
 };
 
+const resendPassword = async (userID) => {
+	const user = await getUserById(userID);
+	if (!user) {
+		throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+	}
+
+	const password = nanoid.nanoid(10);
+	//TODO Send email with new password
+
+	console.log(password);
+
+	user.password = password;
+	await user.save();
+	return
+}
+
 module.exports = {
 	getUserInfo,
 	getUserById,
 	getUsers,
 	createUser,
 	deleteUser,
-	updateUser
+	updateUser,
+	resendPassword
 };

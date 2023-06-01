@@ -9,12 +9,16 @@ const router = express.Router();
 router
     .route('/')
     .get(verifyToken, userController.getUsers)
-    .post(verifyToken, validate(userValidation.createUser), userController.createUser)  
+    .post(verifyToken, validate(userValidation.createUser), userController.createUser)
 
 router
     .route('/:id')
     .get(verifyToken, validate(userValidation.getUserById), userController.getUserById)
     .delete(verifyToken, validate(userValidation.deleteUser), userController.deleteUser)
     .patch(verifyToken, validate(userValidation.updateUser), userController.updateUser)
+
+router
+    .route('/:id/resend-password')
+    .get(verifyToken, validate(userValidation.resendPassword), userController.resendPassword)
 
 module.exports = router;

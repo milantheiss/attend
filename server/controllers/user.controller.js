@@ -24,12 +24,12 @@ const createUser = catchAsync(async (req, res) => {
         return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this resource"})
     }
     const result = await userService.createUser(req.body);
-    res.status(httpStatus.CREATED).send(result)
+    res.status(httpStatus.CREATED).send(result) 
 });
 
 const updateUser = catchAsync(async (req, res) => {
     if(!hasAdminRole(req.user)) {
-        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this group"})
+        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this resource"})
     }
     const result = await userService.updateUser(req.params.id, req.body)
     res.status(httpStatus.OK).send(result)
@@ -37,10 +37,18 @@ const updateUser = catchAsync(async (req, res) => {
 
 const deleteUser = catchAsync(async (req, res) => {
     if(!hasAdminRole(req.user)) {
-        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this group"})
+        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this resource"})
     }
     const result = await userService.deleteUser(req.params.id)
     res.status(httpStatus.OK).send(result)
+})
+
+const resendPassword = catchAsync(async (req, res) => {
+    if(!hasAdminRole(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this resource"})
+    }
+    const result = await userService.resendPassword(req.params.id)
+    res.status(httpStatus.NO_CONTENT).send()
 })
 
 module.exports = {
@@ -48,6 +56,7 @@ module.exports = {
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    resendPassword
 }
 

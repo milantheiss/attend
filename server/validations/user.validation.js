@@ -52,9 +52,17 @@ const getUserById = {
   })
 };
 
+const resendPassword = {
+  params: Joi.object().keys({
+    //String als ObjectId
+    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+  })
+};
+
 module.exports = {
   updateUser,
   createUser,
   deleteUser,
-  getUserById
+  getUserById,
+  resendPassword
 };

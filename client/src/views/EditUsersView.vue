@@ -251,11 +251,12 @@
                 <p class="font-medium">Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in editUser.accessible_groups " :key="group.id" class="flex justify-between items-center gap-2">
+                <div v-for="group in editUser.accessible_groups " :key="group.id"
+                  class="flex justify-between items-center gap-2">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
-                    @click="editUser.groups = editUser.groups.filter(e => e.id !== group.id)">
+                    @click="editUser.accessible_groups = editUser.accessible_groups.filter(e => e !== group)">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
@@ -308,7 +309,7 @@
   
 <script>
 import _ from "lodash"
-import { getAllUsers, createNewUser, updateUser, deleteUser, getGroupName } from "@/util/fetchOperations"
+import { getAllUsers, createNewUser, updateUser, deleteUser, getGroupName, resendPassword } from "@/util/fetchOperations"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -357,7 +358,8 @@ export default {
         cause: {
           firstnameInput: false,
           lastnameInput: false,
-          roleInput: false
+          emailInput: false,
+          usernameInput: false
         }
       },
       showDeleteButton: false,
@@ -400,9 +402,9 @@ export default {
     onClickOnRoles() {
       this.indexSort.roles = (this.indexSort.roles + 1) % 2
       if (this.indexSort.roles === 1) {
-        this.searchResults.sort((a, b) => b.role.localeCompare(a.role))
+        this.searchResults.sort((a, b) => this.getHighestRole(b.roles).localeCompare(this.getHighestRole(a.roles)))
       } else {
-        this.searchResults.sort((a, b) => a.role.localeCompare(b.role))
+        this.searchResults.sort((a, b) => this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles)))
       }
     },
 
@@ -452,91 +454,45 @@ export default {
     },
 
     async createNewUser() {
-      this.resetError()
-
-      if (this.newUser.firstname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (this.newUser.lastname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
-      }
-      //TODO Fehler abfangen für Role
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.roleInput].filter(x => x === true).length >= 2) {
-        this.error.message = 'Mehrere Fehler.'
-      }
+      this.validateInputs(this.newUser)
 
       if (!this.error.show) {
         //Create User --> POST
-        //TODO Implement POST request
         const res = await createNewUser(this.newUser)
-        if (res.status === 201) {
+        if (res.ok) {
           //Update User --> PUT
           this.getAllUsers()
           this.cancel()
         } else {
-          this.error.message = 'Es ist ein Fehler aufgetreten.'
+          this.error.message = res.body.message
           this.error.show = true
         }
       }
     },
 
     async saveEditedUser() {
-      this.resetError()
-
-      if (this.editUser.firstname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (this.editUser.lastname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
-      }
-
-      //TODO Fehlerabfangen andere Inputs
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.roleInput].filter(x => x === true).length >= 2) {
-        this.error.message = 'Mehrere Fehler.'
-      }
+      this.validateInputs(this.editUser)
 
       if (!this.error.show) {
-        const oldEntry = this.allUsers.find(m => m.id === this.editUser.id)
+        delete this.editUser.readPatchnotes
 
-        console.log(_.isEqual(this.editUser.accessible_groups.map(g => g.id), oldEntry.accessible_groups))
-        console.log(this.editUser.firstname === oldEntry.firstname)
-        console.log(this.editUser.lastname === oldEntry.lastname)
-        console.log(_.isEqual(this.editUser.roles, oldEntry.roles))
-        console.log(this.editUser.username === oldEntry.username)
-        console.log(this.editUser.email === oldEntry.email)
+        this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g.id)
 
-        if (this.editUser.firstname === oldEntry.firstname && this.editUser.lastname === oldEntry.lastname && this.editUser.username === oldEntry.username && this.editUser.email === oldEntry.email && _.isEqual(this.editUser.accessible_groups.map(g => g.id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
-          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
-          this.error.show = true
+        const res = await updateUser(this.editUser)
+        if (res.ok) {
+          //Update User
+          this.getAllUsers()
+          this.cancel()
         } else {
-          delete this.editUser.readPatchnotes
-          
-          this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g.id)
-
-          const res = await updateUser(this.editUser)
-          if (res.status === 200) {
-            //Update User
-            this.getAllUsers()
-            this.cancel()
-          } else {
-            this.error.message = 'Es ist ein Fehler aufgetreten.'
-            this.error.show = true
-          }
+          this.error.message = res.body.message
+          this.error.show = true
         }
       }
     },
 
     async deleteUser(id) {
       const res = await deleteUser(id)
-      if (res.status === 200) {
+      if (res.ok) {
         //Update User
         this.getAllUsers()
         this.cancel()
@@ -588,7 +544,61 @@ export default {
       } else {
         return 'Keine Rolle'
       }
-    }
+    },
+
+    validateInputs(inputs) {
+      console.log(inputs);
+      this.resetError()
+
+      if (inputs.firstname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
+      if (inputs.lastname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+      if (inputs.username.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Benutzernamen ein.'
+        this.error.show = true
+        this.error.cause.usernameInput = true
+      }
+      if (inputs.email.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen E-Mail ein.'
+        this.error.show = true
+        this.error.cause.emailInput = true
+      }
+      //Check if email is valid
+      if (!inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+        this.error.message = 'Bitte eine gültige E-Mail ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+
+      //If any error is true, set error.message to 'Mehrere Fehler.'
+      if (Object.keys(this.error.cause).some(k => this.error.cause[k])) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (typeof inputs.id !== 'undefined') {
+        const oldEntry = this.allUsers.find(m => m.id === inputs.id)
+        if (_.isEqual(this.editUser.firstname, oldEntry.firstname) && _.isEqual(this.editUser.lastname, oldEntry.lastname)
+          && _.isEqual(this.editUser.username, oldEntry.username) && _.isEqual(this.editUser.email, oldEntry.email)
+          && _.isEqual(this.editUser.accessible_groups.map(g => g.id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
+          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
+          this.error.show = true
+        }
+      }
+    },
+    async resendPassword(id) {
+      const res = await resendPassword(id)
+      if (res.ok) {
+        this.error.message = res.body.message
+        this.error.show = true
+      }
+    },
   },
 
   async created() {
