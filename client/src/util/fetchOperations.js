@@ -124,13 +124,65 @@ async function getAllGroups() {
 	);
 }
 
+async function createNewGroup(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "groups"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function deleteGroup(groupID){
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID].join("/"), {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }			
+}
+
+async function updateGroup(groupID, body) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID].join("/"), {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
 async function fetchGroup(groupID) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
 	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "group", groupID].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
@@ -640,5 +692,8 @@ export {
 	updateUser,
 	deleteUser,
 	resendPassword,
-	getAllGroups
+	getAllGroups,
+	createNewGroup,
+	deleteGroup,
+	updateGroup
 };
