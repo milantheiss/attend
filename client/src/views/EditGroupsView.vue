@@ -40,44 +40,50 @@
         </transition>
       </div>
       <!--TODO Collapsible für jedes Department-->
-      <div v-for="department in this.departments" :key="department._id">
-        <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-[73vh]">
-          <table class="table-auto w-full text-left">
-            <thead>
-              <tr
-                :class="{ 'border-b border-[#D1D5DB]': typeof this.searchResults.filter(g => g.department._id === department._id) !== 'undefined' && this.searchResults.filter(g => g.department._id === department._id)?.length > 0 }">
-                <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByGroupname">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="indexSort.groupname"></SortIcon>
-                    Gruppenbezeichnung
-                  </span>
-                </th>
-                <th scope="col" class="pb-2.5 font-medium"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="group in this.searchResults.filter(g => g.department._id === department._id)" :key="group._id"
-                @click="openEditGroup(group._id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-                <!--Gruppenbezeichnung-->
-                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                  <p class="">{{ group.name }}</p>
-                </td>
+      <CollapsibleContainer v-for="department in this.departments" :key="department._id"
+        class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col h-fit max-h-[73vh] overflow-y-auto">
+        <template #header>
+          <p class="font-medium">{{ department.name }}</p>
+        </template>
+        <template #content>
+          <div class="">
+            <table class="table-auto w-full text-left">
+              <thead>
+                <tr
+                  :class="{ 'border-b border-[#D1D5DB]': typeof this.searchResults.filter(g => g.department._id === department._id) !== 'undefined' && this.searchResults.filter(g => g.department._id === department._id)?.length > 0 }">
+                  <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByGroupname">
+                    <span class="flex items-center gap-1">
+                      <SortIcon :index="indexSort.groupname"></SortIcon>
+                      Gruppenbezeichnung
+                    </span>
+                  </th>
+                  <th scope="col" class="pb-2.5 font-medium"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="group in this.searchResults.filter(g => g.department._id === department._id)" :key="group._id"
+                  @click="openEditGroup(group._id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                  <!--Gruppenbezeichnung-->
+                  <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                    <p class="">{{ group.name }}</p>
+                  </td>
 
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
-                  <!--Arrow Right-->
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                  </svg>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <p v-show="typeof this.searchResults.filter(g => g.department._id === department._id) === 'undefined' || this.searchResults.filter(g => g.department._id === department._id)?.length === 0"
-            class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
-        </div>
-      </div>
+                  <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
+                    <!--Arrow Right-->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                      stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p v-show="typeof this.searchResults.filter(g => g.department._id === department._id) === 'undefined' || this.searchResults.filter(g => g.department._id === department._id)?.length === 0"
+              class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
+          </div>
+        </template>
+      </CollapsibleContainer>
     </div>
 
     <!-- Create New Group Modal -->
@@ -419,7 +425,8 @@ export default {
     async getAllGroups() {
       this.allGroups = (await getAllGroups()).sort((a, b) => a.name.localeCompare(b.name))
       //Array aus allen Departments der Gruppen Keine Duplikate
-      this.departments = [...new Set(this.allGroups.map(g => g.department))].sort((a, b) => a.name.localeCompare(b.name))
+      this.departments = this.allGroups.map(g => g.department).filter((value, index, array) => array.findIndex(t => (t._id === value._id)) === index)
+      this.searchResults = this.allGroups
     },
 
     resetError() {

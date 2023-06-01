@@ -3,21 +3,21 @@ const { Group, Attendance, Member, User, Department } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
 const attendanceService = require('./attendance.service');
-const { log } = require('../config/logger');
+const _ = require('lodash');
 
 async function getTrainersOfGroup(group) {
-    group.trainers = await Promise.all(group.trainers.map(async (trainer) => {
+    return await Promise.all(group.trainers.map(async (trainer) => {
         const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
         trainer._doc.firstname = res.firstname;
         trainer._doc.lastname = res.lastname;
         trainer._doc._id = res._id;
+
         return trainer;
     }));
-    return group.trainers
 }
 
 async function getParticipantsOfGroup(group) {
-    group.participants = await Promise.all(group.participants.map(async (participant) => {
+    return await Promise.all(group.participants.map(async (participant) => {
         const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
         if (res === null) {
             // console.error(`Member not found ${participant.memberId} in group ${group.name}`);
@@ -29,12 +29,11 @@ async function getParticipantsOfGroup(group) {
         participant._doc._id = res._id;
         return participant;
     }));
-    return group.participants
 }
 
 async function getDepartmentOfGroup(group) {
-    group.department = await Department.findById(group.department, { name: 1, _id: 1 })
-    return group.department
+    const d = await Department.findOne({ _id: group.department }, { name: 1, _id: 1 })
+    return d._doc
 }
 
 /**
@@ -46,10 +45,12 @@ const getGroups = async () => {
     //admin hat Zugriff auf alle Gruppen
     let groups = await Group.find({})
 
-    for (group of groups) {
-        group.trainers = await getTrainersOfGroup(group)
-        group.participants = await getParticipantsOfGroup(group)
-        group.department = await getDepartmentOfGroup(group)
+    for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        group._doc.trainers = await getTrainersOfGroup(group);
+        group._doc.participants = await getParticipantsOfGroup(group);
+        group._doc.department = await getDepartmentOfGroup(group)
+        groups[i] = group;
     }
 
     groups.sort((a, b) => a.name.localeCompare(b.name))

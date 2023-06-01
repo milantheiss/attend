@@ -5,7 +5,15 @@ const path = require("path");
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), mkcert()],
+  plugins: [vue(
+    {
+      template: {
+        compilerOptions: {
+          isCustomElement: tag => ["header", "content"].includes(tag),
+        }
+      }
+    }
+  ), mkcert()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
