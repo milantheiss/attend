@@ -15,7 +15,7 @@ const updateUser = {
     //
     email: Joi.string().email(),
     //String als ObjectId
-    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
     roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")),
     //Array aus ObjectIds

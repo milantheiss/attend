@@ -20,17 +20,19 @@ const addMember = {
 const updateMember = {
   params: Joi.object().keys({
     //String als ObjectId
-    groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+    groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+    memberID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
   }),
   body: Joi.object().keys({
     //String als ObjectId
-    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
     memberId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //Datum als String im Format YYYY-MM-DD sein
     firsttraining: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
     //Array aus ObjectIds Not required
     openIssues: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
+    _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
   })
 };
 
@@ -90,7 +92,8 @@ const updateGroup = {
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
     venue: Joi.string().pattern(/^[a-zA-Z- ]+$/),
     //Array aus ObjectIds Required
-    department: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/))
+    department: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
+    _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
   })
 };
 

@@ -1,15 +1,15 @@
-//Implement GROUP ROUTE
-
 const express = require('express');
 const { groupController } = require('../controllers');
 const verifyToken = require('../middlewares/auth');
+const validate = require('../middlewares/validate');
+const { groupValidation } = require('../validations');
 
 const router = express.Router();
 
 router
     .route('/')
     .get(verifyToken, groupController.getGroups)
-    .post(verifyToken, groupController.createGroup)
+    .post(verifyToken, validate(groupValidation.createGroup), groupController.createGroup)
 
 router
     .route('/assigned')
@@ -17,19 +17,11 @@ router
 
 router
     .route('/:groupID')
-    .get(verifyToken, groupController.getGroupById)
-
-router
-    .route('/:groupID/members')
-    .patch(verifyToken, groupController.updateMember)
+    .get(verifyToken, validate(groupValidation.getGroupById), groupController.getGroupById)
 
 router
     .route('/:groupID/getGroupName')
     .get(verifyToken, groupController.getGroupName)
-
-router
-    .route('/:groupID/removeMember/:memberID')
-    .delete(verifyToken, groupController.removeMember)
 
 module.exports = router;
 

@@ -203,7 +203,7 @@ async function getGroupName(groupID) {
 	);
 }
 
-async function updateMemberInGroup(groupID, body) {
+async function updateMemberInGroup(groupID, memberID, body) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
 	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
@@ -212,7 +212,7 @@ async function updateMemberInGroup(groupID, body) {
 	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "updateMember"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member", memberID].join("/"), {
 			method: "PATCH",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(body),
@@ -232,7 +232,7 @@ async function removeMemberFromGroup(groupID, memberID) {
 	if (typeof memberID !== "string") throw new Error("notificationID must be a string")
 
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID, "removeMember", memberID].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member", memberID].join("/"), {
 			method: "DELETE",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",

@@ -15,7 +15,7 @@ const updateMember = {
     //Array aus ObjectIds Not required
     groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
     //String als ObjectId
-    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //Array aus ObjectIds Not required
     openIssues: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
     //Array aus ObjectIds Not required Can be empty

@@ -108,13 +108,9 @@ const getGroupById = async (user, groupID) => {
  * @param {Object} groupBody
  * @returns {Promise<Group>}
  */
-const createGroup = async (user, groupBody) => {
-    if (hasAdminRole(user)) {
-        //Nur Admins dürfen Gruppen erstellen
-        return await Group.create(groupBody);
-    } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new group")
-    }
+const createGroup = async (groupBody) => {
+    //Nur Admins dürfen Gruppen erstellen
+    return await Group.create(groupBody);
 };
 
 /**

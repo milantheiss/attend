@@ -22,10 +22,10 @@ router
 router
     .route('/:groupID/member')
     .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
-    .patch(verifyToken, validate(groupValidation.updateMember), groupController.updateMember)
-
-router
+    
+    router
     .route('/:groupID/member/:memberID')
+    .patch(verifyToken, validate(groupValidation.updateMember), groupController.updateMember)
     .delete(verifyToken, validate(groupValidation.removeMember), groupController.removeMember)
 
 router

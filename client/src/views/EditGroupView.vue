@@ -77,7 +77,7 @@ export default {
      */
     async onClickOnSave(participantData) {
       //Update DB
-      await updateMemberInGroup(this.selectedGroup._id, participantData)
+      await updateMemberInGroup(this.selectedGroup._id, participantData._id, participantData)
       
       //Updated groupData locally damit Change instant ist
       this.groupData.participants = this.groupData.participants.map(p => {
