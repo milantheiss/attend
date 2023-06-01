@@ -1,7 +1,6 @@
-const { Notification, User } = require("../models");
+const { Notification } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
-const { default: mongoose } = require("mongoose");
 const { hasAdminRole } = require("../utils/roleCheck");
 
 /**
@@ -10,7 +9,6 @@ const { hasAdminRole } = require("../utils/roleCheck");
  */
 const addNewNotification = async (body) => {
 	//WARNING No access control here
-	//TODO Restrictions for Notification creation --> z.B. @everyone nur für Admins
 	body.date = body.date || new Date();
 	const notification = await Notification.create(body);
 
@@ -31,9 +29,9 @@ const addRecipients = async (notificationID, userID) => {
  * @returns {Promise<[Notification]>}
  */
 const removeRecipient = async (notificationID, userID) => {
-	//TODO FIX THIS
-
-	return Notification.findByIdAndUpdate(notificationID, { $pull: { recipients: { userID: userID } } }, { new: true });
+	const notification = await Notification.findById(notificationID);
+	notification.recipients = notification.recipients.filter((recipient) => recipient.userID !== userID);
+	return notification.save();
 };
 
 /**
@@ -43,7 +41,6 @@ const removeRecipient = async (notificationID, userID) => {
  * @returns {Promise<[Notification]>} Returns updated notification
  */
 const updateMessage = async (notificationID, message) => {
-	//TODO Add access control here
 	return Notification.findByIdAndUpdate(notificationID, { $set: { message: message } }, { new: true });
 };
 

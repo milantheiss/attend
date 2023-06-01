@@ -12,18 +12,12 @@ router
     .post(verifyToken, groupController.createGroup)
 
 router
-    .route("/search")
-    .get(verifyToken, groupController.searchGroups)
+    .route('/assigned')
+    .get(verifyToken, groupController.getAssignedGroups)
 
 router
     .route('/:groupID')
     .get(verifyToken, groupController.getGroupById)
-
-//TODO Auth adden + In Service/Controller die returnten Daten auf Permission beschränken
-/*
-.patch(groupController.updateGroup)
-.delete(groupController.deleteGroup)
-*/
 
 router
     .route('/:groupID/members')
@@ -36,9 +30,6 @@ router
 router
     .route('/:groupID/removeMember/:memberID')
     .delete(verifyToken, groupController.removeMember)
-
-//TODO Add capability to update members by /:groupID/addmember
-//Backend soll Teilnehmer Liste ziehen und den neuen Teilnehmer anhängen und dann neue Liste in DB pushen
 
 module.exports = router;
 

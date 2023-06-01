@@ -23,7 +23,7 @@
           </svg>
           <TextInput type="password" name="password" v-model="form.password" placeholder="Passwort"></TextInput>
         </div>
-        <ErrorMessage :message="'Username oder Passwort ist falsch!'" :show="showError" class="font-medium"/>
+        <ErrorMessage :message="'Username oder Passwort ist falsch!'" :show="showError" class=""/>
         <div class="mt-2">
           <button type="submit" class="w-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3.5 md:px-7 py-4 rounded-2xl drop-shadow-md font-medium text-xl">Login</button>
         </div>

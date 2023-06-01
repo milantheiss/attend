@@ -7,7 +7,7 @@
             <div ref="modal-backdrop" class="fixed z-30 inset-0 overflow-y-auto bg-black bg-opacity-50" v-if="showModal">
                 <!--Elementfenster-->
                 <div class="flex items-start justify-center min-h-screen pt-28 md:pt-38 text-center">
-                    <div class="flex flex-col gap-4 overflow-hidden w-5/6 md:max-w-medium-width px-3.5 md:px-7 py-4 bg-white rounded-xl drop-shadow-md text-lg md:text-xl"
+                    <div class="flex flex-col gap-4 overflow-hidden w-full md:max-w-medium-width mx-3.5 md:mx-7  px-3.5 md:px-7 py-4 bg-white rounded-xl drop-shadow-md text-lg md:text-xl"
                         role="dialog" ref="modal" aria-modal="true" aria-labelledby="modal-headline">
                         <!--Header-->
                         <div class="text-left font-bold" v-show="hasHeader">

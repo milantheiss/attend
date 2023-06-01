@@ -18,27 +18,11 @@ async function watchForRedirects(res, { raw = false } = {}) {
 	}
 }
 
-async function fetchGroups() {
-	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups"].join("/"), {
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
 
-async function fetchGroup(groupID) {
-	if (!groupID) throw new Error("No groupID provided")
-	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
 
-	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups", groupID].join("/"), {
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
+
+
+//INFO Fetch Operations zu /attendance
 
 async function fetchAttendance(groupID) {
 	if (!groupID) throw new Error("No groupID provided")
@@ -91,27 +75,6 @@ async function updateTrainingssession(groupID, date, body) {
 	);
 }
 
-//WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
-// async function addTrainingssession(groupID, body) {
-//   await watchForRedirects((await fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID].join('/'), {
-//     method: 'PATCH',
-//     body: JSON.stringify(body),
-//     headers: { 'Content-type': 'application/json; charset=UTF-8' },
-//     credentials: 'include',
-//     mode: 'cors'
-//   })))
-// }
-
-//WARNING Wird nicht benutzt. --> Kann gelöscht werden wenn kein Fehler entsteht. API Endpoint ist deaktiviert!!
-// async function deleteTrainingssession(groupID, date) {
-//   await watchForRedirects((await fetch([import.meta.env.VITE_API_URL, "attendance/byGroupID", groupID, getShortenedJSONDate(date)].join('/'), {
-//     method: 'DELETE',
-//     headers: { 'Content-type': 'application/json; charset=UTF-8' },
-//     credentials: 'include',
-//     mode: 'cors'
-//   })))
-// }
-
 async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
@@ -134,6 +97,43 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 				mode: "cors",
 			}
 		)
+	);
+}
+
+
+
+
+
+//INFO Fetch Operations zu /group oder /groups
+
+async function fetchGroups() {
+	return await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "groups"].join("/assigned"), {
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function getAllGroups() {
+	return await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "groups"].join("/"), {
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function fetchGroup(groupID) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	return await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "groups", groupID].join("/"), {
+			credentials: "include",
+			mode: "cors",
+		})
 	);
 }
 
@@ -170,57 +170,6 @@ async function updateMemberInGroup(groupID, body) {
 	);
 }
 
-async function createNewMember(body) {
-	if (typeof body === "undefined") throw new Error("body must be defined")
-	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
-
-	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "member"].join("/"), {
-			method: "POST",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify(body),
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-async function deleteMember(memberId) {
-	if (!memberId) throw new Error("No memberId provided")
-	if (typeof memberId === "undefined") throw new Error("memberId must be defined")
-	if (typeof memberId !== "string") throw new Error("memberId must be a string")
-
-	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "member", memberId].join("/"), {
-			method: "DELETE",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-async function updateMember(body) {
-	if (typeof body === "undefined") throw new Error("body must be defined")
-	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
-
-	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "member", body.id].join("/"), {
-			method: "PATCH",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify(body),
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
 async function removeMemberFromGroup(groupID, memberID) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
@@ -240,101 +189,9 @@ async function removeMemberFromGroup(groupID, memberID) {
 	);
 }
 
-async function getAllUsers() {
-	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/users`, {
-			method: "GET",
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	)
-	if (res.ok) {
-		return res.json()
-	} else {
-		return []
-	}
-}
 
-async function createNewUser(body) {
-	if (typeof body === "undefined") throw new Error("body must be defined")
-	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
 
-	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/user`, {
-			method: "POST",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify(body),
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-async function updateUser(body) {
-	if (typeof body === "undefined") throw new Error("body must be defined")
-	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
-
-	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/user/${body.id}`, {
-			method: "PATCH",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify(body),
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-async function deleteUser(userID) {
-	if (!userID) throw new Error("No userID provided")
-	if (typeof userID === "undefined") throw new Error("userID must be defined")
-
-	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}`, {
-			method: "DELETE",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-async function resendPassword(userID) {
-	if (!userID) throw new Error("No userID provided")
-	if (typeof userID === "undefined") throw new Error("userID must be defined")
-
-	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}/resend-password`, {
-			method: "GET",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		}), { raw: true }
-	);
-
-	return { ok: res.ok, body: await res.json() }
-}
-
-/**
- * Fetches the last patch notes from the API
- * @returns {Object} {patchNotes: String, version: String, date: Date, text: String, title: String}
- */
-async function getLastPatchNotes() {
-	return (
-		await fetch([import.meta.env.VITE_API_URL, "patchNotes"].join("/"), {
-			method: "GET",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		})
-	).json();
-}
+//INFO Fetch Operations zu /invoice
 
 /**
  * Fetches the data for a new invoice from the API
@@ -389,6 +246,161 @@ async function sendInvoice(body) {
 		{ raw: true }
 	);
 }
+
+async function getAllAssignedInvoices() {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/assigned`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function getInvoiceById(id) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/${id}`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+async function approveInvoice(id) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/approve/${id}`, {
+			method: "POST",
+			credentials: "include",
+			mode: "cors",
+		}),
+		{ raw: true }
+	);
+}
+
+async function rejectInvoice(id) {
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/reject/${id}`, {
+			method: "POST",
+			credentials: "include",
+			mode: "cors",
+		}),
+		{ raw: true }
+	);
+}
+
+async function getAllInvoicesInYear(year) {
+	if (typeof year === "undefined") throw new Error("year must be defined")
+
+	if (typeof year === Number) throw new Error("Year must be a number");
+
+	return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/invoice/getAllInYear/${year}`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+
+
+
+
+//INFO Fetch Operations zu /member oder /members
+
+async function createNewMember(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "member"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function deleteMember(memberId) {
+	if (!memberId) throw new Error("No memberId provided")
+	if (typeof memberId === "undefined") throw new Error("memberId must be defined")
+	if (typeof memberId !== "string") throw new Error("memberId must be a string")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "member", memberId].join("/"), {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function updateMember(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "member", body.id].join("/"), {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function getAllMembers() {
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/members`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	)
+	if (res.ok) {
+		return res.json()
+	} else {
+		return []
+	}
+}
+
+
+
+
+
+//INFO Fetch Operations zu /patchNotes
+
+/**
+ * Fetches the last patch notes from the API
+ * @returns {Object} {patchNotes: String, version: String, date: Date, text: String, title: String}
+ */
+async function getLastPatchNotes() {
+	return (
+		await fetch([import.meta.env.VITE_API_URL, "patchNotes"].join("/"), {
+			method: "GET",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		})
+	).json();
+}
+
+
+
+
+
+//INFO Fetch Operations zu /notification
 
 async function getNotifications() {
 	return await watchForRedirects(
@@ -505,65 +517,15 @@ async function setManyNotificationsAsRead(notificationIDs) {
 	);
 }
 
-async function getAllAssignedInvoices() {
-	return await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/invoice/assigned`, {
-			method: "GET",
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
 
-async function getInvoiceById(id) {
-	return await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/invoice/${id}`, {
-			method: "GET",
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
 
-async function approveInvoice(id) {
-	return await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/invoice/approve/${id}`, {
-			method: "POST",
-			credentials: "include",
-			mode: "cors",
-		}),
-		{ raw: true }
-	);
-}
 
-async function rejectInvoice(id) {
-	return await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/invoice/reject/${id}`, {
-			method: "POST",
-			credentials: "include",
-			mode: "cors",
-		}),
-		{ raw: true }
-	);
-}
 
-async function getAllInvoicesInYear(year) {
-	if (typeof year === "undefined") throw new Error("year must be defined")
+//INFO Fetch Operations zu /user oder /users
 
-	if (typeof year === Number) throw new Error("Year must be a number");
-
-	return await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/invoice/getAllInYear/${year}`, {
-			method: "GET",
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
-
-async function getAllMembers() {
+async function getAllUsers() {
 	const res = await watchForRedirects(
-		fetch(`${import.meta.env.VITE_API_URL}/members`, {
+		fetch(`${import.meta.env.VITE_API_URL}/users`, {
 			method: "GET",
 			credentials: "include",
 			mode: "cors",
@@ -576,13 +538,79 @@ async function getAllMembers() {
 	}
 }
 
+async function createNewUser(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user`, {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function updateUser(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${body.id}`, {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function deleteUser(userID) {
+	if (!userID) throw new Error("No userID provided")
+	if (typeof userID === "undefined") throw new Error("userID must be defined")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}`, {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function resendPassword(userID) {
+	if (!userID) throw new Error("No userID provided")
+	if (typeof userID === "undefined") throw new Error("userID must be defined")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/${userID}/resend-password`, {
+			method: "GET",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
 export {
-	fetchGroup,
-	fetchGroups,
 	fetchAttendance,
 	fetchAttendanceByDate,
 	updateTrainingssession,
 	fetchAttendanceByDateRange,
+	fetchGroup,
+	fetchGroups,
 	getGroupName,
 	updateMemberInGroup,
 	removeMemberFromGroup,
@@ -611,5 +639,6 @@ export {
 	getAllUsers,
 	updateUser,
 	deleteUser,
-	resendPassword
+	resendPassword,
+	getAllGroups
 };

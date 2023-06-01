@@ -4,8 +4,6 @@ const verifyToken = require('../middlewares/auth');
 
 const router = express.Router();
 
-//TODO Add was geschehen soll wenn gewisse URL mit verschiedenen CRUD Operations angesprochen werden
-
 router
     .route('/')
     .get(verifyToken, attendanceController.getAttendance)

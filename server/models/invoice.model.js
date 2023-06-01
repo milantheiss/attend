@@ -45,8 +45,6 @@ const invoiceSchema = mongoose.Schema(
                            ],
                         required: true
                     },
-                    // Embeded Attendance List muss geladen werden
-                    // TODO: Embeded Attendance List muss geladen werden
                     attendanceList: Object,
                     venue: String
                 }

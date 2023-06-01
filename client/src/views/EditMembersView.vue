@@ -27,9 +27,10 @@
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="firstname" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
+            <TextInput name="searchbar" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
             </TextInput>
-            <div class="px-3.5 py-3.5" @click="$refs.searchBar.input = ''">
+            <div class="px-3.5 py-3.5"
+              @click="() => { if ($refs.searchBar.input === '') showSearchBar = false; $refs.searchBar.input = ''; }">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                 stroke="currentColor" class="w-8 h-8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -38,7 +39,7 @@
           </div>
         </transition>
       </div>
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-[73vh]">
         <table class="table-auto w-full text-left">
           <thead>
             <tr :class="{ 'border-b border-[#D1D5DB]': typeof allMembers !== 'undefined' && allMembers?.length > 0 }">
@@ -113,14 +114,14 @@
 
           <!--Vorname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="firstname" class="hidden sm:block">Vorname:</label>
+            <label for="firstname" class="">Vorname:</label>
             <TextInput name="firstname" v-model="newMember.firstname" placeholder="Vorname"
               :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Nachname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="lastname" class="hidden sm:block">Nachname:</label>
+            <label for="lastname" class="">Nachname:</label>
             <TextInput name="lastname" v-model="newMember.lastname" placeholder="Nachname"
               :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
           </div>
@@ -162,14 +163,14 @@
 
           <!--Vorname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="firstname" class="hidden sm:block">Vorname:</label>
+            <label for="firstname" class="">Vorname:</label>
             <TextInput name="firstname" v-model="editMember.firstname" placeholder="Vorname"
               :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Nachname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="lastname" class="hidden sm:block">Nachname:</label>
+            <label for="lastname" class="">Nachname:</label>
             <TextInput name="lastname" v-model="editMember.lastname" placeholder="Nachname"
               :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
           </div>
@@ -190,7 +191,8 @@
                 <p class="font-medium">Gruppen</p>
               </template>
               <template #content>
-                <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2">
+                <div v-for="group in editMember.groups " :key="group.id" class="flex justify-between items-center gap-2"
+                  v-show="editMember.groups.length !== 0">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
@@ -198,17 +200,21 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
+                <p v-show="editMember.groups.length === 0">In keiner Gruppe</p>
               </template>
             </CollapsibleContainer>
           </div>
           <div class="w-full flex items-center justify-between gap-4 mt-4">
             <p class="">Mitglied löschen:</p>
-            <button @click="() => {showDeleteButton = true; error.message = 'Das Mitglied wird aus allen Gruppen und dazu gehörige Listen entfernt!'; error.show = true;}" v-show="!showDeleteButton"
+            <button
+              @click="() => { showDeleteButton = true; error.message = 'Das Mitglied wird aus allen Gruppen und dazu gehörige Listen entfernt!'; error.show = true; }"
+              v-show="!showDeleteButton"
               class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3">
               <p class="font-medium font-base md:text-lg">Löschen</p>
             </button>
             <button @click="deleteMember(editMember.id)"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3" v-show="showDeleteButton">
+              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3"
+              v-show="showDeleteButton">
               <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
             </button>
           </div>
@@ -383,83 +389,34 @@ export default {
     },
 
     async createNewMember() {
-      this.resetError()
-
-      if (this.newMember.firstname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (this.newMember.lastname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
-      }
-      if (this.newMember.birthday.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Geburtstag ein.'
-        this.error.show = true
-        this.error.cause.birthdayInput = true
-      }
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
-        this.error.message = 'Mehrere Fehler.'
-      }
+      this.validateInputs(this.newMember)
 
       if (!this.error.show) {
-        //Create Member --> POST
-        //TODO Implement POST request
         const res = await createNewMember(this.newMember)
         if (res.status === 201) {
-          //Update Member --> PUT
           this.getAllMembers()
           this.cancel()
         } else {
-          this.error.message = 'Es ist ein Fehler aufgetreten.'
+          this.error.message = res.body.message
           this.error.show = true
         }
       }
     },
 
     async saveEditedMember() {
-      this.resetError()
-
-      if (this.editMember.firstname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (this.editMember.lastname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
-      }
-      if (this.editMember.birthday.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Geburtstag ein.'
-        this.error.show = true
-        this.error.cause.birthdayInput = true
-      }
-      if ([this.error.cause.firstnameInput, this.error.cause.lastnameInput, this.error.cause.birthdayInput].filter(x => x === true).length >= 2) {
-        this.error.message = 'Mehrere Fehler.'
-      }
+      this.validateInputs(this.editMember)
 
       if (!this.error.show) {
-        const oldEntry = this.allMembers.find(m => m.id === this.editMember.id)
-
-        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname && this.editMember.birthday === oldEntry.birthday.slice(0, 10) && _.isEqual(this.editMember.groups.map(g => g.id), oldEntry.groups)) {
-          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
-          this.error.show = true
+        const res = await updateMember({
+          ...this.editMember,
+          groups: this.editMember.groups.map(g => g.id)
+        })
+        if (res.status === 200) {
+          this.getAllMembers()
+          this.cancel()
         } else {
-          const res = await updateMember({
-            ...this.editMember,
-            groups: this.editMember.groups.map(g => g.id)
-          })
-          if (res.status === 200) {
-            //Update Member
-            this.getAllMembers()
-            this.cancel()
-          } else {
-            this.error.message = 'Es ist ein Fehler aufgetreten.'
-            this.error.show = true
-          }
+          this.error.message = res.body.message
+          this.error.show = true
         }
       }
     },
@@ -467,11 +424,10 @@ export default {
     async deleteMember(id) {
       const res = await deleteMember(id)
       if (res.status === 200) {
-        //Update Member
         this.getAllMembers()
         this.cancel()
       } else {
-        this.error.message = 'Es ist ein Fehler aufgetreten.'
+        this.error.message = res.body.message
         this.error.show = true
       }
     },
@@ -493,11 +449,48 @@ export default {
 
     resetError() {
       this.error.show = false
-      this.error.cause.firstnameInput = false
-      this.error.cause.lastnameInput = false
-      this.error.cause.birthdayInput = false
+      this.error.cause = {
+        firstnameInput: false,
+        lastnameInput: false,
+        birthdayInput: false
+      }
       this.error.message = ''
-    }
+    },
+
+    validateInputs(inputs) {
+      this.resetError()
+
+      if (inputs.firstname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
+      if (inputs.lastname.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+      if (this.editMember.birthday.trim().length === 0) {
+        this.error.message = 'Bitte gebe einen Geburtstag ein.'
+        this.error.show = true
+        this.error.cause.birthdayInput = true
+      }
+
+      //If any error is true, set error.message to 'Mehrere Fehler.'
+      if (Object.keys(this.error.cause).some(k => this.error.cause[k])) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (typeof inputs.id !== 'undefined') {
+        const oldEntry = this.allMembers.find(m => m.id === this.editMember.id)
+        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname
+          && this.editMember.birthday === oldEntry.birthday.slice(0, 10)
+          && _.isEqual(this.editMember.groups.map(g => g.id), oldEntry.groups)) {
+          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
+          this.error.show = true
+        }
+      }
+    },
   },
 
   async created() {

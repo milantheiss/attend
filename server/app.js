@@ -29,7 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // Defining route middleware
-//TODO Routes wahrscheinlich richtig gesetzt
 app.use('/', routes);
 
 // send back a 404 error for any unknown api request

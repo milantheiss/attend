@@ -140,7 +140,6 @@ class AttendanceListPdf {
   }
 
   static generateAttendanceBox(doc, dates, participant) {
-    //TODO Bug hier?
     let xPos = 249.89;
     for (let i = 0; i < dates.length; i++) {
       dates[i] = new Date(dates[i]);

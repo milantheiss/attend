@@ -28,7 +28,7 @@ const login = catchAsync(async (req, res) => {
 		// Validate if user exist in our database
 		const user = await authenticationService.getUserByUsername(username);
 
-		if (user && (await bcrypt.compare(password, user.password))) {
+		if (user && (await bcrypt.compare(password, user.password)) && !user.deactivated) {
 			// Create access token
 			const access_token = jwt.sign({ user_id: user._id, username: user.username }, config.secret, {
 				expiresIn: "15min",

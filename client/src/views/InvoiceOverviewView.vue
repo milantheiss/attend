@@ -187,8 +187,6 @@ import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
 import YearInput from '@/components/YearInput.vue';
 import SortIcon from '@/components/SortIcon.vue';
 
-//TODO Umstellen auf Antrag Seite
-
 export default {
     name: "InvoiceOverviewView",
     setup() {
@@ -204,8 +202,6 @@ export default {
             allAssignedInvoices: [],
             allInvoicesInYear: [],
             spin: false,
-            //TODO sort by values in array eintragen
-            sortBy: [],
             selectedYear: new Date().getFullYear(),
             indexSortButtonStatus: 0,
             indexSortButtonTimespan: 0,

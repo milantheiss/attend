@@ -1,9 +1,10 @@
 const httpStatus = require("http-status");
-const { default: mongoose } = require("mongoose");
-const { User } = require("../models");
+const { User, Notification, Department } = require("../models");
 const ApiError = require("../utils/ApiError");
 const nanoid = require("nanoid");
-const { groupService } = require(".");
+const groupService = require('./group.service');
+const notificationService = require('./notification.service');
+const _ = require('lodash');
 
 /**
  * Get all members.
@@ -24,7 +25,8 @@ const getUserById = async (userID) => {
 };
 
 const getUsers = async () => {
-	return await User.find({});
+	//Get all users which are not deactivated oder undefined
+	return await User.find({ deactivated: { $ne: true } });
 };
 
 const createUser = async (userBody) => {
@@ -62,28 +64,31 @@ const updateUser = async (userID, updateBody) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
 	}
 
-
-    if (user.accessible_groups.length > updateBody.accessible_groups.length) {
-        //Remove Member from Group
-        const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group))
-        for (groupId of removedGroups) {
-            await groupService.removeTrainer(groupId, user._id)
-        }
-    } else if (user.accessible_groups.length < updateBody.accessible_groups.length) {
-        //Add Member to Group
-        const newGroups = updateBody.accessible_groups.filter(group => !user.accessible_groups.includes(group))
-        for (groupId of newGroups) {
-            await groupService.addTrainer(groupId, {id: user._id, role: user.roles.includes("trainer") ? "trainer" : "assistant"})
-        }
-    }
+	if (!_.isEqual(user.accessible_groups, updateBody.accessible_groups)) {
+		//Remove Member from Group
+		const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group))
+		for (groupId of removedGroups) {
+			await groupService.removeTrainer(groupId, user._id)
+		}
+		//Add Member to Group
+		const newGroups = updateBody.accessible_groups.filter(group => !user.accessible_groups.includes(group))
+		for (groupId of newGroups) {
+			await groupService.addTrainer(groupId, { id: user._id, role: user.roles.includes("trainer") ? "trainer" : "assistant" })
+		}
+	}
 
 	Object.assign(user, updateBody);
+
 	await user.save();
 	return user;
 };
 
 const deleteUser = async (userID) => {
+	//INFO Ein User Document sollte nicht gesamt gelöscht werden, da es in anderen Documents referenziert sein könnte
+	//Diese Methode deaktiviert den User nur
+
 	const user = await getUserById(userID);
+
 	if (!user) {
 		throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 	}
@@ -93,7 +98,22 @@ const deleteUser = async (userID) => {
 		await groupService.deleteTrainer(groupID, userID);
 	}
 
-	await user.remove();
+	const notifications = await Notification.find({ "recipients.userID": userID });
+
+	for (notification of notifications) {
+		await notificationService.removeRecipient(notification._id, userID);
+	}
+
+	//Remove user from department head array
+	const departments = await Department.find({ head: userID });
+	for (department of departments) {
+		department.head = undefined;
+		await department.save();
+	}
+
+	user.deactivated = true;
+
+	await user.save();
 	return user;
 };
 

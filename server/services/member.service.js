@@ -4,7 +4,7 @@ const { Member, Issue, Group, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const groupService = require('./group.service');
 const attendanceService = require('./attendance.service');
-const e = require('express');
+const _ = require('lodash');
 
 
 //Service updated/zieht die Daten aus DB
@@ -150,35 +150,20 @@ const updateMember = async (id, memberBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Member not found')
     }
 
-    if (typeof memberBody.firstname === 'string') {
-        member.firstname = memberBody.firstname
-    }
-
-    if (typeof memberBody.lastname === 'string') {
-        member.lastname = memberBody.lastname
-    }
-
-    if (typeof memberBody.birthday === 'string') {
-        member.birthday = new Date(memberBody.birthday)
-    }
-
-    //TODO Überprüfen ob eine Gruppe entfernt/hinzugefügt wurde --> Dann Member in Gruppe hinzu/entfernen
-
-    if (member.groups.length > memberBody.groups.length) {
+    if(_.isEqual(memberBody.groups, member.groups)) {
         //Remove Member from Group
         const removedGroups = member.groups.filter(group => !memberBody.groups.includes(group))
         for (groupId of removedGroups) {
             await groupService.removeMember(groupId, member._id)
         }
-        member.groups = memberBody.groups
-    } else if (member.groups.length < memberBody.groups.length) {
         //Add Member to Group
         const newGroups = memberBody.groups.filter(group => !member.groups.includes(group))
         for (groupId of newGroups) {
             await groupService.addMember(groupId, member._id)
         }
-        member.groups = memberBody.groups
     }
+
+    Object.assign(member, memberBody)
 
     await member.save()
 

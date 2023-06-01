@@ -2,7 +2,8 @@ const httpStatus = require('http-status');
 const { Group, Attendance, Member, User, Department } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
-const { attendanceService } = require('.');
+const attendanceService = require('./attendance.service');
+const { log } = require('../config/logger');
 
 async function getTrainersOfGroup(group) {
     group.trainers = await Promise.all(group.trainers.map(async (trainer) => {
@@ -41,7 +42,21 @@ async function getDepartmentOfGroup(group) {
  * @param  {import('mongoose').ObjectId} userId
  * @returns {Promise<[Group]>}
  */
-const getGroups = async (user) => {
+const getGroups = async () => {
+    //admin hat Zugriff auf alle Gruppen
+    let groups = await Group.find({})
+
+    for (group of groups) {
+        group.trainers = await getTrainersOfGroup(group)
+        group.participants = await getParticipantsOfGroup(group)
+        group.department = await getDepartmentOfGroup(group)
+    }
+
+    groups.sort((a, b) => a.name.localeCompare(b.name))
+    return groups
+};
+
+const getAssignedGroups = async (user) => {
     if (hasAdminRole(user)) {
         //admin hat Zugriff auf alle Gruppen
         let groups = await Group.find({})
@@ -50,7 +65,6 @@ const getGroups = async (user) => {
     } else if (user.accessible_groups.length > 0) { //Oder z.B. Assistent
         //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
         let groups = await Group.find({ '_id': { $in: user.accessible_groups } })
-
         if (groups.length === 0 || groups === null) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
             throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
@@ -60,10 +74,9 @@ const getGroups = async (user) => {
         groups.sort((a, b) => a.name.localeCompare(b.name))
 
         return groups
-    } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to a groups")
     }
-};
+}
+
 
 /**
  * Get a group by ID.
@@ -126,10 +139,6 @@ const updateMember = async (user, groupID, body) => {
         }
     } else {
         //Wenn Participant bereits existiert, wird er geupdatet
-        //WARNING Im Moment kann jeder Trainer einfach über die Gruppe den Namen eines Kindes ändern
-
-        //Member wird geupdatet
-        //TODO Hier sollte eine Namens Validierung stattfinden
         body = { ...body, ... await memberService.updateMember(body) }
         body.memberId = body._id
 
@@ -142,7 +151,6 @@ const updateMember = async (user, groupID, body) => {
             return e
         })
     }
-    //WARNING Es kann einen Fehler geben, je nachdem wie der übergebene body aussieht
     //Es wird ein Member mit memberId erwartet
     await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
 
@@ -259,17 +267,6 @@ const updateParticipantInTrainingssessions = async (groupID, participantData, ol
     }
 }
 
-const searchGroups = async (user, body) => {
-    // WARNING Es werden nicht die Relationen abgefragt, sondern nur die Gruppen
-    if (hasAdminRole(user) || hasTrainerRole(user) || hasAssistantRole(user)) {
-        let groups = await Group.find({ $text: { $search: body.query } })
-        groups.sort((a, b) => a.name.localeCompare(b.name))
-        return groups
-    } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "The user has no permission to search")
-    }
-}
-
 /**
  * 
  * @param {*} groupID 
@@ -286,8 +283,15 @@ const addTrainer = async (groupID, trainerBody) => {
 
     const group = await Group.findById(groupID)
 
-    if (group.trainers.some(e => e.userId.equals(trainerBody.id))) {
+    if (group.trainers.some(e => e.userId.equals(trainerBody.userId))) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Trainer already in group')
+    }
+
+    const user = await User.findById(trainerBody.userId)
+
+    if (!user.accessible_groups.includes(groupID)) {
+        user.accessible_groups.push(groupID)
+        user.save()
     }
 
     group.trainers.push(trainerBody)
@@ -304,9 +308,13 @@ const removeTrainer = async (groupID, trainerID) => {
     }
 
     const group = await Group.findById(groupID)
+    const user = await User.findById(trainerID)
 
     group.trainers = group.trainers.filter(e => !e.userId.equals(trainerID))
 
+    user.accessible_groups = user.accessible_groups.filter(e => !e.equals(groupID))
+
+    user.save()
     await group.save()
 }
 
@@ -316,7 +324,7 @@ const removeTrainer = async (groupID, trainerID) => {
  * @param {*} trainerID 
  */
 const deleteTrainer = async (groupID, trainerID) => {
-    removeTrainer(groupID, trainerID)
+    await removeTrainer(groupID, trainerID)
 
     await attendanceService.removeTrainerFromAttendanceList(groupID, trainerID)
 }
@@ -328,9 +336,9 @@ module.exports = {
     createGroup,
     updateMember,
     removeMember,
-    searchGroups,
     addMember,
     addTrainer,
     removeTrainer,
-    deleteTrainer
+    deleteTrainer,
+    getAssignedGroups
 };

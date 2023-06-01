@@ -19,12 +19,6 @@ router
     //TODO Query String hinzufügen um nur bestimmte Felder zu bekommen
     .get(verifyToken, validate(groupValidation.getGroupById), groupController.getGroupById)
 
-//TODO Auth adden + In Service/Controller die returnten Daten auf Permission beschränken
-/*
-.patch(groupController.updateGroup)
-.delete(groupController.deleteGroup)
-*/
-
 router
     .route('/:groupID/member')
     .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
@@ -33,6 +27,14 @@ router
 router
     .route('/:groupID/member/:memberID')
     .delete(verifyToken, validate(groupValidation.removeMember), groupController.removeMember)
+
+router
+    .route('/:groupID/trainer')
+    .post(verifyToken, validate(groupValidation.addTrainer), groupController.addTrainer)
+
+router
+    .route('/:groupID/trainer/:userID')
+    .delete(verifyToken, validate(groupValidation.removeTrainer), groupController.removeTrainer)
 
 module.exports = router;
 

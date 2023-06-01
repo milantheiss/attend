@@ -27,9 +27,10 @@
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="firstname" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
+            <TextInput name="searchbar" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
             </TextInput>
-            <div class="px-3.5 py-3.5" @click="$refs.searchBar.input = ''">
+            <div class="px-3.5 py-3.5"
+              @click="() => { if ($refs.searchBar.input === '') showSearchBar = false; $refs.searchBar.input = ''; }">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                 stroke="currentColor" class="w-8 h-8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -38,7 +39,7 @@
           </div>
         </transition>
       </div>
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-[73vh]">
         <table class="table-auto w-full text-left">
           <thead>
             <tr :class="{ 'border-b border-[#D1D5DB]': typeof allUsers !== 'undefined' && allUsers?.length > 0 }">
@@ -252,7 +253,7 @@
               </template>
               <template #content>
                 <div v-for="group in editUser.accessible_groups " :key="group.id"
-                  class="flex justify-between items-center gap-2">
+                  v-show="editUser.accessible_groups.length !== 0" class="flex justify-between items-center gap-2">
                   <p>{{ group.name }}</p>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor" class="w-8 h-8 -mr-[2px]"
@@ -260,6 +261,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
+                <p class="text-light-gray" v-show="editUser.accessible_groups.length === 0">Keine Gruppe zugeteilt</p>
               </template>
             </CollapsibleContainer>
           </div>
@@ -457,10 +459,8 @@ export default {
       this.validateInputs(this.newUser)
 
       if (!this.error.show) {
-        //Create User --> POST
         const res = await createNewUser(this.newUser)
         if (res.ok) {
-          //Update User --> PUT
           this.getAllUsers()
           this.cancel()
         } else {
@@ -480,7 +480,6 @@ export default {
 
         const res = await updateUser(this.editUser)
         if (res.ok) {
-          //Update User
           this.getAllUsers()
           this.cancel()
         } else {
@@ -493,11 +492,10 @@ export default {
     async deleteUser(id) {
       const res = await deleteUser(id)
       if (res.ok) {
-        //Update User
         this.getAllUsers()
         this.cancel()
       } else {
-        this.error.message = 'Es ist ein Fehler aufgetreten.'
+        this.error.message = res.body.message
         this.error.show = true
       }
     },
@@ -524,9 +522,12 @@ export default {
 
     resetError() {
       this.error.show = false
-      this.error.cause.firstnameInput = false
-      this.error.cause.lastnameInput = false
-      this.error.cause.roleInput = false
+      this.error.cause = {
+        firstnameInput: false,
+        lastnameInput: false,
+        emailInput: false,
+        usernameInput: false
+      }
       this.error.message = ''
     },
 
@@ -592,6 +593,7 @@ export default {
         }
       }
     },
+
     async resendPassword(id) {
       const res = await resendPassword(id)
       if (res.ok) {

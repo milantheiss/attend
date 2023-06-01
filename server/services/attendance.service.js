@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const { Attendance, User, Member } = require('../models');
-const { groupService } = require('.');
+const groupService = require('./group.service');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
@@ -106,7 +106,6 @@ const getTrainingssession = async (user, groupID, date) => {
 
         const weekday = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
-        //TODO Handle timeInfo undefined
         //Sucht die entsprechende Zeit für den Wochentag heraus.
         const timeInfo = group.times.find((val) => val.day === weekday[new Date(date).getDay()]);
 
@@ -195,7 +194,7 @@ const createAttendance = async (user, attendanceBody) => {
     }
 };
 
-//TODO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
+//INFO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
 /**
  * Update a trainings session. Wird nicht beim hinzufügen von neuen Member benutzt.
  * @param groupID

@@ -130,7 +130,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!--TODO Implement Click Action zu Trainingssession-->
                                 <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
                                     :key="trainingssession._id"
                                     @click="goToTrainingssession(group.id, trainingssession.date)"

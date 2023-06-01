@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-40 mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
+	<div class="mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
 
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
 		<nav class="container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
@@ -33,8 +33,8 @@
 					</div>
 					<div
 						class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0 drop-shadow-md">
-						<svg xmlns="http://www.w3.org/2000/svg" width="188.262" height="189.375"
-							viewBox="0 0 49.811 50.106" class="text-white w-14 h-14  md:w-14 md:h-14 p-3 md:p-4">
+						<svg xmlns="http://www.w3.org/2000/svg" width="188.262" height="189.375" viewBox="0 0 49.811 50.106"
+							class="text-white w-14 h-14  md:w-14 md:h-14 p-3 md:p-4">
 							<g fill="none" stroke="#ffffff" stroke-width="6.649" transform="translate(-93.826 -82.631)">
 								<ellipse cx="118.732" cy="96.016" rx="10.439" ry="10.061" />
 								<path stroke-linecap="round"
@@ -168,3 +168,26 @@ export default {
 	components: { ModalDialog },
 };
 </script>
+<style>
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #ffffff00 #E8EBED;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+	width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+	background: #ffffff00;
+	border-radius: 2px;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: #6B7280;
+	border-radius: 10px;
+	border: 3px solid #6B7280;
+}
+</style>

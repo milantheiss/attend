@@ -81,7 +81,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!--TODO Implement Click Action zu Trainingssession-->
                                     <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)" :key="trainingssession._id"
                                         class="border-b border-[#E5E7EB] last:border-0 group">
                                         <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">

@@ -189,7 +189,6 @@ export default {
             }
 
             this.selectAll = false
-            //TODO Call Backend mit Array von ids
         },
 
         async setSelectedAsRead() {
@@ -206,8 +205,6 @@ export default {
             }
 
             this.selectAll = false
-
-            //TODO Call Backend mit Array von ids
         },
 
         async onClickDelete(notificationID) {

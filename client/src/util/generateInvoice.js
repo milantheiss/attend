@@ -84,13 +84,13 @@ function generateGroupInfo(doc, group) {
   }
 
   let trainer = ""
-  for (const obj of group.trainers) {
-    trainer = trainer + obj.name + " "
+  for (const obj of group.trainers.map(t => t.role = "trainer")) {
+    trainer = [trainer, obj.firstname, obj.lastname].join(" ")
   }
 
   let assistant = ""
-  for (const obj of group.assistant) {
-    assistant = assistant + obj.name + " "
+  for (const obj of group.trainers.map(t => t.role = "assistant")) {
+    assistant = [assistant, obj.firstname, obj.lastname].join(" ")
   }
 
   doc
@@ -173,7 +173,6 @@ function generateParticipantRows(doc, dates, participants) {
 }
 
 function generateAttendanceBox(doc, dates, participant) {
-  //TODO Bug hier?
   let xPos = 249.89
   for (let i = 0; i < dates.length; i++) {
     dates[i] = new Date(dates[i])

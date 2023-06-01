@@ -83,6 +83,12 @@ const userSchema = mongoose.Schema(
                 hasSubmittedCriminalRecordCertificate: Boolean
             },
             required: false
+        },
+        deactivated: {
+            //Wenn ein User deaktiviert ist, kann er sich nicht mehr einloggen
+            type: Boolean,
+            default: false,
+            private: true
         }
     }
 );
@@ -120,6 +126,9 @@ userSchema.statics.isUsernameTaken = async function (username, excludeUserId) {
  */
 userSchema.methods.isPasswordMatch = async function (password) {
     const user = this;
+    if (user.deactivated) {
+        throw new ApiError(401, 'User is deactivated')
+    }
     return bcrypt.compare(password, user.password);
 };
 

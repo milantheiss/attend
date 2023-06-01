@@ -79,7 +79,6 @@ const submitInvoice = catchAsync(async (req, res) => {
 				group.department = invoice.department;
 			}
 
-			//TODO: Add access control
 			invoice = await Invoice.create(invoice);
 
 			if (invoice === null || typeof invoice === "undefined") {
@@ -184,8 +183,6 @@ const getOwnInvoices = catchAsync(async (req, res) => {
 const approveInvoice = catchAsync(async (req, res) => {
 	if (hasDepartmentHeadRole(req.user)) {
 
-		//TODO Diese Schreibweise häufiger einsetzten
-
 		const invoice = await Invoice.findById(req.params.id);
 
 		if (invoice === null || typeof invoice === "undefined") {
@@ -217,11 +214,11 @@ const approveInvoice = catchAsync(async (req, res) => {
 		});
 
 		await addNewNotification({
-			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} genehmigt`,
+			title: `Abrechnung #${invoice.invoiceNumber} genehmigt`,
 			priority: "normal",
 			from: req.user._id,
 			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
-			message: `Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id})`,
+			message: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung genehmigt. Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id})`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});
@@ -260,13 +257,12 @@ const rejectInvoice = catchAsync(async (req, res) => {
 			]
 		});
 
-		//TODO Add Reject Message
 		await addNewNotification({
-			title: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung #${invoice.invoiceNumber} abgelehnt`,
+			title: `Abrechnung #${invoice.invoiceNumber} abgelehnt`,
 			priority: "normal",
 			from: req.user._id,
 			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
-			message: `Es wurden keine Informationen hinterlassen`,
+			message: `${req.user.firstname} ${req.user.lastname} hat deine [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id}) abgelehnt`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});
@@ -293,7 +289,7 @@ const reopenInvoice = catchAsync(async (req, res) => {
 
 		await addNewNotification({
 			title: `Abrechnung #${invoice.invoiceNumber} wieder geöffnet`,
-			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](${config.origin}) wieder geöffnet`,
+			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id}) wieder geöffnet`,
 			from: req.user._id,
 			recipients: [{ userID: invoice.assignedTo, read: false }],
 			type: "invoice",
