@@ -7,9 +7,9 @@ const updateMember = {
   }),
   body: Joi.object().keys({
     //Es sind alle Groß und Kleinbuchstaben erlaubt
-    firstname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    lastname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Datum als String im Format YYYY-MM-DD sein
     birthday: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
     //Array aus ObjectIds Not required
@@ -26,9 +26,9 @@ const updateMember = {
 const createMember = {
   body: Joi.object().keys({
     //Firstname darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    firstname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Lastname darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    lastname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Birthday muss ein Datumstring im Format YYYY-MM-DD sein
     birthday: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
   })

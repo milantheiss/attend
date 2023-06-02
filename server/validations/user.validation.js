@@ -7,11 +7,11 @@ const updateUser = {
   }),
   body: Joi.object().keys({
     //Es sind alle Groß und Kleinbuchstaben erlaubt
-    firstname: Joi.string().pattern(/^[a-zA-Z- ]+$/),
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    lastname: Joi.string().pattern(/^[a-zA-Z- ]+$/),
-    //Datum als String im Format YYYY-MM-DD sein
-    username: Joi.string().pattern(/^[a-zA-Z- ]+$/),
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
+    //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen bestehen und muss zwischen 3 und 20 Zeichen lang sein
+    username: Joi.string().pattern(/^[a-zA-Z- ]+$/).min(3).max(20),
     //
     email: Joi.string().email(),
     //String als ObjectId
@@ -26,9 +26,9 @@ const updateUser = {
 const createUser = {
   body: Joi.object().keys({
     //Es sind alle Groß und Kleinbuchstaben erlaubt
-    firstname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    lastname: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Datum als String im Format YYYY-MM-DD sein
     username: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
     //

@@ -39,20 +39,20 @@ const updateMember = {
 const createGroup = {
   body: Joi.object().keys({
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    name: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Array aus ObjectIds Not required
     times: Joi.array().items(Joi.object().keys({
       //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-      day: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+      day: Joi.string().valid("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag").required(),
       //String im Format HH:MM sein Nur 24h Format Nur Zahlen
       starttime: Joi.string().regex(/^[0-9]{2}:[0-9]{2}$/).required(),
       //String im Format HH:MM sein Nur 24h Format Nur Zahlen
       endtime: Joi.string().regex(/^[0-9]{2}:[0-9]{2}$/).required(),
     })).required(),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    venue: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+    venue: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //Array aus ObjectIds Required
-    departments: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).required()
+    department: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
   })
 };
 
@@ -63,7 +63,7 @@ const updateGroup = {
   }),
   body: Joi.object().keys({
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    name: Joi.string().pattern(/^[a-zA-Z- ]+$/),
+    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
     //Array aus ObjectIds Not required
     participants: Joi.array().items(Joi.object().keys({
       //String als ObjectId
@@ -78,21 +78,21 @@ const updateGroup = {
       //String als ObjectId
       userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
       //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-      role: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+      role: Joi.array().items(Joi.string().valid("trainer", "assistant")).required(),
     })),
     //Array aus ObjectIds Not required
     times: Joi.array().items(Joi.object().keys({
-      //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-      day: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
+      //Darf Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag oder Sonntag sein
+      day: Joi.string().valid("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag").required(),
       //String im Format HH:MM sein Nur 24h Format Nur Zahlen
       starttime: Joi.string().regex(/^[0-9]{2}:[0-9]{2}$/).required(),
       //String im Format HH:MM sein Nur 24h Format Nur Zahlen
       endtime: Joi.string().regex(/^[0-9]{2}:[0-9]{2}$/).required(),
     })),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    venue: Joi.string().pattern(/^[a-zA-Z- ]+$/),
+    venue: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
     //Array aus ObjectIds Required
-    department: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
+    department: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
   })
 };
