@@ -39,59 +39,63 @@
           </div>
         </transition>
       </div>
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-fit max-h-[73vh]">
-        <table class="table-auto w-full text-left">
-          <thead>
-            <tr :class="{ 'border-b border-[#D1D5DB]': typeof allUsers !== 'undefined' && allUsers?.length > 0 }">
-              <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByLastname">
-                <span class="flex items-center gap-1">
-                  <SortIcon :index="indexSort.lastname"></SortIcon>
-                  Name
-                </span>
-              </th>
-              <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium" @click="onClickOnSortByFirstname">
-                <span class="flex items-center gap-1">
-                  <SortIcon :index="indexSort.firstname"></SortIcon>
-                  Vorname
-                </span>
-              </th>
-              <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnRoles">
-                <span class="flex items-center gap-1 ">
-                  <SortIcon :index="indexSort.roles"></SortIcon>
-                  Rolle
-                </span>
-              </th>
-              <th scope="col" class="pb-2.5 font-medium"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in searchResults" :key="user._id" @click="openEditUser(user._id)"
-              class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-              <!--Lastname-->
-              <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                <p class="">{{ user.lastname }}</p>
-              </td>
-              <!--Firstname-->
-              <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                <p class="">{{ user.firstname }}</p>
-              </td>
-              <!--Höchste Rolle-->
-              <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                <p class="text-light-gray truncate overflow-hidden">{{ getHighestRole(user.roles) }}</p>
-              </td>
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+        <div class="h-fit max-h-[73vh] overflow-y-auto block">
+          <table class="table-auto w-full text-left">
+            <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+              <tr>
+                <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByLastname">
+                  <span class="flex items-center gap-1">
+                    <SortIcon :index="indexSort.lastname"></SortIcon>
+                    Name
+                  </span>
+                </th>
+                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium" @click="onClickOnSortByFirstname">
+                  <span class="flex items-center gap-1">
+                    <SortIcon :index="indexSort.firstname"></SortIcon>
+                    Vorname
+                  </span>
+                </th>
+                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnRoles">
+                  <span class="flex items-center gap-1 ">
+                    <SortIcon :index="indexSort.roles"></SortIcon>
+                    Rolle
+                  </span>
+                </th>
+                <th scope="col" class="pb-2.5 font-medium"></th>
+              </tr>
+            </thead>
+            <tbody class="overscroll-y-scroll">
+              <tr v-for="user in searchResults" :key="user._id" @click="openEditUser(user._id)"
+                class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                <!--Lastname-->
+                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p class="">{{ user.lastname }}</p>
+                </td>
+                <!--Firstname-->
+                <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p class="">{{ user.firstname }}</p>
+                </td>
+                <!--Höchste Rolle-->
+                <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p class="text-light-gray truncate overflow-hidden">{{ getHighestRole(user.roles) }}</p>
+                </td>
 
-              <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
-                <!--Arrow Right-->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                  stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                </svg>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
-          class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
+                  <!--Arrow Right-->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                  </svg>
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+          <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
+            class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+        </div>
       </div>
     </div>
 
@@ -551,31 +555,25 @@ export default {
       console.log(inputs);
       this.resetError()
 
-      if (inputs.firstname.trim().length === 0) {
+      if (inputs.firstname.trim().length === 0 || !inputs.firstname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
         this.error.message = 'Bitte gebe einen Vornamen ein.'
         this.error.show = true
         this.error.cause.firstnameInput = true
       }
-      if (inputs.lastname.trim().length === 0) {
+      if (inputs.lastname.trim().length === 0 || !inputs.lastname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
         this.error.message = 'Bitte gebe einen Nachnamen ein.'
         this.error.show = true
         this.error.cause.lastnameInput = true
       }
-      if (inputs.username.trim().length === 0) {
+      if (inputs.username.trim().length === 0 || !inputs.username.match(/^[a-zA-Z0-9-]+$/)) {
         this.error.message = 'Bitte gebe einen Benutzernamen ein.'
         this.error.show = true
         this.error.cause.usernameInput = true
       }
-      if (inputs.email.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen E-Mail ein.'
+      if (inputs.email.trim().length < 3 || inputs.email.trim().length > 20 || !inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen E-Mail ein.'
         this.error.show = true
         this.error.cause.emailInput = true
-      }
-      //Check if email is valid
-      if (!inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-        this.error.message = 'Bitte eine gültige E-Mail ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
       }
 
       //If any error is true, set error.message to 'Mehrere Fehler.'

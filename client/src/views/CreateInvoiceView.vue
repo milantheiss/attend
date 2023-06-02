@@ -98,7 +98,7 @@
             <!--Group Cards: Alle Gruppe, der Invoice-->
             <div class="my-7 flex flex-col gap-5">
                 <!--Je Gruppe ein Container-->
-                <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md" :show="false"
+                <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md " :show="false"
                     :enableClickOnHeader="false" v-for="(group, index) in dataStore.invoiceData.groups" ref="groupCards"
                     :key="group._id"
                     :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
@@ -108,56 +108,58 @@
                             :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
                     </template>
                     <template #content>
-                        <table class="table-auto w-full text-left">
-                            <thead>
-                                <tr class="border-b border-[#D1D5DB] ">
-                                    <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
-                                        @click="onClickOnDate()">
-                                        <span class="flex items-center gap-1">
-                                            <SortIconDate :index="indexSortButtonDate"></SortIconDate>
-                                            Datum
-                                        </span>
-                                    </th>
-                                    <th scope="col"
-                                        class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
-                                        @click="onClickOnLength()">
-                                        <span class="flex items-center gap-1">
-                                            <SortIcon :index="indexSortButtonLength"></SortIcon>
-                                            Länge
-                                        </span>
-                                    </th>
-                                    <th scope="col" class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
-                                    :key="trainingssession._id"
-                                    @click="goToTrainingssession(group._id, trainingssession.date)"
-                                    class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-                                    <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
-                                        {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
-                                            weekday: "short", year: "numeric",
-                                            month: "2-digit", day: "2-digit"
-                                        }) }}
-                                    </td>
-                                    <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                        <p class="text-light-gray">{{
-                                            convertToReadableTime(calcTime(trainingssession.starttime,
-                                                trainingssession.endtime)) }}</p>
-                                    </td>
-                                    <td
-                                        class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
-                                        <!--Arrow Right-->
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="3" stroke="currentColor"
-                                            class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                                        </svg>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="h-fit max-h-[55vh] overflow-y-auto block">
+                            <table class="table-auto w-full text-left">
+                                <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                                    <tr class="">
+                                        <th class="font-medium w-fit cursor-pointer"
+                                            @click="onClickOnDate()">
+                                            <span class="flex items-center gap-1">
+                                                <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                                Datum
+                                            </span>
+                                        </th>
+                                        <th
+                                            class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
+                                            @click="onClickOnLength()">
+                                            <span class="flex items-center gap-1">
+                                                <SortIcon :index="indexSortButtonLength"></SortIcon>
+                                                Länge
+                                            </span>
+                                        </th>
+                                        <th class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="overscroll-y-scroll">
+                                    <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
+                                        :key="trainingssession._id"
+                                        @click="goToTrainingssession(group._id, trainingssession.date)"
+                                        class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                                        <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                            {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
+                                                weekday: "short", year: "numeric",
+                                                month: "2-digit", day: "2-digit"
+                                            }) }}
+                                        </td>
+                                        <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
+                                            <p class="text-light-gray">{{
+                                                convertToReadableTime(calcTime(trainingssession.starttime,
+                                                    trainingssession.endtime)) }}</p>
+                                        </td>
+                                        <td
+                                            class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                                            <!--Arrow Right-->
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="3" stroke="currentColor"
+                                                class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                            </svg>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </template>
                 </CollapsibleContainer>
             </div>
@@ -165,7 +167,7 @@
             <!--Bestätigungsfeld-->
             <div class="">
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
-                <div class="flex justify-between items-center gap-7">
+                <div class="flex justify-between items-center gap-7 mb-10">
                     <button @click="cancel"
                         class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
                         :class="error.show ? 'mt-4' : ''">
@@ -492,12 +494,4 @@ export default {
     }
 };
 </script>
-<style scoped>
-.cancel {
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    border: 2px solid #6B7280;
-}
-</style>
 ```

@@ -24,7 +24,7 @@
         <transition enter-active-class="transition ease-in-out duration-[150ms]" enter-from-class="-translate-y-5 opacity-0"
             enter-to-class="translate-y-0 opacity-100" leave-active-class="transition ease-in duration-[150ms]"
             leave-from-class="opacity-100 mt-4" leave-to-class="-translate-y-2 opacity-0 mt-4">
-            <content class="container truncate" v-if="showContent">
+            <content class="truncate w-full" v-if="showContent">
                 <slot name="content"></slot>
             </content>
         </transition>

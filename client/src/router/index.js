@@ -80,7 +80,7 @@ const routes = [
     meta: { requiresAuth: true, requiresStaff: true }
   },
   {
-    path: "/editgroup",
+    path: "/edit-group",
     component: () => import("../views/EditGroupView.vue"),
     meta: { requiresAuth: true }
   }

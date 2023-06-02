@@ -2,7 +2,7 @@
   <select v-model="selected" class="block
                         w-full
                         pl-2 pb-0.5 
-                        text-black text-lg md:text-xl
+                        text-lg md:text-xl
                         focus:ring-0 focus:border-standard-gradient-1
                         bg-inherit"
     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
@@ -41,8 +41,11 @@ export default {
       this.$emit("update:modelValue", this.selected);
     },
     modelValue(newVal) {
-      if (this.options.length === 1) {
-        this.selected = this.options[0]
+      console.log(newVal);
+
+      // Wenn nur ein Element in der Liste ist, dann wird dieses automatisch ausgewählt
+      if (this.computedOptions.length === 1) {
+        this.selected = this.computedOptions[0]
       } else {
         this.selected = newVal;
       }
@@ -53,13 +56,19 @@ export default {
       if (this.sortAlphabetically) {
         let options = this.options;
         options.sort((a, b) => a.name.localeCompare(b.name));
-        console.log(options)
         return options
       } else {
         return this.options;
       }
     }
   },
+  created(){
+    if (typeof this.modelValue === 'undefined' || Object.keys(this.modelValue).length === 0) {
+      this.selected = this.defaultValue;
+    } else {
+      this.selected = this.modelValue;
+    }
+  }
 };
 </script>
 

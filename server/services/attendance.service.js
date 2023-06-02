@@ -1,6 +1,5 @@
 const httpStatus = require('http-status');
-const { Attendance, User, Member } = require('../models');
-const groupService = require('./group.service');
+const { Attendance, User, Member, Group } = require('../models');
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
@@ -82,7 +81,7 @@ const getTrainingssession = async (user, groupID, date) => {
 
         let participants = []
 
-        const group = await groupService.getGroupById(user, groupID)
+        const group = await Group.findById(groupID)
 
         date = new Date(date)
 

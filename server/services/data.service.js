@@ -38,7 +38,6 @@ const markPatchnotesAsRead = async (user) => {
     return User.findByIdAndUpdate(user._id, { $set: { readPatchnotes: true } })
 }
 
-
 module.exports = {
     getLastPatchNotes,
     addNewPatchNote,

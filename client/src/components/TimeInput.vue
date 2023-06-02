@@ -1,8 +1,8 @@
 <template>
     <input class='block
-        w-full ty:w-4/6 sm:w-2/6 md:w-1/4
+        w-full ty:w-4/6 sm:w-2/6 md:w-[115px]
         pl-1 py-0.5
-        font-medium text-lg md:text-xl
+        font-medium
         focus:ring-0 focus:border-standard-gradient-1
         bg-inherit text-left'
         :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"

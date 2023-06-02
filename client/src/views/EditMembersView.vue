@@ -39,68 +39,71 @@
           </div>
         </transition>
       </div>
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col overflow-y-auto h-fit max-h-[73vh]">
-        <table class="table-auto w-full text-left">
-          <thead>
-            <tr :class="{ 'border-b border-[#D1D5DB]': typeof allMembers !== 'undefined' && allMembers?.length > 0 }">
-              <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium" @click="onClickOnSortByLastname">
-                <span class="flex items-center gap-1">
-                  <SortIcon :index="indexSort.lastname"></SortIcon>
-                  Name
-                </span>
-              </th>
-              <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
-                @click="onClickOnSortByFirstname">
-                <span class="flex items-center gap-1">
-                  <SortIcon :index="indexSort.firstname"></SortIcon>
-                  Vorname
-                </span>
-              </th>
-              <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
-                <span class="hidden md:flex items-center gap-1 ">
-                  <SortIcon :index="indexSort.birthday"></SortIcon>
-                  Geburtstag
-                </span>
-                <span class="flex md:hidden items-center gap-1 ">
-                  <SortIcon :index="indexSort.birthday"></SortIcon>
-                  Geb.
-                </span>
-              </th>
-              <th scope="col" class="pb-2.5 font-medium w-full"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="member in searchResults" :key="member._id" @click="openEditMember(member._id)"
-              class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-              <!--Lastname-->
-              <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
-                <p class="">{{ member.lastname }}</p>
-              </td>
-              <!--Firstname-->
-              <td class="px-3 md:px-4 w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                <p class="">{{ member.firstname }}</p>
-              </td>
-              <!--Birthday-->
-              <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                <p class="text-light-gray">{{
-                  new Date(member.birthday).toLocaleDateString('de-DE', {
-                    year: '2-digit', month:
-                      '2-digit', day: '2-digit'
-                  })
-                }}</p>
-              </td>
-              <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
-                <!--Arrow Right-->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                  stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                </svg>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
-          class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+        <div class="h-fit max-h-[73vh] overflow-y-auto block">
+          <table class="table-auto w-full text-left">
+            <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+              <tr>
+                <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium" @click="onClickOnSortByLastname">
+                  <span class="flex items-center gap-1">
+                    <SortIcon :index="indexSort.lastname"></SortIcon>
+                    Name
+                  </span>
+                </th>
+                <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
+                  @click="onClickOnSortByFirstname">
+                  <span class="flex items-center gap-1">
+                    <SortIcon :index="indexSort.firstname"></SortIcon>
+                    Vorname
+                  </span>
+                </th>
+                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
+                  <span class="hidden md:flex items-center gap-1 ">
+                    <SortIcon :index="indexSort.birthday"></SortIcon>
+                    Geburtstag
+                  </span>
+                  <span class="flex md:hidden items-center gap-1 ">
+                    <SortIcon :index="indexSort.birthday"></SortIcon>
+                    Geb.
+                  </span>
+                </th>
+                <th scope="col" class="pb-2.5 font-medium w-full"></th>
+              </tr>
+            </thead>
+            <tbody class="overscroll-y-scroll">
+              <tr v-for="member in searchResults" :key="member._id" @click="openEditMember(member._id)"
+                class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                <!--Lastname-->
+                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
+                  <p class="">{{ member.lastname }}</p>
+                </td>
+                <!--Firstname-->
+                <td class="px-3 md:px-4 w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p class="">{{ member.firstname }}</p>
+                </td>
+                <!--Birthday-->
+                <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p class="text-light-gray">{{
+                    new Date(member.birthday).toLocaleDateString('de-DE', {
+                      year: '2-digit', month:
+                        '2-digit', day: '2-digit'
+                    })
+                  }}</p>
+                </td>
+                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                  <!--Arrow Right-->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                  </svg>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
+            class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
+        </div>
       </div>
     </div>
 
@@ -460,17 +463,17 @@ export default {
     validateInputs(inputs) {
       this.resetError()
 
-      if (inputs.firstname.trim().length === 0) {
+      if (inputs.firstname.trim().length === 0 || !inputs.firstname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
         this.error.message = 'Bitte gebe einen Vornamen ein.'
         this.error.show = true
         this.error.cause.firstnameInput = true
       }
-      if (inputs.lastname.trim().length === 0) {
+      if (inputs.lastname.trim().length === 0 || !inputs.lastname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
         this.error.message = 'Bitte gebe einen Nachnamen ein.'
         this.error.show = true
         this.error.cause.lastnameInput = true
       }
-      if (this.editMember.birthday.trim().length === 0) {
+      if (this.editMember.birthday.trim().length === 0 || !this.editMember.birthday.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
         this.error.message = 'Bitte gebe einen Geburtstag ein.'
         this.error.show = true
         this.error.cause.birthdayInput = true

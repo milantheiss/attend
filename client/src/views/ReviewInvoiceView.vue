@@ -63,41 +63,46 @@
                             <p class="truncate text-xl font-semibold">{{ group.name }}</p>
                         </template>
                         <template #content>
-                            <table class="table-auto w-full text-left">
-                                <thead>
-                                    <tr class="border-b border-[#D1D5DB]">
-                                        <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer" @click="onClickOnDate()">
-                                            <span class="flex items-center gap-1">
-                                            <SortIconDate :index="indexSortButtonDate"></SortIconDate>
-                                            Datum
-                                        </span>    
-                                        </th>
-                                        <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer" @click="onClickOnLength()">
-                                            <span class="flex items-center gap-1">
-                                            <SortIcon :index="indexSortButtonLength"></SortIcon>
-                                            Länge
-                                        </span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)" :key="trainingssession._id"
-                                        class="border-b border-[#E5E7EB] last:border-0 group">
-                                        <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
-                                            {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
-                                                weekday: "short", year: "numeric",
-                                                month: "2-digit", day: "2-digit"
-                                            }) }}
-                                        </td>
-                                        <td
-                                            class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
-                                            <p class="text-light-gray">{{
-                                                convertToReadableTime(calcTime(trainingssession.starttime,
-                                                    trainingssession.endtime)) }}</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="h-fit max-h-[55vh] overflow-y-auto block">
+                                <table class="table-auto w-full text-left">
+                                    <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                                        <tr class="">
+                                            <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
+                                                @click="onClickOnDate()">
+                                                <span class="flex items-center gap-1">
+                                                    <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                                    Datum
+                                                </span>
+                                            </th>
+                                            <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer"
+                                                @click="onClickOnLength()">
+                                                <span class="flex items-center gap-1">
+                                                    <SortIcon :index="indexSortButtonLength"></SortIcon>
+                                                    Länge
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="overscroll-y-scroll">
+                                        <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
+                                            :key="trainingssession._id"
+                                            class="border-b border-[#E5E7EB] last:border-0 group">
+                                            <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                                {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
+                                                    weekday: "short", year: "numeric",
+                                                    month: "2-digit", day: "2-digit"
+                                                }) }}
+                                            </td>
+                                            <td
+                                                class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
+                                                <p class="text-light-gray">{{
+                                                    convertToReadableTime(calcTime(trainingssession.starttime,
+                                                        trainingssession.endtime)) }}</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </template>
                     </CollapsibleContainer>
                 </div>

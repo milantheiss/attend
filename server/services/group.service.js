@@ -96,7 +96,7 @@ const getGroupById = async (user, groupID) => {
 
         group.trainers = await getTrainersOfGroup(group)
         group.participants = await getParticipantsOfGroup(group)
-        group.department = await getDepartmentOfGroup(group)
+        group._doc.department = await getDepartmentOfGroup(group)
 
         return group
     } else {

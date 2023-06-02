@@ -104,11 +104,26 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 
 
 
+//INFO Fetch Operations /departments
+async function getAllDepartments() {
+    return await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/departments`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		})
+	);
+}
+
+
+
+
+
 //INFO Fetch Operations zu /group oder /groups
 
 async function fetchGroups() {
 	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "groups"].join("/assigned"), {
+		fetch([import.meta.env.VITE_API_URL, "groups", "assigned"].join("/"), {
 			credentials: "include",
 			mode: "cors",
 		})
@@ -695,5 +710,6 @@ export {
 	getAllGroups,
 	createNewGroup,
 	deleteGroup,
-	updateGroup
+	updateGroup,
+	getAllDepartments
 };

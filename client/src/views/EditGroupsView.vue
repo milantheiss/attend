@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="flex flex-col gap-4">
+
+    <div class="flex flex-col gap-4 mb-10">
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center ">
           <button @click="showCreateGroupModal = true"
@@ -40,27 +41,26 @@
         </transition>
       </div>
       <!--TODO Collapsible für jedes Department-->
-      <CollapsibleContainer v-for="department in this.departments" :key="department._id"
-        class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col h-fit max-h-[73vh] overflow-y-auto">
+      <CollapsibleContainer v-for="(department, index) in this.departments" :key="department._id"
+        class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col" :show="index === 0">
         <template #header>
           <p class="font-medium">{{ department.name }}</p>
         </template>
         <template #content>
-          <div class="">
+          <div class="h-fit max-h-[55vh] overflow-y-auto block">
             <table class="table-auto w-full text-left">
-              <thead>
-                <tr
-                  :class="{ 'border-b border-[#D1D5DB]': typeof this.searchResults.filter(g => g.department._id === department._id) !== 'undefined' && this.searchResults.filter(g => g.department._id === department._id)?.length > 0 }">
+              <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                <tr>
                   <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByGroupname">
                     <span class="flex items-center gap-1">
-                      <SortIcon :index="indexSort.groupname"></SortIcon>
+                      <SortIcon :index="indexSort"></SortIcon>
                       Gruppenbezeichnung
                     </span>
                   </th>
                   <th scope="col" class="pb-2.5 font-medium"></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="overscroll-y-scroll">
                 <tr v-for="group in this.searchResults.filter(g => g.department._id === department._id)" :key="group._id"
                   @click="openEditGroup(group._id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                   <!--Gruppenbezeichnung-->
@@ -71,7 +71,7 @@
                   <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
                     <!--Arrow Right-->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                      stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto transition group-hover:translate-x-0.5">
+                      stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
                       <path stroke-linecap="round" stroke-linejoin="round"
                         d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
                     </svg>
@@ -95,32 +95,131 @@
         <div class="flex flex-col justify-center items-center gap-4">
           <!--Gruppenbezeichnung-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="name" class="hidden sm:block">Name:</label>
-            <TextInput name="name" v-model="newGroup.name" placeholder="Benutzername" :showError="error.cause.nameInput"
-              class="md:w-96"></TextInput>
-          </div>
-
-          <!--Zeiten der Gruppe -->
-          <div class="w-full flex items-center justify-between gap-4">
-            <!-- Selector für Tag (Mo, Di, Mi, ...) -->
-            <!-- Time Selector -->
-            <label for="firstname" class="hidden sm:block">Vorname:</label>
-            <TextInput name="firstname" v-model="newGroup.firstname" placeholder="Vorname"
-              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Hauptveranstaltungsort-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="venue" class="hidden sm:block">Sportstätte:</label>
-            <TextInput name="venue" v-model="newGroup.venue" placeholder="Nachname" :showError="error.cause.venueInput"
-              class="md:w-96"></TextInput>
+            <label for="name" class="font-medium">Name:</label>
+            <TextInput name="name" v-model="newGroup.name" placeholder="Gruppenbezeichnung"
+              :showError="error.cause.nameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Abteilung-->
           <div class="w-full flex items-center justify-between gap-4">
             <!--Dropdown Selector aus allen Departments-->
-            <label for="email" class="hidden sm:block">E-Mail:</label>
-            <TextInput name="email" v-model="newGroup.email" placeholder="E-Mail" :showError="error.cause.emailInput"
+            <p class="font-medium">Abteilung:</p>
+            <SelectList v-model="newGroup.department" :options="departments" :showError="error.cause.departmentInput"
+              class="md:w-96 text-black" :sortAlphabetically="true"></SelectList>
+          </div>
+
+          <!--Zeiten der Gruppe -->
+          <div class="w-full flex items-center justify-between gap-4">
+            <CollapsibleContainer :show="true" class="w-full">
+              <template #header>
+                <p class="font-medium">Zeiten</p>
+              </template>
+              <template #content>
+                <table class="table-auto md:table-fixed w-full mb-2">
+                  <thead class="border-b border-[#D1D5DB] text-left">
+                    <tr>
+                      <th class="pb-1.5 font-medium">Tag</th>
+                      <th class="pb-1.5 font-medium  px-2.5">Start</th>
+                      <th class="pb-1.5 font-medium">Ende</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-b border-[#E5E7EB] last:border-0 group" v-for="(time, index) in newGroup.times.sort((a, b) => sorter[b] - sorter[a])"
+                      :key="index">
+                      <td class="py-2 group-last:pt-2 group-last:pb-0">
+                        <!--Selector Day-->
+                        <select v-model="time.day"
+                          class="block md:hidden w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-base md:text-lg font-medium ">
+                          <option value="Montag">Mo.</option>
+                          <option value="Dienstag">Di.</option>
+                          <option value="Mittwoch">Mi.</option>
+                          <option value="Donnerstag">Do.</option>
+                          <option value="Freitag">Fr.</option>
+                          <option value="Samstag">Sa.</option>
+                          <option value="Sonntag">So.</option>
+                        </select>
+                        <select v-model="time.day"
+                          class="hidden md:block w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-base md:text-lg font-medium ">
+                          <option value="Montag">Montag</option>
+                          <option value="Dienstag">Dienstag</option>
+                          <option value="Mittwoch">Mittwoch</option>
+                          <option value="Donnerstag">Donnerstag</option>
+                          <option value="Freitag">Freitag</option>
+                          <option value="Samstag">Samstag</option>
+                          <option value="Sonntag">Sonntag</option>
+                        </select>
+                      </td>
+                      <td class="py-2 group-last:pt-2 group-last:pb-0 px-2.5">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="time.starttime" min='00:00' :max='time.endtime' @change="validateTime(time)" />
+                      </td>
+                      <td class="py-2 group-last:pt-2 group-last:pb-0">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="time.endtime" :min='time.starttime' max='00:00' @change="validateTime(time)" />
+                      </td>
+                    </tr>
+
+                    <tr v-show="showNewTime">
+                      <td class="pt-2 ">
+                        <!--Selector Day-->
+                        <select v-model="tempTime.day"
+                          class="block md:hidden w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-base md:text-lg font-medium ">
+                          <option value="Montag">Mo.</option>
+                          <option value="Dienstag">Di.</option>
+                          <option value="Mittwoch">Mi.</option>
+                          <option value="Donnerstag">Do.</option>
+                          <option value="Freitag">Fr.</option>
+                          <option value="Samstag">Sa.</option>
+                          <option value="Sonntag">So.</option>
+                        </select>
+                        <select v-model="tempTime.day"
+                          class="hidden md:block w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-base md:text-lg font-medium ">
+                          <option value="Montag">Montag</option>
+                          <option value="Dienstag">Dienstag</option>
+                          <option value="Mittwoch">Mittwoch</option>
+                          <option value="Donnerstag">Donnerstag</option>
+                          <option value="Freitag">Freitag</option>
+                          <option value="Samstag">Samstag</option>
+                          <option value="Sonntag">Sonntag</option>
+                        </select>
+                      </td>
+                      <td class="pt-2 px-2.5">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="tempTime.starttime" :max='tempTime.endtime' min='00:00' @change="tempTimeChange()" />
+                      </td>
+                      <td class="pt-2">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="tempTime.endtime" max='00:00' :min='tempTime.starttime' @change="tempTimeChange()" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="flex items-center justify-end w-full" v-show="!showNewTime">
+                  <button @click="showNewTime = true"
+                    class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md px-3.5 py-1">
+                    <p class="font-medium font-base md:text-lg">Zeit hinzufügen</p>
+                  </button>
+                </div>
+              </template>
+            </CollapsibleContainer>
+          </div>
+
+          <!--Veranstaltungsort-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="venue" class="font-medium">Sportstätte:</label>
+            <TextInput name="venue" v-model="newGroup.venue" placeholder="Sportstätte" :showError="error.cause.venueInput"
               class="md:w-96"></TextInput>
           </div>
         </div>
@@ -151,35 +250,106 @@
         <div class="flex flex-col justify-center items-center gap-4">
           <!--Gruppenbezeichnung-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="name" class="hidden sm:block">Name:</label>
-            <TextInput name="name" v-model="editGroup.name" placeholder="Benutzername" :showError="error.cause.nameInput"
-              class="md:w-96"></TextInput>
-          </div>
-
-          <!--Zeiten der Gruppe -->
-          <div class="w-full flex items-center justify-between gap-4">
-            <!-- Selector für Tag (Mo, Di, Mi, ...) -->
-            <!-- Time Selector -->
-            <label for="firstname" class="hidden sm:block">Vorname:</label>
-            <TextInput name="firstname" v-model="editGroup.firstname" placeholder="Vorname"
-              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Hauptveranstaltungsort-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="venue" class="hidden sm:block">Sportstätte:</label>
-            <TextInput name="venue" v-model="editGroup.venue" placeholder="Nachname" :showError="error.cause.venueInput"
-              class="md:w-96"></TextInput>
+            <label for="name" class="font-medium">Name:</label>
+            <TextInput name="name" v-model="newGroup.name" placeholder="Gruppenbezeichnung"
+              :showError="error.cause.nameInput" class="md:w-96"></TextInput>
           </div>
 
           <!--Abteilung-->
           <div class="w-full flex items-center justify-between gap-4">
             <!--Dropdown Selector aus allen Departments-->
-            <label for="email" class="hidden sm:block">E-Mail:</label>
-            <TextInput name="email" v-model="editGroup.email" placeholder="E-Mail" :showError="error.cause.emailInput"
-              class="md:w-96"></TextInput>
+            <p class="font-medium">Abteilung:</p>
+            <SelectList v-model="newGroup.department" :options="departments" :showError="error.cause.departmentInput"
+              class="md:w-96 text-black" :sortAlphabetically="true"></SelectList>
           </div>
 
+          <!--Zeiten der Gruppe -->
+          <div class="w-full flex items-center justify-between gap-4">
+            <CollapsibleContainer :show="true" class="w-full">
+              <template #header>
+                <p class="font-medium">Zeiten</p>
+              </template>
+              <template #content>
+                <table class="table-fixed w-full mb-2">
+                  <thead class="border-b border-[#D1D5DB]">
+                    <tr>
+                      <th class="pb-1.5 font-medium">Tag</th>
+                      <th class="pb-1.5 font-medium  px-2.5">Start</th>
+                      <th class="pb-1.5 font-medium">Ende</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-b border-[#E5E7EB] last:border-0 group" v-for="(time, index) in newGroup.times"
+                      :key="index">
+                      <td class="py-2 group-last:pt-2 group-last:pb-0">
+                        <!--Selector Day-->
+                        <select v-model="time.day"
+                          class="block w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-lg font-medium">
+                          <option value="Montag">Montag</option>
+                          <option value="Dienstag">Dienstag</option>
+                          <option value="Mittwoch">Mittwoch</option>
+                          <option value="Donnerstag">Donnerstag</option>
+                          <option value="Freitag">Freitag</option>
+                          <option value="Samstag">Samstag</option>
+                          <option value="Sonntag">Sonntag</option>
+                        </select>
+                      </td>
+                      <td class="py-2 group-last:pt-2 group-last:pb-0 px-2.5">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="time.starttime" min='00:00' :max='time.endtime' @change="validateTime(time)" />
+                      </td>
+                      <td class="py-2 group-last:pt-2 group-last:pb-0">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="time.endtime" :min='time.starttime' max='00:00' @change="validateTime(time)" />
+                      </td>
+                    </tr>
+
+                    <tr class="">
+                      <td class="pt-2 ">
+                        <!--Selector Day-->
+                        <select v-model="tempTime.day"
+                          class="block w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-2 border-[#9ea3ae] rounded-2xl text-lg font-medium">
+                          <option value="Montag">Montag</option>
+                          <option value="Dienstag">Dienstag</option>
+                          <option value="Mittwoch">Mittwoch</option>
+                          <option value="Donnerstag">Donnerstag</option>
+                          <option value="Freitag">Freitag</option>
+                          <option value="Samstag">Samstag</option>
+                          <option value="Sonntag">Sonntag</option>
+                        </select>
+                      </td>
+                      <td class="pt-2 px-2.5">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="tempTime.starttime" :max='tempTime.endtime' min='00:00' @change="tempTimeChange()" />
+                      </td>
+                      <td class="pt-2">
+                        <!--Time Selector-->
+                        <input
+                          class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg'
+                          :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                          v-model="tempTime.endtime" max='00:00' :min='tempTime.starttime' @change="tempTimeChange()" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </CollapsibleContainer>
+          </div>
+          <!--Veranstaltungsort-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="venue" class="font-medium">Sportstätte:</label>
+            <TextInput name="venue" v-model="newGroup.venue" placeholder="Sportstätte" :showError="error.cause.venueInput"
+              class="md:w-96"></TextInput>
+          </div>
           <!--Teilnehmer-->
           <div class="w-full flex items-center justify-between gap-4">
             <CollapsibleContainer>
@@ -263,13 +433,14 @@
   
 <script>
 import _ from "lodash"
-import { getAllGroups, createNewGroup, updateGroup, deleteGroup } from "@/util/fetchOperations"
+import { getAllGroups, createNewGroup, updateGroup, deleteGroup, getAllDepartments } from "@/util/fetchOperations"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
+import SelectList from "@/components/SelectList.vue";
 
 export default {
   name: "EditUsersView",
@@ -283,24 +454,20 @@ export default {
     return {
       allGroups: [],
       searchResults: [],
-      indexSort: {
-        groupname: 0,
-        firstname: 0,
-        roles: 0
-      },
+      indexSort: 0,
       showSearchBar: false,
       showCreateGroupModal: false,
       showEditGroupModal: false,
       newGroup: {
         name: '',
         venue: '',
-        department: '',
+        department: {},
         times: []
       },
       editGroup: {
         venue: '',
         name: '',
-        department: '',
+        department: {},
         times: [],
         participants: [],
         trainers: []
@@ -311,10 +478,27 @@ export default {
         show: false,
         cause: {
           venueInput: false,
-          nameInput: false
+          nameInput: false,
+          departmentInput: false,
+          timesInput: false
         }
       },
-      showDeleteButton: false
+      showDeleteButton: false,
+      tempTime: {
+        day: '',
+        starttime: '',
+        endtime: ''
+      },
+      showNewTime: false,
+      sorter: {
+        "Montag": 1,
+        "Dienstag": 2,
+        "Mittwoch": 3,
+        "Donnerstag": 4,
+        "Freitag": 5,
+        "Samstag": 6,
+        "Sonntag": 7
+      }
     }
   },
   components: {
@@ -322,12 +506,13 @@ export default {
     TextInput,
     ModalDialog,
     ErrorMessage,
-    CollapsibleContainer
+    CollapsibleContainer,
+    SelectList
   },
   methods: {
     onClickOnSortByGroupname() {
-      this.indexSort.groupname = (this.indexSort.groupname + 1) % 2
-      if (this.indexSort.groupname === 1) {
+      this.indexSort = (this.indexSort + 1) % 2
+      if (this.indexSort === 1) {
         this.searchResults.sort((a, b) => b.name.localeCompare(a.name))
       } else {
         this.searchResults.sort((a, b) => a.name.localeCompare(b.name))
@@ -354,14 +539,14 @@ export default {
       this.newGroup = {
         name: '',
         venue: '',
-        department: '',
+        department: {},
         times: []
       }
 
       this.editGroup = {
         venue: '',
         name: '',
-        department: '',
+        department: {},
         times: [],
         participants: [],
         trainers: []
@@ -374,6 +559,8 @@ export default {
       this.validateInputs(this.newGroup)
 
       if (!this.error.show) {
+        this.newGroup.department = this.newGroup.department._id
+
         const res = await createNewGroup(this.newGroup)
         if (res.ok) {
           this.getAllGroups()
@@ -390,6 +577,19 @@ export default {
 
       if (!this.error.show) {
         this.editGroup.department = this.editGroup.department._id
+        this.editGroup.participants = this.editGroup.participants.map(p => {
+          return {
+            memberId: p.memberId,
+            firsttraining: p.firsttraining
+          }
+        })
+
+        this.editGroup.trainers = this.editGroup.trainers.map(p => {
+          return {
+            userId: p.memberId,
+            role: p.role
+          }
+        })
 
         const res = await updateGroup(this.editGroup)
         if (res.ok) {
@@ -414,18 +614,13 @@ export default {
     },
 
     async openEditGroup(id) {
-      //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editGroup = _.cloneDeep(this.allGroups.find(m => m._id === id))
-
-      this.editGroup.department = this.departments.find(d => d._id === this.editGroup.department)
-
-      this.showEditGroupModal = true
+      this.$router.push({ path: '/edit-group', query: { id: id } })
     },
 
     async getAllGroups() {
       this.allGroups = (await getAllGroups()).sort((a, b) => a.name.localeCompare(b.name))
       //Array aus allen Departments der Gruppen Keine Duplikate
-      this.departments = this.allGroups.map(g => g.department).filter((value, index, array) => array.findIndex(t => (t._id === value._id)) === index)
+      this.departments = await getAllDepartments()
       this.searchResults = this.allGroups
     },
 
@@ -434,7 +629,9 @@ export default {
       //TODO Update error.cause
       this.error.cause = {
         nameInput: false,
-        venueInput: false
+        venueInput: false,
+        departmentInput: false,
+        timesInput: false
       }
       this.error.message = ''
     },
@@ -443,31 +640,27 @@ export default {
       console.log(inputs);
       this.resetError()
 
-      if (inputs.firstname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (inputs.lastname.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.venueInput = true
-      }
-      if (inputs.username.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen Benutzernamen ein.'
+      if (inputs.name.trim().length === 0 || !inputs.name.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen Name ein.'
         this.error.show = true
         this.error.cause.nameInput = true
       }
-      if (inputs.email.trim().length === 0) {
-        this.error.message = 'Bitte gebe einen E-Mail ein.'
-        this.error.show = true
-        this.error.cause.emailInput = true
-      }
-      //Check if email is valid
-      if (!inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-        this.error.message = 'Bitte eine gültige E-Mail ein.'
+      //Regex Groß- und Kleinbuchstaben, Umlaute, ß, Bindestriche & Leerzeichen
+      //Regex: /^[a-zA-ZäöüÄÖÜß- ]+$/
+      if (inputs.venue.trim().length === 0 || !inputs.venue.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Veranstaltungsort ein.'
         this.error.show = true
         this.error.cause.venueInput = true
+      }
+      if (typeof inputs.department._id === "undefined" || inputs.department._id?.trim().length === 0 || !inputs.department._id?.match(/^[0-9a-fA-F]{24}$/)) {
+        this.error.message = 'Bitte wähle eine Abteilung aus.'
+        this.error.show = true
+        this.error.cause.departmentInput = true
+      }
+      if (inputs.times.length === 0 || !inputs.times.every(t => ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"].includes(t.day) && t.starttime.match(/^[0-9]{2}:[0-9]{2}$/) && t.endtime.match(/^[0-9]{2}:[0-9]{2}$/))) {
+        this.error.message = 'Bitte gebe die Trainingszeiten ein.'
+        this.error.show = true
+        this.error.cause.timesInput = true
       }
 
       //If any error is true, set error.message to 'Mehrere Fehler.'
@@ -477,19 +670,46 @@ export default {
 
       if (typeof inputs._id !== 'undefined') {
         const oldEntry = this.allGroups.find(m => m._id === inputs._id)
-        if (_.isEqual(this.editGroup.firstname, oldEntry.firstname) && _.isEqual(this.editGroup.venue, oldEntry.lastname)
-          && _.isEqual(this.editGroup.username, oldEntry.username) && _.isEqual(this.editGroup.email, oldEntry.email)
-          && _.isEqual(this.editGroup.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editGroup.roles, oldEntry.roles)) {
+        if (_.isEqual(this.editGroup.name, oldEntry.name) && _.isEqual(this.editGroup.venue, oldEntry.venue)
+          && _.isEqual(this.editGroup.participants, oldEntry.participants) && _.isEqual(this.editGroup.trainers, oldEntry.trainers)
+          && _.isEqual(this.editGroup.times, oldEntry.times) && _.isEqual(this.editGroup.department, oldEntry.department)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }
+      }
+    },
+
+    validateTime(time) {
+      if (time.starttime !== "" && time.endtime !== "") {
+        if (parseInt(time.starttime.replace(":", "")) > parseInt(time.endtime.replace(":", ""))) {
+          const temp = time.starttime
+          time.starttime = time.endtime
+          time.endtime = temp
+        }
+      }
+    },
+
+    tempTimeChange() {
+      if (this.tempTime.day !== '' && this.tempTime.starttime !== '' && this.tempTime.endtime !== '') {
+        if (parseInt(this.tempTime.starttime.replace(":", "")) > parseInt(this.tempTime.endtime.replace(":", ""))) {
+          const temp = this.tempTime.starttime
+          this.tempTime.starttime = this.tempTime.endtime
+          this.tempTime.endtime = temp
+        }
+        this.newGroup.times.push(this.tempTime)
+        this.tempTime = {
+          day: '',
+          starttime: '',
+          endtime: ''
+        }
+        this.showNewTime = false
       }
     }
   },
 
   async created() {
-    document.title = 'Benutzer bearbeiten - Attend'
-    this.dataStore.viewname = "Benutzer bearbeiten"
+    document.title = 'Gruppen bearbeiten - Attend'
+    this.dataStore.viewname = "Gruppen bearbeiten"
 
     this.getAllGroups()
   },
@@ -497,52 +717,45 @@ export default {
   watch: {
     allGroups() {
       this.searchResults = this.allGroups
-    },
-    "roles.admin": function (newVal) {
-      if (newVal && !this.editGroup.roles.includes('admin') && !this.newGroup.roles.includes('admin')) {
-        this.editGroup.roles.push('admin')
-        this.newGroup.roles.push('admin')
-      } else if (!newVal) {
-        this.editGroup.roles = this.editGroup.roles.filter(r => r !== 'admin')
-        this.newGroup.roles = this.newGroup.roles.filter(r => r !== 'admin')
-      }
-    },
-    "roles.staff": function (newVal) {
-      if (newVal && !this.editGroup.roles.includes('staff') && !this.newGroup.roles.includes('staff')) {
-        this.editGroup.roles.push('staff')
-        this.newGroup.roles.push('staff')
-      } else if (!newVal) {
-        this.editGroup.roles = this.editGroup.roles.filter(r => r !== 'staff')
-        this.newGroup.roles = this.newGroup.roles.filter(r => r !== 'staff')
-      }
-    },
-    "roles.head": function (newVal) {
-      if (newVal && !this.editGroup.roles.includes('head') && !this.newGroup.roles.includes('head')) {
-        this.editGroup.roles.push('head')
-        this.newGroup.roles.push('head')
-      } else if (!newVal) {
-        this.editGroup.roles = this.editGroup.roles.filter(r => r !== 'head')
-        this.newGroup.roles = this.newGroup.roles.filter(r => r !== 'head')
-      }
-    },
-    "roles.trainer": function (newVal) {
-      if (newVal && !this.editGroup.roles.includes('trainer') && !this.newGroup.roles.includes('trainer')) {
-        this.editGroup.roles.push('trainer')
-        this.newGroup.roles.push('trainer')
-      } else if (!newVal) {
-        this.editGroup.roles = this.editGroup.roles.filter(r => r !== 'trainer')
-        this.newGroup.roles = this.newGroup.roles.filter(r => r !== 'trainer')
-      }
-    },
-    "roles.assistant": function (newVal) {
-      if (newVal && !this.editGroup.roles.includes('assistant') && !this.newGroup.roles.includes('assistant')) {
-        this.editGroup.roles.push('assistant')
-        this.newGroup.roles.push('assistant')
-      } else if (!newVal) {
-        this.editGroup.roles = this.editGroup.roles.filter(r => r !== 'assistant')
-        this.newGroup.roles = this.newGroup.roles.filter(r => r !== 'assistant')
-      }
     }
   }
 }
 </script>
+
+<style scoped>
+select {
+  line-height: 2rem;
+  padding-bottom: 2px;
+  padding-top: 5px;
+}
+
+input[type="time"] {
+  line-height: 2rem;
+  padding-bottom: 2px;
+  padding-top: 5px;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: block;
+  opacity: 0;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-clear-button {
+  display: block;
+  opacity: 0;
+}
+
+input[type="time"] {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke-width%3D%221.5%22%20stroke%3D%22currentColor%22%20class%3D%22w-6%20h-6%22%3E%0A%20%20%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M12%206v6h4.5m4.5%200a9%209%200%2011-18%200%209%209%200%200118%200z%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+  background-position: right 0.25rem center;
+
+  cursor: pointer;
+}
+
+input::-webkit-date-and-time-value {
+  text-align: left;
+}
+</style>
