@@ -44,20 +44,22 @@
           <table class="table-auto w-full text-left">
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
-                <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium" @click="onClickOnSortByLastname">
+                <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium"
+                  @click="indexSort.lastname = (indexSort.lastname + 1) % 2">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.lastname"></SortIcon>
                     Name
                   </span>
                 </th>
                 <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
-                  @click="onClickOnSortByFirstname">
+                  @click="indexSort.firstname = (indexSort.firstname + 1) % 2">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.firstname"></SortIcon>
                     Vorname
                   </span>
                 </th>
-                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnSortByBirthday">
+                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
+                  @click="indexSort.birthday = (indexSort.birthday + 1) % 2">
                   <span class="hidden md:flex items-center gap-1 ">
                     <SortIcon :index="indexSort.birthday"></SortIcon>
                     Geburtstag
@@ -306,33 +308,6 @@ export default {
     CollapsibleContainer
   },
   methods: {
-    onClickOnSortByLastname() {
-      this.indexSort.lastname = (this.indexSort.lastname + 1) % 2
-      if (this.indexSort.lastname === 1) {
-        this.searchResults.sort((a, b) => b.lastname.localeCompare(a.lastname))
-      } else {
-        this.searchResults.sort((a, b) => a.lastname.localeCompare(b.lastname))
-      }
-    },
-
-    onClickOnSortByFirstname() {
-      this.indexSort.firstname = (this.indexSort.firstname + 1) % 2
-      if (this.indexSort.firstname === 1) {
-        this.searchResults.sort((a, b) => b.firstname.localeCompare(a.firstname))
-      } else {
-        this.searchResults.sort((a, b) => a.firstname.localeCompare(b.firstname))
-      }
-    },
-
-    onClickOnSortByBirthday() {
-      this.indexSort.birthday = (this.indexSort.birthday + 1) % 2
-      if (this.indexSort.birthday === 1) {
-        this.searchResults.sort((a, b) => new Date(b.birthday) - new Date(a.birthday))
-      } else {
-        this.searchResults.sort((a, b) => new Date(a.birthday) - new Date(b.birthday))
-      }
-    },
-
     search(searchString) {
       if (this.showSearchBar) {
         // this.showSearchBar = false
@@ -414,7 +389,7 @@ export default {
           ...this.editMember,
           groups: this.editMember.groups.map(g => g._id)
         })
-        if (res.status === 200) {
+        if (res.ok) {
           this.getAllMembers()
           this.cancel()
         } else {
@@ -426,7 +401,7 @@ export default {
 
     async deleteMember(id) {
       const res = await deleteMember(id)
-      if (res.status === 200) {
+      if (res.ok) {
         this.getAllMembers()
         this.cancel()
       } else {
@@ -473,22 +448,22 @@ export default {
         this.error.show = true
         this.error.cause.lastnameInput = true
       }
-      if (this.editMember.birthday.trim().length === 0 || !this.editMember.birthday.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
+      if (inputs.birthday.trim().length === 0 || !inputs.birthday.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
         this.error.message = 'Bitte gebe einen Geburtstag ein.'
         this.error.show = true
         this.error.cause.birthdayInput = true
       }
 
       //If any error is true, set error.message to 'Mehrere Fehler.'
-      if (Object.keys(this.error.cause).some(k => this.error.cause[k])) {
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
         this.error.message = 'Mehrere Fehler.'
       }
 
       if (typeof inputs._id !== 'undefined') {
-        const oldEntry = this.allMembers.find(m => m._id === this.editMember._id)
-        if (this.editMember.firstname === oldEntry.firstname && this.editMember.lastname === oldEntry.lastname
-          && this.editMember.birthday === oldEntry.birthday.slice(0, 10)
-          && _.isEqual(this.editMember.groups.map(g => g._id), oldEntry.groups)) {
+        const oldEntry = this.allMembers.find(m => m._id === inputs._id)
+        if (inputs.firstname === oldEntry.firstname && inputs.lastname === oldEntry.lastname
+          && inputs.birthday === oldEntry.birthday.slice(0, 10)
+          && _.isEqual(inputs.groups.map(g => g._id), oldEntry.groups)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }
@@ -506,7 +481,37 @@ export default {
   watch: {
     allMembers() {
       this.searchResults = this.allMembers
-    }
+    },
+    "indexSort.lastname"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.lastname === 1) {
+          return b.lastname.localeCompare(a.lastname)
+        } else {
+          return a.lastname.localeCompare(b.lastname)
+        }
+      })
+    },
+
+    "indexSort.firstname"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.firstname === 1) {
+          return b.firstname.localeCompare(a.firstname)
+        } else {
+          return a.firstname.localeCompare(b.firstname)
+        }
+      })
+    },
+
+    "indexSort.birthday"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.birthday === 1) {
+          return new Date(b.birthday) - new Date(a.birthday)
+        } else {
+          return new Date(a.birthday) - new Date(b.birthday)
+        }
+      })
+    },
+
   }
 }
 </script>

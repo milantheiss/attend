@@ -167,7 +167,7 @@
             <!--Bestätigungsfeld-->
             <div class="">
                 <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
-                <div class="flex justify-between items-center gap-7 mb-10">
+                <div class="flex justify-between items-center gap-7 mb-20">
                     <button @click="cancel"
                         class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
                         :class="error.show ? 'mt-4' : ''">

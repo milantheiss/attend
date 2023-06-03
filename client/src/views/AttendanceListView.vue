@@ -94,7 +94,7 @@
     </div>
 
     <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)"
-      class="flex justify-center items-center mb-10">
+      class="flex justify-center items-center mb-20">
       <p class="text-lg md:text-xl font-medium text-light-gray">{{ countParticipants(attended.participants) }} Teilnehmer
         am {{ new Date(date).toLocaleDateString() }}</p>
     </div>

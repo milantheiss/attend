@@ -18,15 +18,24 @@ router
     .route('/:groupID')
     //TODO Query String hinzufügen um nur bestimmte Felder zu bekommen
     .get(verifyToken, validate(groupValidation.getGroupById), groupController.getGroupById)
+    .patch(verifyToken, validate(groupValidation.updateGroup), groupController.updateGroup)
+
+router
+    .route("/:groupID/multipleMembers")
+    .post(verifyToken, validate(groupValidation.addMultipleMembers), groupController.addMultipleMembers)
 
 router
     .route('/:groupID/member')
     .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
-    
-    router
+
+router
     .route('/:groupID/member/:memberID')
     .patch(verifyToken, validate(groupValidation.updateMember), groupController.updateMember)
     .delete(verifyToken, validate(groupValidation.removeMember), groupController.removeMember)
+
+router
+    .route("/:groupID/multipleTrainer")
+    .post(verifyToken, validate(groupValidation.addMultipleTrainer), groupController.addMultipleTrainer)
 
 router
     .route('/:groupID/trainer')
@@ -34,6 +43,7 @@ router
 
 router
     .route('/:groupID/trainer/:userID')
+    .patch(verifyToken, validate(groupValidation.updateTrainer), groupController.updateTrainer)
     .delete(verifyToken, validate(groupValidation.removeTrainer), groupController.removeTrainer)
 
 module.exports = router;

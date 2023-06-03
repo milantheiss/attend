@@ -35,7 +35,7 @@ const updateMember = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.updateMember(req.params.groupID, req.body)
+    const result = await groupService.updateMember(req.params.groupID, req.params.memberID, req.body)
     res.status(httpStatus.OK).send(result)
 })
 
@@ -79,7 +79,40 @@ const removeTrainer = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.removeTrainer(req.params.groupID, req.params.trainerID)
+    const result = await groupService.removeTrainer(req.params.groupID, req.params.userID)
+    res.status(httpStatus.OK).send(result)
+})
+
+const updateTrainer = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
+
+    const result = await groupService.updateTrainer(req.params.groupID, req.params.userID, req.body)
+    res.status(httpStatus.OK).send(result)
+})
+
+const updateGroup = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
+    const result = await groupService.updateGroup(req.params.groupID, req.body)
+    res.status(httpStatus.OK).send(result)
+})
+
+const addMultipleMembers = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
+    const result = await groupService.addMultipleMembers(req.params.groupID, req.body)
+    res.status(httpStatus.OK).send(result)
+})
+
+const addMultipleTrainer = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
+    const result = await groupService.addMultipleTrainer(req.params.groupID, req.body)
     res.status(httpStatus.OK).send(result)
 })
 
@@ -94,6 +127,10 @@ module.exports = {
     getGroupName,
     addMember,
     addTrainer,
-    removeTrainer
+    removeTrainer,
+    updateGroup,
+    updateTrainer,
+    addMultipleMembers,
+    addMultipleTrainer
 }
 

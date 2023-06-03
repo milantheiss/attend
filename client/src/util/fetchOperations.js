@@ -106,7 +106,7 @@ async function fetchAttendanceByDateRange(groupID, startdate, enddate) {
 
 //INFO Fetch Operations /departments
 async function getAllDepartments() {
-    return await watchForRedirects(
+	return await watchForRedirects(
 		fetch(`${import.meta.env.VITE_API_URL}/departments`, {
 			method: "GET",
 			credentials: "include",
@@ -156,7 +156,7 @@ async function createNewGroup(body) {
 	return { ok: res.ok, body: await res.json() }
 }
 
-async function deleteGroup(groupID){
+async function deleteGroup(groupID) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
 	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
@@ -170,7 +170,7 @@ async function deleteGroup(groupID){
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }			
+	return { ok: res.ok, body: await res.json() }
 }
 
 async function updateGroup(groupID, body) {
@@ -218,26 +218,7 @@ async function getGroupName(groupID) {
 	);
 }
 
-async function updateMemberInGroup(groupID, memberID, body) {
-	if (!groupID) throw new Error("No groupID provided")
-	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
-	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
-
-	if (typeof body === "undefined") throw new Error("body must be defined")
-	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
-
-	return await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member", memberID].join("/"), {
-			method: "PATCH",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify(body),
-			credentials: "include",
-			mode: "cors",
-		})
-	);
-}
-
-async function removeMemberFromGroup(groupID, memberID) {
+async function updateParticipantInGroup(groupID, memberID, body) {
 	if (!groupID) throw new Error("No groupID provided")
 	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
 	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
@@ -246,16 +227,128 @@ async function removeMemberFromGroup(groupID, memberID) {
 	if (typeof memberID === "undefined") throw new Error("memberID must be defined")
 	if (typeof memberID !== "string") throw new Error("notificationID must be a string")
 
-	return await watchForRedirects(
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member", memberID].join("/"), {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function removeParticipantFromGroup(groupID, memberID) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	if (!memberID) throw new Error("No memberID provided")
+	if (typeof memberID === "undefined") throw new Error("memberID must be defined")
+	if (typeof memberID !== "string") throw new Error("notificationID must be a string")
+
+	const res = await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member", memberID].join("/"), {
 			method: "DELETE",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			credentials: "include",
 			mode: "cors",
-		})
+		}), { raw: true }
 	);
+
+	return { ok: res.ok, body: await res.json() }
 }
 
+async function updateTrainerInGroup(groupID, userID, body) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	if (!userID) throw new Error("No memberID provided")
+	if (typeof userID === "undefined") throw new Error("memberID must be defined")
+	if (typeof userID !== "string") throw new Error("notificationID must be a string")
+
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "trainer", userID].join("/"), {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function removeTrainerFromGroup(groupID, userID) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+	if (typeof groupID !== "string") throw new Error("notificationID must be a string")
+
+	if (!userID) throw new Error("No memberID provided")
+	if (typeof userID === "undefined") throw new Error("memberID must be defined")
+	if (typeof userID !== "string") throw new Error("notificationID must be a string")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "trainer", userID].join("/"), {
+			method: "DELETE",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function addMultipleMembersToGroup(groupID, members) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+
+	if (typeof members === "undefined") throw new Error("members must be defined")
+	if (members.length === 0) throw new Error("members must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "multipleMembers"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(members),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
+
+async function addMultipleTrainerToGroup(groupID, trainers) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+
+	if (typeof trainers === "undefined") throw new Error("trainers must be defined")
+	if (trainers.length === 0) throw new Error("trainers must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "multipleTrainer"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(trainers),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: await res.json() }
+}
 
 
 //INFO Fetch Operations zu /invoice
@@ -679,8 +772,8 @@ export {
 	fetchGroup,
 	fetchGroups,
 	getGroupName,
-	updateMemberInGroup,
-	removeMemberFromGroup,
+	updateParticipantInGroup,
+	removeParticipantFromGroup,
 	getLastPatchNotes,
 	fetchDataForNewInvoice,
 	sendInvoice,
@@ -711,5 +804,9 @@ export {
 	createNewGroup,
 	deleteGroup,
 	updateGroup,
-	getAllDepartments
+	getAllDepartments,
+	updateTrainerInGroup,
+	removeTrainerFromGroup,
+	addMultipleMembersToGroup,
+	addMultipleTrainerToGroup
 };

@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <div class="flex flex-col gap-4 mb-10">
+    <div class="flex flex-col gap-4 mb-20">
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center ">
           <button @click="showCreateGroupModal = true"
@@ -40,8 +40,7 @@
           </div>
         </transition>
       </div>
-      <!--TODO Collapsible für jedes Department-->
-      <CollapsibleContainer v-for="(department, index) in this.departments" :key="department._id"
+      <CollapsibleContainer v-for="(department, index) in departments" :key="department._id"
         class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col" :show="index === 0">
         <template #header>
           <p class="font-medium">{{ department.name }}</p>
@@ -51,7 +50,7 @@
             <table class="table-auto w-full text-left">
               <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
                 <tr>
-                  <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByGroupname">
+                  <th scope="col" class="pb-2.5 font-medium" @click="index = (indexSort + 1) % 2">
                     <span class="flex items-center gap-1">
                       <SortIcon :index="indexSort"></SortIcon>
                       Gruppenbezeichnung
@@ -61,7 +60,7 @@
                 </tr>
               </thead>
               <tbody class="overscroll-y-scroll">
-                <tr v-for="group in this.searchResults.filter(g => g.department._id === department._id)" :key="group._id"
+                <tr v-for="group in searchResults.filter(g => g.department._id === department._id)" :key="group._id"
                   @click="openEditGroup(group._id)" class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                   <!--Gruppenbezeichnung-->
                   <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
@@ -79,7 +78,7 @@
                 </tr>
               </tbody>
             </table>
-            <p v-show="typeof this.searchResults.filter(g => g.department._id === department._id) === 'undefined' || this.searchResults.filter(g => g.department._id === department._id)?.length === 0"
+            <p v-show="typeof searchResults.filter(g => g.department._id === department._id) === 'undefined' || searchResults.filter(g => g.department._id === department._id)?.length === 0"
               class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
           </div>
         </template>
@@ -115,17 +114,18 @@
                 <p class="font-medium">Zeiten</p>
               </template>
               <template #content>
-                <table class="table-auto md:table-fixed w-full mb-2">
+                <table class="table-auto w-full mb-2">
                   <thead class="border-b border-[#D1D5DB] text-left">
                     <tr>
                       <th class="pb-1.5 font-medium">Tag</th>
                       <th class="pb-1.5 font-medium  px-2.5">Start</th>
                       <th class="pb-1.5 font-medium">Ende</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="border-b border-[#E5E7EB] last:border-0 group" v-for="(time, index) in newGroup.times.sort((a, b) => sorter[b] - sorter[a])"
-                      :key="index">
+                    <tr class="border-b border-[#E5E7EB] last:border-0 group"
+                      v-for="(time, index) in newGroup.times.sort((a, b) => sorter[b] - sorter[a])" :key="index">
                       <td class="py-2 group-last:pt-2 group-last:pb-0">
                         <!--Selector Day-->
                         <select v-model="time.day"
@@ -162,6 +162,13 @@
                           class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
                           :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
                           v-model="time.endtime" :min='time.starttime' max='00:00' @change="validateTime(time)" />
+                      </td>
+
+                      <td @click="newGroup.times.splice(index, 1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" class="w-7 h-7">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       </td>
                     </tr>
 
@@ -510,15 +517,6 @@ export default {
     SelectList
   },
   methods: {
-    onClickOnSortByGroupname() {
-      this.indexSort = (this.indexSort + 1) % 2
-      if (this.indexSort === 1) {
-        this.searchResults.sort((a, b) => b.name.localeCompare(a.name))
-      } else {
-        this.searchResults.sort((a, b) => a.name.localeCompare(b.name))
-      }
-    },
-
     search(searchString) {
       if (this.showSearchBar) {
         if (searchString !== '') {
@@ -664,15 +662,15 @@ export default {
       }
 
       //If any error is true, set error.message to 'Mehrere Fehler.'
-      if (Object.keys(this.error.cause).some(k => this.error.cause[k])) {
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
         this.error.message = 'Mehrere Fehler.'
       }
 
       if (typeof inputs._id !== 'undefined') {
         const oldEntry = this.allGroups.find(m => m._id === inputs._id)
-        if (_.isEqual(this.editGroup.name, oldEntry.name) && _.isEqual(this.editGroup.venue, oldEntry.venue)
-          && _.isEqual(this.editGroup.participants, oldEntry.participants) && _.isEqual(this.editGroup.trainers, oldEntry.trainers)
-          && _.isEqual(this.editGroup.times, oldEntry.times) && _.isEqual(this.editGroup.department, oldEntry.department)) {
+        if (_.isEqual(inputs.name, oldEntry.name) && _.isEqual(inputs.venue, oldEntry.venue)
+          && _.isEqual(inputs.participants, oldEntry.participants) && _.isEqual(inputs.trainers, oldEntry.trainers)
+          && _.isEqual(inputs.times, oldEntry.times) && _.isEqual(inputs.department, oldEntry.department)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }
@@ -717,6 +715,15 @@ export default {
   watch: {
     allGroups() {
       this.searchResults = this.allGroups
+    },
+    indexSort() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort === 1) {
+          return b.name.localeCompare(a.name)
+        } else {
+          return a.name.localeCompare(b.name)
+        }
+      })
     }
   }
 }

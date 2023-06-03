@@ -7,7 +7,7 @@
                         bg-inherit"
     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
     style="background-position: right 0.1rem center;padding-right: 1.9rem;">
-    <option disabled :value="defaultValue">{{ defaultValue }}</option>
+    <option disabled :value="defaultValue" hidden>{{ defaultValue }}</option>
     <option v-for="element in computedOptions" :key="element._id" :value="element">
       {{ element.name }}
     </option>
@@ -41,8 +41,6 @@ export default {
       this.$emit("update:modelValue", this.selected);
     },
     modelValue(newVal) {
-      console.log(newVal);
-
       // Wenn nur ein Element in der Liste ist, dann wird dieses automatisch ausgewählt
       if (this.computedOptions.length === 1) {
         this.selected = this.computedOptions[0]

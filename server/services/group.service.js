@@ -4,6 +4,8 @@ const ApiError = require('../utils/ApiError');
 const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
 const attendanceService = require('./attendance.service');
 const _ = require('lodash');
+const memberService = require('./member.service');
+const userService = require('./user.service');
 
 async function getTrainersOfGroup(group) {
     return await Promise.all(group.trainers.map(async (trainer) => {
@@ -122,41 +124,24 @@ const createGroup = async (groupBody) => {
  * @param {Object} groupBody
  * @returns {boolean} true if successful
  */
-const updateMember = async (user, groupID, body) => {
-    let oldFirsttraining
+const updateMember = async (groupID, memberID, body) => {
     let group = await Group.findById(groupID)
+    await memberService.updateMember(memberID, { firstname: body.firstname, lastname: body.lastname, birthday: body.birthday })
 
-    //Wenn Participant noch nicht existiert, wird er neu erstellt
-    if (typeof body.memberId === 'undefined') {
-        if (!group.participants.some(e => e.memberId.equals(body.memberId))) {
-            //Wenn der Member noch nicht Teil der Gruppe ist, wird er hinzugefügt
-            body = { ...body, ...await memberService.handleNewMemberEvent(user, group, body) }
-            body.memberId = body._id
-            group._doc.participants.push(body)
-        }
-    } else {
-        //Wenn Participant bereits existiert, wird er geupdatet
-        body = { ...body, ... await memberService.updateMember(body) }
-        body.memberId = body._id
+    let oldFirsttraining = group._doc.participants.find(e => e.memberId.equals(memberID)).firsttraining
 
-        //OldFirsttraining wird aus group gezogen & group lokal geupdatet, damit es zurückgeben werden kann
-        group._doc.participants = group._doc.participants.map(e => {
-            if (e.memberId.equals(body.memberId)) {
-                oldFirsttraining = e.firsttraining
-                return body
-            }
-            return e
-        })
-    }
     //Es wird ein Member mit memberId erwartet
-    await updateParticipantInTrainingssessions(groupID, body, oldFirsttraining, body.firsttraining)
+    await updateParticipantInTrainingssessions(groupID, memberID, body.firsttraining, oldFirsttraining)
+
+    participant = group.participants.find(e => e.memberId.equals(memberID))
+    Object.assign(participant, body)
 
     await group.save()
 
     return group
 };
 
-const addMember = async (groupID, memberBody) => {
+const addMember = async (groupID, memberID, memberBody) => {
     if (typeof memberBody.memberId === 'undefined') {
         memberBody.memberId = memberBody._id
     }
@@ -179,7 +164,7 @@ const addMember = async (groupID, memberBody) => {
 
     group.participants.push(memberBody)
 
-    await updateParticipantInTrainingssessions(groupID, memberBody, undefined, memberBody.firsttraining)
+    await updateParticipantInTrainingssessions(groupID, memberID, memberBody.firsttraining)
 
     await group.save()
     return group
@@ -195,6 +180,10 @@ const removeMember = async (groupID, memberID) => {
 
     group.participants = group.participants.filter(e => !e.memberId.equals(memberID))
 
+    const member = await Member.findById(memberID)
+    member.groups = member.groups.filter(e => !e.equals(groupID))
+    await member.save()
+
     await group.save()
     return group
 };
@@ -202,66 +191,51 @@ const removeMember = async (groupID, memberID) => {
 /**
  * Update Participant in Attendance
  * @param {*} groupID 
- * @param {*} participantData 
+ * @param {*} memberID 
  * @param {*} oldFirsttraining Can be undefined for new Participants
  * @param {*} newFirsttraining 
  * @returns {Promise<Attendance>} Updated Attendance
  */
-const updateParticipantInTrainingssessions = async (groupID, participantData, oldFirsttraining, newFirsttraining) => {
+const updateParticipantInTrainingssessions = async (groupID, memberID, newFirsttraining, oldFirsttraining = undefined) => {
     let list = await Attendance.findOne({ group: groupID });
 
-    //Wird nur ausgeführt, wenn schon Trainingssession bzw. Attendance Documents existieren
-    if (typeof list !== "undefined" && list !== null) {
-        newFirsttraining = new Date(newFirsttraining)
-
-        //Wenn der Datum Firsttraining verändert wurde, muss der Participant geupdatet werden
-        if (typeof oldFirsttraining !== 'undefined') {
-            oldFirsttraining = new Date(oldFirsttraining)
-
-            //Fügt Participant neu in Trainingsessions hinzu, wenn newFirsttraining früher war als oldFirsttraining 
-            if (newFirsttraining <= oldFirsttraining) {
-                for (const session of list.trainingssessions) {
-                    //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
-                    if (session.date >= newFirsttraining) {
-                        participant = session.participants.find(foo => foo.memberId.equals(participantData.memberId))
-                        //Wenn Participant noch nicht in Trainingssession existiert
-                        if (typeof participant === 'undefined') {
-                            session.participants.push({
-                                memberId: participantData.memberId,
-                                attended: false,
-                                _id: participantData.memberId
-                            })
-                        }
-                    }
-                }
-            } else {
-                //Entfernt Participant in Trainingsessions, wenn newFirsttraining später ist als oldFirsttraining 
-                for (const session of list.trainingssessions) {
-                    //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
-                    if (session.date >= oldFirsttraining) {
-                        session.participants = session.participants.filter(foo => !foo.memberId.equals(participantData.memberId))
-                    }
-                }
-            }
-        } else { //Wenn der Participant neu erstellt wird
-            list.trainingssessions = list.trainingssessions.map(session => {
-                //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
-                if (session.date >= newFirsttraining) {
-                    session.participants.push({
-                        memberId: participantData.memberId,
-                        attended: false,
-                        _id: participantData.memberId
-                    })
-                }
-                return session
-            })
-        }
-
-        await list.save()
-        return list
-    } else {
+    if (typeof list === "undefined" || list === null) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Attendance not found')
     }
+
+    newFirsttraining = new Date(newFirsttraining)
+    oldFirsttraining = new Date(oldFirsttraining)
+
+    //Wenn das Datum des Firsttraining früher liegt, als das alte Datum
+    if (newFirsttraining > oldFirsttraining) {
+        //Participant wird aus allen Trainingsessions entfernt, die früher liegen als newFirsttraining 
+        for (const session of list.trainingssessions) {
+            //Aus allen Trainingssessions, die jünger sind als oldFirsttraining && älter als newFirsttraining, wird Participant gelöscht
+            if (session.date >= oldFirsttraining && session.date < newFirsttraining) {
+                session.participants = session.participants.filter(foo => !foo.memberId.equals(memberID))
+            }
+        }
+    } else { //Wenn der Participant neu erstellt wurde oder das Datum des Firsttraining vor dem alten Datum liegt oder gleich geblieben ist
+        list.trainingssessions = list.trainingssessions.map((session) => {
+            //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
+            if (session.date >= newFirsttraining && session.date < oldFirsttraining) {
+                participant = session.participants.find(foo => foo.memberId.equals(memberID))
+
+                //Wenn Participant noch nicht in Trainingssession existiert
+                if (typeof participant === 'undefined') {
+                    session.participants.push({
+                        memberId: memberID,
+                        attended: false,
+                        _id: memberID
+                    })
+                }
+            }
+            return session
+        })
+    }
+
+    await list.save()
+    return list
 }
 
 /**
@@ -315,6 +289,28 @@ const removeTrainer = async (groupID, trainerID) => {
     await group.save()
 }
 
+const updateTrainer = async (groupID, userID, trainerBody) => {
+    const group = await Group.findById(groupID)
+
+    if (!group) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
+    }
+
+    group.trainers = group.trainers.map((trainer) => {
+        if (trainer.userId.equals(userID)) {
+            Object.assign(trainer, trainerBody)
+        }
+        return trainer
+    })
+
+    await group.save()
+
+    await userService.updateUser(userID, { firstname: trainerBody.firstname, lastname: trainerBody.lastname })
+
+    return group
+}
+
+
 /**
  * Completely deletes a trainer from the group (So that there is no ref to the user object)
  * @param {*} groupID 
@@ -325,6 +321,86 @@ const deleteTrainer = async (groupID, trainerID) => {
 
     await attendanceService.removeTrainerFromAttendanceList(groupID, trainerID)
 }
+
+const updateGroup = async (groupID, groupBody) => {
+    const group = await Group.findById(groupID)
+
+    if (!group) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
+    }
+
+    Object.assign(group, groupBody)
+    await group.save()
+    return group
+}
+
+const addMultipleMembers = async (groupID, members) => {
+    const group = await Group.findById(groupID)
+
+    await Promise.all(members.map(async (m) => {
+        if (typeof m.memberId === 'undefined') {
+            m.memberId = m._id
+        }
+
+        //Wenn member schon in Gruppe ist, dann wird er übersprungen
+        if (group.participants.some(e => e.memberId.equals(m.memberId))) {
+            return
+        }
+
+        const member = await Member.findById(m.memberId)
+
+        if (typeof member === 'undefined' || member === null) {
+            throw new ApiError(httpStatus.NOT_FOUND, `Member with id ${m.memberId} not found`)
+        }
+
+        if (!member.groups.includes(groupID)) {
+            member.groups.push(groupID)
+        }
+
+        await member.save()
+
+        group.participants.push(m)
+
+        await updateParticipantInTrainingssessions(groupID, m.memberId, m.firsttraining)
+    }))
+
+    await group.save()
+    return group
+}
+
+const addMultipleTrainer = async (groupID, trainers) => {
+    const group = await Group.findById(groupID)
+
+    await Promise.all(trainers.map(async (t) => {
+        if (typeof t.userId === 'undefined') {
+            t.userId = t._id
+        }
+
+        //Wenn trainer schon in Gruppe ist, dann wird er übersprungen
+        if (group.trainers.some(e => e.userId.equals(t.userId))) {
+            return
+        }
+
+        const user = await User.findById(t.userId)
+
+        if (typeof user === 'undefined' || user === null) {
+            throw new ApiError(httpStatus.NOT_FOUND, `User with id ${t.userId} not found`)
+        }
+
+        if (!user.accessible_groups.includes(groupID)) {
+            user.accessible_groups.push(groupID)
+        }
+
+        await user.save()
+
+        group.trainers.push(t)
+
+    }))
+
+    await group.save()
+    return group
+}
+
 
 
 module.exports = {
@@ -337,5 +413,9 @@ module.exports = {
     addTrainer,
     removeTrainer,
     deleteTrainer,
-    getAssignedGroups
+    getAssignedGroups,
+    updateGroup,
+    updateTrainer,
+    addMultipleMembers,
+    addMultipleTrainer
 };

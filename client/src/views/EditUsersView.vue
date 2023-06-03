@@ -44,19 +44,21 @@
           <table class="table-auto w-full text-left">
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
-                <th scope="col" class="pb-2.5 font-medium" @click="onClickOnSortByLastname">
+                <th scope="col" class="pb-2.5 font-medium" @click=" indexSort.lastname = (indexSort.lastname + 1) % 2">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.lastname"></SortIcon>
                     Name
                   </span>
                 </th>
-                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium" @click="onClickOnSortByFirstname">
+                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
+                  @click="indexSort.firstname = (indexSort.firstname + 1) % 2">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.firstname"></SortIcon>
                     Vorname
                   </span>
                 </th>
-                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium" @click="onClickOnRoles">
+                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
+                  @click="indexSort.roles = (indexSort.roles + 1) % 2">
                   <span class="flex items-center gap-1 ">
                     <SortIcon :index="indexSort.roles"></SortIcon>
                     Rolle
@@ -90,7 +92,7 @@
                   </svg>
                 </td>
               </tr>
-              
+
             </tbody>
           </table>
           <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
@@ -387,33 +389,6 @@ export default {
     CheckboxInput
   },
   methods: {
-    onClickOnSortByLastname() {
-      this.indexSort.lastname = (this.indexSort.lastname + 1) % 2
-      if (this.indexSort.lastname === 1) {
-        this.searchResults.sort((a, b) => b.lastname.localeCompare(a.lastname))
-      } else {
-        this.searchResults.sort((a, b) => a.lastname.localeCompare(b.lastname))
-      }
-    },
-
-    onClickOnSortByFirstname() {
-      this.indexSort.firstname = (this.indexSort.firstname + 1) % 2
-      if (this.indexSort.firstname === 1) {
-        this.searchResults.sort((a, b) => b.firstname.localeCompare(a.firstname))
-      } else {
-        this.searchResults.sort((a, b) => a.firstname.localeCompare(b.firstname))
-      }
-    },
-
-    onClickOnRoles() {
-      this.indexSort.roles = (this.indexSort.roles + 1) % 2
-      if (this.indexSort.roles === 1) {
-        this.searchResults.sort((a, b) => this.getHighestRole(b.roles).localeCompare(this.getHighestRole(a.roles)))
-      } else {
-        this.searchResults.sort((a, b) => this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles)))
-      }
-    },
-
     search(searchString) {
       if (this.showSearchBar) {
         // this.showSearchBar = false
@@ -426,7 +401,6 @@ export default {
         }
       }
     },
-
     cancel() {
       this.showCreateUserModal = false
       this.showEditUserModal = false
@@ -478,8 +452,6 @@ export default {
       this.validateInputs(this.editUser)
 
       if (!this.error.show) {
-        delete this.editUser.readPatchnotes
-
         this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g._id)
 
         const res = await updateUser(this.editUser)
@@ -577,15 +549,15 @@ export default {
       }
 
       //If any error is true, set error.message to 'Mehrere Fehler.'
-      if (Object.keys(this.error.cause).some(k => this.error.cause[k])) {
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
         this.error.message = 'Mehrere Fehler.'
       }
 
       if (typeof inputs._id !== 'undefined') {
         const oldEntry = this.allUsers.find(m => m._id === inputs._id)
-        if (_.isEqual(this.editUser.firstname, oldEntry.firstname) && _.isEqual(this.editUser.lastname, oldEntry.lastname)
-          && _.isEqual(this.editUser.username, oldEntry.username) && _.isEqual(this.editUser.email, oldEntry.email)
-          && _.isEqual(this.editUser.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
+        if (_.isEqual(inputs.firstname, oldEntry.firstname) && _.isEqual(inputs.lastname, oldEntry.lastname)
+          && _.isEqual(inputs.username, oldEntry.username) && _.isEqual(inputs.email, oldEntry.email)
+          && _.isEqual(inputs.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
           this.error.message = 'Es wurden keine Änderungen vorgenommen.'
           this.error.show = true
         }
@@ -656,7 +628,36 @@ export default {
         this.editUser.roles = this.editUser.roles.filter(r => r !== 'assistant')
         this.newUser.roles = this.newUser.roles.filter(r => r !== 'assistant')
       }
-    }
+    },
+    "indexSort.lastname"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.lastname === 1) {
+          return b.lastname.localeCompare(a.lastname)
+        } else {
+          return a.lastname.localeCompare(b.lastname)
+        }
+      })
+    },
+
+    "indexSort.firstname"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.firstname === 1) {
+          return b.firstname.localeCompare(a.firstname)
+        } else {
+          return a.firstname.localeCompare(b.firstname)
+        }
+      })
+    },
+
+    "indexSort.roles"() {
+      this.searchResults.sort((a, b) => {
+        if (this.indexSort.roles === 1) {
+          return this.getHighestRole(b.roles).localeCompare(this.getHighestRole(a.roles))
+        } else {
+          return this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles))
+        }
+      })
+    },
   }
 }
 </script>

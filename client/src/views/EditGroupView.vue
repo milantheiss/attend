@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col gap-8 mb-10">
+    <div class="flex flex-col gap-8 mb-20">
       <!-- Group Info -->
       <div class="flex flex-col justify-center items-center gap-4 bg-white rounded-xl p-3.5 md:p-7">
         <!--Gruppenbezeichnung-->
@@ -19,18 +19,21 @@
         </div>
 
         <!--Zeiten der Gruppe -->
-        <div class="w-full flex items-center justify-between gap-4">
+        <div class="w-full flex items-center justify-between gap-4"
+          :class="{ 'outline outline-2 outline-offset-4 rounded-lg outline-special-red': error.cause.timesInput }">
           <CollapsibleContainer :show="true" class="w-full">
             <template #header>
               <p class="font-medium">Zeiten</p>
             </template>
             <template #content>
-              <table class="table-auto md:table-fixed w-full mb-2">
+              <table class="table-auto w-full mb-2">
                 <thead class="border-b border-[#D1D5DB] text-left">
                   <tr>
                     <th class="pb-1.5 font-medium">Tag</th>
-                    <th class="pb-1.5 font-medium  px-2.5">Start</th>
-                    <th class="pb-1.5 font-medium">Ende</th>
+                    <th class="pb-1.5 font-medium px-2.5"><span class="hidden ty:block">Start</span> <span
+                        class="block ty:hidden">Zeiten</span></th>
+                    <th class="pb-1.5 font-medium hidden ty:block">Ende</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -60,19 +63,30 @@
                         <option value="Sonntag">Sonntag</option>
                       </select>
                     </td>
-                    <td class="py-2 px-2.5">
+                    <td class="py-2 px-2.5 flex flex-col gap-2 sm:table-cell">
                       <!--Time Selector-->
                       <input
                         class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
                         :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
                         v-model="time.starttime" min='00:00' :max='time.endtime' @change="validateTime(time)" />
+                      <!--Time Selector-->
+                      <input
+                        class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3 block ty:hidden'
+                        :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
+                        v-model="time.endtime" :min='time.starttime' max='00:00' @change="validateTime(time)" />
                     </td>
-                    <td class="">
+                    <td class="hidden ty:table-cell">
                       <!--Time Selector-->
                       <input
                         class='font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3'
                         :class="error.cause.timesInput ? 'border-2 rounded-lg border-special-red' : ''" type='time'
                         v-model="time.endtime" :min='time.starttime' max='00:00' @change="validateTime(time)" />
+                    </td>
+                    <td @click="group.times.splice(index, 1)" class="">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-7 h-7 ml-auto">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </td>
                   </tr>
 
@@ -133,7 +147,12 @@
           <TextInput name="venue" v-model="group.venue" placeholder="Sportstätte" :showError="error.cause.venueInput"
             class="md:w-96"></TextInput>
         </div>
-        <ErrorMessage></ErrorMessage>
+        <!-- TODO Config Error Message -->
+        <div class="w-full">
+          <ErrorMessage
+            :show="error.cause.nameInput || error.cause.departmentInput || error.cause.timesInput || error.cause.venueInput"
+            :message="error.message"></ErrorMessage>
+        </div>
         <button @click="saveChanges"
           class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-2.5">
           <p class="font-medium font-base md:text-lg">Speichern</p>
@@ -146,7 +165,7 @@
       <div class="flex flex-col gap-4 items-center w-full">
         <div class="flex gap-4 items-center justify-between w-full px-3.5 md:px-7">
           <p class="font-medium text-xl md:text-2xl">Teilnehmer</p>
-          <button @click="addMember()"
+          <button @click="showAddParticipantModal = true"
             class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md px-3.5 md:px-7 py-2.5">
             <p class="font-medium font-base md:text-lg">Hinzufügen</p>
           </button>
@@ -185,7 +204,7 @@
             </thead>
             <tbody class="overscroll-y-scroll">
               <tr v-for="participant in group.participants" :key="participant._id"
-                @click="openEditMember(participant._id)"
+                @click="openEditParticipant(participant._id)"
                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                 <!--Lastname-->
                 <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
@@ -224,7 +243,7 @@
       <div class="flex flex-col gap-4 items-center w-full">
         <div class="flex gap-4 items-center justify-between w-full px-3.5 md:px-7">
           <p class="font-medium text-xl md:text-2xl">Trainer</p>
-          <button @click="addTrainer()"
+          <button @click="showAddTrainerModal = true"
             class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md px-3.5 md:px-7 py-2.5">
             <p class="font-medium font-base md:text-lg">Hinzufügen</p>
           </button>
@@ -258,7 +277,7 @@
               </tr>
             </thead>
             <tbody class="overscroll-y-scroll">
-              <tr v-for="trainer in group.trainers" :key="trainer._id" @click="openEditMember(trainer._id)"
+              <tr v-for="trainer in group.trainers" :key="trainer._id" @click="openEditTrainer(trainer._id)"
                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                 <!--Lastname-->
                 <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
@@ -288,6 +307,7 @@
         </div>
       </div>
     </div>
+
     <!-- Edit Participant -->
     <ModalDialog :show="showEditParticipantModal" :hasSubheader="false" @onClose="cancel">
       <!-- TODO Edit Participant Weiter -->
@@ -322,21 +342,22 @@
 
           <!--Erstes Training des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
-            <label for="birthday" class=""><span class="hidden sm:block">Erstes Training:</span><span
+            <label for="firsttraining" class=""><span class="hidden sm:block">Erstes Training:</span><span
                 class="block sm:hidden">Erstes Train.:</span></label>
-            <DateInput v-model="editParticipant.birthday" name="birthday" :max="new Date().toJSON().slice(0, 10)"
-              class="font-medium md:w-96" :showError="error.cause.firsttrainingInput">
+            <DateInput v-model="editParticipant.firsttraining" name="firsttraining"
+              :max="new Date().toJSON().slice(0, 10)" class="font-medium md:w-96"
+              :showError="error.cause.firsttrainingInput">
             </DateInput>
           </div>
 
           <div class="w-full flex items-center justify-between gap-4 mt-4">
             <p class="">Teilnehmer entfernen:</p>
             <button @click="showDeleteButton = true" v-show="!showDeleteButton"
-              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3">
+              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-2 ty:px-3 md:px-6 py-3">
               <p class="font-medium font-base md:text-lg">Entfernen</p>
             </button>
             <button @click="removeParticipant(editParticipant._id)"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-3 md:px-6 py-3"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-2 md:px-4 py-2"
               v-show="showDeleteButton">
               <p class="font-medium font-base md:text-lg">Wirklich entfernen?</p>
             </button>
@@ -346,14 +367,211 @@
       <template #footer>
         <div class="flex flex-col gap-4">
           <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
-          <div class="flex justify-between items-center gap-6 ">
+          <div class="flex justify-between items-center gap-2 ty:gap-6 ">
             <button @click="cancel"
-              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
+              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-2 ty:px-3.5 md:px-7 py-3.5">
               <p class="font-medium font-base md:text-lg">Abbrechen</p>
             </button>
             <button @click="saveEditedParticipant"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-2 ty:px-3.5 md:px-7 py-4">
               <p class="font-medium font-base md:text-lg">Speichern</p>
+            </button>
+          </div>
+        </div>
+      </template>
+    </ModalDialog>
+
+    <!-- Edit Trainer -->
+    <ModalDialog :show="showEditTrainerModal" :hasSubheader="false" @onClose="cancel">
+      <!-- TODO Edit Participant Weiter -->
+      <template #header>
+        <p class="text-xl md:text-2xl">Bearbeiten</p>
+      </template>
+      <template #content>
+        <div class="flex flex-col justify-center items-center gap-4">
+
+          <!--Vorname des Trainer-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="firstname" class="">Vorname:</label>
+            <TextInput name="firstname" v-model="editTrainer.firstname" placeholder="Vorname"
+              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
+          </div>
+
+          <!--Nachname des Trainer-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <label for="lastname" class="">Nachname:</label>
+            <TextInput name="lastname" v-model="editTrainer.lastname" placeholder="Nachname"
+              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
+          </div>
+
+          <!--Rolle des Trainer-->
+          <div class="w-full flex items-center justify-between gap-4">
+            <p class="">Rolle:</p>
+            <select v-model="editTrainer.role"
+              class="w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-0 border-b-2 border-[#9ea3ae] text-base md:text-lg font-medium"
+              :class="{ 'outline outline-2 outline-offset-4 rounded-lg outline-special-red': error.cause.roleInput }">
+              <option value="trainer">Trainer</option>
+              <option value="assistant">Assistent</option>
+            </select>
+          </div>
+
+          <div class="w-full flex items-center justify-between gap-4 mt-4">
+            <p class="">Trainer entfernen:</p>
+            <button @click="showDeleteButton = true" v-show="!showDeleteButton"
+              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-2 ty:px-3 md:px-6 py-3">
+              <p class="font-medium font-base md:text-lg">Entfernen</p>
+            </button>
+            <button @click="removeTrainer(editTrainer._id)"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-2 md:px-4 py-2"
+              v-show="showDeleteButton">
+              <p class="font-medium font-base md:text-lg">Wirklich entfernen?</p>
+            </button>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-4">
+          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+          <div class="flex justify-between items-center gap-2 ty:gap-6 ">
+            <button @click="cancel"
+              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-2 ty:px-3.5 md:px-7 py-3.5">
+              <p class="font-medium font-base md:text-lg">Abbrechen</p>
+            </button>
+            <button @click="saveEditTrainer"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-2 ty:px-3.5 md:px-7 py-4">
+              <p class="font-medium font-base md:text-lg">Speichern</p>
+            </button>
+          </div>
+        </div>
+      </template>
+    </ModalDialog>
+
+    <!-- Add Participant -->
+    <ModalDialog :show="showAddParticipantModal" :hasSubheader="false" @onClose="cancel">
+      <template #header>
+        <p class="text-xl md:text-2xl">Teilnehmer hinzufügen</p>
+      </template>
+      <template #content>
+        <div class="flex flex-col gap-4">
+          <!-- Search Bar -->
+          <div class="w-full flex items-center justify-between gap-4">
+            <TextInput name="search" v-model="searchString" placeholder="Suche" class="w-full"></TextInput>
+            <span class="mr-2">
+              <!-- Lupe -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                stroke="currentColor" class="w-7 h-7" v-show="searchString === ''">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <!-- X Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                stroke="currentColor" class="w-7 h-7" v-show="searchString !== ''" @click="searchString = ''">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </span>
+          </div>
+          <!-- Tabelle Trainers -->
+          <div class="h-fit max-h-[40vh] overflow-y-auto block w-full pr-2">
+            <div v-for="member in searchResult" :key="member._id" @click="onClickOnNewParticipant(member._id)"
+              class="w-full border-b last:border-0 border-[#D1D5DB] py-2 last:pb-0 flex justify-between items-center gap-2">
+              <div class="w-full flex justify-start items-center gap-2">
+                <p class="">{{ member.firstname }} {{ member.lastname }}</p>
+                <p class="text-light-gray">{{ new Date(member.birthday).toLocaleDateString('de-DE', {
+                  year: '2-digit', month:
+                    '2-digit', day: '2-digit'
+                }) }}</p>
+              </div>
+              <div class="w-fit h-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                  stroke="currentColor" class="w-7 h-7 text-[#111827]"
+                  v-show="selectedMembers.some(m => m._id === member._id) || group.trainers.some(p => p.userId === member._id)">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <div
+                  v-show="!selectedMembers.some(m => m._id === member._id) && !group.trainers.some(p => p.userId === member._id)"
+                  class="w-[28px] h-[28px] border-[2.25pt] border-light-gray rounded-xl"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-4">
+          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+          <div class="flex justify-center items-center gap-2">
+            <button @click="addParticipants()"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-2 ty:px-3.5 md:px-7 py-3.5">
+              <p class="font-medium font-base md:text-lg">Hinzufügen</p>
+            </button>
+          </div>
+        </div>
+      </template>
+    </ModalDialog>
+
+    <!-- Add Trainer -->
+    <ModalDialog :show="showAddTrainerModal" :hasSubheader="false" @onClose="cancel">
+      <template #header>
+        <p class="text-xl md:text-2xl">Trainer hinzufügen</p>
+      </template>
+      <template #content>
+        <div class="flex flex-col gap-4">
+          <!-- Search Bar -->
+          <div class="w-full flex items-center justify-between gap-4">
+            <TextInput name="search" v-model="searchString" placeholder="Suche" class="w-full"></TextInput>
+            <span class="mr-2">
+              <!-- Lupe -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                stroke="currentColor" class="w-7 h-7" v-show="searchString === ''">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <!-- X Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                stroke="currentColor" class="w-7 h-7" v-show="searchString !== ''" @click="searchString = ''">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </span>
+          </div>
+          <!-- Tabelle Trainers -->
+          <div class="h-fit max-h-[40vh] overflow-y-auto block w-full pr-2">
+            <div v-for="user in searchResult" :key="user._id" @click="onClickOnNewTrainer(user._id)"
+              class="w-full border-b last:border-0 border-[#D1D5DB] py-2 last:pb-0 flex justify-between items-center gap-2">
+              <div class="w-full flex justify-between items-center gap-2">
+                <p class="">{{ user.firstname }} {{ user.lastname }}</p>
+                <select v-model="user.role" @click.stop=""
+                  class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 font-medium py-0.5 rounded-xl bg-[#ff0000]]"
+                  :class="{ 'outline outline-2 outline-offset-4 rounded-lg outline-special-red': (error.cause.roleInput && user.role === 'role') }"
+                  v-show="selectedUsers.some(m => m._id === user._id)">
+                  <option value="trainer">Trainer</option>
+                  <option value="assistant">Assistent</option>
+                  <option value="role" disabled hidden>Rolle</option>
+                </select>
+              </div>
+              <div class="w-fit h-fit">
+                <!-- Checkmark Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                  stroke="currentColor" class="w-7 h-7 text-[#111827]"
+                  v-show="selectedUsers.some(m => m._id === user._id) || group.trainers.some(p => p.userId === user._id)"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <!-- Rectangle -->
+                <div
+                  v-show="!selectedUsers.some(m => m._id === user._id) && !group.trainers.some(p => p.userId === user._id)"
+                  class="w-[28px] h-[28px] border-[2.25pt] border-light-gray rounded-xl"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-4">
+          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
+          <div class="flex justify-center items-center gap-2">
+            <button @click="addTrainers()"
+              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-2 ty:px-3.5 md:px-7 py-3.5">
+              <p class="font-medium font-base md:text-lg">Hinzufügen</p>
             </button>
           </div>
         </div>
@@ -370,7 +588,9 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import SelectList from "@/components/SelectList.vue";
-import { fetchGroup, getAllDepartments } from "@/util/fetchOperations";
+import { fetchGroup, getAllDepartments, updateParticipantInGroup, removeParticipantFromGroup, updateGroup, removeTrainerFromGroup, updateTrainerInGroup, getAllMembers, addMultipleMembersToGroup, getAllUsers, addMultipleTrainerToGroup } from "@/util/fetchOperations";
+import _ from "lodash";
+import DateInput from "@/components/DateInput.vue";
 
 export default {
   name: "EditGroupView",
@@ -410,7 +630,8 @@ export default {
           firstnameInput: false,
           lastnameInput: false,
           birthdayInput: false,
-          firsttrainingInput: false
+          firsttrainingInput: false,
+          roleInput: false
         }
       },
       participantSortIndex: {
@@ -436,21 +657,31 @@ export default {
       },
       showAddParticipantModal: false,
       showEditParticipantModal: false,
+      showEditTrainerModal: false,
+      showAddTrainerModal: false,
       showDeleteButton: false,
-
-      newParticipant: {
-        firstname: '',
-        lastname: '',
-        birthday: ''
-      },
 
       editParticipant: {
         firstname: '',
         lastname: '',
         birthday: '',
-        id: '',
-        groups: []
-      }
+        firsttraining: '',
+        memberId: '',
+        id: ''
+      },
+
+      editTrainer: {
+        firstname: '',
+        lastname: '',
+        role: '',
+        userId: ''
+      },
+
+      searchString: '',
+      selectedMembers: [],
+      selectedUsers: [],
+      allMembers: [],
+      allUsers: []
     }
   },
   components: {
@@ -459,29 +690,10 @@ export default {
     ErrorMessage,
     CollapsibleContainer,
     SelectList,
-    ModalDialog
+    ModalDialog,
+    DateInput
   },
   methods: {
-    /**
-     * Isoliert Participant Array aus selectedGroup.
-     * Wird zur Fehlerprävention eingesetzt.
-     */
-    getParticipants() {
-      if (typeof this.groupData !== 'undefined') {
-        return this.groupData.participants
-      } else {
-        return undefined
-      }
-    },
-    /**
-     * Handelt onClickOnSave Emit aus @see GroupListGomponent und @see MemberEditor 
-     * Callt Fetch Methode und updatet ParticipantData im Backend
-     * @param {Object} participantData 
-     */
-    async onClickOnSave() {
-
-    },
-
     tempTimeChange() {
       if (this.tempTime.day !== '' && this.tempTime.starttime !== '' && this.tempTime.endtime !== '') {
         if (parseInt(this.tempTime.starttime.replace(":", "")) > parseInt(this.tempTime.endtime.replace(":", ""))) {
@@ -501,25 +713,334 @@ export default {
 
     cancel() {
       this.showAddParticipantModal = false
+      this.showAddTrainerModal = false
       this.showEditParticipantModal = false
+      this.showEditTrainerModal = false
       this.showDeleteButton = false
-
-      this.newParticipant = {
-        firstname: '',
-        lastname: '',
-        birthday: ''
-      }
 
       this.editParticipant = {
         firstname: '',
         lastname: '',
         birthday: '',
-        id: '',
-        groups: []
+        firsttraining: '',
+        memberId: '',
+        id: ''
       }
+
+      this.editTrainer = {
+        firstname: '',
+        lastname: '',
+        role: '',
+        userId: ''
+      }
+
+      this.selectedMembers = []
+      this.selectedUsers = []
+      this.searchString = ''
+      this.allMembers = []
+      this.allUsers = []
 
       this.resetError()
     },
+
+    async openEditParticipant(id) {
+      //Deep Copy, damit Änderungen nicht direkt übernommen werden
+      this.editParticipant = _.cloneDeep(this.group.participants.find(m => m.memberId === id))
+
+      this.editParticipant.birthday = this.editParticipant.birthday.slice(0, 10)
+      this.editParticipant.firsttraining = this.editParticipant.firsttraining.slice(0, 10)
+
+      this.showEditParticipantModal = true
+    },
+
+    async saveEditedParticipant() {
+      this.validateParticipantInputs(this.editParticipant)
+
+      if (!this.error.show) {
+        const res = await updateParticipantInGroup(this.group._id, this.editParticipant.memberId, this.editParticipant)
+        if (res.ok) {
+          this.group = await fetchGroup(this.group._id)
+          this.cancel()
+        } else {
+          this.error.message = res.body.message
+          this.error.show = true
+        }
+      }
+    },
+
+    async removeParticipant(id) {
+      const res = await removeParticipantFromGroup(this.group._id, id)
+      if (res.ok) {
+        this.group = await fetchGroup(this.group._id)
+        this.cancel()
+      } else {
+        this.error.message = res.body.message
+        this.error.show = true
+      }
+    },
+
+    async openEditTrainer(id) {
+      //Deep Copy, damit Änderungen nicht direkt übernommen werden
+      this.editTrainer = _.cloneDeep(this.group.trainers.find(t => t.userId === id))
+
+      this.showEditTrainerModal = true
+    },
+
+    async saveEditTrainer() {
+      this.validateTrainerInputs(this.editTrainer)
+
+      if (!this.error.show) {
+        const res = await updateTrainerInGroup(this.group._id, this.editTrainer.userId, this.editTrainer)
+        if (res.ok) {
+          this.group = await fetchGroup(this.group._id)
+          this.cancel()
+        } else {
+          this.error.message = res.body.message
+          this.error.show = true
+        }
+      }
+    },
+
+    async removeTrainer(id) {
+      const res = await removeTrainerFromGroup(this.group._id, id)
+      if (res.ok) {
+        this.group = await fetchGroup(this.group._id)
+        this.cancel()
+      } else {
+        this.error.message = res.body.message
+        this.error.show = true
+      }
+    },
+
+    async saveChanges() {
+      this.validateInputs()
+
+      if (!this.error.show) {
+        this.group.department = this.group.department._id
+
+        const res = await updateGroup(this.group._id, this.group)
+        if (res.ok) {
+          this.group = await fetchGroup(this.group._id)
+          this.cancel()
+        } else {
+          this.error.message = res.body.message
+          this.error.show = true
+        }
+      }
+    },
+
+    resetError() {
+      this.error.show = false
+      this.error.cause = {
+        venueInput: false,
+        nameInput: false,
+        departmentInput: false,
+        timesInput: false,
+        firstnameInput: false,
+        lastnameInput: false,
+        birthdayInput: false,
+        firsttrainingInput: false,
+        roleInput: false
+      }
+      this.error.message = ''
+    },
+
+    validateParticipantInputs(inputs) {
+      this.resetError()
+
+      if (inputs.firstname.trim().length === 0 || !inputs.firstname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
+      if (inputs.lastname.trim().length === 0 || !inputs.lastname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+      if (inputs.birthday.trim().length === 0 || !inputs.birthday.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
+        this.error.message = 'Bitte gebe einen Geburtstag ein.'
+        this.error.show = true
+        this.error.cause.birthdayInput = true
+      }
+
+      if (inputs.firsttraining.trim().length === 0 || !inputs.firsttraining.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
+        this.error.message = 'Bitte das erste Trainingsdatum ein.'
+        this.error.show = true
+        this.error.cause.firsttrainingInput = true
+      }
+
+      //If any error is true, set error.message to 'Mehrere Fehler.'
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (typeof inputs._id !== 'undefined') {
+        const oldEntry = this.group.participants.find(m => m._id === inputs._id)
+        if (inputs.firstname === oldEntry.firstname && inputs.lastname === oldEntry.lastname
+          && inputs.birthday === oldEntry.birthday.slice(0, 10)
+          && inputs.firsttraining === oldEntry.firsttraining.slice(0, 10)) {
+          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
+          this.error.show = true
+        }
+      }
+    },
+
+    validateTrainerInputs(inputs) {
+      this.resetError()
+
+      if (inputs.firstname.trim().length === 0 || !inputs.firstname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Vornamen ein.'
+        this.error.show = true
+        this.error.cause.firstnameInput = true
+      }
+      if (inputs.lastname.trim().length === 0 || !inputs.lastname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Nachnamen ein.'
+        this.error.show = true
+        this.error.cause.lastnameInput = true
+      }
+
+      if (!["trainer", "assistant"].includes(inputs.role)) {
+        this.error.message = 'Bitte wähle eine gültige Rolle aus.'
+        this.error.show = true
+        this.error.cause.roleInput = true
+      }
+
+      //If any error is true, set error.message to 'Mehrere Fehler.'
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+
+      if (typeof inputs._id !== 'undefined') {
+        const oldEntry = this.group.trainers.find(t => t.userId === inputs.userId)
+        if (inputs.firstname === oldEntry.firstname && inputs.lastname === oldEntry.lastname
+          && inputs.role === oldEntry.role) {
+          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
+          this.error.show = true
+        }
+      }
+    },
+
+    validateInputs() {
+      this.resetError()
+
+      if (this.group.name.trim().length === 0 || !this.group.name.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe einen gültigen Namen ein.'
+        this.error.show = true
+        this.error.cause.nameInput = true
+      }
+      if (this.group.department._id.trim().length === 0 || !this.group.department._id.match(/^[0-9a-fA-F]{24}$/)) {
+        this.error.message = 'Bitte wähle eine Abteilung aus.'
+        this.error.show = true
+        this.error.cause.departmentInput = true
+      }
+
+      if (this.group.venue.trim().length === 0 || !this.group.venue.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+        this.error.message = 'Bitte gebe eine gültige Sportstätte ein.'
+        this.error.show = true
+        this.error.cause.venueInput = true
+      }
+
+      if (this.group.times.length === 0) {
+        this.error.message = 'Bitte gebe mindestens eine Zeit an.'
+        this.error.show = true
+        this.error.cause.timesInput = true
+      }
+
+      if (!this.group.times.every(t => ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"].includes(t.day) && t.starttime.match(/^[0-9]{2}:[0-9]{2}$/) && t.endtime.match(/^[0-9]{2}:[0-9]{2}$/))) {
+        this.error.message = 'Bitte kontrolliere die Zeiten.'
+        this.error.show = true
+        this.error.cause.timesInput = true
+      }
+
+      //If any error is true, set error.message to 'Mehrere Fehler.'
+      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
+        this.error.message = 'Mehrere Fehler.'
+      }
+    },
+
+    validateTime(time) {
+      if (time.starttime !== "" && time.endtime !== "") {
+        if (parseInt(time.starttime.replace(":", "")) > parseInt(time.endtime.replace(":", ""))) {
+          const temp = time.starttime
+          time.starttime = time.endtime
+          time.endtime = temp
+        }
+      }
+    },
+
+    onClickOnNewParticipant(id) {
+      if (!this.group.participants.some(p => p.memberId === id)) {
+        if (this.selectedMembers.some(m => m._id === id)) {
+          this.selectedMembers = this.selectedMembers.filter(m => m._id !== id)
+        } else {
+          this.selectedMembers.push(this.allMembers.find(m => m._id === id))
+        }
+      }
+    },
+
+    onClickOnNewTrainer(id) {
+      if (!this.group.trainers.some(t => t.userId === id)) {
+        if (this.selectedUsers.some(t => t._id === id)) {
+          this.selectedUsers = this.selectedUsers.filter(t => t._id !== id)
+        } else {
+          this.allUsers.find(u => u._id === id).role = "role"
+          this.selectedUsers.push(this.allUsers.find(u => u._id === id))
+        }
+      }
+    },
+
+    async addParticipants() {
+      if (this.selectedMembers.length > 0) {
+        this.selectedMembers = this.selectedMembers.map(m => {
+          return {
+            ...m,
+            firsttraining: new Date().toJSON().slice(0, 10)
+          }
+        })
+
+        const res = await addMultipleMembersToGroup(this.group._id, this.selectedMembers)
+        if (res.ok) {
+          this.group = await fetchGroup(this.group._id)
+          this.cancel()
+        } else {
+          this.error.message = res.body.message
+          this.error.show = true
+        }
+      } else {
+        this.cancel()
+
+      }
+    },
+
+    async addTrainers() {
+      if (this.selectedUsers.length > 0) {
+        this.selectedUsers = this.selectedUsers.map(u => {
+          return {
+            ...u,
+            role: u.role
+          }
+        })
+
+        if(this.selectedUsers.some(u => u.role === "role")) {
+          this.error.message = "Bitte wähle für jeden Trainer eine Rolle aus."
+          this.error.show = true
+          this.error.cause.roleInput = true
+          return
+        }
+
+        const res = await addMultipleTrainerToGroup(this.group._id, this.selectedUsers)
+        if (res.ok) {
+          this.group = await fetchGroup(this.group._id)
+          this.cancel()
+        } else {
+          this.error.message = res.body.message
+          this.error.show = true
+        }
+      } else {
+        this.cancel()
+      }
+    }
   },
 
   async created() {
@@ -529,8 +1050,6 @@ export default {
 
   async mounted() {
     const id = this.$route.query.id
-
-    console.log(id);
 
     if (!id || typeof id !== "string") {
       console.error("No ID provided");
@@ -596,6 +1115,44 @@ export default {
           return b.role.localeCompare(a.role)
         }
       })
+    },
+    async showAddParticipantModal(newVal) {
+      if (newVal) {
+        this.allMembers = await getAllMembers()
+        this.allMembers.sort((a, b) => a.lastname.localeCompare(b.lastname))
+        this.searchResult = this.allMembers
+      } else {
+        this.searchResult = []
+        this.selectedMembers = []
+      }
+    },
+    async showAddTrainerModal(newVal) {
+      if (newVal) {
+        this.allUsers = await getAllUsers()
+        this.allUsers.sort((a, b) => a.lastname.localeCompare(b.lastname))
+        this.searchResult = this.allUsers
+      } else {
+        this.searchResult = []
+        this.selectedMembers = []
+      }
+    }
+  },
+  computed: {
+    searchResult() {
+      if (this.showAddParticipantModal) {
+        if (this.searchString === '') {
+          return this.allMembers
+        } else {
+          return this.allMembers.filter(m => m.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || m.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1)
+        }
+      } else if (this.showAddTrainerModal) {
+        if (this.searchString === '') {
+          return this.allUsers
+        } else {
+          return this.allUsers.filter(u => u.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || u.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1)
+        }
+      }
+      return []
     }
   }
 }

@@ -171,17 +171,18 @@ export default {
 <style>
 /* Firefox */
 * {
+	scroll-padding-left: 5px;
 	scrollbar-width: thin;
-	scrollbar-color: #ffffff00 #E8EBED;
+	scrollbar-color: #ffffff #E8EBED;
 }
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-	width: 10px;
+	width: 6px;
 }
 
 *::-webkit-scrollbar-track {
-	background: #ffffff00;
+	background: #ffffff;
 	border-radius: 2px;
 }
 

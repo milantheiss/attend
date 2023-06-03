@@ -19,7 +19,9 @@ const updateUser = {
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
     roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")),
     //Array aus ObjectIds
-    accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/))
+    accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
+    //WARNING: readPatchnotes wird entfernt
+    readPatchnotes: Joi.boolean().strip()
   })
 };
 
