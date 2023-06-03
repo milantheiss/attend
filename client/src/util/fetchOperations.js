@@ -153,7 +153,7 @@ async function createNewGroup(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function deleteGroup(groupID) {
@@ -170,7 +170,7 @@ async function deleteGroup(groupID) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function updateGroup(groupID, body) {
@@ -188,7 +188,7 @@ async function updateGroup(groupID, body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function fetchGroup(groupID) {
@@ -240,7 +240,7 @@ async function updateParticipantInGroup(groupID, memberID, body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function removeParticipantFromGroup(groupID, memberID) {
@@ -261,7 +261,7 @@ async function removeParticipantFromGroup(groupID, memberID) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.ok ? undefined : await res.json() }
 }
 
 async function updateTrainerInGroup(groupID, userID, body) {
@@ -286,7 +286,7 @@ async function updateTrainerInGroup(groupID, userID, body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function removeTrainerFromGroup(groupID, userID) {
@@ -307,7 +307,7 @@ async function removeTrainerFromGroup(groupID, userID) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function addMultipleMembersToGroup(groupID, members) {
@@ -327,7 +327,7 @@ async function addMultipleMembersToGroup(groupID, members) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function addMultipleTrainerToGroup(groupID, trainers) {
@@ -347,7 +347,7 @@ async function addMultipleTrainerToGroup(groupID, trainers) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 
@@ -483,7 +483,7 @@ async function createNewMember(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function deleteMember(memberId) {
@@ -500,7 +500,7 @@ async function deleteMember(memberId) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function updateMember(body) {
@@ -517,7 +517,7 @@ async function updateMember(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function getAllMembers() {
@@ -712,7 +712,7 @@ async function createNewUser(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function updateUser(body) {
@@ -729,7 +729,7 @@ async function updateUser(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function deleteUser(userID) {
@@ -745,7 +745,7 @@ async function deleteUser(userID) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function resendPassword(userID) {
@@ -761,7 +761,7 @@ async function resendPassword(userID) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: await res.json() }
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
 export {

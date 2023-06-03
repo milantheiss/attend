@@ -47,16 +47,12 @@ const removeMember = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(result)
 })
 
-const searchGroups = catchAsync(async (req, res) => {
-    res.send(await groupService.searchGroups(req.user, req.body))
-})
-
 const getGroupName = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
     const group = await Group.findById(req.params.groupID, { name: 1 })
-    res.send(group)
+    res.status(httpStatus.OK).send(group)
 })
 
 const addMember = catchAsync(async (req, res) => {
@@ -123,7 +119,6 @@ module.exports = {
     createGroup,
     updateMember,
     removeMember,
-    searchGroups,
     getGroupName,
     addMember,
     addTrainer,

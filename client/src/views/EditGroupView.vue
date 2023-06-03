@@ -1120,9 +1120,7 @@ export default {
       if (newVal) {
         this.allMembers = await getAllMembers()
         this.allMembers.sort((a, b) => a.lastname.localeCompare(b.lastname))
-        this.searchResult = this.allMembers
       } else {
-        this.searchResult = []
         this.selectedMembers = []
       }
     },
@@ -1130,9 +1128,7 @@ export default {
       if (newVal) {
         this.allUsers = await getAllUsers()
         this.allUsers.sort((a, b) => a.lastname.localeCompare(b.lastname))
-        this.searchResult = this.allUsers
       } else {
-        this.searchResult = []
         this.selectedMembers = []
       }
     }

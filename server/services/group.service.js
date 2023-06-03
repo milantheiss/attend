@@ -287,6 +287,7 @@ const removeTrainer = async (groupID, trainerID) => {
 
     user.save()
     await group.save()
+    return group
 }
 
 const updateTrainer = async (groupID, userID, trainerBody) => {
