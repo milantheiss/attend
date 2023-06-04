@@ -34,13 +34,13 @@
       leave-from-class="opacity-100" leave-to-class="-translate-y-2 opacity-0">
       <div v-show="showTimesBox" class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col gap-3">
         <div class="flex justify-between items-center gap-4">
-          <p class="text-light-gray w-full">Beginn: </p>
-          <TimeInput class="text-right" v-model="attended.starttime" min="00:00" :max="attended.endtime"
+          <p class="text-light-gray w-fit">Beginn: </p>
+          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.starttime" min="00:00" :max="attended.endtime"
             :show-error="attended.starttime === null || attended.starttime === ''"></TimeInput>
         </div>
         <div class="flex justify-between items-center gap-4">
-          <p class="text-light-gray w-full">Ende: </p>
-          <TimeInput class="text-right" v-model="attended.endtime" :min="attended.starttime" max="23:59"
+          <p class="text-light-gray w-fit">Ende: </p>
+          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.endtime" :min="attended.starttime" max="23:59"
             :show-error="attended.endtime === null || attended.endtime === ''">
           </TimeInput>
         </div>

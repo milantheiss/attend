@@ -8,27 +8,25 @@ const memberService = require('./member.service');
 const userService = require('./user.service');
 
 async function getTrainersOfGroup(group) {
+    const trainerData = await User.find({ _id: { $in: group.trainers.map(e => e.userId) } }, { firstname: 1, lastname: 1, _id: 1 })
     return await Promise.all(group.trainers.map(async (trainer) => {
-        const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
-        trainer._doc.firstname = res.firstname;
-        trainer._doc.lastname = res.lastname;
-        trainer._doc._id = res._id;
+        const t = trainerData.find(e => e._id.equals(trainer.userId))
+        trainer._doc.firstname = t.firstname;
+        trainer._doc.lastname = t.lastname;
+        trainer._doc._id = t._id;
 
         return trainer;
     }));
 }
 
 async function getParticipantsOfGroup(group) {
+    const membersData = await Member.find({ _id: { $in: group.participants.map(e => e.memberId) } }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
     return await Promise.all(group.participants.map(async (participant) => {
-        const res = await Member.findOne({ _id: participant.memberId }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
-        if (res === null) {
-            // console.error(`Member not found ${participant.memberId} in group ${group.name}`);
-            return null;
-        }
-        participant._doc.firstname = res.firstname;
-        participant._doc.lastname = res.lastname;
-        participant._doc.birthday = res.birthday;
-        participant._doc._id = res._id;
+        const member = membersData.find(e => e._id.equals(participant.memberId))
+        participant._doc.firstname = member.firstname;
+        participant._doc.lastname = member.lastname;
+        participant._doc.birthday = member.birthday;
+        participant._doc._id = member._id;
         return participant;
     }));
 }

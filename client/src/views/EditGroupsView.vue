@@ -636,7 +636,6 @@ export default {
     },
 
     validateInputs(inputs) {
-      console.log(inputs);
       this.resetError()
 
       if (inputs.name.trim().length === 0 || !inputs.name.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {

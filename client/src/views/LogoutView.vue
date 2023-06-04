@@ -22,7 +22,7 @@ export default {
       this.$router.push('/login')
     }
   },
-  async created() {
+  async mounted() {
     await this.logout()
   }
 };

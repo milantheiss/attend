@@ -1,5 +1,6 @@
 import router from "@/router/index";
 import { getShortenedJSONDate } from "./formatter.js";
+import { useAuthStore } from "@/store/authStore.js";
 
 /**
  *
@@ -9,7 +10,9 @@ import { getShortenedJSONDate } from "./formatter.js";
 async function watchForRedirects(res, { raw = false } = {}) {
 	if ((await res).status === 401 && await (await res).text() === "Logout") {
 		console.log("Server responded with 401, redirecting to logout");
-		router.push("/logout");
+		await useAuthStore().logOut();
+		console.log("Logged out");
+		router.push("/login");
 		return undefined;
 	} else if (raw) {
 		return await res;

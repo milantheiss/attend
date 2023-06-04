@@ -188,7 +188,7 @@ const deleteMember = async (id) => {
     const member = await Member.findById(id)
     for (groupId of member.groups) {
         await groupService.removeMember(groupId, id)
-        await attendanceService.removeMemberFromAttendanceList({ roles: "admin" }, groupId, id)
+        await attendanceService.removeMemberFromAttendanceList(groupId, id)
     }
 
     await member.delete()

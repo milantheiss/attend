@@ -1,9 +1,10 @@
-const { groupService, attendanceService } = require("../services");
+const attendanceService = require("../services/attendance.service");
+const groupService = require("../services/group.service");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const mongoose = require("mongoose");
-const { Department, Invoice, Group, User, Notification } = require("../models");
+const { Department, Invoice, User, Notification } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole, hasDepartmentHeadRole } = require("../utils/roleCheck");
 const config = require("../config/config");
@@ -18,16 +19,18 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 	let department;
 
 	for (groupID of req.query.groups) {
-		const groupInfos = await Group.findById(groupID, { _id: 1, name: 1, department: 1, venue: 1 });
+		const groupInfos = await groupService.getGroupById(groupID);
 
 		if (typeof department === "undefined") {
-			department = await Department.findById(groupInfos._doc.department, { _id: 1, name: 1 });
+			department = groupInfos._doc.department;
 		}
 
-		if (department._id.equals(groupInfos._doc.department)) {
-			groupInfos._doc.trainingssessions = await attendanceService.getDataForInvoice(req.user, groupID, dataset.startdate, dataset.enddate);
+		if (department._id.equals(groupInfos._doc.department._id)) {
+			groupInfos._doc.trainingssessions = await attendanceService.getDataForInvoice(req.user._id, groupID, dataset.startdate, dataset.enddate);
 			dataset.groups.push(await groupInfos);
 		}
+
+		delete groupInfos._doc.participants
 	}
 
 	dataset.department = {
@@ -75,10 +78,13 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.dateOfLastChange = new Date();
 
 			for (group of invoice.groups) {
-				console.log(invoice.groups);
-				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(req.user, group.id, invoice.startdate, invoice.enddate);
+				group.trainingssessions.sort((a, b) => a - b);
+				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(group._id, invoice.startdate, invoice.enddate);
 				group.department = invoice.department;
 			}
+
+			//Sortiere Group nach Gruppenname
+			invoice.groups.sort((a, b) => a.name.localeCompare(b.name));
 
 			invoice = await Invoice.create(invoice);
 
@@ -97,30 +103,6 @@ const submitInvoice = catchAsync(async (req, res) => {
 				type: "invoice",
 				data: { invoiceID: invoice._id },
 			});
-
-			//Sortiere Group nach Gruppenname
-			invoice.groups.sort((a, b) => {
-				if (a.name < b.name) {
-					return -1;
-				}
-				if (a.name > b.name) {
-					return 1;
-				}
-				return 0;
-			});
-
-			//Sortiere Trainingssessions nach Datum
-			for (group of invoice.groups) {
-				group.trainingssessions.sort((a, b) => {
-					if (a.date < b.date) {
-						return -1;
-					}
-					if (a.date > b.date) {
-						return 1;
-					}
-					return 0;
-				});
-			}
 
 			if (notification === null || typeof notification === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Notification could not be created");

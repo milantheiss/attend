@@ -51,6 +51,9 @@ class AttendanceListPdf {
     }
 
     let trainer = "";
+
+    console.log(group.trainers);
+
     for (const obj of group.trainers.filter((val) => val.role === "trainer")) {
       trainer = trainer + obj.firstname + " " + obj.lastname + " ";
     }

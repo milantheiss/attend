@@ -13,7 +13,6 @@ const staff = "staff"
  * @returns {Boolean} 
  */
 function hasAccessToGroup(user, groupID = undefined) {
-    console.log(user.accessible_groups, groupID);
     return hasAdminRole(user) || user.accessible_groups.includes(groupID)
 }
 
