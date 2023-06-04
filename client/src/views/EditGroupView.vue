@@ -235,7 +235,7 @@
             </tbody>
           </table>
           <p v-show="typeof this.group.participants === 'undefined' || this.group.participants?.length === 0"
-            class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
+            class="font-medium text-gray-500 text-center pt-2.5">Keine Teilnehmer gefunden</p>
         </div>
       </div>
 
@@ -303,7 +303,7 @@
             </tbody>
           </table>
           <p v-show="typeof this.group.trainers === 'undefined' || this.group.trainers?.length === 0"
-            class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
+            class="font-medium text-gray-500 text-center pt-2.5">Keine Trainer gefunden</p>
         </div>
       </div>
     </div>
