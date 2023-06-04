@@ -65,6 +65,11 @@ const routes = [
     meta: { requiresAuth: true, requiresStaff: true }
   },
   {
+    path: "/administration/edit-group",
+    component: () => import("../views/EditGroupView.vue"),
+    meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
     path: "/administration/users",
     component: () => import("../views/EditUsersView.vue"),
     meta: { requiresAuth: true, requiresAdmin: true }
@@ -73,11 +78,6 @@ const routes = [
     path: "/administration/issues-overview",
     component: () => import("../views/IssuesOverviewView.vue"),
     meta: { requiresAuth: true, requiresStaff: true }
-  },
-  {
-    path: "/edit-group",
-    component: () => import("../views/EditGroupView.vue"),
-    meta: { requiresAuth: true }
   }
 ]
 

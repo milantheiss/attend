@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="container w-full mx-auto">
     <!--Einfache Nachricht. Sollte nur für ein Bruchteil einer Sekunde sichtbar sein.-->
-    <p>Logging you off...</p>
+    <p class="mx-3.5 md:mx-7 font-medium">Logging you off...</p>
   </div>
 </template>
 
@@ -22,8 +22,8 @@ export default {
       this.$router.push('/login')
     }
   },
-  created() {
-    this.logout()
+  async created() {
+    await this.logout()
   }
 };
 </script>

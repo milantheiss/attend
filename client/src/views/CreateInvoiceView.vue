@@ -1,5 +1,139 @@
 <template>
-    <div class="relative container">
+    <div>
+        <div class="container mx-auto mb-20">
+            <!--Abrechnungsanzeige-->
+            <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
+
+                <!--TODO Add ÜL Nummer Prompt-->
+                <!--TODO ÜL Info-->
+
+                <!--Invoice Info Field-->
+                <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Antragsteller: </p>
+                        <p class="font-medium text-right">
+                            {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname
+                            }}
+                        </p>
+                    </div>
+
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Abteilung: </p>
+                        <p class="font-medium text-right">{{
+                            dataStore.invoiceData.department.name
+                        }}</p>
+                    </div>
+
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Abrechnungszeitraum: </p>
+                        <p class="font-normal text-right">
+                            <span class="font-medium">{{
+                                new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
+                                    year: "numeric",
+                                    month: "2-digit", day: "2-digit"
+                                })
+                            }}</span>
+                            bis
+                            <span class="font-medium">{{
+                                new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
+                                    year: "numeric",
+                                    month: "2-digit", day: "2-digit"
+                                })
+                            }}</span>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
+                        <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
+                    </div>
+                </div>
+
+                <!--Group Cards: Alle Gruppe, der Invoice-->
+                <div class="my-7 flex flex-col gap-5">
+                    <!--Je Gruppe ein Container-->
+                    <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md "
+                        :show="false" :enableClickOnHeader="false" v-for="(group, index) in dataStore.invoiceData.groups"
+                        ref="groupCards" :key="group._id"
+                        :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
+                        <template #header>
+                            <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
+                            <p class="truncate text-xl font-semibold"
+                                :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
+                        </template>
+                        <template #content>
+                            <div class="h-fit max-h-[55vh] overflow-y-auto block">
+                                <table class="table-auto w-full text-left">
+                                    <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                                        <tr class="">
+                                            <th class="font-medium w-fit cursor-pointer" @click="onClickOnDate()">
+                                                <span class="flex items-center gap-1">
+                                                    <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                                    Datum
+                                                </span>
+                                            </th>
+                                            <th class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
+                                                @click="onClickOnLength()">
+                                                <span class="flex items-center gap-1">
+                                                    <SortIcon :index="indexSortButtonLength"></SortIcon>
+                                                    Länge
+                                                </span>
+                                            </th>
+                                            <th class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="overscroll-y-scroll">
+                                        <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
+                                            :key="trainingssession._id"
+                                            @click="goToTrainingssession(group._id, trainingssession.date)"
+                                            class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                                            <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                                {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
+                                                    weekday: "short", year: "numeric",
+                                                    month: "2-digit", day: "2-digit"
+                                                }) }}
+                                            </td>
+                                            <td
+                                                class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
+                                                <p class="text-light-gray">{{
+                                                    convertToReadableTime(calcTime(trainingssession.starttime,
+                                                        trainingssession.endtime)) }}</p>
+                                            </td>
+                                            <td
+                                                class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
+                                                <!--Arrow Right-->
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="3" stroke="currentColor"
+                                                    class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                                </svg>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+                    </CollapsibleContainer>
+                </div>
+
+                <!--Bestätigungsfeld-->
+                <div class="">
+                    <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
+                    <div class="flex justify-between items-center gap-7">
+                        <button @click="cancel"
+                            class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
+                            :class="error.show ? 'mt-4' : ''">
+                            <p class="font-medium font-base md:text-lg">Abbrechen</p>
+                        </button>
+                        <button @click="send"
+                            class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4"
+                            :class="error.show ? 'mt-4' : ''">
+                            <p class="font-medium font-base md:text-lg">Versenden</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!--Pull Invoice Data Modal Dialog-->
         <!--Wird angezeigt, wenn keine Daten vorhanden sind-->
         <ModalDialog
@@ -48,139 +182,6 @@
                 </div>
             </template>
         </ModalDialog>
-
-        <!--Abrechnungsanzeige-->
-        <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
-
-            <!--TODO Add ÜL Nummer Prompt-->
-            <!--TODO ÜL Info-->
-
-            <!--Invoice Info Field-->
-            <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
-                <div class="flex justify-between items-baseline">
-                    <p class="text-light-gray font-normal">Antragsteller: </p>
-                    <p class="font-medium text-right">
-                        {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname }}
-                    </p>
-                </div>
-
-                <div class="flex justify-between items-baseline">
-                    <p class="text-light-gray font-normal">Abteilung: </p>
-                    <p class="font-medium text-right">{{
-                        dataStore.invoiceData.department.name
-                    }}</p>
-                </div>
-
-                <div class="flex justify-between items-baseline">
-                    <p class="text-light-gray font-normal">Abrechnungszeitraum: </p>
-                    <p class="font-normal text-right">
-                        <span class="font-medium">{{
-                            new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
-                                year: "numeric",
-                                month: "2-digit", day: "2-digit"
-                            })
-                        }}</span>
-                        bis
-                        <span class="font-medium">{{
-                            new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
-                                year: "numeric",
-                                month: "2-digit", day: "2-digit"
-                            })
-                        }}</span>
-                    </p>
-                </div>
-                <div class="flex justify-between items-baseline">
-                    <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
-                    <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
-                </div>
-            </div>
-
-            <!--Group Cards: Alle Gruppe, der Invoice-->
-            <div class="my-7 flex flex-col gap-5">
-                <!--Je Gruppe ein Container-->
-                <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md " :show="false"
-                    :enableClickOnHeader="false" v-for="(group, index) in dataStore.invoiceData.groups" ref="groupCards"
-                    :key="group._id"
-                    :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
-                    <template #header>
-                        <CheckboxInput class="mr-3" v-model="group.include"></CheckboxInput>
-                        <p class="truncate text-xl font-semibold"
-                            :class="!group.include ? 'text-light-gray line-through' : ''">{{ group.name }}</p>
-                    </template>
-                    <template #content>
-                        <div class="h-fit max-h-[55vh] overflow-y-auto block">
-                            <table class="table-auto w-full text-left">
-                                <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
-                                    <tr class="">
-                                        <th class="font-medium w-fit cursor-pointer"
-                                            @click="onClickOnDate()">
-                                            <span class="flex items-center gap-1">
-                                                <SortIconDate :index="indexSortButtonDate"></SortIconDate>
-                                                Datum
-                                            </span>
-                                        </th>
-                                        <th
-                                            class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
-                                            @click="onClickOnLength()">
-                                            <span class="flex items-center gap-1">
-                                                <SortIcon :index="indexSortButtonLength"></SortIcon>
-                                                Länge
-                                            </span>
-                                        </th>
-                                        <th class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="overscroll-y-scroll">
-                                    <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
-                                        :key="trainingssession._id"
-                                        @click="goToTrainingssession(group._id, trainingssession.date)"
-                                        class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
-                                        <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
-                                            {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
-                                                weekday: "short", year: "numeric",
-                                                month: "2-digit", day: "2-digit"
-                                            }) }}
-                                        </td>
-                                        <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[80px] md:w-[100px]">
-                                            <p class="text-light-gray">{{
-                                                convertToReadableTime(calcTime(trainingssession.starttime,
-                                                    trainingssession.endtime)) }}</p>
-                                        </td>
-                                        <td
-                                            class="hidden ty:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
-                                            <!--Arrow Right-->
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="3" stroke="currentColor"
-                                                class="w-7 md:w-8 h-7 md:h-8 ml-auto">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                                            </svg>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </template>
-                </CollapsibleContainer>
-            </div>
-
-            <!--Bestätigungsfeld-->
-            <div class="">
-                <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
-                <div class="flex justify-between items-center gap-7 mb-20">
-                    <button @click="cancel"
-                        class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
-                        :class="error.show ? 'mt-4' : ''">
-                        <p class="font-medium font-base md:text-lg">Abbrechen</p>
-                    </button>
-                    <button @click="send"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4"
-                        :class="error.show ? 'mt-4' : ''">
-                        <p class="font-medium font-base md:text-lg">Versenden</p>
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!--Sendebestätigung-->
         <ModalDialog :show="status.show" :hasHeader="false" :hasSubheader="false" @onClose="cancel">

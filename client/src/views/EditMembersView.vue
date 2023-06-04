@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col gap-4">
+    <div class="container mx-auto flex flex-col gap-4">
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center ">
           <button @click="showCreateMemberModal = true"

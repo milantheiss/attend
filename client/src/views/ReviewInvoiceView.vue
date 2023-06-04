@@ -1,123 +1,119 @@
 <template>
-    <div class="relative container">
-        <div>
-            <!--Abrechnungsanzeige-->
-            <div v-if="typeof invoice !== 'undefined'" class="flex flex-col gap-7">
-                <!--Invoice Info Field-->
-                <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">Antragsteller: </p>
-                        <p class="font-medium text-right">
-                            {{ invoice.submittedBy.firstname }} {{ invoice.submittedBy.lastname }}
-                        </p>
-                    </div>
+    <div class="container mx-auto">
+        <!--Abrechnungsanzeige-->
+        <div v-if="invoice !== undefined" class="flex flex-col gap-7">
+            <!--Invoice Info Field-->
+            <div class="bg-white px-3.5 md:px-7 py-4 md:py-8 rounded-xl drop-shadow-md flex flex-col gap-1">
+                <div class="flex justify-between items-baseline">
+                    <p class="text-light-gray font-normal">Antragsteller: </p>
+                    <p class="font-medium text-right">
+                        {{ invoice.submittedBy.firstname }} {{ invoice.submittedBy.lastname }}
+                    </p>
+                </div>
 
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">Abteilung: </p>
-                        <p class="font-medium text-right">{{
-                            invoice.department.name
-                        }}</p>
-                    </div>
+                <div class="flex justify-between items-baseline">
+                    <p class="text-light-gray font-normal">Abteilung: </p>
+                    <p class="font-medium text-right">{{
+                        invoice.department.name
+                    }}</p>
+                </div>
 
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal truncate">Zeitraum: </p>
-                        <p class="font-normal text-right">
-                            <span class="font-medium">{{
-                                new Date(invoice.startdate).toLocaleDateString("de-DE", {
-                                    year: "numeric",
-                                    month: "2-digit", day: "2-digit"
-                                })
-                            }}</span>
-                            bis <span class="font-medium">{{
-                                new Date(invoice.enddate).toLocaleDateString("de-DE", {
-                                    year: "numeric",
-                                    month: "2-digit", day: "2-digit"
-                                })
-                            }}</span>
-                        </p>
-                    </div>
-
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
-                        <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
-                    </div>
-
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal truncate">Erstellungsdatum: </p>
-                        <p class="font-medium text-right">
-                            {{ new Date(invoice.dateOfReceipt).toLocaleDateString("de-DE", {
+                <div class="flex justify-between items-baseline">
+                    <p class="text-light-gray font-normal truncate">Zeitraum: </p>
+                    <p class="font-normal text-right">
+                        <span class="font-medium">{{
+                            new Date(invoice.startdate).toLocaleDateString("de-DE", {
                                 year: "numeric",
                                 month: "2-digit", day: "2-digit"
-                            }) }}
-                        </p>
-                    </div>
+                            })
+                        }}</span>
+                        bis <span class="font-medium">{{
+                            new Date(invoice.enddate).toLocaleDateString("de-DE", {
+                                year: "numeric",
+                                month: "2-digit", day: "2-digit"
+                            })
+                        }}</span>
+                    </p>
                 </div>
 
-                <div class="flex flex-col gap-4">
-                    <!--Je Gruppe ein Container-->
-                    <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md"
-                        :show="false" :enableClickOnHeader="false" v-for="(group, index) in invoice.groups" :key="group._id"
-                        ref="groupCards"
-                        :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
-                        <template #header>
-                            <p class="truncate text-xl font-semibold">{{ group.name }}</p>
-                        </template>
-                        <template #content>
-                            <div class="h-fit max-h-[55vh] overflow-y-auto block">
-                                <table class="table-auto w-full text-left">
-                                    <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
-                                        <tr class="">
-                                            <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
-                                                @click="onClickOnDate()">
-                                                <span class="flex items-center gap-1">
-                                                    <SortIconDate :index="indexSortButtonDate"></SortIconDate>
-                                                    Datum
-                                                </span>
-                                            </th>
-                                            <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer"
-                                                @click="onClickOnLength()">
-                                                <span class="flex items-center gap-1">
-                                                    <SortIcon :index="indexSortButtonLength"></SortIcon>
-                                                    Länge
-                                                </span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="overscroll-y-scroll">
-                                        <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
-                                            :key="trainingssession._id"
-                                            class="border-b border-[#E5E7EB] last:border-0 group">
-                                            <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
-                                                {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
-                                                    weekday: "short", year: "numeric",
-                                                    month: "2-digit", day: "2-digit"
-                                                }) }}
-                                            </td>
-                                            <td
-                                                class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
-                                                <p class="text-light-gray">{{
-                                                    convertToReadableTime(calcTime(trainingssession.starttime,
-                                                        trainingssession.endtime)) }}</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-                    </CollapsibleContainer>
+                <div class="flex justify-between items-baseline">
+                    <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
+                    <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
                 </div>
 
-                <!--Bestätigungsfeld-->
-                <div class="flex justify-between items-center gap-7">
-                    <button @click="reject"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-                        <p class="font-medium font-base md:text-lg">Ablehnen</p>
-                    </button>
-                    <button @click="approve"
-                        class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-                        <p class="font-medium font-base md:text-lg">Genehmigen</p>
-                    </button>
+                <div class="flex justify-between items-baseline">
+                    <p class="text-light-gray font-normal truncate">Erstellungsdatum: </p>
+                    <p class="font-medium text-right">
+                        {{ new Date(invoice.dateOfReceipt).toLocaleDateString("de-DE", {
+                            year: "numeric",
+                            month: "2-digit", day: "2-digit"
+                        }) }}
+                    </p>
                 </div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <!--Je Gruppe ein Container-->
+                <CollapsibleContainer class="flex min-w-full px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md" :show="false"
+                    :enableClickOnHeader="false" v-for="(group, index) in invoice.groups" :key="group._id" ref="groupCards"
+                    :class="{ 'bg-white': showGroupCard[index], 'bg-gradient-to-b from-unchecked-gradient-1 to-unchecked-gradient-2': !showGroupCard[index] }">
+                    <template #header>
+                        <p class="truncate text-xl font-semibold">{{ group.name }}</p>
+                    </template>
+                    <template #content>
+                        <div class="h-fit max-h-[55vh] overflow-y-auto block">
+                            <table class="table-auto w-full text-left">
+                                <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                                    <tr class="">
+                                        <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
+                                            @click="onClickOnDate()">
+                                            <span class="flex items-center gap-1">
+                                                <SortIconDate :index="indexSortButtonDate"></SortIconDate>
+                                                Datum
+                                            </span>
+                                        </th>
+                                        <th scope="col" class="pl-3 md:pl-4 pb-2.5 font-medium cursor-pointer"
+                                            @click="onClickOnLength()">
+                                            <span class="flex items-center gap-1">
+                                                <SortIcon :index="indexSortButtonLength"></SortIcon>
+                                                Länge
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="overscroll-y-scroll">
+                                    <tr v-for="(trainingssession) in getSortedTrainingssessionlist(group.trainingssessions)"
+                                        :key="trainingssession._id" class="border-b border-[#E5E7EB] last:border-0 group">
+                                        <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 font-medium w-fit">
+                                            {{ new Date(trainingssession.date).toLocaleDateString("de-DE", {
+                                                weekday: "short", year: "numeric",
+                                                month: "2-digit", day: "2-digit"
+                                            }) }}
+                                        </td>
+                                        <td
+                                            class="pl-3 md:pl-4 py-2.5 group-last:pt-2.5 group-last:pb-0 min-w-[80px] md:min-w-[100px]">
+                                            <p class="text-light-gray">{{
+                                                convertToReadableTime(calcTime(trainingssession.starttime,
+                                                    trainingssession.endtime)) }}</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                </CollapsibleContainer>
+            </div>
+
+            <!--Bestätigungsfeld-->
+            <div class="flex justify-between items-center gap-7">
+                <button @click="reject"
+                    class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                    <p class="font-medium font-base md:text-lg">Ablehnen</p>
+                </button>
+                <button @click="approve"
+                    class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
+                    <p class="font-medium font-base md:text-lg">Genehmigen</p>
+                </button>
             </div>
         </div>
     </div>

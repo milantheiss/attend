@@ -1,5 +1,5 @@
 <template>
-  <div class="relative container flex flex-col gap-4">
+  <div class="container mx-auto flex flex-col gap-4 mb-20">
     <!--Oberer Container: Enthält Gruppenauswahl, Gruppen Info & Date Picker-->
     <div class="flex items-center justify-between px-3.5 md:px-7 gap-8">
       <!--Auswahlelement, um Gruppe auszuwählen-->
@@ -94,7 +94,7 @@
     </div>
 
     <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)"
-      class="flex justify-center items-center mb-20">
+      class="flex justify-center items-center">
       <p class="text-lg md:text-xl font-medium text-light-gray">{{ countParticipants(attended.participants) }} Teilnehmer
         am {{ new Date(date).toLocaleDateString() }}</p>
     </div>

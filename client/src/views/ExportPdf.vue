@@ -1,5 +1,5 @@
 <template>
-    <div class="relative container">
+    <div class="container mx-auto">
         <!--Export Settings-->
         <div class="bg-white px-6 py-5 rounded-xl drop-shadow-md">
             <div class="flex items-center justify-between mb-4">

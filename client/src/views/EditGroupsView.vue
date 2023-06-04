@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col gap-4 mb-20">
+    <div class="container mx-auto flex flex-col gap-4 mb-20">
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center ">
           <button @click="showCreateGroupModal = true"
@@ -611,7 +611,7 @@ export default {
     },
 
     async openEditGroup(id) {
-      this.$router.push({ path: '/edit-group', query: { id: id } })
+      this.$router.push({ path: '/administration/edit-group', query: { id: id } })
     },
 
     async getAllGroups() {

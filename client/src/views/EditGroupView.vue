@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col gap-8 mb-20">
+    <div class="container mx-auto flex flex-col gap-8 mb-20">
       <!-- Group Info -->
       <div class="flex flex-col justify-center items-center gap-4 bg-white rounded-xl p-3.5 md:p-7">
         <!--Gruppenbezeichnung-->

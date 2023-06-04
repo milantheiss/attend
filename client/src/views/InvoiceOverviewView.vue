@@ -1,5 +1,5 @@
 <template>
-    <div class="relative container flex flex-col gap-4">
+    <div class="container mx-auto flex flex-col gap-4">
         <!--Header-->
         <div class="flex justify-between items-center px-3.5 md:px-7 mb-2.5">
             <!--Refresh Button-->

@@ -86,24 +86,20 @@ const getAssignedGroups = async (user) => {
  * @param {ObjectId} groupId
  * @returns {Promise<Group>}
  */
-const getGroupById = async (user, groupID) => {
-    if (hasAccessToGroup(user, groupID)) {
-        //admin hat Zugriff auf alle Gruppen
-        //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
-        const group = await Group.findById(groupID)
+const getGroupById = async (groupID) => {
+    //admin hat Zugriff auf alle Gruppen
+    //Es werden nur die Gruppendaten returnt, wenn user access zu der Gruppe hat
+    const group = await Group.findById(groupID)
 
-        if (!group) {
-            throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
-        }
-
-        group.trainers = await getTrainersOfGroup(group)
-        group.participants = await getParticipantsOfGroup(group)
-        group._doc.department = await getDepartmentOfGroup(group)
-
-        return group
-    } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "The user has no access to this group")
+    if (!group) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
     }
+
+    group.trainers = await getTrainersOfGroup(group)
+    group.participants = await getParticipantsOfGroup(group)
+    group._doc.department = await getDepartmentOfGroup(group)
+
+    return group
 };
 
 /**

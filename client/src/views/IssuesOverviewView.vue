@@ -1,5 +1,5 @@
 <template>
-  <div class="relative container">
+  <div class="container mx-auto">
     <!--Selector um Gruppe auszuwählen-->
     <div class="bg-white px-3 py-4 rounded-xl drop-shadow-md mb-6">
       <div class="flex justify-between items-center ml-3 mr-3">

@@ -1,5 +1,5 @@
 <template >
-  <div class="mt-12 md:w-120 sm:w-96">
+  <div class="container mx-auto mt-12 md:w-120 sm:w-96">
     <div class="flex flex-col justify-center items-start ml-6 mb-4">
       <p class="text-xl md:text-2xl font-medium">Willkommen...</p>
       <p class="text-light-gray">Bitte melde dich an</p>
@@ -23,9 +23,9 @@
           </svg>
           <TextInput type="password" name="password" v-model="form.password" placeholder="Passwort"></TextInput>
         </div>
-        <ErrorMessage :message="'Username oder Passwort ist falsch!'" :show="showError" class=""/>
+        <ErrorMessage :message="'Username oder Passwort ist falsch!'" :show="showError" class="text-lg md:text-xl"/>
         <div class="mt-2">
-          <button type="submit" class="w-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3.5 md:px-7 py-4 rounded-2xl drop-shadow-md font-medium text-xl">Login</button>
+          <button type="submit" class="w-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3.5 md:px-7 py-3.5 rounded-2xl drop-shadow-md font-medium text-xl">Login</button>
         </div>
       </form>
     </div>

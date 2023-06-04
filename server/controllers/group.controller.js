@@ -20,7 +20,7 @@ const getGroupById = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    res.status(httpStatus.OK).send(await groupService.getGroupById(req.user, req.params.groupID))
+    res.status(httpStatus.OK).send(await groupService.getGroupById(req.params.groupID))
 });
 
 const createGroup = catchAsync(async (req, res) => {
