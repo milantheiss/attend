@@ -740,10 +740,11 @@ export default {
 
       this.selectedMembers = []
       this.selectedUsers = []
-      this.searchString = ''
       this.allMembers = []
       this.allUsers = []
-
+      
+      this.searchString = ''
+      
       this.resetError()
     },
 

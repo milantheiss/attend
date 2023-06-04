@@ -1,12 +1,13 @@
 <template>
   <div>
     <div class="container mx-auto flex flex-col gap-4">
+      <!-- Header mit Neuer B Button & Search Bar -->
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
-        <div class="flex gap-4 justify-end items-center ">
-          <button @click="showCreateUserModal = true"
-            class="hidden ty:flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-fit px-3.5 md:px-7 py-3.5 z-10">
-            <p class="font-medium font-base md:text-lg">Neuer Benutzer</p>
-          </button>
+        <div class="flex gap-4 justify-end items-center">
+          <StandardButton @click="showCreateUserModal = true" class="hidden ty:flex">
+            <p class="font-base md:text-lg">Neuer Benutzer</p>
+          </StandardButton>
+          <!-- Button callapset wenn Screen zu klein wird. Es wird nur noch + Icon gezeigt -->
           <button @click="showCreateUserModal = true"
             class="flex ty:hidden justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"
@@ -14,6 +15,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </button>
+          <!-- Toggle Search Bar -->
           <button @click="showSearchBar = !showSearchBar"
             class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -23,14 +25,15 @@
             </svg>
           </button>
         </div>
+        <!-- Searchbar -->
         <transition enter-active-class="transition ease-linear duration-200" enter-from-class="-translate-y-9"
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="searchbar" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
-            </TextInput>
+            <TextInput name="searchbar" placeholder="Suche..." v-model="searchString" ref="searchBar"></TextInput>
+            <!-- X Icon entweder clear searchString oder schließt Searchbar, wenn searchString leer -->
             <div class="px-3.5 py-3.5"
-              @click="() => { if ($refs.searchBar.input === '') showSearchBar = false; $refs.searchBar.input = ''; }">
+              @click="() => { if (searchString === '') showSearchBar = false; searchString = ''; }">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                 stroke="currentColor" class="w-8 h-8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -39,9 +42,13 @@
           </div>
         </transition>
       </div>
+      <!-- Ende Header -->
+
+      <!-- Box mit allen Benutzern -->
       <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
-        <div class="h-fit max-h-[73vh] overflow-y-auto block">
-          <table class="table-auto w-full text-left">
+        <!-- INFO Muss in zwei Divs aufgeteilt sein, ansonsten scrollt Tabelle durch Header durch und kann über Header gesehen werden -->
+        <div class="h-fit max-h-[60vh] overflow-y-auto block">
+          <table class="table-auto w-full">
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
                 <th scope="col" class="pb-2.5 font-medium" @click=" indexSort.lastname = (indexSort.lastname + 1) % 2">
@@ -64,26 +71,26 @@
                     Rolle
                   </span>
                 </th>
-                <th scope="col" class="pb-2.5 font-medium"></th>
+                <th scope="col" class="pb-2.5"></th>
               </tr>
             </thead>
             <tbody class="overscroll-y-scroll">
               <tr v-for="user in searchResults" :key="user._id" @click="openEditUser(user._id)"
                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                 <!--Lastname-->
-                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                  <p class="">{{ user.lastname }}</p>
+                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
+                  <p>{{ user.lastname }}</p>
                 </td>
                 <!--Firstname-->
                 <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                  <p class="">{{ user.firstname }}</p>
+                  <p>{{ user.firstname }}</p>
                 </td>
                 <!--Höchste Rolle-->
                 <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                  <p class="text-light-gray truncate overflow-hidden">{{ getHighestRole(user.roles) }}</p>
+                  <p class="text-light-gray">{{ getHighestRole(user.roles) }}</p>
                 </td>
 
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
+                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0">
                   <!--Arrow Right-->
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                     stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
@@ -325,6 +332,7 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import CheckboxInput from "@/components/CheckboxInput.vue";
+import StandardButton from "@/components/StandardButton.vue";
 
 export default {
   name: "EditUsersView",
@@ -337,12 +345,13 @@ export default {
   data() {
     return {
       allUsers: [],
-      searchResults: [],
       indexSort: {
         lastname: 0,
         firstname: 0,
         roles: 0
       },
+      sortKey: 'lastname',
+      searchString: '',
       showSearchBar: false,
       showCreateUserModal: false,
       showEditUserModal: false,
@@ -386,21 +395,10 @@ export default {
     ModalDialog,
     ErrorMessage,
     CollapsibleContainer,
-    CheckboxInput
+    CheckboxInput,
+    StandardButton
   },
   methods: {
-    search(searchString) {
-      if (this.showSearchBar) {
-        // this.showSearchBar = false
-        if (searchString !== '') {
-          this.searchResults = this.allUsers.filter(user => {
-            return user.firstname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || user.lastname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || this.getHighestRole(user.roles).toLowerCase().indexOf(searchString.toLowerCase()) > -1
-          })
-        } else {
-          this.searchResults = this.allUsers
-        }
-      }
-    },
     cancel() {
       this.showCreateUserModal = false
       this.showEditUserModal = false
@@ -584,9 +582,6 @@ export default {
   },
 
   watch: {
-    allUsers() {
-      this.searchResults = this.allUsers
-    },
     "roles.admin": function (newVal) {
       if (newVal && !this.editUser.roles.includes('admin') && !this.newUser.roles.includes('admin')) {
         this.editUser.roles.push('admin')
@@ -633,34 +628,33 @@ export default {
       }
     },
     "indexSort.lastname"() {
-      this.searchResults.sort((a, b) => {
-        if (this.indexSort.lastname === 1) {
-          return b.lastname.localeCompare(a.lastname)
-        } else {
-          return a.lastname.localeCompare(b.lastname)
-        }
-      })
+      this.sortKey = 'lastname'
     },
 
     "indexSort.firstname"() {
-      this.searchResults.sort((a, b) => {
-        if (this.indexSort.firstname === 1) {
-          return b.firstname.localeCompare(a.firstname)
-        } else {
-          return a.firstname.localeCompare(b.firstname)
-        }
-      })
+      this.sortKey = 'firstname'
     },
 
     "indexSort.roles"() {
-      this.searchResults.sort((a, b) => {
-        if (this.indexSort.roles === 1) {
-          return this.getHighestRole(b.roles).localeCompare(this.getHighestRole(a.roles))
-        } else {
-          return this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles))
-        }
+      this.sortKey = 'roles'
+    }
+  },
+  computed: {
+    searchResults() {
+      //Filtert die Teilnehmer nach dem Suchstring bzw. wenn der Suchstring leer ist, wird die Liste ungefiltert zurückgegeben
+      const arr = this.allUsers.filter(user => user.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+        || user.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+        || this.getHighestRole(user.roles).toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+        || this.searchString.trim().length === 0
+      ).sort((a, b) => {
+        //Sortiert die Teilnehmer nach dem SortKey
+        //Wenn der SortKey 'roles' ist, wird die höchste Rolle des Teilnehmers verglichen
+        if (this.sortKey === "roles") return this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles));
+        return a[this.sortKey].localeCompare(b[this.sortKey])
       })
-    },
+      //Wenn der indexSort des SortKeys 1 ist, wird die Liste umgedreht
+      return this.indexSort[this.sortKey] === 1 ? arr.reverse() : arr
+    }
   }
 }
 </script>
