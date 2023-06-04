@@ -156,7 +156,7 @@ async function createNewGroup(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+	return { ok: res.status === 201, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function deleteGroup(groupID) {
@@ -486,7 +486,7 @@ async function createNewMember(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+	return { ok: res.status === 201, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function deleteMember(memberId) {
@@ -715,7 +715,7 @@ async function createNewUser(body) {
 		}), { raw: true }
 	);
 
-	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+	return { ok: res.status === 201, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function updateUser(body) {

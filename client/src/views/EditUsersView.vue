@@ -1,21 +1,27 @@
 <template>
   <div>
     <div class="container mx-auto flex flex-col gap-4">
+
       <!-- Header mit Neuer B Button & Search Bar -->
+
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center">
-          <StandardButton @click="showCreateUserModal = true" class="hidden ty:flex">
+
+          <!-- Button callapset wenn Screen zu klein wird. Es wird nur noch + Icon gezeigt -->
+
+          <StandardButton @click="() => { this.$refs.newUserModal.open() }" class="hidden ty:flex">
             <p class="font-base md:text-lg">Neuer Benutzer</p>
           </StandardButton>
-          <!-- Button callapset wenn Screen zu klein wird. Es wird nur noch + Icon gezeigt -->
-          <button @click="showCreateUserModal = true"
+          <button @click="() => { this.$refs.newUserModal.open() }"
             class="flex ty:hidden justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"
               class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </button>
+
           <!-- Toggle Search Bar -->
+
           <button @click="showSearchBar = !showSearchBar"
             class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -24,8 +30,11 @@
                 d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </button>
+
         </div>
+
         <!-- Searchbar -->
+
         <transition enter-active-class="transition ease-linear duration-200" enter-from-class="-translate-y-9"
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
@@ -41,22 +50,27 @@
             </div>
           </div>
         </transition>
+
       </div>
-      <!-- Ende Header -->
 
       <!-- Box mit allen Benutzern -->
+
       <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
         <!-- INFO Muss in zwei Divs aufgeteilt sein, ansonsten scrollt Tabelle durch Header durch und kann über Header gesehen werden -->
         <div class="h-fit max-h-[60vh] overflow-y-auto block">
           <table class="table-auto w-full">
+
+            <!-- Tabellen Header ist sticky -->
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
+
                 <th scope="col" class="pb-2.5 font-medium" @click=" indexSort.lastname = (indexSort.lastname + 1) % 2">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.lastname"></SortIcon>
                     Name
                   </span>
                 </th>
+
                 <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
                   @click="indexSort.firstname = (indexSort.firstname + 1) % 2">
                   <span class="flex items-center gap-1">
@@ -64,6 +78,7 @@
                     Vorname
                   </span>
                 </th>
+
                 <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
                   @click="indexSort.roles = (indexSort.roles + 1) % 2">
                   <span class="flex items-center gap-1 ">
@@ -71,9 +86,13 @@
                     Rolle
                   </span>
                 </th>
+
+                <!-- Spalte für Pfeil -->
                 <th scope="col" class="pb-2.5"></th>
+
               </tr>
             </thead>
+
             <tbody class="overscroll-y-scroll">
               <tr v-for="user in searchResults" :key="user._id" @click="openEditUser(user._id)"
                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
@@ -98,250 +117,46 @@
                       d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
                   </svg>
                 </td>
-              </tr>
 
+              </tr>
             </tbody>
           </table>
+
+          <!-- Wenn keine Benutzer gefunden wurden -->
           <p v-show="typeof searchResults === 'undefined' || searchResults?.length === 0"
             class="font-medium text-gray-500 text-center pt-2.5">Keine Mitglieder gefunden</p>
         </div>
       </div>
     </div>
+    <!-- Ende Benutzer Box -->
 
-    <!-- Create New User Modal -->
-    <ModalDialog :show="showCreateUserModal" :hasSubheader="false" @onClose="cancel">
-      <template #header>
-        <p class="text-xl md:text-2xl">Neuen Benutzer</p>
-      </template>
-      <template #content>
-        <div class="flex flex-col justify-center items-center gap-4">
-          <!--Username des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="username" class="hidden sm:block">Benutzername:</label>
-            <TextInput name="username" v-model="newUser.username" placeholder="Benutzername"
-              :showError="error.cause.usernameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Vorname des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="firstname" class="hidden sm:block">Vorname:</label>
-            <TextInput name="firstname" v-model="newUser.firstname" placeholder="Vorname"
-              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Nachname des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="lastname" class="hidden sm:block">Nachname:</label>
-            <TextInput name="lastname" v-model="newUser.lastname" placeholder="Nachname"
-              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--E-Mail des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="email" class="hidden sm:block">E-Mail:</label>
-            <TextInput name="email" v-model="newUser.email" placeholder="E-Mail" :showError="error.cause.emailInput"
-              class="md:w-96"></TextInput>
-          </div>
-
-          <!--Rollen des Benutzers-->
-          <CollapsibleContainer class="w-full">
-            <template #header>
-              <p class="font-medium">Rollen</p>
-            </template>
-            <template #content>
-              <div class="flex flex-col gap-2">
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Admin</p>
-                  <CheckboxInput class="" v-model="roles.admin"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Mitarbeiter</p>
-                  <CheckboxInput class="" v-model="roles.staff"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Abteilungsleiter</p>
-                  <CheckboxInput class="" v-model="roles.head"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Trainer</p>
-                  <CheckboxInput class="" v-model="roles.trainer"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Assistent</p>
-                  <CheckboxInput class="" v-model="roles.assistant"></CheckboxInput>
-                </div>
-              </div>
-            </template>
-          </CollapsibleContainer>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex flex-col gap-4">
-          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
-          <div class="flex justify-between items-center gap-6 ">
-            <button @click="cancel"
-              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
-              <p class="font-medium font-base md:text-lg">Abbrechen</p>
-            </button>
-            <button @click="createNewUser"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-              <p class="font-medium font-base md:text-lg">Erstellen</p>
-            </button>
-          </div>
-        </div>
-      </template>
-    </ModalDialog>
+    <!-- Create User Modal -->
+    <UserModal ref="newUserModal" @onClose="getAllUsers" type="new"></UserModal>
 
     <!-- Edit User Modal -->
-    <ModalDialog :show="showEditUserModal" :hasSubheader="false" @onClose="cancel">
-      <template #header>
-        <p class="text-xl md:text-2xl">Bearbeiten</p>
-      </template>
-      <template #content>
-        <div class="flex flex-col justify-center items-center gap-4">
-          <!--Username des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="username" class="">Benutzername:</label>
-            <TextInput name="username" v-model="editUser.username" placeholder="Benutzername"
-              :showError="error.cause.usernameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Vorname des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="firstname" class="">Vorname:</label>
-            <TextInput name="firstname" v-model="editUser.firstname" placeholder="Vorname"
-              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Nachname des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="lastname" class="">Nachname:</label>
-            <TextInput name="lastname" v-model="editUser.lastname" placeholder="Nachname"
-              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--E-Mail des Benutzers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="email" class="whitespace-nowrap">E-Mail:</label>
-            <TextInput name="email" v-model="editUser.email" placeholder="E-Mail" :showError="error.cause.emailInput"
-              class="md:w-96"></TextInput>
-          </div>
-
-          <!--Rollen des Benutzers-->
-          <CollapsibleContainer class="w-full">
-            <template #header>
-              <p class="font-medium">Rollen</p>
-            </template>
-            <template #content>
-              <div class="flex flex-col gap-2">
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Admin</p>
-                  <CheckboxInput class="" v-model="roles.admin"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Mitarbeiter</p>
-                  <CheckboxInput class="" v-model="roles.staff"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Abteilungsleiter</p>
-                  <CheckboxInput class="" v-model="roles.head"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Trainer</p>
-                  <CheckboxInput class="" v-model="roles.trainer"></CheckboxInput>
-                </div>
-                <div class="w-full flex justify-between items-center">
-                  <p class="">Assistent</p>
-                  <CheckboxInput class="" v-model="roles.assistant"></CheckboxInput>
-                </div>
-              </div>
-            </template>
-          </CollapsibleContainer>
-
-          <!--Gruppen des Teilnehmers-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <CollapsibleContainer>
-              <template #header>
-                <p class="font-medium">Gruppen</p>
-              </template>
-              <template #content>
-                <div v-for="group in editUser.accessible_groups " :key="group._id"
-                  v-show="editUser.accessible_groups.length !== 0" class="flex justify-between items-center gap-2">
-                  <p>{{ group.name }}</p>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                    stroke="currentColor" class="w-8 h-8 -mr-[2px]"
-                    @click="editUser.accessible_groups = editUser.accessible_groups.filter(e => e !== group)">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <p class="text-light-gray" v-show="editUser.accessible_groups.length === 0">Keine Gruppe zugeteilt</p>
-              </template>
-            </CollapsibleContainer>
-          </div>
-
-          <div class="w-full flex items-center justify-between gap-4 mt-4">
-            <p class="">Passwort neu senden:</p>
-            <button @click="resendPassword(editUser._id)"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-[92px] md:w-[116px] py-3">
-              <p class="font-medium font-base md:text-lg">Senden</p>
-            </button>
-          </div>
-
-          <div class="w-full flex items-center justify-between gap-4">
-            <p class="">Benutzer löschen:</p>
-            <button
-              @click="() => { showDeleteButton = true; error.message = 'Der Benutzer wird aus allen Gruppen und dazu gehörige Listen entfernt!'; error.show = true; }"
-              v-show="!showDeleteButton"
-              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-[90px] md:w-[114px] py-3">
-              <p class="font-medium font-base md:text-lg">Löschen</p>
-            </button>
-            <button @click="deleteUser(editUser._id)"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-[7px] md:px-6 py-1.5"
-              v-show="showDeleteButton">
-              <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
-            </button>
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex flex-col gap-4">
-          <ErrorMessage :message="error.message" :show="error.show" class=""></ErrorMessage>
-          <div class="flex justify-between items-center gap-6 ">
-            <button @click="cancel"
-              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5">
-              <p class="font-medium font-base md:text-lg">Abbrechen</p>
-            </button>
-            <button @click="saveEditedUser"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-3.5 md:px-7 py-4">
-              <p class="font-medium font-base md:text-lg">Speichern</p>
-            </button>
-          </div>
-        </div>
-      </template>
-    </ModalDialog>
+    <UserModal ref="editUserModal" @onClose="getAllUsers" type="edit"></UserModal>
   </div>
 </template>
   
 <script>
 import _ from "lodash"
-import { getAllUsers, createNewUser, updateUser, deleteUser, getGroupName, resendPassword } from "@/util/fetchOperations"
+import { getAllUsers, getGroupName } from "@/util/fetchOperations"
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
-import ModalDialog from '@/components/ModalDialog.vue';
-import ErrorMessage from '@/components/ErrorMessage.vue';
-import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
-import CheckboxInput from "@/components/CheckboxInput.vue";
 import StandardButton from "@/components/StandardButton.vue";
+import UserModal from "@/components/UserModal.vue";
 
 export default {
   name: "EditUsersView",
+  
   setup() {
     const dataStore = useDataStore()
     return {
       dataStore
     }
   },
+
   data() {
     return {
       allUsers: [],
@@ -353,158 +168,38 @@ export default {
       sortKey: 'lastname',
       searchString: '',
       showSearchBar: false,
-      showCreateUserModal: false,
-      showEditUserModal: false,
-      newUser: {
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        roles: []
-      },
-      editUser: {
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        roles: []
-      },
-      error: {
-        message: '',
-        show: false,
-        cause: {
-          firstnameInput: false,
-          lastnameInput: false,
-          emailInput: false,
-          usernameInput: false
-        }
-      },
-      showDeleteButton: false,
-      roles: {
-        admin: false,
-        staff: false,
-        head: false,
-        trainer: false,
-        assistant: false
-      }
     }
   },
+
   components: {
     SortIcon,
     TextInput,
-    ModalDialog,
-    ErrorMessage,
-    CollapsibleContainer,
-    CheckboxInput,
-    StandardButton
+    StandardButton,
+    UserModal
   },
+
   methods: {
-    cancel() {
-      this.showCreateUserModal = false
-      this.showEditUserModal = false
-      this.showDeleteButton = false
-
-      this.searchString = ''
-
-      this.newUser = {
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        roles: []
-      }
-
-      this.editUser = {
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        roles: []
-      }
-
-      this.roles = {
-        admin: false,
-        staff: false,
-        head: false,
-        trainer: false,
-        assistant: false
-      }
-
-      this.resetError()
-    },
-
-    async createNewUser() {
-      this.validateInputs(this.newUser)
-
-      if (!this.error.show) {
-        const res = await createNewUser(this.newUser)
-        if (res.ok) {
-          this.getAllUsers()
-          this.cancel()
-        } else {
-          this.error.message = res.body.message
-          this.error.show = true
-        }
-      }
-    },
-
-    async saveEditedUser() {
-      this.validateInputs(this.editUser)
-
-      if (!this.error.show) {
-        this.editUser.accessible_groups = this.editUser.accessible_groups.map(g => g._id)
-
-        const res = await updateUser(this.editUser)
-        if (res.ok) {
-          this.getAllUsers()
-          this.cancel()
-        } else {
-          this.error.message = res.body.message
-          this.error.show = true
-        }
-      }
-    },
-
-    async deleteUser(id) {
-      const res = await deleteUser(id)
-      if (res.ok) {
-        this.getAllUsers()
-        this.cancel()
-      } else {
-        this.error.message = res.body.message
-        this.error.show = true
-      }
-    },
 
     async openEditUser(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editUser = _.cloneDeep(this.allUsers.find(m => m._id === id))
+      const editUser = _.cloneDeep(this.allUsers.find(m => m._id === id))
 
-      this.editUser.accessible_groups = await Promise.all(this.editUser.accessible_groups.map(async g => getGroupName(g)))
+      editUser.accessible_groups = await Promise.all(editUser.accessible_groups.map(async g => getGroupName(g)))
 
-      //Übertrage die Rollen in das Checkbox-Objekt
-      this.roles.admin = this.editUser.roles.includes('admin')
-      this.roles.staff = this.editUser.roles.includes('staff')
-      this.roles.head = this.editUser.roles.includes('head')
-      this.roles.trainer = this.editUser.roles.includes('trainer')
-      this.roles.assistant = this.editUser.roles.includes('assistant')
+      const roles = {
+        admin: editUser.roles.includes('admin'),
+        staff: editUser.roles.includes('staff'),
+        head: editUser.roles.includes('head'),
+        trainer: editUser.roles.includes('trainer'),
+        assistant: editUser.roles.includes('assistant')
 
-      this.showEditUserModal = true
+      }
+
+      this.$refs.editUserModal.open(editUser, roles)
     },
 
     async getAllUsers() {
-      this.allUsers = (await getAllUsers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
-    },
-
-    resetError() {
-      this.error.show = false
-      this.error.cause = {
-        firstnameInput: false,
-        lastnameInput: false,
-        emailInput: false,
-        usernameInput: false
-      }
-      this.error.message = ''
+      this.allUsers = await getAllUsers()
     },
 
     getHighestRole(roles) {
@@ -521,55 +216,7 @@ export default {
       } else {
         return 'Keine Rolle'
       }
-    },
-
-    validateInputs(inputs) {
-      this.resetError()
-
-      if (inputs.firstname.trim().length === 0 || !inputs.firstname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
-        this.error.message = 'Bitte gebe einen Vornamen ein.'
-        this.error.show = true
-        this.error.cause.firstnameInput = true
-      }
-      if (inputs.lastname.trim().length === 0 || !inputs.lastname.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
-        this.error.message = 'Bitte gebe einen Nachnamen ein.'
-        this.error.show = true
-        this.error.cause.lastnameInput = true
-      }
-      if (inputs.username.trim().length === 0 || !inputs.username.match(/^[a-zA-Z0-9-]+$/)) {
-        this.error.message = 'Bitte gebe einen Benutzernamen ein.'
-        this.error.show = true
-        this.error.cause.usernameInput = true
-      }
-      if (inputs.email.trim().length < 3 || inputs.email.trim().length > 20 || !inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-        this.error.message = 'Bitte gebe einen gültigen E-Mail ein.'
-        this.error.show = true
-        this.error.cause.emailInput = true
-      }
-
-      //If any error is true, set error.message to 'Mehrere Fehler.'
-      if (Object.keys(this.error.cause).filter(k => this.error.cause[k]).length > 1) {
-        this.error.message = 'Mehrere Fehler.'
-      }
-
-      if (typeof inputs._id !== 'undefined') {
-        const oldEntry = this.allUsers.find(m => m._id === inputs._id)
-        if (_.isEqual(inputs.firstname, oldEntry.firstname) && _.isEqual(inputs.lastname, oldEntry.lastname)
-          && _.isEqual(inputs.username, oldEntry.username) && _.isEqual(inputs.email, oldEntry.email)
-          && _.isEqual(inputs.accessible_groups.map(g => g._id), oldEntry.accessible_groups) && _.isEqual(this.editUser.roles, oldEntry.roles)) {
-          this.error.message = 'Es wurden keine Änderungen vorgenommen.'
-          this.error.show = true
-        }
-      }
-    },
-
-    async resendPassword(id) {
-      const res = await resendPassword(id)
-      if (res.ok) {
-        this.error.message = res.body.message
-        this.error.show = true
-      }
-    },
+    }
   },
 
   async created() {
@@ -582,51 +229,6 @@ export default {
   },
 
   watch: {
-    "roles.admin": function (newVal) {
-      if (newVal && !this.editUser.roles.includes('admin') && !this.newUser.roles.includes('admin')) {
-        this.editUser.roles.push('admin')
-        this.newUser.roles.push('admin')
-      } else if (!newVal) {
-        this.editUser.roles = this.editUser.roles.filter(r => r !== 'admin')
-        this.newUser.roles = this.newUser.roles.filter(r => r !== 'admin')
-      }
-    },
-    "roles.staff": function (newVal) {
-      if (newVal && !this.editUser.roles.includes('staff') && !this.newUser.roles.includes('staff')) {
-        this.editUser.roles.push('staff')
-        this.newUser.roles.push('staff')
-      } else if (!newVal) {
-        this.editUser.roles = this.editUser.roles.filter(r => r !== 'staff')
-        this.newUser.roles = this.newUser.roles.filter(r => r !== 'staff')
-      }
-    },
-    "roles.head": function (newVal) {
-      if (newVal && !this.editUser.roles.includes('head') && !this.newUser.roles.includes('head')) {
-        this.editUser.roles.push('head')
-        this.newUser.roles.push('head')
-      } else if (!newVal) {
-        this.editUser.roles = this.editUser.roles.filter(r => r !== 'head')
-        this.newUser.roles = this.newUser.roles.filter(r => r !== 'head')
-      }
-    },
-    "roles.trainer": function (newVal) {
-      if (newVal && !this.editUser.roles.includes('trainer') && !this.newUser.roles.includes('trainer')) {
-        this.editUser.roles.push('trainer')
-        this.newUser.roles.push('trainer')
-      } else if (!newVal) {
-        this.editUser.roles = this.editUser.roles.filter(r => r !== 'trainer')
-        this.newUser.roles = this.newUser.roles.filter(r => r !== 'trainer')
-      }
-    },
-    "roles.assistant": function (newVal) {
-      if (newVal && !this.editUser.roles.includes('assistant') && !this.newUser.roles.includes('assistant')) {
-        this.editUser.roles.push('assistant')
-        this.newUser.roles.push('assistant')
-      } else if (!newVal) {
-        this.editUser.roles = this.editUser.roles.filter(r => r !== 'assistant')
-        this.newUser.roles = this.newUser.roles.filter(r => r !== 'assistant')
-      }
-    },
     "indexSort.lastname"() {
       this.sortKey = 'lastname'
     },
@@ -639,16 +241,17 @@ export default {
       this.sortKey = 'roles'
     }
   },
+
   computed: {
     searchResults() {
-      //Filtert die Teilnehmer nach dem Suchstring bzw. wenn der Suchstring leer ist, wird die Liste ungefiltert zurückgegeben
+      //Filtert die Nutzer nach dem Suchstring bzw. wenn der Suchstring leer ist, wird die Liste ungefiltert zurückgegeben
       const arr = this.allUsers.filter(user => user.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
         || user.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
         || this.getHighestRole(user.roles).toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
         || this.searchString.trim().length === 0
       ).sort((a, b) => {
-        //Sortiert die Teilnehmer nach dem SortKey
-        //Wenn der SortKey 'roles' ist, wird die höchste Rolle des Teilnehmers verglichen
+        //Sortiert die Nutzer nach dem SortKey
+        //Wenn der SortKey 'roles' ist, wird die höchste Rolle des Benutzers verglichen
         if (this.sortKey === "roles") return this.getHighestRole(a.roles).localeCompare(this.getHighestRole(b.roles));
         return a[this.sortKey].localeCompare(b[this.sortKey])
       })
