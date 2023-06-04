@@ -1,7 +1,7 @@
 <template>
   <div @click="onClick"
     :class="this.activated ? 'text-white bg-gradient-to-tl from-dimmed-gradient-2 to-dimmed-gradient-1' : 'text-black bg-gradient-to-tr from-unchecked-gradient-1 to-unchecked-gradient-2'"
-    class="px-3.5 md:px-7 py-4 rounded-xl drop-shadow font-medium text-xl hover:cursor-pointer select-none">
+    class="px-3.5 md:px-7 py-4 rounded-xl drop-shadow font-medium text-xl hover:cursor-pointer select-none ">
     <span class="flex items-center justify-between">
       <h3 class="w-full">{{ participant.lastname }}, {{ participant.firstname }}</h3>
       <!--Checkmark Icon-->

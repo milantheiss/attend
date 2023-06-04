@@ -53,7 +53,8 @@ const login = catchAsync(async (req, res) => {
 					firstname: user.firstname,
 					lastname: user.lastname,
 					_id: user._id,
-					lengthAccessibleGroups: user.accessible_groups.length 
+					lengthAccessibleGroups: user.accessible_groups.length,
+					roles: user.roles,
 				},
 				showPatchNotesDialog: !user.readPatchnotes,
 			};
@@ -161,7 +162,8 @@ const authenticate = catchAsync(async (req, res) => {
 					firstname: user.firstname,
 					lastname: user.lastname,
 					_id: user._id,
-					lengthAccessibleGroups: user.accessible_groups.length 
+					lengthAccessibleGroups: user.accessible_groups.length,
+					roles: user.roles
 				},
 				showPatchNotesDialog: !user.readPatchnotes,
 			};

@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="flex flex-col gap-4 mb-20">
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center ">
@@ -709,7 +708,10 @@ export default {
     document.title = 'Gruppen bearbeiten - Attend'
     this.dataStore.viewname = "Gruppen bearbeiten"
 
-    this.getAllGroups()
+  },
+
+  async mounted() {
+    await this.getAllGroups()
   },
 
   watch: {

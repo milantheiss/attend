@@ -576,8 +576,10 @@ export default {
   async created() {
     document.title = 'Benutzer bearbeiten - Attend'
     this.dataStore.viewname = "Benutzer bearbeiten"
+  },
 
-    this.getAllUsers()
+  async mounted() {
+    await this.getAllUsers()
   },
 
   watch: {

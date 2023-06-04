@@ -55,11 +55,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: "/administration",
-    component: () => import("../views/AdministrationView.vue"),
-    meta: { requiresAuth: true, requiresStaff: true }
-  },
-  {
     path: "/administration/members",
     component: () => import("../views/EditMembersView.vue"),
     meta: { requiresAuth: true, requiresStaff: true }
@@ -72,7 +67,7 @@ const routes = [
   {
     path: "/administration/users",
     component: () => import("../views/EditUsersView.vue"),
-    meta: { requiresAuth: true, requiresStaff: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: "/administration/issues-overview",
@@ -124,6 +119,40 @@ router.beforeEach(async (to, from, next) => {
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresGroup)) {
     if (useAuthStore().user?.lengthAccessibleGroups > 0) {
+      next();
+      return;
+    } else {
+      next("/profile");
+    }
+  } else {
+    next();
+  }
+});
+
+/**
+ * Middleware: Wird ausgeführt bevor eine Unterseite aufgerufen wird.
+ * Überprüft, ob für die Unterseite die mindestens die Staff Roll benötigt wird.
+ */
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresStaff)) {
+    if (useAuthStore().user?.roles.includes("staff") || useAuthStore().user?.roles.includes("admin")) {
+      next();
+      return;
+    } else {
+      next("/profile");
+    }
+  } else {
+    next();
+  }
+});
+
+/**
+ * Middleware: Wird ausgeführt bevor eine Unterseite aufgerufen wird.
+ * Überprüft, ob für die Unterseite die mindestens die Staff Roll benötigt wird.
+ */
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresAdmin)) {
+    if (useAuthStore().user?.roles.includes("admin")) {
       next();
       return;
     } else {

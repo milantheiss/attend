@@ -474,8 +474,10 @@ export default {
   async created() {
     document.title = 'Mitglieder bearbeiten - Attend'
     this.dataStore.viewname = "Mitglieder bearbeiten"
+  },
 
-    this.getAllMembers()
+  async mounted() {
+    await this.getAllMembers()
   },
 
   watch: {

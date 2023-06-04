@@ -2,7 +2,7 @@
 	<div class="mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
 
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
-		<nav class="container mx-auto mt-6 md:mt-12 mb-8 md:mb-12 md:max-w-medium-width px-3.5 md:px-7"
+		<nav class="container mx-auto mt-6 md:mt-12 mb-6 md:max-w-medium-width px-3.5 md:px-7"
 			v-if="auth.authenticated">
 			<div class="flex justify-between items-center">
 				<!--Menu Icon-->
@@ -52,7 +52,7 @@
 				<div class="flex flex-col gap-2" v-show="showMenu">
 					<router-link @click="showMenu = !showMenu" to="/attendancelist"
 						class="text-left font-medium md:text-2xl text-xl flex items-center group"
-						v-if="auth.user?.lengthAccessibleGroups > 0">
+						v-show="auth.user?.lengthAccessibleGroups > 0">
 						Anwesenheitsliste
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 							stroke="currentColor"
@@ -61,7 +61,7 @@
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
 					</router-link>
-					<router-link @click="showMenu = !showMenu" to="/invoices"
+					<router-link @click="showMenu = !showMenu" to="/invoices" v-show="auth.user?.lengthAccessibleGroups > 0 || auth.user?.roles.includes('admin') || auth.user?.roles.includes('staff') || auth.user?.roles.includes('head')"
 						class="text-left font-medium md:text-2xl text-xl flex items-center group">
 						Abrechnungen
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -71,16 +71,41 @@
 								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 						</svg>
 					</router-link>
-					<router-link @click="showMenu = !showMenu" to="/administration"
-						class="text-left font-medium md:text-2xl text-xl flex items-center group">
+					<div class="text-left font-medium md:text-2xl text-xl items-start flex flex-col" v-show="auth.user?.roles.includes('admin') || auth.user?.roles.includes('staff')">
 						Verwaltung
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-							stroke="currentColor"
-							class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
-							<path stroke-linecap="round" stroke-linejoin="round"
-								d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-						</svg>
-					</router-link>
+						<div class="indent-8 flex flex-col gap-1">
+							<router-link @click="showMenu = !showMenu" to="/administration/groups"
+								class="flex items-center group">
+								Gruppen
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+									stroke="currentColor"
+									class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+									<path stroke-linecap="round" stroke-linejoin="round"
+										d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+								</svg>
+							</router-link>
+							<router-link @click="showMenu = !showMenu" to="/administration/members"
+								class="flex items-center group">
+								Mitglieder
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+									stroke="currentColor"
+									class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+									<path stroke-linecap="round" stroke-linejoin="round"
+										d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+								</svg>
+							</router-link>
+							<router-link @click="showMenu = !showMenu" to="/administration/users"
+								class="flex items-center group" v-show="auth.user?.roles.includes('admin')">
+								Benutzer
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+									stroke="currentColor"
+									class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+									<path stroke-linecap="round" stroke-linejoin="round"
+										d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+								</svg>
+							</router-link>
+						</div>
+					</div>
 					<router-link @click="showMenu = !showMenu" to="/logout"
 						class="text-left font-medium md:text-2xl text-xl flex items-center group">
 						Logout
@@ -118,7 +143,7 @@
 		</div>
 
 		<!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
-		<router-view class="font-normal md:max-w-medium-width mx-auto" v-slot="{ Component }">
+		<router-view class="font-normal md:max-w-medium-width mx-auto h-fit max-h-[90vh] overflow-auto w-full no-scrollbar pb-5" v-slot="{ Component }">
 			<transition enter-active-class="transition ease-in-out duration-[200ms] delay-[240ms]"
 				enter-from-class="opacity-0 translate-y-5" enter-to-class="opacity-100 translate-y-0"
 				leave-active-class="transition ease-in-out duration-[200ms]" leave-from-class="opacity-100 translate-y-0"
@@ -173,7 +198,7 @@ export default {
 * {
 	scroll-padding-left: 5px;
 	scrollbar-width: thin;
-	scrollbar-color: #ffffff #E8EBED;
+	scrollbar-color: #ffffff00 #E8EBED;
 }
 
 /* Chrome, Edge, and Safari */
@@ -182,7 +207,7 @@ export default {
 }
 
 *::-webkit-scrollbar-track {
-	background: #ffffff;
+	background: #ffffff00;
 	border-radius: 2px;
 }
 
@@ -190,5 +215,16 @@ export default {
 	background-color: #6B7280;
 	border-radius: 10px;
 	border: 3px solid #6B7280;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 </style>

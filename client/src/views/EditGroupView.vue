@@ -312,10 +312,10 @@
     <ModalDialog :show="showEditParticipantModal" :hasSubheader="false" @onClose="cancel">
       <!-- TODO Edit Participant Weiter -->
       <template #header>
-        <p class="text-xl md:text-2xl">Bearbeiten</p>
+        <p class="text-xl md:text-2xl text-[#111827]">Bearbeiten</p>
       </template>
       <template #content>
-        <div class="flex flex-col justify-center items-center gap-4">
+        <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
 
           <!--Vorname des Teilnehmers-->
           <div class="w-full flex items-center justify-between gap-4">
@@ -385,10 +385,10 @@
     <ModalDialog :show="showEditTrainerModal" :hasSubheader="false" @onClose="cancel">
       <!-- TODO Edit Participant Weiter -->
       <template #header>
-        <p class="text-xl md:text-2xl">Bearbeiten</p>
+        <p class="text-xl md:text-2xl text-[#111827]">Bearbeiten</p>
       </template>
       <template #content>
-        <div class="flex flex-col justify-center items-center gap-4">
+        <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
 
           <!--Vorname des Trainer-->
           <div class="w-full flex items-center justify-between gap-4">
@@ -449,10 +449,13 @@
     <!-- Add Participant -->
     <ModalDialog :show="showAddParticipantModal" :hasSubheader="false" @onClose="cancel">
       <template #header>
-        <p class="text-xl md:text-2xl">Teilnehmer hinzufügen</p>
+        <div class="flex justify-between items-center">
+          <p class="text-xl md:text-2xl text-[#111827]">Teilnehmer hinzufügen</p>
+          <p class="text-light-gray mr-[7px] font-medium cursor-pointer" @click="cancel">Schließen</p>
+        </div>
       </template>
       <template #content>
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 text-[#111827]">
           <!-- Search Bar -->
           <div class="w-full flex items-center justify-between gap-4">
             <TextInput name="search" v-model="searchString" placeholder="Suche" class="w-full"></TextInput>
@@ -509,12 +512,15 @@
     </ModalDialog>
 
     <!-- Add Trainer -->
-    <ModalDialog :show="showAddTrainerModal" :hasSubheader="false" @onClose="cancel">
+    <ModalDialog :show="showAddTrainerModal" :hasSubheader="false" @onClose="cancel" class="">
       <template #header>
-        <p class="text-xl md:text-2xl">Trainer hinzufügen</p>
+        <div class="flex justify-between items-center">
+          <p class="text-xl md:text-2xl text-[#111827]">Trainer hinzufügen</p>
+          <p class="text-light-gray mr-[7px] font-medium cursor-pointer" @click="cancel">Schließen</p>
+        </div>
       </template>
       <template #content>
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 text-[#111827]">
           <!-- Search Bar -->
           <div class="w-full flex items-center justify-between gap-4">
             <TextInput name="search" v-model="searchString" placeholder="Suche" class="w-full"></TextInput>
@@ -535,31 +541,29 @@
           <!-- Tabelle Trainers -->
           <div class="h-fit max-h-[40vh] overflow-y-auto block w-full pr-2">
             <div v-for="user in searchResult" :key="user._id" @click="onClickOnNewTrainer(user._id)"
-              class="w-full border-b last:border-0 border-[#D1D5DB] py-2 last:pb-0 flex justify-between items-center gap-2">
-              <div class="w-full flex justify-between items-center gap-2">
+              class="w-full border-b last:border-0 border-[#D1D5DB] py-3 last:pb-0 flex justify-between items-center gap-2">
+              <div class="w-full flex justify-between items-center gap-2 -my-[4px]">
                 <p class="">{{ user.firstname }} {{ user.lastname }}</p>
                 <select v-model="user.role" @click.stop=""
-                  class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 font-medium py-0.5 rounded-xl bg-[#ff0000]]"
+                  class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 py-[4px] rounded-xl bg-[#D1D5DB] font-medium text-base md:text-lg"
                   :class="{ 'outline outline-2 outline-offset-4 rounded-lg outline-special-red': (error.cause.roleInput && user.role === 'role') }"
                   v-show="selectedUsers.some(m => m._id === user._id)">
-                  <option value="trainer">Trainer</option>
-                  <option value="assistant">Assistent</option>
-                  <option value="role" disabled hidden>Rolle</option>
+                  <option value="trainer" class="bg-white">Trainer</option>
+                  <option value="assistant" class="bg-white">Assistent</option>
+                  <option value="role" disabled hidden class="bg-white">Rolle</option>
                 </select>
               </div>
               <div class="w-fit h-fit">
                 <!-- Checkmark Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                  stroke="currentColor" class="w-7 h-7 text-[#111827]"
-                  v-show="selectedUsers.some(m => m._id === user._id) || group.trainers.some(p => p.userId === user._id)"
-                >
+                  stroke="currentColor" class="w-7 h-7 "
+                  v-show="selectedUsers.some(m => m._id === user._id) || group.trainers.some(p => p.userId === user._id)">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
                 <!-- Rectangle -->
                 <div
                   v-show="!selectedUsers.some(m => m._id === user._id) && !group.trainers.some(p => p.userId === user._id)"
-                  class="w-[28px] h-[28px] border-[2.25pt] border-light-gray rounded-xl"
-                ></div>
+                  class="w-[28px] h-[28px] border-[2.25pt] border-light-gray rounded-xl"></div>
               </div>
             </div>
           </div>
@@ -1022,7 +1026,7 @@ export default {
           }
         })
 
-        if(this.selectedUsers.some(u => u.role === "role")) {
+        if (this.selectedUsers.some(u => u.role === "role")) {
           this.error.message = "Bitte wähle für jeden Trainer eine Rolle aus."
           this.error.show = true
           this.error.cause.roleInput = true
