@@ -15,7 +15,7 @@
                 </span>
             </Transition>
             <!--Erstellen Button-->
-            <Button @click="createNewInvoice()">Erstellen</Button>
+            <Button @click="createNewInvoice()" v-show="auth.user?.lengthAccessibleGroups > 0">Erstellen</Button>
         </div>
 
         <!--Eigene Abrechnungen-->
@@ -185,6 +185,7 @@
 import { getAllAssignedInvoices, getAllInvoicesInYear } from '@/util/fetchOperations'
 import { downloadInvoice } from '@/util/generatePdf';
 import { useDataStore } from "@/store/dataStore";
+import { useAuthStore } from "@/store/authStore";
 import { ref } from 'vue';
 import Button from '@/components/Button.vue';
 import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
@@ -195,8 +196,10 @@ export default {
     name: "InvoiceOverviewView",
     setup() {
         const dataStore = useDataStore();
+        const auth = useAuthStore();
         const showCollapsibleContainer = ref(true);
         return {
+            auth,
             dataStore,
             showCollapsibleContainer
         };
