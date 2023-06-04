@@ -27,7 +27,7 @@
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="searchbar" placeholder="Suche..." @onChange="(str) => search(str)" ref="searchBar">
+            <TextInput name="searchbar" placeholder="Suche..." v-model="searchString" ref="searchBar">
             </TextInput>
             <div class="px-3.5 py-3.5"
               @click="() => { if ($refs.searchBar.input === '') showSearchBar = false; $refs.searchBar.input = ''; }">
@@ -40,7 +40,7 @@
         </transition>
       </div>
       <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
-        <div class="h-fit max-h-[73vh] overflow-y-auto block">
+        <div class="h-fit max-h-[60vh] overflow-y-auto block">
           <table class="table-auto w-full text-left">
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
@@ -296,7 +296,8 @@ export default {
           birthdayInput: false
         }
       },
-      showDeleteButton: false
+      showDeleteButton: false,
+      searchString: ''
     }
   },
   components: {
@@ -308,46 +309,13 @@ export default {
     CollapsibleContainer
   },
   methods: {
-    search(searchString) {
-      if (this.showSearchBar) {
-        // this.showSearchBar = false
-        if (searchString !== '') {
-          this.searchResults = this.allMembers.filter(member => {
-            //Search for birthday
-            //Regex if searchString contains only numbers, dots, slashes or dashes
-            //Regex . / - and numbers
-            if (/^[0-9./-]*$/.test(searchString)) {
-              //Split searchString by . / -
-              const dateString = searchString.split(/\.|\//).filter(s => s !== '')
-              //If searchString contains 3 parts or less, search in dates
-              if (dateString.length <= 3) {
-                //If searchString contains 3 parts, search for day, month and year
-                if (dateString.length === 3) {
-                  return new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) && new Date(member.birthday).getFullYear() === parseInt(dateString[2]) || new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) && new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[2]
-                }
-                //If dateString contains 2 parts, search for day and month
-                if (dateString.length === 2) {
-                  return new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) && new Date(member.birthday).getFullYear() === parseInt(dateString[1]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) && new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[1]
-                }
-                //If dateString contains 1 part, search for day, month or year
-                if (dateString.length === 1) {
-                  return new Date(member.birthday).getDate() === parseInt(dateString[0]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) || new Date(member.birthday).getFullYear() === parseInt(dateString[0]) || new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[0]
-                }
-              }
-            }
-
-            return member.firstname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || member.lastname.toLowerCase().indexOf(searchString.toLowerCase()) > -1
-          })
-        } else {
-          this.searchResults = this.allMembers
-        }
-      }
-    },
-
     cancel() {
       this.showCreateMemberModal = false
       this.showEditMemberModal = false
       this.showDeleteButton = false
+      this.showSearchBar = false
+
+      this.searchString = ''
 
       this.newMember = {
         firstname: '',
@@ -514,6 +482,39 @@ export default {
       })
     },
 
+    searchString(newVal) {
+      // this.showSearchBar = false
+      if (newVal !== '') {
+        this.searchResults = this.allMembers.filter(member => {
+          //Search for birthday
+          //Regex if searchString contains only numbers, dots, slashes or dashes
+          //Regex . / - and numbers
+          if (/^[0-9./-]*$/.test(newVal)) {
+            //Split searchString by . / -
+            const dateString = newVal.split(/\.|\//).filter(s => s !== '')
+            //If searchString contains 3 parts or less, search in dates
+            if (dateString.length <= 3) {
+              //If searchString contains 3 parts, search for day, month and year
+              if (dateString.length === 3) {
+                return new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) && new Date(member.birthday).getFullYear() === parseInt(dateString[2]) || new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) && new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[2]
+              }
+              //If dateString contains 2 parts, search for day and month
+              if (dateString.length === 2) {
+                return new Date(member.birthday).getDate() === parseInt(dateString[0]) && new Date(member.birthday).getMonth() + 1 === parseInt(dateString[1]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) && new Date(member.birthday).getFullYear() === parseInt(dateString[1]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) && new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[1]
+              }
+              //If dateString contains 1 part, search for day, month or year
+              if (dateString.length === 1) {
+                return new Date(member.birthday).getDate() === parseInt(dateString[0]) || new Date(member.birthday).getMonth() + 1 === parseInt(dateString[0]) || new Date(member.birthday).getFullYear() === parseInt(dateString[0]) || new Date(member.birthday).getFullYear().toString().slice(2, 4) === dateString[0]
+              }
+            }
+          }
+
+          return member.firstname.toLowerCase().indexOf(newVal.toLowerCase()) > -1 || member.lastname.toLowerCase().indexOf(newVal.toLowerCase()) > -1
+        })
+      } else {
+        this.searchResults = this.allMembers
+      }
+    }
   }
 }
 </script>

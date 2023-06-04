@@ -533,6 +533,8 @@ export default {
       this.showEditGroupModal = false
       this.showDeleteButton = false
 
+      this.searchString = ''
+
       this.newGroup = {
         name: '',
         venue: '',

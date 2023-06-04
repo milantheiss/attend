@@ -406,6 +406,8 @@ export default {
       this.showEditUserModal = false
       this.showDeleteButton = false
 
+      this.searchString = ''
+
       this.newUser = {
         firstname: '',
         lastname: '',
