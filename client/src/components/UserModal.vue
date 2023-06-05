@@ -114,7 +114,7 @@
                         <button @click="deleteUser"
                             class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-[20px] drop-shadow-md w-fit px-[7px] md:px-6 py-1.5"
                             v-show="showDeleteButton">
-                            <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
+                            <p class="font-medium font-base md:text-lg">Wirklich löschen?</p>
                         </button>
                     </div>
 

@@ -300,8 +300,6 @@ const updateTrainer = async (groupID, userID, trainerBody) => {
 
     await group.save()
 
-    await userService.updateUser(userID, { firstname: trainerBody.firstname, lastname: trainerBody.lastname })
-
     return group
 }
 

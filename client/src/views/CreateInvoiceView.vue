@@ -64,7 +64,7 @@
                             <div class="h-fit max-h-[55vh] overflow-y-auto block">
                                 <table class="table-auto w-full text-left">
                                     <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
-                                        <tr class="">
+                                        <tr >
                                             <th class="font-medium w-fit cursor-pointer" @click="onClickOnDate()">
                                                 <span class="flex items-center gap-1">
                                                     <SortIconDate :index="indexSortButtonDate"></SortIconDate>
@@ -117,7 +117,7 @@
                 </div>
 
                 <!--Bestätigungsfeld-->
-                <div class="">
+                <div >
                     <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
                     <div class="flex justify-between items-center gap-7">
                         <button @click="cancel"
@@ -147,7 +147,7 @@
                             <p class="text-light-gray">Gruppe:</p>
                         </template>
                         <template #content>
-                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" class=""
+                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" 
                                 :sortAlphabetically="true" :default="true">
                             </CheckboxList>
                         </template>

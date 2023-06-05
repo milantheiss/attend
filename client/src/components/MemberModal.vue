@@ -2,12 +2,12 @@
     <ModalDialog :show="show" :hasSubheader="false" @onClose="close">
 
         <template #header>
-            <p class="text-xl md:text-2xl" v-if="type === 'edit'">Bearbeiten</p>
-            <p class="text-xl md:text-2xl" v-if="type === 'new'">Neues Mitglied</p>
+            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'edit'">Bearbeiten</p>
+            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'new'">Neues Mitglied</p>
         </template>
 
         <template #content>
-            <div class="flex flex-col justify-center items-center gap-4">
+            <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
 
                 <!--Vorname des Teilnehmers-->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -58,7 +58,7 @@
 
                     <!-- Löschen Button -->
                     <div class="w-full flex items-center justify-between gap-4 mt-4">
-                        <p class="">Mitglied löschen:</p>
+                        <p >Mitglied löschen:</p>
                         <button
                             @click="() => { showDeleteButton = true; error.message = 'Das Mitglied wird aus allen Gruppen und dazu gehörige Listen entfernt!'; error.show = true; }"
                             v-show="!showDeleteButton"
@@ -68,7 +68,7 @@
                         <button @click="deleteMember"
                             class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-[20px] drop-shadow-md w-fit px-[7px] md:px-6 py-1.5"
                             v-show="showDeleteButton">
-                            <p class="font-medium font-base md:text-lg">Wirklich Löschen?</p>
+                            <p class="font-medium font-base md:text-lg">Wirklich löschen?</p>
                         </button>
                     </div>
 
@@ -210,7 +210,7 @@ export default {
                     birthdayInput: false
                 }
             }
-        },        
+        },
 
         validateInputs(inputs) {
             this.resetError()

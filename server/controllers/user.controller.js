@@ -3,10 +3,10 @@ const User = require('../models/group.model')
 const {userService} = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { hasAdminRole } = require('../utils/roleCheck');
+const { hasAdminRole, hasStaffAccess } = require('../utils/roleCheck');
 
 const getUsers = catchAsync(async (req, res) => {
-    if(!hasAdminRole(req.user)) {
+    if(!hasStaffAccess(req.user)) {
         return res.status(httpStatus.FORBIDDEN).send({message: "You don't have access to this resource"})
     }
     res.send(await userService.getUsers())

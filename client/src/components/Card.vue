@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div >
         <transition enter-active-class="transition-opacity ease-in-out delay-400 duration-500 transform "
             enter-from-class="opacity-0" enter-to-class="opacity-100">
             <div @click="togglePanel"

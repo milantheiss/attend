@@ -174,9 +174,10 @@ const updateTrainer = {
   body: Joi.object().keys({
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
-    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
-    role: Joi.string().valid('trainer', 'assistant')
+    role: Joi.string().valid('trainer', 'assistant'),
+    //WARNING Alle folgenden Felder werden entfernt
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).strip(),
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).strip(),
   })
 };
 

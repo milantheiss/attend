@@ -88,7 +88,7 @@
                   class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                   <!--Gruppenbezeichnung-->
                   <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                    <p class="">{{ group.name }}</p>
+                    <p >{{ group.name }}</p>
                   </td>
 
                   <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">

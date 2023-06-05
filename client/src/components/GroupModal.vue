@@ -2,11 +2,11 @@
     <ModalDialog :show="show" :hasSubheader="false" @onClose="close">
 
         <template #header>
-            <p class="text-xl md:text-2xl">Neue Gruppe</p>
+            <p class="text-xl md:text-2xl text-[#111827]">Neue Gruppe</p>
         </template>
 
         <template #content>
-            <div class="flex flex-col justify-center items-center gap-4">
+            <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
 
                 <!-- Gruppenbezeichnung -->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -60,17 +60,17 @@
                                         <!-- Wird als Stapel angezeigt, wenn Screen zu klein wird -->
                                         <td class="py-2 px-2.5 flex flex-col gap-2 sm:table-cell">
                                             <!--Starttime Selector-->
-                                            <input :class="inputStyle" type='time' v-model="time.starttime" min='00:00'
+                                            <input :class="timeInputStyle" type='time' v-model="time.starttime" min='00:00'
                                                 :max='time.endtime' @change="validateTime(time)" />
                                             <!--Endtime Selector-->
-                                            <input class='block ty:hidden' :class="inputStyle" type='time'
+                                            <input class='block ty:hidden' :class="timeInputStyle" type='time'
                                                 v-model="time.endtime" :min='time.starttime' max='00:00'
                                                 @change="validateTime(time)" />
                                         </td>
 
                                         <td class="hidden ty:table-cell">
                                             <!--Endtime Selector-->
-                                            <input :class="inputStyle" type='time' v-model="time.endtime"
+                                            <input :class="timeInputStyle" type='time' v-model="time.endtime"
                                                 :min='time.starttime' max='00:00' @change="validateTime(time)" />
                                         </td>
 
@@ -91,12 +91,12 @@
                                         </td>
                                         <td class="pt-2 px-2.5">
                                             <!--Time Selector-->
-                                            <input :class="inputStyle" type='time' v-model="tempTime.starttime"
+                                            <input :class="timeInputStyle" type='time' v-model="tempTime.starttime"
                                                 :max='tempTime.endtime' min='00:00' @change="tempTimeChange()" />
                                         </td>
                                         <td class="pt-2">
                                             <!--Time Selector-->
-                                            <input :class="inputStyle" type='time' v-model="tempTime.endtime" max='00:00'
+                                            <input :class="timeInputStyle" type='time' v-model="tempTime.endtime" max='00:00'
                                                 :min='tempTime.starttime' @change="tempTimeChange()" />
                                         </td>
                                         <!-- X Icon Löscht Zeit -->
@@ -335,7 +335,7 @@ export default {
     expose: ['open', 'close'],
 
     computed: {
-        inputStyle() {
+        timeInputStyle() {
             const standard = "font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3"
 
             return this.error.cause.timesInput ? standard + ' border-2 rounded-lg border-special-red' : standard

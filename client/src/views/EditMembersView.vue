@@ -102,12 +102,12 @@
 
                 <!--Lastname-->
                 <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 w-fit text-base sm:text-lg md:text-xl">
-                  <p class="">{{ member.lastname }}</p>
+                  <p >{{ member.lastname }}</p>
                 </td>
 
                 <!--Firstname-->
                 <td class="px-3 md:px-4 w-fit py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                  <p class="">{{ member.firstname }}</p>
+                  <p >{{ member.firstname }}</p>
                 </td>
 
                 <!--Birthday-->

@@ -55,14 +55,14 @@
                                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                                 <td class="truncate">
                                     <div class="hidden md:flex py-2.5 group-last:pt-2.5 group-last:pb-0">
-                                        <p class="">{{
+                                        <p >{{
                                             new Date(invoice.startdate).toLocaleDateString('de-DE', {
                                                 year: '2-digit', month:
                                                     '2-digit', day: '2-digit'
                                             })
                                         }}</p>
                                         <p class="mx-2">-</p>
-                                        <p class="">{{
+                                        <p >{{
                                             new Date(invoice.enddate).toLocaleDateString('de-DE', {
                                                 year: '2-digit', month:
                                                     '2-digit', day: '2-digit'
@@ -78,7 +78,7 @@
                                         }}</p>
                                         <div class="flex">
                                             <p class="mr-2">-</p>
-                                            <p class="">{{
+                                            <p >{{
                                                 new Date(invoice.enddate).toLocaleDateString('de-DE', {
                                                     year: '2-digit', month:
                                                         '2-digit', day: '2-digit'

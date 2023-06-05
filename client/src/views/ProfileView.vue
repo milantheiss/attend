@@ -19,7 +19,7 @@
                                                             bg-inherit"
                     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-light-gray rounded-none'"
                     style="background-position: right 0.1rem center;padding-right: 1.9rem;">
-                    <option value="date" class="" default>Datum</option>
+                    <option value="date"  default>Datum</option>
                     <option value="unread">Ungelesen</option>
                     <option value="title">Betreff</option>
                 </select>
@@ -51,7 +51,7 @@
                     <p class="font-medium font-base md:text-lg">Löschen</p>
                 </button>
                 <!--Select all-->
-                <CheckboxInput class="" v-model="selectAll"></CheckboxInput>
+                <CheckboxInput  v-model="selectAll"></CheckboxInput>
             </div>
         </transition>
 
@@ -98,7 +98,7 @@
                     <transition enter-active-class="transition ease-in-out duration-700" enter-from-class="opacity-0"
                         enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500"
                         leave-from-class="opacity-100" leave-to-class="opacity-0">
-                        <CheckboxInput class="" v-show="showToolbar" @click.stop="true"
+                        <CheckboxInput  v-show="showToolbar" @click.stop="true"
                             v-model="localNotifications[index].selected"></CheckboxInput>
                     </transition>
                 </div>

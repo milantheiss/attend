@@ -64,7 +64,7 @@
                         <div class="h-fit max-h-[55vh] overflow-y-auto block">
                             <table class="table-auto w-full text-left">
                                 <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
-                                    <tr class="">
+                                    <tr >
                                         <th scope="col" class="pb-2.5 font-medium w-fit cursor-pointer"
                                             @click="onClickOnDate()">
                                             <span class="flex items-center gap-1">
