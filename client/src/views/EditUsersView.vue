@@ -63,8 +63,8 @@
             <!-- Tabellen Header ist sticky -->
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
               <tr>
-
-                <th scope="col" class="pb-2.5 font-medium" @click=" indexSort.lastname = (indexSort.lastname + 1) % 2">
+                <th scope="col" class="pb-2.5 font-medium"
+                  @click="() => { if (sortKey === 'lastname') indexSort.lastname = (indexSort.lastname + 1) % 2; sortKey = 'lastname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.lastname"></SortIcon>
                     Name
@@ -72,7 +72,7 @@
                 </th>
 
                 <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                  @click="indexSort.firstname = (indexSort.firstname + 1) % 2">
+                  @click="() => { if (sortKey === 'firstname') indexSort.firstname = (indexSort.firstname + 1) % 2; sortKey = 'firstname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.firstname"></SortIcon>
                     Vorname
@@ -80,7 +80,7 @@
                 </th>
 
                 <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="indexSort.roles = (indexSort.roles + 1) % 2">
+                  @click="() => { if (sortKey === 'roles') indexSort.roles = (indexSort.roles + 1) % 2; sortKey = 'roles' }">
                   <span class="flex items-center gap-1 ">
                     <SortIcon :index="indexSort.roles"></SortIcon>
                     Rolle
@@ -149,7 +149,7 @@ import UserModal from "@/components/UserModal.vue";
 
 export default {
   name: "EditUsersView",
-  
+
   setup() {
     const dataStore = useDataStore()
     return {
@@ -227,21 +227,7 @@ export default {
   async mounted() {
     await this.getAllUsers()
   },
-
-  watch: {
-    "indexSort.lastname"() {
-      this.sortKey = 'lastname'
-    },
-
-    "indexSort.firstname"() {
-      this.sortKey = 'firstname'
-    },
-
-    "indexSort.roles"() {
-      this.sortKey = 'roles'
-    }
-  },
-
+  
   computed: {
     searchResults() {
       //Filtert die Nutzer nach dem Suchstring bzw. wenn der Suchstring leer ist, wird die Liste ungefiltert zurückgegeben

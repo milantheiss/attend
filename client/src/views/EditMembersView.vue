@@ -63,7 +63,7 @@
               <tr>
 
                 <th scope="col" class="w-[142px] md:w-[152px] pb-2.5 font-medium"
-                  @click="indexSort.lastname = (indexSort.lastname + 1) % 2">
+                  @click="() => { if (sortKey === 'lastname') indexSort.lastname = (indexSort.lastname + 1) % 2; sortKey = 'lastname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.lastname"></SortIcon>
                     Name
@@ -71,7 +71,7 @@
                 </th>
 
                 <th scope="col" class="w-[142px] md:w-[152px] px-3 md:px-4 pb-2.5 font-medium"
-                  @click="indexSort.firstname = (indexSort.firstname + 1) % 2">
+                  @click="() => { if (sortKey === 'firstname') indexSort.firstname = (indexSort.firstname + 1) % 2; sortKey = 'firstname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="indexSort.firstname"></SortIcon>
                     Vorname
@@ -79,7 +79,7 @@
                 </th>
 
                 <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="indexSort.birthday = (indexSort.birthday + 1) % 2">
+                  @click="() => { if (sortKey === 'birthday') indexSort.birthday = (indexSort.birthday + 1) % 2; sortKey = 'birthday' }">
                   <span class="hidden md:flex items-center gap-1 ">
                     <SortIcon :index="indexSort.birthday"></SortIcon>
                     Geburtstag
