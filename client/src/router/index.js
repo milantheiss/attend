@@ -78,6 +78,11 @@ const routes = [
     path: "/administration/issues-overview",
     component: () => import("../views/IssuesOverviewView.vue"),
     meta: { requiresAuth: true, requiresStaff: true }
+  },
+  {
+    path: "/my-groups",
+    component: () => import("../views/MyGroupsView.vue"),
+    meta: { requiresAuth: true }
   }
 ]
 

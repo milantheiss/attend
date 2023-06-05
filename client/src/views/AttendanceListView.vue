@@ -222,7 +222,15 @@ export default {
   },
   async mounted() {
     //Zieht sich alle Namen und IDs der Gruppen auf die der Nutzer zugreifen kann.
-    this.groups = await fetchGroups()
+    const res = await fetchGroups()
+
+    if (!res.ok && res.status === 204) {
+      // Keine Gruppen dem User zugeordnet
+      this.groups = []
+    } else {
+      this.groups = res.body
+    }
+ 
     const groupId = this.$route.query.groupId
     const date = this.$route.query.date
 

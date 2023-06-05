@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="container mx-auto flex flex-col gap-8 mb-20">
+    <div class="container mx-auto flex flex-col gap-8 mb-20 text-[#111827]">
 
       <!-- Group Info -->
 
-      <div class="flex flex-col justify-center items-center gap-4 bg-white rounded-xl p-3.5 md:px-7">
+      <div class="flex flex-col justify-center items-center gap-4 bg-white rounded-xl p-3.5 md:px-7 drop-shadow-md">
 
         <!-- Gruppenbezeichnung -->
 
@@ -170,7 +170,7 @@
               <tr>
 
                 <th scope="col" class="pb-2.5 font-medium"
-                  @click="() => { if(participantSort.key === 'lastname') participantSort.index.lastname = (participantSort.index.lastname + 1) % 2; participantSort.key = 'lastname'}">
+                  @click="() => { if (participantSort.key === 'lastname') participantSort.index.lastname = (participantSort.index.lastname + 1) % 2; participantSort.key = 'lastname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="participantSort.index.lastname"></SortIcon>
                     Name
@@ -178,7 +178,7 @@
                 </th>
 
                 <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                  @click="() => { if(participantSort.key === 'firstname') participantSort.index.firstname = (participantSort.index.firstname + 1) % 2; participantSort.key = 'firstname'}">
+                  @click="() => { if (participantSort.key === 'firstname') participantSort.index.firstname = (participantSort.index.firstname + 1) % 2; participantSort.key = 'firstname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="participantSort.index.firstname"></SortIcon>
                     Vorname
@@ -189,7 +189,7 @@
 
                 <!-- Wird ausgeblendet, wenn Screen zuklein -->
                 <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="() => { if(participantSort.key === 'birthday') participantSort.index.birthday = (participantSort.index.birthday + 1) % 2; participantSort.key = 'birthday'}">
+                  @click="() => { if (participantSort.key === 'birthday') participantSort.index.birthday = (participantSort.index.birthday + 1) % 2; participantSort.key = 'birthday' }">
                   <!-- Wird abgekürzt, wenn Screen kleiner als md -->
                   <span class="hidden md:flex items-center gap-1 ">
                     <SortIcon :index="participantSort.index.birthday"></SortIcon>
@@ -274,7 +274,7 @@
               <tr>
 
                 <th scope="col" class="pb-2.5 font-medium w-[120px] sm:w-[240px]"
-                  @click="() => { if(trainerSort.key === 'lastname') trainerSort.index.lastname = (trainerSort.index.lastname + 1) % 2; trainerSort.key = 'lastname'}">
+                  @click="() => { if (trainerSort.key === 'lastname') trainerSort.index.lastname = (trainerSort.index.lastname + 1) % 2; trainerSort.key = 'lastname' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="trainerSort.index.lastname"></SortIcon>
                     Name
@@ -282,7 +282,7 @@
                 </th>
 
                 <th scope="col" class="pb-2.5 font-medium w-[130px]"
-                  @click="() => { if(trainerSort.key === 'role') trainerSort.index.role = (trainerSort.index.role + 1) % 2; trainerSort.key = 'role'}">
+                  @click="() => { if (trainerSort.key === 'role') trainerSort.index.role = (trainerSort.index.role + 1) % 2; trainerSort.key = 'role' }">
                   <span class="flex items-center gap-1">
                     <SortIcon :index="trainerSort.index.role"></SortIcon>
                     Rolle
@@ -341,7 +341,7 @@
 
     <!-- Add Teilnehmer -->
 
-    <ParticipantModal ref="addParticipantModal" type="new" access="staff" :groupID="group._id"
+    <ParticipantModal ref="addParticipantModal" type="add" access="staff" :groupID="group._id"
       :groupParticipants="group.participants" @on-close="close"></ParticipantModal>
 
     <!-- Add Trainer -->
@@ -591,7 +591,8 @@ export default {
       handler() {
         this.group.participants.sort((a, b) => {
           if (this.participantSort.key === 'birthday') return this.participantSort.index["birthday"] === 1 ? new Date(b["birthday"]) - new Date(a["birthday"]) : new Date(a["birthday"]) - new Date(b["birthday"])
-          return this.participantSort.index[this.participantSort.key] === 1 ? b[this.participantSort.key].localeCompare(a[this.participantSort.key]) : a[this.participantSort.key].localeCompare(b[this.participantSort.key])})
+          return this.participantSort.index[this.participantSort.key] === 1 ? b[this.participantSort.key].localeCompare(a[this.participantSort.key]) : a[this.participantSort.key].localeCompare(b[this.participantSort.key])
+        })
       },
       deep: true
     },

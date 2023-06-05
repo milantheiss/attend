@@ -150,7 +150,7 @@ const updateMember = async (id, memberBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Member not found')
     }
 
-    if(_.isEqual(memberBody.groups, member.groups)) {
+    if (_.isEqual(memberBody.groups, member.groups)) {
         //Remove Member from Group
         const removedGroups = member.groups.filter(group => !memberBody.groups.includes(group))
         for (groupId of removedGroups) {
@@ -171,6 +171,15 @@ const updateMember = async (id, memberBody) => {
 }
 
 const createMember = async (memberBody) => {
+    //Sucht nach Membern mit dem gleichen Namen und Geburtsdatum
+    const members = await Member.find({
+        $and: [
+            { lastname: memberBody.lastname },
+            { firstname: memberBody.firstname },
+            { birthday: memberBody.birthday }
+        ]
+    })
+
     memberBody = {
         ...memberBody,
         birthday: new Date(memberBody.birthday),
@@ -180,6 +189,32 @@ const createMember = async (memberBody) => {
     }
 
     const member = await Member.create(memberBody)
+    
+    if (members.length === 0) {
+        return member
+    }
+    
+    //Wenn mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.
+
+    const issue = await Issue.create({
+        tag: "duplicateMemberInDB",
+        date: new Date(),
+        body: {
+            memberIDs: [...members.map(val => val._id), member._id],
+            firstname: members[0].firstname,
+            lastname: members[0].lastname,
+            birthday: members[0].birthday,
+        }
+    })
+
+    members.forEach(async (member) => {
+        member._doc.openIssues.push(issue._id)
+        await member.save()
+    })
+
+    member._doc.openIssues.push(issue._id)
+
+    await member.save()
 
     return member
 }

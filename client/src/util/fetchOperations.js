@@ -125,12 +125,14 @@ async function getAllDepartments() {
 //INFO Fetch Operations zu /group oder /groups
 
 async function fetchGroups() {
-	return await watchForRedirects(
+	const res = await watchForRedirects(
 		fetch([import.meta.env.VITE_API_URL, "groups", "assigned"].join("/"), {
 			credentials: "include",
 			mode: "cors",
-		})
+		}), { raw: true }
 	);
+
+	return { ok: res.status === 201, status: res.status, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function getAllGroups() {
@@ -139,7 +141,7 @@ async function getAllGroups() {
 			credentials: "include",
 			mode: "cors",
 		})
-	);
+	)
 }
 
 async function createNewGroup(body) {
@@ -351,6 +353,27 @@ async function addMultipleTrainerToGroup(groupID, trainers) {
 	);
 
 	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+}
+
+async function addMemberToGroup(groupID, member) {
+	if (!groupID) throw new Error("No groupID provided")
+	if (typeof groupID === "undefined") throw new Error("groupID must be defined")
+
+	if (typeof member === "undefined") throw new Error("member must be defined")
+	if (Object.keys(member).length === 0) throw new Error("member must not be empty")
+
+	const res = await watchForRedirects(
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "temporaryMember"].join("/"), {
+			method: "POST",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(member),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+
 }
 
 
@@ -811,5 +834,6 @@ export {
 	updateTrainerInGroup,
 	removeTrainerFromGroup,
 	addMultipleMembersToGroup,
-	addMultipleTrainerToGroup
+	addMultipleTrainerToGroup,
+	addMemberToGroup,
 };

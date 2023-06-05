@@ -60,7 +60,7 @@ export default {
       }
     }
   },
-  created(){
+  created() {
     if (typeof this.modelValue === 'undefined' || Object.keys(this.modelValue).length === 0) {
       this.selected = this.defaultValue;
     } else {

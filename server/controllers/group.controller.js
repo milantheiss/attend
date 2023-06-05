@@ -13,6 +13,9 @@ const getGroups = catchAsync(async (req, res) => {
 });
 
 const getAssignedGroups = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user) && !hasTrainerRole(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
     res.status(httpStatus.OK).send(await groupService.getAssignedGroups(req.user))
 })
 
@@ -59,7 +62,15 @@ const addMember = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.addMember(req.params.groupID, req.body)
+    const result = await groupService.addMember(req.params.groupID, req.body.memberId, req.body.firsttraining)
+    res.status(httpStatus.OK).send(result)
+})
+
+const addTemporaryMember = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user) || !hasAccessToGroup(req.user, req.params.groupID)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
+    }
+    const result = await groupService.addTemporaryMember(req.params.groupID, req.body)
     res.status(httpStatus.OK).send(result)
 })
 
@@ -89,10 +100,10 @@ const updateTrainer = catchAsync(async (req, res) => {
 })
 
 const updateGroup = catchAsync(async (req, res) => {
-    if (!hasStaffAccess(req.user)) {
+    if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.updateGroup(req.params.groupID, req.body)
+    const result = await groupService.updateGroup(req.params.groupID, req.body, !hasStaffAccess(req.user))
     res.status(httpStatus.OK).send(result)
 })
 
@@ -126,6 +137,7 @@ module.exports = {
     updateGroup,
     updateTrainer,
     addMultipleMembers,
-    addMultipleTrainer
+    addMultipleTrainer,
+    addTemporaryMember
 }
 

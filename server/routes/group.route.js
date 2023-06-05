@@ -46,5 +46,9 @@ router
     .patch(verifyToken, validate(groupValidation.updateTrainer), groupController.updateTrainer)
     .delete(verifyToken, validate(groupValidation.removeTrainer), groupController.removeTrainer)
 
+router
+    .route("/:groupID/temporaryMember")
+    .post(verifyToken, validate(groupValidation.addTemporaryMember), groupController.addTemporaryMember)
+
 module.exports = router;
 

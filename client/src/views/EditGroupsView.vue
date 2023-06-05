@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container mx-auto flex flex-col gap-4 mb-20">
+    <div class="container mx-auto flex flex-col gap-4 mb-20 text-[#111827]">
 
       <!-- Header mit Neue G Button & Search Bar -->
 

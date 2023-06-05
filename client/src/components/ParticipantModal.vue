@@ -3,14 +3,14 @@
 
         <template #header>
             <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'edit'">Bearbeiten</p>
-            <p class="text-xl md:text-2xl text-[#111827]">Teilnehmer hinzufügen</p>
+            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'add'">Teilnehmer hinzufügen</p>
         </template>
 
         <template #content>
 
             <!-- Wird angezeigt, wenn type=edit oder type=new & access=trainer (Trainer kann nicht auf alle Mitglieder zugreifen) -->
             <div class="flex flex-col justify-center items-center gap-4 text-[#111827]"
-                v-if="type === 'edit' || type === 'new' && access === 'trainer'">
+                v-if="type === 'edit' || (type === 'add' && access === 'trainer')">
 
                 <!--Vorname des Teilnehmers-->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Wird angezeigt wenn type=new & access=staff -> Nur staff kann auf alle Participant zugreifen (Datenschutz) -->
-            <div class="flex flex-col gap-4 text-[#111827]" v-if="type === 'new' && access === 'staff'">
+            <div class="flex flex-col gap-4 text-[#111827]" v-if="type === 'add' && access === 'staff'">
 
                 <!-- Search Bar -->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -125,7 +125,10 @@
                         class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-[20px] px-3.5 md:px-7 py-2.5">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
-                    <StandardButton @click="addParticipants()" class="w-full" v-if="type === 'new' && access === 'staff'">
+                    <StandardButton @click="addMultipleParticipants()" class="w-full" v-if="type === 'add' && access === 'staff'">
+                        <p class="font-base md:text-lg">Hinzufügen</p>
+                    </StandardButton>
+                    <StandardButton @click="addParticipant()" class="w-full" v-if="type === 'add' && access === 'trainer'">
                         <p class="font-base md:text-lg">Hinzufügen</p>
                     </StandardButton>
                     <StandardButton @click="saveEditedParticipant()" class="w-full" v-if="type === 'edit'">
@@ -143,7 +146,7 @@ import TextInput from './TextInput.vue';
 import DateInput from './DateInput.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import StandardButton from './StandardButton.vue';
-import { updateParticipantInGroup, getAllMembers, removeParticipantFromGroup, addMultipleMembersToGroup } from "@/util/fetchOperations";
+import { updateParticipantInGroup, getAllMembers, removeParticipantFromGroup, addMultipleMembersToGroup, addMemberToGroup } from "@/util/fetchOperations";
 
 export default {
     name: "ParticipantModal",
@@ -201,7 +204,7 @@ export default {
     },
     methods: {
         async open(participant = this.participant) {
-            if (this.type === 'new' && this.access === 'staff') {
+            if (this.type === 'add' && this.access === 'staff') {
                 this.allMembers = (await getAllMembers()).sort((a, b) => a.lastname.localeCompare(b.lastname))
             } else if (this.type === 'edit') {
                 participant = {
@@ -254,7 +257,8 @@ export default {
             }
         },
 
-        async addParticipants() {
+        //Für Staff add multiple members
+        async addMultipleParticipants() {
             if (this.selectedMembers.length > 0) {
                 this.selectedMembers = this.selectedMembers.map(m => {
                     return {
@@ -273,6 +277,21 @@ export default {
             } else {
                 this.cancel()
 
+            }
+        },
+
+        //Für Trainer add one member
+        async addParticipant(){
+            this.validateInputs(this.participant)
+
+            if (!this.error.show) {
+                const res = await addMemberToGroup(this.groupID, this.participant)
+                if (res.ok) {
+                    this.close()
+                } else {
+                    this.error.message = res.body.message
+                    this.error.show = true
+                }
             }
         },
 

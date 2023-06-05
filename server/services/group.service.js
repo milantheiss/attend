@@ -9,26 +9,26 @@ const userService = require('./user.service');
 
 async function getTrainersOfGroup(group) {
     const trainerData = await User.find({ _id: { $in: group.trainers.map(e => e.userId) } }, { firstname: 1, lastname: 1, _id: 1 })
-    return await Promise.all(group.trainers.map(async (trainer) => {
+    return (await Promise.all(group.trainers.map(async (trainer) => {
         const t = trainerData.find(e => e._id.equals(trainer.userId))
         trainer._doc.firstname = t.firstname;
         trainer._doc.lastname = t.lastname;
         trainer._doc._id = t._id;
 
         return trainer;
-    }));
+    }))).sort((a, b) => a._doc.lastname.localeCompare(b._doc.lastname));
 }
 
 async function getParticipantsOfGroup(group) {
     const membersData = await Member.find({ _id: { $in: group.participants.map(e => e.memberId) } }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
-    return await Promise.all(group.participants.map(async (participant) => {
+    return (await Promise.all(group.participants.map(async (participant) => {
         const member = membersData.find(e => e._id.equals(participant.memberId))
         participant._doc.firstname = member.firstname;
         participant._doc.lastname = member.lastname;
         participant._doc.birthday = member.birthday;
         participant._doc._id = member._id;
         return participant;
-    }));
+    }))).sort((a, b) => a._doc.lastname.localeCompare(b._doc.lastname))
 }
 
 async function getDepartmentOfGroup(group) {
@@ -58,23 +58,20 @@ const getGroups = async () => {
 };
 
 const getAssignedGroups = async (user) => {
-    if (hasAdminRole(user)) {
-        //admin hat Zugriff auf alle Gruppen
-        let groups = await Group.find({})
-        groups.sort((a, b) => a.name.localeCompare(b.name))
-        return groups
-    } else if (user.accessible_groups.length > 0) { //Oder z.B. Assistent
-        //Wenn user ein Trainer o.ä. ist, werden die zugreifbaren Gruppen aus user.accessible_groups genommen
+    //WARNING Es werden nur assigned groups zurückgegeben
+    if (user.accessible_groups.length > 0) {
         let groups = await Group.find({ '_id': { $in: user.accessible_groups } })
         if (groups.length === 0 || groups === null) {
             //Sollten keine Gruppen gefunden worden sein --> Heißt user.access ist leer
-            throw new ApiError(httpStatus.NOT_FOUND, 'No groups found to which the user has access.')
+            throw new ApiError(httpStatus.NO_CONTENT, 'Groups assigned to the user not found.')
         }
 
         //Sortieren nach Name
         groups.sort((a, b) => a.name.localeCompare(b.name))
 
         return groups
+    } else {
+        throw new ApiError(httpStatus.NO_CONTENT, 'No groups assigned to the user.')
     }
 }
 
@@ -135,17 +132,13 @@ const updateMember = async (groupID, memberID, body) => {
     return group
 };
 
-const addMember = async (groupID, memberID, memberBody) => {
-    if (typeof memberBody.memberId === 'undefined') {
-        memberBody.memberId = memberBody._id
-    }
-
+const addMember = async (groupID, memberID, firsttraining) => {
     const group = await Group.findById(groupID)
-    if (group.participants.some(e => e.memberId.equals(memberBody.memberId))) {
+    if (group.participants.some(e => e.memberId.equals(memberID))) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Member already in group')
     }
 
-    const member = await Member.findById(memberBody.memberId)
+    const member = await Member.findById(memberID)
 
     if (typeof member === 'undefined' || member === null) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Member not found')
@@ -156,9 +149,9 @@ const addMember = async (groupID, memberID, memberBody) => {
     }
     await member.save()
 
-    group.participants.push(memberBody)
+    group.participants.push({firsttraining: firsttraining, memberId: memberID})
 
-    await updateParticipantInTrainingssessions(groupID, memberID, memberBody.firsttraining)
+    await updateParticipantInTrainingssessions(groupID, memberID, firsttraining)
 
     await group.save()
     return group
@@ -315,11 +308,15 @@ const deleteTrainer = async (groupID, trainerID) => {
     await attendanceService.removeTrainerFromAttendanceList(groupID, trainerID)
 }
 
-const updateGroup = async (groupID, groupBody) => {
+const updateGroup = async (groupID, groupBody, restricted = false) => {
     const group = await Group.findById(groupID)
 
     if (!group) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Group not found')
+    }
+
+    if (restricted) {
+        groupBody = _.pick(groupBody, ['times', 'venue'])
     }
 
     Object.assign(group, groupBody)
@@ -394,6 +391,17 @@ const addMultipleTrainer = async (groupID, trainers) => {
     return group
 }
 
+const addTemporaryMember = async (groupID, memberBody) => {
+    const member = await memberService.createMember(memberBody)
+
+    await addMember(groupID, member._id, _.pick(member, [, 'firsttraining']))
+
+    //TODO Issue handling 
+
+    //Wie soll ein Add gehandelt werden?
+
+    return member
+}
 
 
 module.exports = {

@@ -208,6 +208,22 @@ const addMultipleTrainer = {
   )
 };
 
+const addTemporaryMember = {
+  params: Joi.object().keys({
+    //String als ObjectId
+    groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+  }),
+  body: Joi.object().keys({
+    firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
+    //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
+    lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
+    //Datum als String im Format YYYY-MM-DD
+    birthday: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
+    //Datum als String im Format YYYY-MM-DD
+    firsttraining: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
+  })
+};
+
 module.exports = {
   addMember,
   createGroup,
@@ -219,5 +235,6 @@ module.exports = {
   addTrainer,
   updateTrainer,
   addMultipleMembers,
-  addMultipleTrainer
+  addMultipleTrainer,
+  addTemporaryMember
 };
