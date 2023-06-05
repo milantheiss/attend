@@ -337,9 +337,15 @@ export default {
 
     computed: {
         searchResult() {
-            return this.allMembers.filter(m => m.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-                || m.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-                || this.searchString === '')
+            return this.allMembers.filter(m => {
+                // Ermöglicht suche nach mehreren Wörtern (z.B. "Max Mustermann")
+                if (this.searchString.indexOf(" ") > -1) {
+                    const searchStrings = this.searchString.split(" ")
+                    return searchStrings.every(s => m.firstname.toLowerCase().indexOf(s.toLowerCase()) > -1 || m.lastname.toLowerCase().indexOf(s.toLowerCase()) > -1)
+                }
+                
+                return m.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || m.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || this.searchString === ''
+            })
         }
     }
 }

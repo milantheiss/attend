@@ -227,14 +227,24 @@ export default {
   async mounted() {
     await this.getAllUsers()
   },
-  
+
   computed: {
     searchResults() {
       //Filtert die Nutzer nach dem Suchstring bzw. wenn der Suchstring leer ist, wird die Liste ungefiltert zurückgegeben
-      const arr = this.allUsers.filter(user => user.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-        || user.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-        || this.getHighestRole(user.roles).toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-        || this.searchString.trim().length === 0
+      const arr = this.allUsers.filter(user => {
+        // Ermöglicht suche nach mehreren Wörtern (z.B. "Max Mustermann")
+        if (this.searchString.indexOf(" ") > -1) {
+          const searchStrings = this.searchString.split(" ")
+          return searchStrings.every(s => user.firstname.toLowerCase().indexOf(s.toLowerCase()) > -1
+            || user.lastname.toLowerCase().indexOf(s.toLowerCase()) > -1
+            || this.getHighestRole(user.roles).toLowerCase().indexOf(s.toLowerCase()) > -1)
+        }
+
+        return user.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+          || user.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+          || this.getHighestRole(user.roles).toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+          || this.searchString.trim().length === 0
+      }
       ).sort((a, b) => {
         //Sortiert die Nutzer nach dem SortKey
         //Wenn der SortKey 'roles' ist, wird die höchste Rolle des Benutzers verglichen

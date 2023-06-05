@@ -196,9 +196,15 @@ export default {
 
     computed: {
         searchResult() {
-            return this.allUsers.filter(u => u.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-                || u.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-                || this.searchString === '')
+            return this.allUsers.filter(u => {
+                // Ermöglicht suche nach mehreren Wörtern (z.B. "Max Mustermann")
+                if (this.searchString.indexOf(" ") > -1) {
+                    const searchStrings = this.searchString.split(" ")
+                    return searchStrings.every(s => u.firstname.toLowerCase().indexOf(s.toLowerCase()) > -1 || u.lastname.toLowerCase().indexOf(s.toLowerCase()) > -1)
+                }
+                
+                return u.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || u.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || this.searchString === ''
+            })
         }
     }
 }

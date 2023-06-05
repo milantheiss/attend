@@ -236,6 +236,12 @@ export default {
         }
       }
 
+      // Ermöglicht suche nach mehreren Wörtern (z.B. "Max Mustermann")
+      if(searchString.indexOf(" ") > -1) {
+        const searchStrings = searchString.split(" ")
+        return searchStrings.every(s => this.searchFilter(member, s))
+      }
+
       //Sucht in Vorname, Nachname, dem Monat des Geburtstags oder gibt true zurück, wenn der Suchstring leer ist	
       return member.firstname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || member.lastname.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || searchString.trim().length === 0 || new Date(member.birthday).toLocaleString('de-DE', { month: 'long' }).toLowerCase().indexOf(searchString.toLowerCase()) > -1
     }
@@ -248,20 +254,6 @@ export default {
 
   async mounted() {
     await this.getAllMembers()
-  },
-
-  watch: {
-    "indexSort.lastname"() {
-      this.sortKey = 'lastname'
-    },
-
-    "indexSort.firstname"() {
-      this.sortKey = 'firstname'
-    },
-
-    "indexSort.birthday"() {
-      this.sortKey = 'birthday'
-    },
   },
 
   computed: {

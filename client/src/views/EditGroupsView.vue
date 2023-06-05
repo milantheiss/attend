@@ -88,7 +88,7 @@
                   class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
                   <!--Gruppenbezeichnung-->
                   <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0 text-base sm:text-lg md:text-xl">
-                    <p >{{ group.name }}</p>
+                    <p>{{ group.name }}</p>
                   </td>
 
                   <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 justify-items-end">
@@ -182,10 +182,16 @@ export default {
 
   computed: {
     searchResults() {
-      return this.allGroups.filter(group =>
-        group.name.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
-        || this.searchString === '')
+      return this.allGroups.filter(group => {
+        // Ermöglicht suche nach mehreren Wörtern (z.B. "Max Mustermann")
+        if (this.searchString.indexOf(" ") > -1) {
+          const searchStrings = this.searchString.split(" ")
+          return searchStrings.every(s => group.name.toLowerCase().indexOf(s.toLowerCase()) > -1)
+        }
+        return group.name.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || this.searchString === ''
+      })
     }
   }
+
 }
 </script>
