@@ -170,17 +170,17 @@
               <tr>
 
                 <th scope="col" class="pb-2.5 font-medium"
-                  @click="participantSortIndex.lastname = (participantSortIndex.lastname + 1) % 2">
+                  @click="() => { if(participantSort.key === 'lastname') participantSort.index.lastname = (participantSort.index.lastname + 1) % 2; participantSort.key = 'lastname'}">
                   <span class="flex items-center gap-1">
-                    <SortIcon :index="participantSortIndex.lastname"></SortIcon>
+                    <SortIcon :index="participantSort.index.lastname"></SortIcon>
                     Name
                   </span>
                 </th>
 
                 <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                  @click="participantSortIndex.firstname = (participantSortIndex.firstname + 1) % 2">
+                  @click="() => { if(participantSort.key === 'firstname') participantSort.index.firstname = (participantSort.index.firstname + 1) % 2; participantSort.key = 'firstname'}">
                   <span class="flex items-center gap-1">
-                    <SortIcon :index="participantSortIndex.firstname"></SortIcon>
+                    <SortIcon :index="participantSort.index.firstname"></SortIcon>
                     Vorname
                   </span>
                 </th>
@@ -189,14 +189,14 @@
 
                 <!-- Wird ausgeblendet, wenn Screen zuklein -->
                 <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="participantSortIndex.birthday = (participantSortIndex.birthday + 1) % 2">
+                  @click="() => { if(participantSort.key === 'birthday') participantSort.index.birthday = (participantSort.index.birthday + 1) % 2; participantSort.key = 'birthday'}">
                   <!-- Wird abgekürzt, wenn Screen kleiner als md -->
                   <span class="hidden md:flex items-center gap-1 ">
-                    <SortIcon :index="participantSortIndex.birthday"></SortIcon>
+                    <SortIcon :index="participantSort.index.birthday"></SortIcon>
                     Geburtstag
                   </span>
                   <span class="flex md:hidden items-center gap-1 ">
-                    <SortIcon :index="participantSortIndex.birthday"></SortIcon>
+                    <SortIcon :index="participantSort.index.birthday"></SortIcon>
                     Geb.
                   </span>
                 </th>
@@ -268,32 +268,23 @@
         </div>
 
         <div class="h-fit max-h-[55vh] overflow-y-auto block w-full bg-white p-3.5 md:p-7 rounded-xl">
-          <table class="table-auto w-full text-left">
+          <table class="table-fixed w-full text-left">
 
             <thead class="sticky top-0 border-b border-[#D1D5DB]">
               <tr>
 
-                <th scope="col" class="pb-2.5 font-medium"
-                  @click="trainersSortIndex.lastname = (trainersSortIndex.lastname + 1) % 2">
+                <th scope="col" class="pb-2.5 font-medium w-[120px] sm:w-[240px]"
+                  @click="() => { if(trainerSort.key === 'lastname') trainerSort.index.lastname = (trainerSort.index.lastname + 1) % 2; trainerSort.key = 'lastname'}">
                   <span class="flex items-center gap-1">
-                    <SortIcon :index="trainersSortIndex.lastname"></SortIcon>
+                    <SortIcon :index="trainerSort.index.lastname"></SortIcon>
                     Name
                   </span>
                 </th>
 
-                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                  @click="trainersSortIndex.firstname = (trainersSortIndex.firstname + 1) % 2">
+                <th scope="col" class="pb-2.5 font-medium w-[130px]"
+                  @click="() => { if(trainerSort.key === 'role') trainerSort.index.role = (trainerSort.index.role + 1) % 2; trainerSort.key = 'role'}">
                   <span class="flex items-center gap-1">
-                    <SortIcon :index="trainersSortIndex.firstname"></SortIcon>
-                    Vorname
-                  </span>
-                </th>
-
-                <!-- Wird ausgeblendet, wenn Screen zu klein ist -->
-                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="trainersSortIndex.role = (trainersSortIndex.role + 1) % 2">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="trainersSortIndex.role"></SortIcon>
+                    <SortIcon :index="trainerSort.index.role"></SortIcon>
                     Rolle
                   </span>
                 </th>
@@ -305,35 +296,31 @@
 
             <tbody class="overscroll-y-scroll">
               <!-- Eine Reihe pro Trainer -->
-              <tr v-for="trainer in group.trainers" :key="trainer._id" @click="openEditTrainer(trainer._id)"
+              <tr v-for="(trainer) in group.trainers" :key="trainer._id"
                 class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
 
-                <!-- Nachname -->
+                <!-- Name -->
 
-                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p>{{ trainer.lastname }}</p>
-                </td>
-
-                <!-- Vorname -->
-
-                <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p>{{ trainer.firstname }}</p>
+                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0  w-[120px] md:w-[150px]">
+                  <p class="text-ellipsis overflow-hidden">{{ trainer.firstname }} {{ trainer.lastname }}</p>
                 </td>
 
                 <!-- Rolle -->
-
-                <!-- Wird ausgeblendet, wenn Screen zu klein wird -->
-                <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p class="text-light-gray">{{ trainer.role === "trainer" ? "Trainer" : "Assistent" }}</p>
+                <td class="px-2.5 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[130px]">
+                  <select v-model="trainer.role" @click.stop="" @change="updateTrainerRole(trainer)"
+                    class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 py-[4px] rounded-xl bg-[#D1D5DB] font-medium text-base md:text-lg">
+                    <option value="trainer" class="bg-white">Trainer</option>
+                    <option value="assistant" class="bg-white">Assistent</option>
+                  </select>
                 </td>
 
-                <!-- Pfeil nach Rechts -->
-
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                <!-- - Icon -->
+                <!-- Click entfernt User -->
+                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end"
+                  @click="removeTrainer(trainer._id)">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto text-delete-gradient-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </td>
               </tr>
@@ -347,84 +334,19 @@
       </div>
     </div>
 
-    <!-- Edit Trainer -->
-    <ModalDialog :show="showEditTrainerModal" :hasSubheader="false" @onClose="cancel">
-      <!-- TODO Edit Participant Weiter -->
-      <template #header>
-        <p class="text-xl md:text-2xl text-[#111827]">Bearbeiten</p>
-      </template>
-      <template #content>
-        <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
-
-          <!--Vorname des Trainer-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="firstname">Vorname:</label>
-            <TextInput name="firstname" v-model="editTrainer.firstname" placeholder="Vorname"
-              :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Nachname des Trainer-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="lastname">Nachname:</label>
-            <TextInput name="lastname" v-model="editTrainer.lastname" placeholder="Nachname"
-              :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
-          </div>
-
-          <!--Rolle des Trainer-->
-          <div class="w-full flex items-center justify-between gap-4">
-            <p>Rolle:</p>
-            <select v-model="editTrainer.role"
-              class="w-fit focus:ring-0 focus:border-standard-gradient-1 bg-inherit border-0 border-b-2 border-[#9ea3ae] text-base md:text-lg font-medium"
-              :class="{ 'outline outline-2 outline-offset-4 rounded-lg outline-special-red': error.cause.roleInput }">
-              <option value="trainer">Trainer</option>
-              <option value="assistant">Assistent</option>
-            </select>
-          </div>
-
-          <div class="w-full flex items-center justify-between gap-4 mt-4">
-            <p>Trainer entfernen:</p>
-            <button @click="showDeleteButton = true" v-show="!showDeleteButton"
-              class="flex justify-center items-center text-delete-gradient-1 outline outline-2 outline-delete-gradient-1 rounded-2xl drop-shadow-md w-fit px-2 ty:px-3 md:px-6 py-3">
-              <p class="font-medium font-base md:text-lg">Entfernen</p>
-            </button>
-            <button @click="removeTrainer(editTrainer._id)"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-2xl drop-shadow-md w-fit px-2 md:px-4 py-2"
-              v-show="showDeleteButton">
-              <p class="font-medium font-base md:text-lg">Wirklich entfernen?</p>
-            </button>
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex flex-col gap-4">
-          <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
-          <div class="flex justify-between items-center gap-2 ty:gap-6 ">
-            <button @click="cancel"
-              class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-2 ty:px-3.5 md:px-7 py-3.5">
-              <p class="font-medium font-base md:text-lg">Abbrechen</p>
-            </button>
-            <button @click="saveEditTrainer"
-              class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-2xl drop-shadow-md w-full px-2 ty:px-3.5 md:px-7 py-4">
-              <p class="font-medium font-base md:text-lg">Speichern</p>
-            </button>
-          </div>
-        </div>
-      </template>
-    </ModalDialog>
-
     <!-- Edit Teilnehmer -->
 
-    <ParticipantModal ref="editParticipantModal" type="edit" access="staff" :groupID="group._id" @onClose="cancel">
+    <ParticipantModal ref="editParticipantModal" type="edit" access="staff" :groupID="group._id" @onClose="close">
     </ParticipantModal>
 
     <!-- Add Teilnehmer -->
 
     <ParticipantModal ref="addParticipantModal" type="new" access="staff" :groupID="group._id"
-      :groupParticipants="group.participants" @on-close="cancel"></ParticipantModal>
+      :groupParticipants="group.participants" @on-close="close"></ParticipantModal>
 
     <!-- Add Trainer -->
 
-    <NewTrainerModal ref="addTrainerModal" :groupID="group._id" :groupTrainers="group.trainers" @onClose="cancel">
+    <NewTrainerModal ref="addTrainerModal" :groupID="group._id" :groupTrainers="group.trainers" @onClose="close">
     </NewTrainerModal>
   </div>
 </template>
@@ -433,16 +355,15 @@
 import { useDataStore } from "@/store/dataStore";
 import SortIcon from "@/components/SortIcon.vue";
 import TextInput from "@/components/TextInput.vue";
-import ModalDialog from '@/components/ModalDialog.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import SelectList from "@/components/SelectList.vue";
 import { fetchGroup, getAllDepartments, updateGroup, removeTrainerFromGroup, updateTrainerInGroup } from "@/util/fetchOperations";
-import _ from "lodash";
 import DaySelect from "@/components/DaySelect.vue";
 import StandardButton from "@/components/StandardButton.vue";
 import ParticipantModal from "@/components/ParticipantModal.vue";
 import NewTrainerModal from "@/components/NewTrainerModal.vue";
+import _ from "lodash";
 
 export default {
   name: "EditGroupView",
@@ -479,20 +400,22 @@ export default {
           nameInput: false,
           departmentInput: false,
           timesInput: false,
-          firstnameInput: false,
-          lastnameInput: false,
-          roleInput: false
         }
       },
-      participantSortIndex: {
-        lastname: 0,
-        firstname: 0,
-        birthday: 0
+      participantSort: {
+        key: 'lastname',
+        index: {
+          lastname: 0,
+          firstname: 0,
+          birthday: 0
+        }
       },
-      trainersSortIndex: {
-        lastname: 0,
-        firstname: 0,
-        role: 0
+      trainerSort: {
+        key: 'lastname',
+        index: {
+          lastname: 0,
+          role: 0
+        }
       },
       departments: [],
       showNewTime: false,
@@ -504,33 +427,7 @@ export default {
         "Freitag": 5,
         "Samstag": 6,
         "Sonntag": 7
-      },
-      showEditParticipantModal: false,
-      showEditTrainerModal: false,
-      showAddTrainerModal: false,
-      showDeleteButton: false,
-
-      editParticipant: {
-        firstname: '',
-        lastname: '',
-        birthday: '',
-        firsttraining: '',
-        memberId: '',
-        id: ''
-      },
-
-      editTrainer: {
-        firstname: '',
-        lastname: '',
-        role: '',
-        userId: ''
-      },
-
-      searchString: '',
-      selectedMembers: [],
-      selectedUsers: [],
-      allMembers: [],
-      allUsers: []
+      }
     }
   },
   components: {
@@ -539,92 +436,37 @@ export default {
     ErrorMessage,
     CollapsibleContainer,
     SelectList,
-    ModalDialog,
     DaySelect,
     StandardButton,
     ParticipantModal,
     NewTrainerModal
   },
   methods: {
-    tempTimeChange() {
-      if (this.tempTime.day !== '' && this.tempTime.starttime !== '' && this.tempTime.endtime !== '') {
-        if (parseInt(this.tempTime.starttime.replace(":", "")) > parseInt(this.tempTime.endtime.replace(":", ""))) {
-          const temp = this.tempTime.starttime
-          this.tempTime.starttime = this.tempTime.endtime
-          this.tempTime.endtime = temp
-        }
-        this.group.times.push(this.tempTime)
-        this.tempTime = {
-          day: '',
-          starttime: '',
-          endtime: ''
-        }
-        this.showNewTime = false
-      }
-    },
-
-    async cancel() {
-      this.showAddTrainerModal = false
-      this.showEditParticipantModal = false
-      this.showEditTrainerModal = false
-      this.showDeleteButton = false
-
-      this.editParticipant = {
-        firstname: '',
-        lastname: '',
-        birthday: '',
-        firsttraining: '',
-        memberId: '',
-        id: ''
-      }
-
-      this.editTrainer = {
-        firstname: '',
-        lastname: '',
-        role: '',
-        userId: ''
-      }
-
-      this.selectedMembers = []
-      this.selectedUsers = []
-      this.allMembers = []
-      this.allUsers = []
-
-      this.searchString = ''
-
+    async close() {
       this.group = await fetchGroup(this.group._id)
 
       this.resetError()
     },
 
-
-    async openEditTrainer(id) {
+    async openEditParticipant(id) {
       //Deep Copy, damit Änderungen nicht direkt übernommen werden
-      this.editTrainer = _.cloneDeep(this.group.trainers.find(t => t.userId === id))
-
-      this.showEditTrainerModal = true
+      this.$refs.editParticipantModal.open(_.cloneDeep(this.group.participants.find(m => m.memberId === id)))
     },
 
-    async saveEditTrainer() {
-      this.validateTrainerInputs(this.editTrainer)
-
-      if (!this.error.show) {
-        const res = await updateTrainerInGroup(this.group._id, this.editTrainer.userId, this.editTrainer)
-        if (res.ok) {
-          this.group = await fetchGroup(this.group._id)
-          this.cancel()
-        } else {
-          this.error.message = res.body.message
-          this.error.show = true
-        }
+    async updateTrainerRole(id) {
+      const res = await updateTrainerInGroup(this.group._id, this.editTrainer.userId, this.group.trainers.find(t => t.userId === id))
+      if (res.ok) {
+        this.close()
+      } else {
+        this.error.message = res.body.message
+        this.error.show = true
       }
     },
 
     async removeTrainer(id) {
       const res = await removeTrainerFromGroup(this.group._id, id)
       if (res.ok) {
-        this.group = await fetchGroup(this.group._id)
-        this.cancel()
+        this.close()
       } else {
         this.error.message = res.body.message
         this.error.show = true
@@ -639,8 +481,7 @@ export default {
 
         const res = await updateGroup(this.group._id, this.group)
         if (res.ok) {
-          this.group = await fetchGroup(this.group._id)
-          this.cancel()
+          this.close()
         } else {
           this.error.message = res.body.message
           this.error.show = true
@@ -709,14 +550,20 @@ export default {
       }
     },
 
-    onClickOnNewTrainer(id) {
-      if (!this.group.trainers.some(t => t.userId === id)) {
-        if (this.selectedUsers.some(t => t._id === id)) {
-          this.selectedUsers = this.selectedUsers.filter(t => t._id !== id)
-        } else {
-          this.allUsers.find(u => u._id === id).role = "role"
-          this.selectedUsers.push(this.allUsers.find(u => u._id === id))
+    tempTimeChange() {
+      if (this.tempTime.day !== '' && this.tempTime.starttime !== '' && this.tempTime.endtime !== '') {
+        if (parseInt(this.tempTime.starttime.replace(":", "")) > parseInt(this.tempTime.endtime.replace(":", ""))) {
+          const temp = this.tempTime.starttime
+          this.tempTime.starttime = this.tempTime.endtime
+          this.tempTime.endtime = temp
         }
+        this.group.times.push(this.tempTime)
+        this.tempTime = {
+          day: '',
+          starttime: '',
+          endtime: ''
+        }
+        this.showNewTime = false
       }
     }
   },
@@ -740,61 +587,21 @@ export default {
   },
 
   watch: {
-    "participantSortIndex.lastname"() {
-      this.group.participants.sort((a, b) => {
-        if (this.participantSortIndex.lastname === 0) {
-          return a.lastname.localeCompare(b.lastname)
-        } else {
-          return b.lastname.localeCompare(a.lastname)
-        }
-      })
-    },
-    "participantSortIndex.firstname"() {
-      this.group.participants.sort((a, b) => {
-        if (this.participantSortIndex.firstname === 0) {
-          return a.firstname.localeCompare(b.firstname)
-        } else {
-          return b.firstname.localeCompare(a.firstname)
-        }
-      })
-    },
-    "participantSortIndex.birthday"() {
-      this.group.participants.sort((a, b) => {
-        if (this.participantSortIndex.birthday === 0) {
-          return new Date(a.birthday) - new Date(b.birthday)
-        } else {
-          return new Date(b.birthday) - new Date(a.birthday)
-        }
-      })
-    },
-    "trainersSortIndex.lastname"() {
-      this.group.trainers.sort((a, b) => {
-        if (this.trainersSortIndex.lastname === 0) {
-          return a.lastname.localeCompare(b.lastname)
-        } else {
-          return b.lastname.localeCompare(a.lastname)
-        }
-      })
-    },
-    "trainersSortIndex.firstname"() {
-      this.group.trainers.sort((a, b) => {
-        if (this.trainersSortIndex.firstname === 0) {
-          return a.firstname.localeCompare(b.firstname)
-        } else {
-          return b.firstname.localeCompare(a.firstname)
-        }
-      })
-    },
-    "trainersSortIndex.role"() {
-      this.group.trainers.sort((a, b) => {
-        if (this.trainersSortIndex.role === 0) {
-          return a.role.localeCompare(b.role)
-        } else {
-          return b.role.localeCompare(a.role)
-        }
-      })
+    participantSort: {
+      handler() {
+        this.group.participants.sort((a, b) => {
+          if (this.participantSort.key === 'birthday') return this.participantSort.index["birthday"] === 1 ? new Date(b["birthday"]) - new Date(a["birthday"]) : new Date(a["birthday"]) - new Date(b["birthday"])
+          return this.participantSort.index[this.participantSort.key] === 1 ? b[this.participantSort.key].localeCompare(a[this.participantSort.key]) : a[this.participantSort.key].localeCompare(b[this.participantSort.key])})
+      },
+      deep: true
     },
 
+    trainerSort: {
+      handler() {
+        this.group.trainers.sort((a, b) => this.trainerSort.index[this.trainerSort.key] === 1 ? b[this.trainerSort.key].localeCompare(a[this.trainerSort.key]) : a[this.trainerSort.key].localeCompare(b[this.trainerSort.key]))
+      },
+      deep: true
+    }
   },
   computed: {
     timeInputStyle() {
