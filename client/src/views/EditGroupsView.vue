@@ -1,8 +1,15 @@
 <template>
   <div>
     <div class="container mx-auto flex flex-col gap-4 mb-20">
+
+      <!-- Header mit Neue G Button & Search Bar -->
+
       <div class="flex flex-col gap-4 px-3.5 md:px-7">
         <div class="flex gap-4 justify-end items-center">
+
+          <!-- Button callapset wenn Screen zu klein wird. Es wird nur noch + Icon gezeigt -->
+
+
           <StandardButton @click="$refs.newGroupModal.open()" class="hidden ty:flex">
             <p class="font-base md:text-lg">Neue Gruppe</p>
           </StandardButton>
@@ -13,6 +20,9 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </button>
+
+          <!-- Toggle Search Bar -->
+
           <button @click="showSearchBar = !showSearchBar"
             class="flex justify-center items-center text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 rounded-full drop-shadow-md w-fit h-fit p-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -22,12 +32,15 @@
             </svg>
           </button>
         </div>
+
+        <!-- Searchbar -->
+
         <transition enter-active-class="transition ease-linear duration-200" enter-from-class="-translate-y-9"
           enter-to-class="translate-y-0" leave-active-class="transition ease-linear duration-200"
           leave-from-class="translate-y-0" leave-to-class="-translate-y-9">
           <div class="flex items-center gap-4" v-show="showSearchBar">
-            <TextInput name="searchbar" placeholder="Suche..." v-model="searchString">
-            </TextInput>
+            <TextInput name="searchbar" placeholder="Suche..." v-model="searchString"></TextInput>
+            <!-- X Icon entweder clear searchString oder schließt Searchbar, wenn searchString leer -->
             <div class="px-3.5 py-3.5"
               @click="() => { if (searchString === '') showSearchBar = false; searchString = ''; }">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
@@ -38,14 +51,21 @@
           </div>
         </transition>
       </div>
+
+      <!-- Abteilungsbox (Je eine Box für eine Abteilung) -->
+
       <CollapsibleContainer v-for="( department, index ) in   departments  " :key="department._id"
         class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col" :show="index === 0">
+
         <template #header>
           <p class="font-medium">{{ department.name }}</p>
         </template>
+
         <template #content>
           <div class="h-fit max-h-[55vh] overflow-y-auto block">
             <table class="table-auto w-full text-left">
+
+              <!-- Tabellen Header -->
               <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
                 <tr>
                   <th scope="col" class="pb-2.5 font-medium cursor-pointer"
@@ -58,6 +78,8 @@
                   <th scope="col" class="pb-2.5 font-medium"></th>
                 </tr>
               </thead>
+
+              <!-- Je eine Zeil für jede Gruppe der jeweiligen Abteilung -->
               <tbody class="overscroll-y-scroll">
                 <tr v-for=" group in searchResults.filter(g => g.department._id === department._id).sort((a, b) => {
                   if (departments[index].sortIndex === 1) return b.name.localeCompare(a.name)
@@ -79,9 +101,12 @@
                   </td>
                 </tr>
               </tbody>
+
             </table>
+            <!-- Wird angezeigt, wenn einer Abteilung keine Gruppe zugeteilt ist -->
             <p v-show="typeof searchResults.filter(g => g.department._id === department._id) === 'undefined' || searchResults.filter(g => g.department._id === department._id)?.length === 0"
               class="font-medium text-gray-500 text-center pt-2.5">Keine Gruppen gefunden</p>
+
           </div>
         </template>
       </CollapsibleContainer>
@@ -112,7 +137,6 @@ export default {
   data() {
     return {
       allGroups: [],
-      indexSort: 0,
       showSearchBar: false,
       departments: [],
       searchString: '',
@@ -126,6 +150,8 @@ export default {
     StandardButton
   },
   methods: {
+
+    //Zum Bearbeiten einer Gruppe wird auf die EditGroupView weitergeleitet
     async openEditGroup(id) {
       this.$router.push({ path: '/administration/edit-group', query: { id: id } })
     },
@@ -136,9 +162,11 @@ export default {
       this.departments = (await getAllDepartments()).map(d => {
         return {
           ...d,
+          //Wird für jede Abteilung einzeln initialisiert, damit die einzelnen Boxen
+          //gesondert sortiert werden können (SortIndex 0 = Aufsteigend, 1 = Absteigend)
           sortIndex: 0
         }
-      })
+      }).sort((a, b) => a.name.localeCompare(b.name))
     },
   },
 
@@ -154,12 +182,9 @@ export default {
 
   computed: {
     searchResults() {
-      return this.allGroups.filter(group => {
-        return group.name.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || this.searchString === ''
-      }).sort((a, b) => {
-        if (this.indexSort === 0) return a.name.localeCompare(b.name)
-        return b.name.localeCompare(a.name)
-      })
+      return this.allGroups.filter(group =>
+        group.name.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1
+        || this.searchString === '')
     }
   }
 }
