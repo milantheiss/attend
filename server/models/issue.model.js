@@ -18,7 +18,11 @@ const issueSchema = mongoose.Schema(
         body: {
             type: Object,
             required: true
-        }
+        },
+        message: {
+            type: String,
+            required: true
+        },
     }
 );
 

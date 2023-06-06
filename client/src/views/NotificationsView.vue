@@ -256,7 +256,7 @@ export default {
         }
     },
     async created() {
-        document.title = 'Wähle eine Gruppe - Attend'
+        document.title = 'Benachrichtigungen - Attend'
         this.dataStore.viewname = "Benachrichtigungen"
 
         this.sortNotifications()

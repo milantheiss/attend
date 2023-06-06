@@ -12,9 +12,9 @@ const addMember = {
     //Datum als String im Format YYYY-MM-DD sein
     firsttraining: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+    //WARNING Alle folgenden Felder werden entfernt
     //Array aus ObjectIds Not required
     openIssues: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
-    //WARNING Alle folgenden Felder werden entfernt
     departments: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
     groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
     firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).strip(),
@@ -208,7 +208,7 @@ const addMultipleTrainer = {
   )
 };
 
-const addTemporaryMember = {
+const createAndAddMember = {
   params: Joi.object().keys({
     //String als ObjectId
     groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
@@ -221,6 +221,11 @@ const addTemporaryMember = {
     birthday: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
     //Datum als String im Format YYYY-MM-DD
     firsttraining: Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
+    //WARNING Alle folgenden Felder werden entfernt
+    openIssues: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
+    departments: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
+    groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
+
   })
 };
 
@@ -236,5 +241,5 @@ module.exports = {
   updateTrainer,
   addMultipleMembers,
   addMultipleTrainer,
-  addTemporaryMember
+  createAndAddMember
 };

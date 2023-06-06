@@ -31,9 +31,9 @@ const routes = [
     meta: { requiresAuth: true, requiresGroup: true }
   },
   {
-    path: "/profile",
-    name: "Profile",
-    component: () => import("../views/ProfileView.vue"),
+    path: "/notifications",
+    name: "Notifications",
+    component: () => import("../views/NotificationsView.vue"),
     meta: { requiresAuth: true }
   },
   {
@@ -75,7 +75,7 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    path: "/administration/issues-overview",
+    path: "/administration/issues",
     component: () => import("../views/IssuesOverviewView.vue"),
     meta: { requiresAuth: true, requiresStaff: true }
   },
@@ -118,7 +118,7 @@ router.beforeEach(async (to, from, next) => {
  * Überprüft, ob für die Unterseite Zugriff auf mindestens eine Gruppe benötigt wird.
  * Wenn ja, wir überprüft, auf wie viele Gruppen ein User Zugriff hat.
  *    Wenn > 0, wird Unterseite angezeigt.
- *    Wenn == 0, wird router zu /profile weitergeleitet.
+ *    Wenn == 0, wird router zu /notifications weitergeleitet.
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
 router.beforeEach(async (to, from, next) => {
@@ -127,7 +127,7 @@ router.beforeEach(async (to, from, next) => {
       next();
       return;
     } else {
-      next("/profile");
+      next("/notifications");
     }
   } else {
     next();
@@ -144,7 +144,7 @@ router.beforeEach(async (to, from, next) => {
       next();
       return;
     } else {
-      next("/profile");
+      next("/notifications");
     }
   } else {
     next();
@@ -161,7 +161,7 @@ router.beforeEach(async (to, from, next) => {
       next();
       return;
     } else {
-      next("/profile");
+      next("/notifications");
     }
   } else {
     next();

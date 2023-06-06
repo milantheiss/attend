@@ -1,8 +1,10 @@
 const logger = require('../config/logger')
 const Group = require('../models/group.model')
-const { groupService } = require('../services')
+const Issue = require('../models/issue.model')
+const { groupService, memberService } = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
+const _ = require('lodash');
 const { hasStaffAccess, hasTrainerRole, hasAccessToGroup } = require('../utils/roleCheck');
 
 const getGroups = catchAsync(async (req, res) => {
@@ -38,7 +40,7 @@ const updateMember = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.updateMember(req.params.groupID, req.params.memberID, req.body)
+    const result = await groupService.updateMemberInGroup(req.params.groupID, req.params.memberID, req.body)
     res.status(httpStatus.OK).send(result)
 })
 
@@ -66,11 +68,32 @@ const addMember = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(result)
 })
 
-const addTemporaryMember = catchAsync(async (req, res) => {
+const createAndAddMember = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user) || !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
-    const result = await groupService.addTemporaryMember(req.params.groupID, req.body)
+    const member = await memberService.createMember(_.pick(req.body, ['firstname', 'lastname', 'birthday']))
+
+    if (member._doc.openIssues.length === 0) {
+        //Wenn kein Issue existiert, dann wurde kein doppeltes Mitglied gefunden
+        //Dem neu erstellten Mitglied wird dann ein newMemberCreated Issue hinzugefügt, 
+        //damit das Mitglied verifiziert werden kann
+        const issue = await Issue.create({
+            tag: 'newMemberCreated',
+            date: new Date(),
+            body: {
+                memberID: member._doc._id,
+                createdBy: req.user._id
+            },
+            message: `**${member.lastname}, ${member.firstname} (Geb. ${new Date(member.birthday).toLocaleDateString('de-DE', { year: '2-digit', month: '2-digit', day: '2-digit' })})** wurde als neues Mitglied erstellt.`
+        })
+
+        member._doc.openIssues.push(issue._id)
+
+        await member.save()
+    }
+
+    const result = await groupService.addMember(req.params.groupID, member._id, req.body.firsttraining)
     res.status(httpStatus.OK).send(result)
 })
 
@@ -138,6 +161,6 @@ module.exports = {
     updateTrainer,
     addMultipleMembers,
     addMultipleTrainer,
-    addTemporaryMember
+    createAndAddMember
 }
 

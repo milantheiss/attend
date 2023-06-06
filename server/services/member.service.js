@@ -1,6 +1,5 @@
 const httpStatus = require('http-status');
-const { default: mongoose } = require('mongoose');
-const { Member, Issue, Group, User } = require('../models');
+const { Member, Issue} = require('../models');
 const ApiError = require('../utils/ApiError');
 const groupService = require('./group.service');
 const attendanceService = require('./attendance.service');
@@ -25,123 +24,6 @@ const getMembers = async () => {
 const getMemberById = async (id) => {
     return Member.findById(id);
 };
-
-/**
- * Handels Event which is triggered if a member is added to a group. (Member must not be completely new in DB)
- * WARNING No Access Control: Must be handle from the caller.
- * @param {User} user 
- * @param {Group} group 
- * @param {Object} memberBody 
- * @returns 
- */
-const handleNewMemberEvent = async (user, group, memberBody) => {
-    //Sucht nach Membern mit dem gleichen Namen und Geburtsdatum
-    const members = await Member.find({
-        $and: [
-            { lastname: memberBody.lastname },
-            { firstname: memberBody.firstname },
-            { birthday: memberBody.birthday }
-        ]
-    })
-
-    /*
-    Wenn keine gleichen Member gefunden wurden, heißt ein neuer Member hinzugefügt wurde. 
-    Wird der Member in der DB angelegt, damit die Daten abgespeichert sind, jedoch wird ein Issue erstellt, damit ein Sachbearbeiter den User verifizieren kann.
-    */
-    if (members.length === 0) {
-        //Der neue Member wird erstellt
-
-        memberBody = {
-            ...memberBody,
-            departments: [group.department],
-            groups: [group._id],
-            openIssues: [new mongoose.Types.ObjectId()]
-        }
-
-        const newMember = await Member.create(memberBody);
-
-        await Issue.create({
-            _id: newMember.openIssues[0],
-            tag: 'newMemberCreated',
-            date: new Date(),
-            body: {
-                groupID: group._id,
-                memberID: newMember._id,
-                createdBy: user._id,
-                firstname: newMember.firstname,
-                lastname: newMember.lastname,
-                birthday: newMember.birthday,
-                department: group.department
-            }
-        })
-
-        newMember.memberId = newMember._id
-
-        //Es muss doc zurückgegeben werden, da sonst die Daten noch verschachtelt sind
-        return newMember._doc
-    } else {
-        //Wenn es mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.    
-        //TODO Hier sollte eine Whitelist hinzugefügt werden, sodass diese Member ignoriert werden, sollte die Dopplung kein Fehler sein.
-        if (members.length > 1) {
-            const issue = await Issue.create({
-                tag: "duplicateMemberInDB",
-                date: new Date(),
-                body: {
-                    memberIDs: members.map(val => val._id),
-                    firstname: members[0].firstname,
-                    lastname: members[0].lastname,
-                    birthday: members[0].birthday,
-                }
-            })
-
-            members.forEach(async (member) => {
-                member._doc.openIssues.push(issue._id)
-                if (!member.groups.includes(group._id)) {
-                    member._doc.groups.push(group._id)
-                }
-                await member.save()
-            })
-
-            return members
-        }
-
-        //Wenn bereits ein Member existiert, wird ein Issue erstellt, dass der Member zu einer Gruppe hinzugefügt wurde.
-        members[0]._doc.memberId = members[0]._id
-
-        //Wenn der Member bereits in der Gruppe ist, wird kein Issue erstellt und einfach nur der Member zurückgeben.
-        if (members[0].groups.includes(group._id)) {
-            return members[0]._doc
-        }
-
-        //Wenn der Member noch nicht dem Department zugeordnet ist zu der die Gruppe gehört, wird ein Issue erstellt, dass der Member dem Department hinzugefügt wurde.
-        //INFO Dieses Issues muss nicht erstellt werden. Es wird nur zum Tracken von Veränderungen erstellt
-        if (!members[0].departments.includes(group.department)) {
-            let issue = await Issue.create({
-                tag: "memberWasAddedToDepartment",
-                date: new Date(),
-                body: {
-                    memberID: members[0]._id,
-                    firstname: members[0].firstname,
-                    lastname: members[0].lastname,
-                    birthday: members[0].birthday,
-                    department: group.department,
-                    groupID: group._id,
-                    createdBy: user._id
-                }
-            })
-
-            members[0]._doc.openIssues = [...members[0], issue._id]
-        }
-
-        //Member wird der Gruppe hinzugefügt
-        members[0]._doc.groups.push(group._id)
-
-        await members[0].save()
-
-        //Hier muss _doc zurückgegeben werden, da die Daten sonst verschachtelt sind
-        return members[0]._doc
-    }
-}
 
 const updateMember = async (id, memberBody) => {
     let member = await Member.findById(id)
@@ -189,22 +71,19 @@ const createMember = async (memberBody) => {
     }
 
     const member = await Member.create(memberBody)
-    
+
     if (members.length === 0) {
         return member
     }
-    
-    //Wenn mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.
 
+    //Wenn mehrere Member mit dem gleichen Namen und Geburtsdatum in der DB existieren, wird ein Issue erstellt, dass dies von einem Sachbearbeiter geprüft werden muss.
     const issue = await Issue.create({
         tag: "duplicateMemberInDB",
         date: new Date(),
         body: {
-            memberIDs: [...members.map(val => val._id), member._id],
-            firstname: members[0].firstname,
-            lastname: members[0].lastname,
-            birthday: members[0].birthday,
-        }
+            memberIDs: [...members.map(val => val._id), member._id].sort((a, b) => a.getTimestamp() - b.getTimestamp()),
+        },
+        message: `Für **${member.lastname}, ${member.firstname} (Geb. ${new Date(member.birthday).toLocaleDateString('de-DE', { year: '2-digit', month: '2-digit', day: '2-digit' })})** existieren doppelte Einträge`
     })
 
     members.forEach(async (member) => {
@@ -231,11 +110,21 @@ const deleteMember = async (id) => {
     return member
 }
 
+const removeIssueFromMember = async (memberId, issueId) => {
+    const member = await Member.findById(memberId)
+    member.openIssues = member.openIssues.filter(issue => !issue.equals(issueId))
+
+    console.log(memberId, issueId, member.openIssues);
+
+    return await member.save()
+}
+
+
 module.exports = {
     getMembers,
     getMemberById,
-    handleNewMemberEvent,
     updateMember,
     createMember,
-    deleteMember
+    deleteMember,
+    removeIssueFromMember
 };

@@ -16,14 +16,18 @@
                 <div class="w-full flex items-center justify-between gap-4">
                     <label for="firstname">Vorname:</label>
                     <TextInput name="firstname" v-model="participant.firstname" placeholder="Vorname"
+                        v-if="type === 'add' || type === 'edit' && access === 'staff'"
                         :showError="error.cause.firstnameInput" class="md:w-96"></TextInput>
+                    <p class="font-medium" v-if="type === 'edit' && access === 'trainer'">{{ participant.firstname }}</p>
                 </div>
 
                 <!--Nachname des Teilnehmers-->
                 <div class="w-full flex items-center justify-between gap-4">
                     <label for="lastname">Nachname:</label>
                     <TextInput name="lastname" v-model="participant.lastname" placeholder="Nachname"
+                        v-if="type === 'add' || type === 'edit' && access === 'staff'"
                         :showError="error.cause.lastnameInput" class="md:w-96"></TextInput>
+                    <p class="font-medium" v-if="type === 'edit' && access === 'trainer'">{{ participant.lastname }}</p>
                 </div>
 
                 <!--Geburtstag des Teilnehmers-->
@@ -31,8 +35,14 @@
                     <label for="birthday"><span class="hidden sm:block">Geburtstag:</span><span
                             class="block sm:hidden">Geb.:</span></label>
                     <DateInput v-model="participant.birthday" name="birthday" :max="new Date().toJSON().slice(0, 10)"
-                        class="font-medium md:w-96" :showError="error.cause.birthdayInput">
+                        v-if="type === 'add' || type === 'edit' && access === 'staff'" class="font-medium md:w-96"
+                        :showError="error.cause.birthdayInput">
                     </DateInput>
+                    <p class="font-medium" v-if="type === 'edit' && access === 'trainer'">{{ new
+                        Date(participant.birthday).toLocaleDateString('de-DE', {
+                            year: '2-digit',
+                            month: '2-digit', day: '2-digit'
+                        }) }}</p>
                 </div>
 
                 <!--Erstes Training des Teilnehmers-->
@@ -125,7 +135,8 @@
                         class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-[20px] px-3.5 md:px-7 py-2.5">
                         <p class="font-medium font-base md:text-lg">Abbrechen</p>
                     </button>
-                    <StandardButton @click="addMultipleParticipants()" class="w-full" v-if="type === 'add' && access === 'staff'">
+                    <StandardButton @click="addMultipleParticipants()" class="w-full"
+                        v-if="type === 'add' && access === 'staff'">
                         <p class="font-base md:text-lg">Hinzufügen</p>
                     </StandardButton>
                     <StandardButton @click="addParticipant()" class="w-full" v-if="type === 'add' && access === 'trainer'">
@@ -198,7 +209,6 @@ export default {
             required: false
         },
         groupID: {
-            type: String,
             required: true
         }
     },
@@ -281,7 +291,7 @@ export default {
         },
 
         //Für Trainer add one member
-        async addParticipant(){
+        async addParticipant() {
             this.validateInputs(this.participant)
 
             if (!this.error.show) {
@@ -362,7 +372,7 @@ export default {
                     const searchStrings = this.searchString.split(" ")
                     return searchStrings.every(s => m.firstname.toLowerCase().indexOf(s.toLowerCase()) > -1 || m.lastname.toLowerCase().indexOf(s.toLowerCase()) > -1)
                 }
-                
+
                 return m.firstname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || m.lastname.toLowerCase().indexOf(this.searchString.toLowerCase()) > -1 || this.searchString === ''
             })
         }

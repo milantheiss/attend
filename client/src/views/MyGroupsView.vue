@@ -179,94 +179,96 @@
                     </StandardButton>
                 </div>
 
-                <div class="h-fit max-h-[55vh] overflow-y-auto block w-full bg-white p-3.5 md:p-7 rounded-xl">
-                    <table class="table-auto w-full text-left">
+                <div class="flex flex-col w-full bg-white p-3.5 md:p-7 rounded-xl">
+                    <div class="h-fit max-h-[60vh] overflow-y-auto block">
+                        <table class="table-auto w-full ">
 
-                        <thead class="sticky top-0 border-b border-[#D1D5DB]">
-                            <tr>
+                            <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                                <tr>
 
-                                <th scope="col" class="pb-2.5 font-medium"
-                                    @click="() => { if (sort.key === 'lastname') sort.index.lastname = (sort.index.lastname + 1) % 2; sort.key = 'lastname' }">
-                                    <span class="flex items-center gap-1">
-                                        <SortIcon :index="sort.index.lastname"></SortIcon>
-                                        Name
-                                    </span>
-                                </th>
+                                    <th scope="col" class="pb-2.5 font-medium"
+                                        @click="() => { if (sort.key === 'lastname') sort.index.lastname = (sort.index.lastname + 1) % 2; sort.key = 'lastname' }">
+                                        <span class="flex items-center gap-1">
+                                            <SortIcon :index="sort.index.lastname"></SortIcon>
+                                            Name
+                                        </span>
+                                    </th>
 
-                                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                                    @click="() => { if (sort.key === 'firstname') sort.index.firstname = (sort.index.firstname + 1) % 2; sort.key = 'firstname' }">
-                                    <span class="flex items-center gap-1">
-                                        <SortIcon :index="sort.index.firstname"></SortIcon>
-                                        Vorname
-                                    </span>
-                                </th>
+                                    <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
+                                        @click="() => { if (sort.key === 'firstname') sort.index.firstname = (sort.index.firstname + 1) % 2; sort.key = 'firstname' }">
+                                        <span class="flex items-center gap-1">
+                                            <SortIcon :index="sort.index.firstname"></SortIcon>
+                                            Vorname
+                                        </span>
+                                    </th>
 
-                                <!-- Geburtstag -->
+                                    <!-- Geburtstag -->
 
-                                <!-- Wird ausgeblendet, wenn Screen zuklein -->
-                                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                                    @click="() => { if (sort.key === 'birthday') sort.index.birthday = (sort.index.birthday + 1) % 2; sort.key = 'birthday' }">
-                                    <!-- Wird abgekürzt, wenn Screen kleiner als md -->
-                                    <span class="hidden md:flex items-center gap-1 ">
-                                        <SortIcon :index="sort.index.birthday"></SortIcon>
-                                        Geburtstag
-                                    </span>
-                                    <span class="flex md:hidden items-center gap-1 ">
-                                        <SortIcon :index="sort.index.birthday"></SortIcon>
-                                        Geb.
-                                    </span>
-                                </th>
+                                    <!-- Wird ausgeblendet, wenn Screen zuklein -->
+                                    <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
+                                        @click="() => { if (sort.key === 'birthday') sort.index.birthday = (sort.index.birthday + 1) % 2; sort.key = 'birthday' }">
+                                        <!-- Wird abgekürzt, wenn Screen kleiner als md -->
+                                        <span class="hidden md:flex items-center gap-1 ">
+                                            <SortIcon :index="sort.index.birthday"></SortIcon>
+                                            Geburtstag
+                                        </span>
+                                        <span class="flex md:hidden items-center gap-1 ">
+                                            <SortIcon :index="sort.index.birthday"></SortIcon>
+                                            Geb.
+                                        </span>
+                                    </th>
 
-                                <!-- Spalte für Pfeil -->
-                                <th scope="col" class="pb-2.5 font-medium w-full"></th>
+                                    <!-- Spalte für Pfeil -->
+                                    <th scope="col" class="pb-2.5 font-medium w-full"></th>
 
-                            </tr>
-                        </thead>
+                                </tr>
+                            </thead>
 
-                        <tbody class="overscroll-y-scroll">
-                            <!-- Je eine Reihe pro Teilnehmer -->
-                            <tr v-for="participant in group.participants" :key="participant._id"
-                                @click="openEditParticipant(participant._id)"
-                                class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+                            <tbody class="overscroll-y-scroll">
+                                <!-- Je eine Reihe pro Teilnehmer -->
+                                <tr v-for="participant in group.participants" :key="participant._id"
+                                    @click="openEditParticipant(participant._id)"
+                                    class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
 
-                                <!-- Nachname -->
+                                    <!-- Nachname -->
 
-                                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0">
-                                    <p>{{ participant.lastname }}</p>
-                                </td>
+                                    <td class="py-2.5 group-last:pt-2.5 group-last:pb-0">
+                                        <p>{{ participant.lastname }}</p>
+                                    </td>
 
-                                <!-- Vorname -->
+                                    <!-- Vorname -->
 
-                                <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0">
-                                    <p>{{ participant.firstname }}</p>
-                                </td>
+                                    <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0">
+                                        <p>{{ participant.firstname }}</p>
+                                    </td>
 
-                                <!-- Geburtstag -->
+                                    <!-- Geburtstag -->
 
-                                <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
-                                    <p class="text-light-gray">{{
-                                        new Date(participant.birthday).toLocaleDateString('de-DE', {
-                                            year: '2-digit', month:
-                                                '2-digit', day: '2-digit'
-                                        })
-                                    }}</p>
-                                </td>
+                                    <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
+                                        <p class="text-light-gray">{{
+                                            new Date(participant.birthday).toLocaleDateString('de-DE', {
+                                                year: '2-digit', month:
+                                                    '2-digit', day: '2-digit'
+                                            })
+                                        }}</p>
+                                    </td>
 
-                                <!-- Pfeil nach rechts -->
+                                    <!-- Pfeil nach rechts -->
 
-                                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                        stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                                    </svg>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- Wird angezeigt, wenn keine Teilnehmer der Gruppe zugeteilt sind -->
-                    <p v-show="this.group.participants === undefined || this.group.participants?.length === 0"
-                        class="font-medium text-gray-500 text-center pt-2.5">Keine Teilnehmer gefunden</p>
+                                    <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="3" stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                        </svg>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Wird angezeigt, wenn keine Teilnehmer der Gruppe zugeteilt sind -->
+                        <p v-if="this.group.participants === undefined || this.group.participants?.length === 0"
+                            class="font-medium text-gray-500 text-center pt-2.5">Keine Teilnehmer gefunden</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -283,10 +285,10 @@
             <StandardButton @click="$router.back()">Zurück</StandardButton>
         </div>
 
-        <ParticipantModal ref="addParticipantModal" :group="group" type="add" access="trainer" @onClose="close()">
+        <ParticipantModal ref="addParticipantModal" type="add" access="trainer" @onClose="close()" :groupID="group?._id">
         </ParticipantModal>
 
-        <ParticipantModal ref="editParticipantModal" :group="group" type="edit" access="trainer" @onClose="close()">
+        <ParticipantModal ref="editParticipantModal" type="edit" access="trainer" @onClose="close()" :groupID="group?._id">
         </ParticipantModal>
     </div>
 </template>
@@ -302,6 +304,7 @@ import StandardButton from "@/components/StandardButton.vue";
 import SortIcon from "@/components/SortIcon.vue";
 import CollapsibleContainer from "@/components/CollapsibleContainer.vue";
 import ParticipantModal from "@/components/ParticipantModal.vue";
+import _ from "lodash";
 
 export default {
     name: "MyGroupsView",
@@ -365,6 +368,11 @@ export default {
         async close() {
             this.group = await fetchGroup(this.group._id)
             this.resetError()
+        },
+
+        async openEditParticipant(id) {
+            //Deep Copy, damit Änderungen nicht direkt übernommen werden
+            this.$refs.editParticipantModal.open(_.cloneDeep(this.group.participants.find(m => m.memberId === id)))
         },
 
         async saveChanges() {
@@ -469,8 +477,8 @@ export default {
     },
 
     async created() {
-        document.title = 'Gruppe bearbeiten - Attend'
-        this.dataStore.viewname = "Gruppe bearbeiten"
+        document.title = 'Meine Gruppen - Attend'
+        this.dataStore.viewname = "Meine Gruppen"
     },
 
     async mounted() {

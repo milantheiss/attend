@@ -1,11 +1,8 @@
 const httpStatus = require('http-status');
 const { Group, Attendance, Member, User, Department } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { hasAdminRole, hasAccessToGroup, hasTrainerRole, hasAssistantRole } = require('../utils/roleCheck');
 const attendanceService = require('./attendance.service');
 const _ = require('lodash');
-const memberService = require('./member.service');
-const userService = require('./user.service');
 
 async function getTrainersOfGroup(group) {
     const trainerData = await User.find({ _id: { $in: group.trainers.map(e => e.userId) } }, { firstname: 1, lastname: 1, _id: 1 })
@@ -115,9 +112,11 @@ const createGroup = async (groupBody) => {
  * @param {Object} groupBody
  * @returns {boolean} true if successful
  */
-const updateMember = async (groupID, memberID, body) => {
+const updateMemberInGroup = async (groupID, memberID, body) => {
     let group = await Group.findById(groupID)
-    await memberService.updateMember(memberID, { firstname: body.firstname, lastname: body.lastname, birthday: body.birthday })
+    const member = await Member.findById(memberID)
+    Object.assign(member, _.pick(body, ['firstname', 'lastname', 'birthday']))
+    await member.save()
 
     let oldFirsttraining = group._doc.participants.find(e => e.memberId.equals(memberID)).firsttraining
 
@@ -149,7 +148,9 @@ const addMember = async (groupID, memberID, firsttraining) => {
     }
     await member.save()
 
-    group.participants.push({firsttraining: firsttraining, memberId: memberID})
+    group.participants.push({ firsttraining: firsttraining, memberId: memberID })
+
+    console.log(firsttraining);
 
     await updateParticipantInTrainingssessions(groupID, memberID, firsttraining)
 
@@ -205,7 +206,8 @@ const updateParticipantInTrainingssessions = async (groupID, memberID, newFirstt
     } else { //Wenn der Participant neu erstellt wurde oder das Datum des Firsttraining vor dem alten Datum liegt oder gleich geblieben ist
         list.trainingssessions = list.trainingssessions.map((session) => {
             //Wird auf alle Trainingssessions angewenden, die jünger sind als newFirsttraining
-            if (session.date >= newFirsttraining && session.date < oldFirsttraining) {
+            //Wenn oldFristraining undefined ist, ist das Date NaN. isNaN() gibt dann true zurück und der Member wird in die Attendancelist hinzugefügt
+            if (session.date >= newFirsttraining && (session.date < oldFirsttraining || isNaN(oldFirsttraining))) {
                 participant = session.participants.find(foo => foo.memberId.equals(memberID))
 
                 //Wenn Participant noch nicht in Trainingssession existiert
@@ -391,24 +393,36 @@ const addMultipleTrainer = async (groupID, trainers) => {
     return group
 }
 
-const addTemporaryMember = async (groupID, memberBody) => {
-    const member = await memberService.createMember(memberBody)
+const updateMemberIdOfParticipant = async (groupID, newMemberId, oldMemberId) => {
+    const group = await Group.findById(groupID)
 
-    await addMember(groupID, member._id, _.pick(member, [, 'firsttraining']))
+    //Id soll geupdatet werden. Wenn die neue Id bereits in der Gruppe ist, dann soll die alte Id gelöscht werden
+    if (group.participants.some(e => e.memberId.equals(newMemberId))) {
+        const keep = group.participants.find(e => e.memberId.equals(newMemberId))
+        const merge = group.participants.find(e => e.memberId.equals(oldMemberId))
 
-    //TODO Issue handling 
+        keep.firsttraining = keep.firsttraining < merge.firsttraining ? keep.firsttraining : merge.firsttraining
 
-    //Wie soll ein Add gehandelt werden?
+        console.log(keep.firsttraining, merge.firsttraining);
 
-    return member
+        group.participants = group.participants.filter(e => !e.memberId.equals(oldMemberId))
+    } else {
+        group.participants = group.participants.map((p) => {
+            if (p.memberId.equals(oldMemberId)) {
+                p.memberId = newMemberId
+            }
+            return p
+        })
+    }
+
+    return await group.save()
 }
-
 
 module.exports = {
     getGroupById,
     getGroups,
     createGroup,
-    updateMember,
+    updateMemberInGroup,
     removeMember,
     addMember,
     addTrainer,
@@ -418,5 +432,6 @@ module.exports = {
     updateGroup,
     updateTrainer,
     addMultipleMembers,
-    addMultipleTrainer
+    addMultipleTrainer,
+    updateMemberIdOfParticipant
 };

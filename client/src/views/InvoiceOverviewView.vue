@@ -15,7 +15,7 @@
                 </span>
             </Transition>
             <!--Erstellen Button-->
-            <Button @click="createNewInvoice()" v-show="auth.user?.lengthAccessibleGroups > 0">Erstellen</Button>
+            <StandardButton @click="createNewInvoice()" v-show="auth.user?.lengthAccessibleGroups > 0">Erstellen</StandardButton>
         </div>
 
         <!--Eigene Abrechnungen-->
@@ -187,7 +187,7 @@ import { downloadInvoice } from '@/util/generatePdf';
 import { useDataStore } from "@/store/dataStore";
 import { useAuthStore } from "@/store/authStore";
 import { ref } from 'vue';
-import Button from '@/components/Button.vue';
+import StandardButton from '@/components/StandardButton.vue';
 import CollapsibleContainer from '@/components/CollapsibleContainer.vue';
 import YearInput from '@/components/YearInput.vue';
 import SortIcon from '@/components/SortIcon.vue';
@@ -319,7 +319,7 @@ export default {
 
         this.allInvoicesInYear = await getAllInvoicesInYear(this.selectedYear);
     },
-    components: { Button, CollapsibleContainer, YearInput, SortIcon }
+    components: { StandardButton, CollapsibleContainer, YearInput, SortIcon }
 
 };
 </script>

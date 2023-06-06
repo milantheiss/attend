@@ -363,7 +363,7 @@ async function addMemberToGroup(groupID, member) {
 	if (Object.keys(member).length === 0) throw new Error("member must not be empty")
 
 	const res = await watchForRedirects(
-		fetch([import.meta.env.VITE_API_URL, "group", groupID, "temporaryMember"].join("/"), {
+		fetch([import.meta.env.VITE_API_URL, "group", groupID, "member"].join("/"), {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(member),
@@ -490,6 +490,40 @@ async function getAllInvoicesInYear(year) {
 }
 
 
+
+
+
+//INFO Fetch Operations zu /issue
+
+async function getIssues() {
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/issues`, {
+			method: "GET",
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, status: res.status, body: res.status === 204 ? undefined : await res.json() }
+}
+
+async function resolveIssue(issueID, action) {
+	if (!issueID) throw new Error("No issueID provided")
+	if (typeof issueID === "undefined") throw new Error("issueID must be defined")
+
+	if (!action) throw new Error("No action provided")
+	if (typeof action === "undefined") throw new Error("action must be defined")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/issues/${issueID}/resolve?action=${action}`, {
+			method: "POST",
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: res.ok ? undefined : await res.json() }
+}
 
 
 
@@ -836,4 +870,6 @@ export {
 	addMultipleMembersToGroup,
 	addMultipleTrainerToGroup,
 	addMemberToGroup,
+	getIssues,
+	resolveIssue
 };

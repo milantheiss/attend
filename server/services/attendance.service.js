@@ -381,6 +381,35 @@ const removeTrainerFromAttendanceList = async (groupID, trainerID) => {
     await attendance.save()
 }
 
+const updateMemberIdOfParticipant = async (groupID, newMemberID, oldMemberID) => {
+    const attendance = await getAttendanceByGroup(groupID)
+
+    attendance.trainingssessions.forEach(session => {
+        //Die Teilnehmerliste wird durchgegangen und der alte MemberID durch die neue ersetzt
+        //Wenn die neue ID bereits in der Liste ist, wird sie nicht nochmal hinzugefügt
+        //Wenn attend beim alten Member true ist, wird es auch beim neuen Member true
+
+        if (session.participants.some(participant => participant.memberId.equals(newMemberID))) {
+            const keep = session.participants.find(participant => participant.memberId.equals(newMemberID))
+            const old = session.participants.find(participant => participant.memberId.equals(oldMemberID))
+
+            keep.attended = keep.attended || old.attended
+
+            session.participants = session.participants.filter(participant => !participant.memberId.equals(oldMemberID))
+
+            console.log(session.participants.find(participant => participant.memberId.equals(newMemberID)));
+        } else if (session.participants.some(participant => participant.memberId.equals(oldMemberID))) {
+            session.participants.forEach(participant => {
+                if (participant.memberId.equals(oldMemberID)) {
+                    participant.memberId = newMemberID
+                }
+            })
+        }
+    })
+
+    return await attendance.save()
+}
+
 
 module.exports = {
     getAttendance,
@@ -394,5 +423,6 @@ module.exports = {
     getDataForInvoice,
     getFormattedListForAttendanceListPDF,
     removeMemberFromAttendanceList,
-    removeTrainerFromAttendanceList
+    removeTrainerFromAttendanceList,
+    updateMemberIdOfParticipant
 };

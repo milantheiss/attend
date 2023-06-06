@@ -26,10 +26,11 @@ router
 
 router
     .route('/:groupID/member')
-    .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
-
-router
+    .post(verifyToken, validate(groupValidation.createAndAddMember), groupController.createAndAddMember)
+    
+    router
     .route('/:groupID/member/:memberID')
+    .post(verifyToken, validate(groupValidation.addMember), groupController.addMember)
     .patch(verifyToken, validate(groupValidation.updateMember), groupController.updateMember)
     .delete(verifyToken, validate(groupValidation.removeMember), groupController.removeMember)
 
@@ -45,10 +46,6 @@ router
     .route('/:groupID/trainer/:userID')
     .patch(verifyToken, validate(groupValidation.updateTrainer), groupController.updateTrainer)
     .delete(verifyToken, validate(groupValidation.removeTrainer), groupController.removeTrainer)
-
-router
-    .route("/:groupID/temporaryMember")
-    .post(verifyToken, validate(groupValidation.addTemporaryMember), groupController.addTemporaryMember)
 
 module.exports = router;
 

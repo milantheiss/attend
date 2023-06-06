@@ -26,8 +26,8 @@
 					<!--Profile Avatar-->
 					<!--TODO Custom Avatar jenach User-->
 
-					<router-link @click="showMenu = false" to="/profile">
-						<div class="absolute -top-1 right-1 md:right-5 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold"
+					<router-link @click="showMenu = false" to="/notifications" class="relative">
+						<div class="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold"
 							v-if="dataStore.getCountOfUnreadNotifications() > 0">
 							{{ dataStore.getCountOfUnreadNotifications() }}
 						</div>
@@ -73,6 +73,17 @@
 									d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
 							</svg>
 						</router-link>
+						<router-link @click="showMenu = !showMenu" to="/my-groups"
+							v-show="auth.user?.lengthAccessibleGroups > 0"
+							class="text-left font-medium md:text-2xl text-xl flex items-center group">
+							Meine Gruppen
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+								stroke="currentColor"
+								class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+								<path stroke-linecap="round" stroke-linejoin="round"
+									d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+							</svg>
+						</router-link>
 						<div class="text-left font-medium md:text-2xl text-xl items-start flex flex-col"
 							v-show="auth.user?.roles.includes('admin') || auth.user?.roles.includes('staff')">
 							Verwaltung
@@ -100,6 +111,16 @@
 								<router-link @click="showMenu = !showMenu" to="/administration/users"
 									class="flex items-center group" v-show="auth.user?.roles.includes('admin')">
 									Benutzer
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+										stroke="currentColor"
+										class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+										<path stroke-linecap="round" stroke-linejoin="round"
+											d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+									</svg>
+								</router-link>
+								<router-link @click="showMenu = !showMenu" to="/administration/issues"
+									class="flex items-center group">
+									Konflikte
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
 										stroke="currentColor"
 										class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
@@ -239,4 +260,5 @@ export default {
 	/* IE and Edge */
 	scrollbar-width: none;
 	/* Firefox */
-}</style>
+}
+</style>
