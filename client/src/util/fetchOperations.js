@@ -824,6 +824,23 @@ async function resendPassword(userID) {
 	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
+async function updateOwnUserData(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/user/self`, {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
+}
+
 export {
 	fetchAttendance,
 	fetchAttendanceByDate,
@@ -871,5 +888,6 @@ export {
 	addMultipleTrainerToGroup,
 	addMemberToGroup,
 	getIssues,
-	resolveIssue
+	resolveIssue,
+	updateOwnUserData,
 };

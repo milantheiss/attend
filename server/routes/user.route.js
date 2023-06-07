@@ -12,6 +12,10 @@ router
     .post(verifyToken, validate(userValidation.createUser), userController.createUser)
 
 router
+    .route("/self")
+    .patch(verifyToken, validate(userValidation.updateSelf), userController.updateSelf)
+
+router
     .route('/:id')
     .get(verifyToken, validate(userValidation.getUserById), userController.getUserById)
     .delete(verifyToken, validate(userValidation.deleteUser), userController.deleteUser)

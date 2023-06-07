@@ -51,12 +51,19 @@ const resendPassword = catchAsync(async (req, res) => {
     res.status(httpStatus.NO_CONTENT).send()
 })
 
+const updateSelf = catchAsync(async (req, res) => {
+    // Durch die Validation kann body nur Firstname, Lastname & Email enthalten
+    const result = await userService.updateUser(req.user._id, req.body)
+    res.status(httpStatus.OK).send(result)
+})
+
 module.exports = {
     getUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
-    resendPassword
+    resendPassword,
+    updateSelf
 }
 

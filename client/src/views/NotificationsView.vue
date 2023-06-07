@@ -14,12 +14,12 @@
                 </span>
             </Transition>
             <div class="flex items-center gap-3.5">
-                <select v-model="sortBy" class="pl-2 pb-0.5 text-black text-lg md:text-xl
+                <select v-model="sortBy"
+                    class="pl-2 pb-0.5 text-black text-lg md:text-xl
                                                             focus:ring-0 focus:border-standard-gradient-1
-                                                            bg-inherit"
-                    :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-light-gray rounded-none'"
+                                                            bg-inherit  border-0 border-b-2 border-light-gray rounded-none"
                     style="background-position: right 0.1rem center;padding-right: 1.9rem;">
-                    <option value="date"  default>Datum</option>
+                    <option value="date" default>Datum</option>
                     <option value="unread">Ungelesen</option>
                     <option value="title">Betreff</option>
                 </select>
@@ -45,13 +45,14 @@
         <transition enter-active-class="transition ease-in-out duration-500" enter-from-class="-translate-y-2 opacity-0"
             enter-to-class="translate-y-0 opacity-100" leave-active-class="transition ease-in-out duration-500"
             leave-from-class="translate-y-0 opacity-100" leave-to-class="-translate-y-2 opacity-0">
-            <div class="flex justify-between items-center w-full px-3.5 md:px-7" v-show="showToolbar && dataStore.notifications?.length !== 0">
+            <div class="flex justify-between items-center w-full px-3.5 md:px-7"
+                v-show="showToolbar && dataStore.notifications?.length !== 0">
                 <button @click="deleteSelected"
                     class="flex justify-center items-center text-white bg-gradient-to-br from-delete-gradient-1 to-delete-gradient-2 rounded-full drop-shadow-md px-5 md:px-7 py-2">
                     <p class="font-medium font-base md:text-lg">Löschen</p>
                 </button>
                 <!--Select all-->
-                <CheckboxInput  v-model="selectAll"></CheckboxInput>
+                <CheckboxInput v-model="selectAll"></CheckboxInput>
             </div>
         </transition>
 
@@ -70,20 +71,25 @@
                     </div>
 
                     <div class="flex flex-col w-full" @click.self="{ toggleNotification(index); }">
-                        <p class="font-medium flex justify-between items-center gap-2" @click.self="{ toggleNotification(index); }">{{
-                            notification.title }}
-                        <span class="cursor-pointer" @click.self="{ toggleNotification(index); }" v-show="!showToolbar">
-                            <!--Chevron Down-->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                stroke="currentColor" class="w-7 h-7" v-show="!localNotifications[index]?.show" @click.self="{ toggleNotification(index); }">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" @click.self="{ toggleNotification(index); }"/>
-                            </svg>
-                            <!--Chevron Up-->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                                stroke="currentColor" class="w-7 h-7" v-show="localNotifications[index]?.show" @click.self="{ toggleNotification(index); }">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" @click.self="{ toggleNotification(index); }"/>
-                            </svg>
-                        </span>
+                        <p class="font-medium flex justify-between items-center gap-2"
+                            @click.self="{ toggleNotification(index); }">{{
+                                notification.title }}
+                            <span class="cursor-pointer" @click.self="{ toggleNotification(index); }" v-show="!showToolbar">
+                                <!--Chevron Down-->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                                    stroke="currentColor" class="w-7 h-7" v-show="!localNotifications[index]?.show"
+                                    @click.self="{ toggleNotification(index); }">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                                        @click.self="{ toggleNotification(index); }" />
+                                </svg>
+                                <!--Chevron Up-->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                                    stroke="currentColor" class="w-7 h-7" v-show="localNotifications[index]?.show"
+                                    @click.self="{ toggleNotification(index); }">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"
+                                        @click.self="{ toggleNotification(index); }" />
+                                </svg>
+                            </span>
                         </p>
                         <p class="text-light-gray" @click.self="{ toggleNotification(index); }">{{
                             new Date(notification.date).toLocaleString('de-DE', {
@@ -98,8 +104,8 @@
                     <transition enter-active-class="transition ease-in-out duration-700" enter-from-class="opacity-0"
                         enter-to-class="opacity-100" leave-active-class="transition ease-in-out duration-500"
                         leave-from-class="opacity-100" leave-to-class="opacity-0">
-                        <CheckboxInput  v-show="showToolbar" @click.stop="true"
-                            v-model="localNotifications[index].selected"></CheckboxInput>
+                        <CheckboxInput v-show="showToolbar" @click.stop="true" v-model="localNotifications[index].selected">
+                        </CheckboxInput>
                     </transition>
                 </div>
 
@@ -126,7 +132,7 @@ import { setNotificationAsRead, deleteManyNotifications, setManyNotificationsAsR
 import CheckboxInput from "@/components/CheckboxInput.vue";
 
 export default {
-    name: "ProfileView",
+    name: "NotificationsView",
     setup() {
         const dataStore = useDataStore()
         const authStore = useAuthStore()
@@ -291,5 +297,4 @@ option:hover,
 option::selection {
     color: white;
     background: #5864e0;
-}
-</style>    
+}</style>    
