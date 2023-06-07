@@ -118,20 +118,15 @@ const deleteUser = async (userID) => {
 	return user;
 };
 
-const resendPassword = async (userID) => {
-	const user = await getUserById(userID);
-	if (!user) {
-		throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-	}
+/**
+ * Get user by email
+ * @param {string} email
+ * @returns {Promise<User>}
+ */
+const getUserByEmail = async (email) => {
+	return User.findOne({ email });
+};
 
-	const password = nanoid.nanoid(10);
-
-	sendAccountDetails(user.email, { firstname: user.firstname, lastname: user.lastname, username: user.username, email: user.email, password: password })
-
-	user.password = password;
-	await user.save();
-	return
-}
 
 module.exports = {
 	getUserInfo,
@@ -140,5 +135,5 @@ module.exports = {
 	createUser,
 	deleteUser,
 	updateUser,
-	resendPassword
+	getUserByEmail
 };

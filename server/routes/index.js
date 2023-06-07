@@ -14,6 +14,7 @@ const invoiceRoute = require("./invoice.route")
 const notificationRoute = require("./notification.route")
 const departmentsRoute = require('./departments.route');
 const issueRoute = require("./issue.route")
+const authRoute = require("./auth.route")
 
 const router = express.Router();
 
@@ -77,6 +78,10 @@ const defaultRoutes = [
     {
         path: "/issues",
         route: issueRoute
+    },
+    {
+        path: "/auth",
+        route: authRoute
     }
 ];
 

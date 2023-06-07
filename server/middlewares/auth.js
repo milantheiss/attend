@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { authenticationService } = require("../services");
+const { authenticationService, tokenService } = require("../services");
 
 const config = require('../config/config');
 const logger = require("../config/logger");
@@ -10,44 +10,42 @@ const verifyToken = async (req, res, next) => {
   let access_token = req.cookies.access_token;
   const refresh_token = req.cookies.refresh_token;
 
-  try {
-    if (!access_token) {
-      if (refresh_token) {
-        access_token = await getNewToken(req, res, refresh_token)
-      } else {
-        //TODO Hier auch auto redirect
-        return res.clearCookie('access_token', {
-          secure: true,
-          httpOnly: true,
-          sameSite: config.sameSite
-        }).clearCookie('refresh_token', {
-          secure: true,
-          httpOnly: true,
-          sameSite: config.sameSite
-        }).status(httpStatus.UNAUTHORIZED).send('Logout')
-        //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
-      }
-    }
-  } catch (err) {
-    logger.error(err.toString())
-    return res.clearCookie('access_token', {
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    }).clearCookie('refresh_token', {
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    }).status(httpStatus.UNAUTHORIZED).send('Logout')
-  }
+  //if not access_token, try to get new access_token with refresh_token
+
+  //Gucke ob access_token vorhanden ist
+
+  //Wenn nicht, gucke ob refresh_token vorhanden ist
+  //Wenn ja, generiere neuen access_token mit refresh_token über token service
+
+  //Ansonsten return 401 Unauthorized & clear cookies
 
   try {
-    if (typeof access_token !== 'undefined') {
-      const decrypt = jwt.verify(access_token, config.secret);
-      req.user = await authenticationService.getUserById(decrypt.user_id)
-      return next();
-    }
-    else {
+
+    if (!access_token) {
+      if (refresh_token) {
+        access_token = await tokenService.
+  
+  
+    try {
+      if (!access_token) {
+        if (refresh_token) {
+          access_token = await getNewToken(req, res, refresh_token)
+        } else {
+          //TODO Hier auch auto redirect
+          return res.clearCookie('access_token', {
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+          }).clearCookie('refresh_token', {
+            secure: true,
+            httpOnly: true,
+            sameSite: config.sameSite
+          }).status(httpStatus.UNAUTHORIZED).send('Logout')
+          //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
+        }
+      }
+    } catch (err) {
+      logger.error(err.toString())
       return res.clearCookie('access_token', {
         secure: true,
         httpOnly: true,
@@ -58,10 +56,31 @@ const verifyToken = async (req, res, next) => {
         sameSite: config.sameSite
       }).status(httpStatus.UNAUTHORIZED).send('Logout')
     }
+  
+    try {
+      if (typeof access_token !== 'undefined') {
+        const decrypt = jwt.verify(access_token, config.secret);
+        req.user = await authenticationService.getUserById(decrypt.user_id)
+        return next();
+      }
+      else {
+        return res.clearCookie('access_token', {
+          secure: true,
+          httpOnly: true,
+          sameSite: config.sameSite
+        }).clearCookie('refresh_token', {
+          secure: true,
+          httpOnly: true,
+          sameSite: config.sameSite
+        }).status(httpStatus.UNAUTHORIZED).send('Logout')
+      }
+    } catch (err) {
+      logger.error(err.toString())
+      return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
+    }
   } catch (err) {
     logger.error(err.toString())
-    return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
-  }
+    
 };
 
 const getNewToken = async (req, res, old_refresh_token) => {
@@ -126,5 +145,19 @@ const getNewToken = async (req, res, old_refresh_token) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
   }
 }
+
+const clearCookies = (req, res, next) => {
+  res.clearCookie('access_token', {
+    secure: true,
+    httpOnly: true,
+    sameSite: config.sameSite
+  }).clearCookie('refresh_token', {
+    secure: true,
+    httpOnly: true,
+    sameSite: config.sameSite
+  })
+  next()
+}
+
 
 module.exports = verifyToken;
