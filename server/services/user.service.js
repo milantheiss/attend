@@ -5,6 +5,7 @@ const nanoid = require("nanoid");
 const groupService = require('./group.service');
 const notificationService = require('./notification.service');
 const _ = require('lodash');
+const { sendAccountDetails } = require("./email.service");
 
 /**
  * Get all members.
@@ -40,9 +41,7 @@ const createUser = async (userBody) => {
 
 	const password = nanoid.nanoid(10);
 
-	console.log(password);
-
-	//TODO Add send email with password
+	sendAccountDetails(userBody.email, { firstname: userBody.firstname, lastname: userBody.lastname, username: userBody.username, email: userBody.email, password: password })
 
 	userBody.password = password;
 
@@ -126,9 +125,8 @@ const resendPassword = async (userID) => {
 	}
 
 	const password = nanoid.nanoid(10);
-	//TODO Send email with new password
 
-	console.log(password);
+	sendAccountDetails(user.email, { firstname: user.firstname, lastname: user.lastname, username: user.username, email: user.email, password: password })
 
 	user.password = password;
 	await user.save();

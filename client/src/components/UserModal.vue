@@ -127,6 +127,8 @@
 
                 <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
 
+                <Toast ref="toast"></Toast>
+
                 <div class="flex justify-between items-center gap-6 ">
                     <button @click="close"
                         class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-[20px] px-3.5 md:px-7 py-2.5">
@@ -152,17 +154,19 @@ import CollapsibleContainer from './CollapsibleContainer.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import StandardButton from './StandardButton.vue';
 import { createNewUser, updateUser, deleteUser, resendPassword } from "@/util/fetchOperations";
+import Toast from './Toast.vue';
 
 export default {
     name: "UserModal",
     components: {
-        ModalDialog,
-        TextInput,
-        CheckboxInput,
-        CollapsibleContainer,
-        ErrorMessage,
-        StandardButton
-    },
+    ModalDialog,
+    TextInput,
+    CheckboxInput,
+    CollapsibleContainer,
+    ErrorMessage,
+    StandardButton,
+    Toast
+},
     data() {
         return {
             user: {
@@ -261,9 +265,10 @@ export default {
 
         async resendPassword() {
             const res = await resendPassword(this.user._id)
-            if (!res.ok) {
-                this.error.message = res.body.message
-                this.error.show = true
+            if(res.ok) {
+                this.$refs.toast.trigger(3000, 'success', 'Das Passwort wurde erfolgreich gesendet.')
+            } else {
+                this.$refs.toast.trigger(3000, 'error', res.body.message)
             }
         },
 
