@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useDataStore } from "./dataStore";
+import Cookies from "js-cookie";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
@@ -17,7 +18,7 @@ export const useAuthStore = defineStore('authStore', {
     // },
 
     async logIn(user_credentials) {
-      let res = (await fetch([import.meta.env.VITE_API_URL, "login"].join('/'), {
+      let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
         body: JSON.stringify(user_credentials),
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -25,7 +26,6 @@ export const useAuthStore = defineStore('authStore', {
         mode: 'cors'
       }));
 
-      this.authenticated = res.status === 200
       res = await res.json()
       useDataStore().showPatchNotesDialog = res.showPatchNotesDialog
 
@@ -33,42 +33,25 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async logOut() {
-      const res = await fetch([import.meta.env.VITE_API_URL, "logout"].join('/'), {
+      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
         credentials: 'include',
         mode: 'cors'
       });
 
-      this.authenticated = !res.status === 200
       this.user = undefined
     },
 
-    // Authentifiziert die Session
-    async authenticate() {
-      // Returnt true, wenn Session bereits authentifiziert ist
-      if (this.authenticated) {
-        return true
-      } else {
-        // Ansonsten wird versucht, Session zu authentifizieren
-        let res = (await fetch([import.meta.env.VITE_API_URL, 'authenticate'].join('/'), {
-          method: 'POST',
-          headers: { 'Content-type': 'application/json; charset=UTF-8' },
-          credentials: 'include',
-          mode: 'cors'
-        }))
-
-        this.authenticated = res.status === 200
-
-        if (this.authenticated) {
-          res = await res.json()
-          this.user = res.user
-          useDataStore().showPatchNotesDialog = res.showPatchNotesDialog
-        }
-
-        // Gibt Ergebnis der Server Anfrage zurück
-        return this.authenticated
-      }
+    isAuthenticated() {
+      //Refresh & Access Token sind htttOnly Cookies. Damit kann man sie nicht mit JavaScript auslesen.
+      //Um festzustellen, ob ein Cookie existiert & die Session authentifiziert ist, wird testweise ein Cookie mit dem Namen "refresh_token" gesetzt.
+      //Wenn bereits ein Cookie mit dem Namen "refresh_token" existiert, dann kann er nicht gesetzt werden und wenn man den Cookie zieht, ist er undefined.
+      Cookies.set("refresh_token", "test", { expires: 0.0006 })
+      const bool = Cookies.get("refresh_token") === undefined
+      this.authenticated = bool
+      return bool
     }
-  }
+  },
+  persist: true
 })

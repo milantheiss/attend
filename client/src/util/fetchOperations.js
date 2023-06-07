@@ -841,6 +841,23 @@ async function updateOwnUserData(body) {
 	return { ok: res.ok, body: res.status === 204 ? undefined : await res.json() }
 }
 
+async function changePassword(body) {
+	if (typeof body === "undefined") throw new Error("body must be defined")
+	if (Object.keys(body).length === 0) throw new Error("body must not be empty")
+
+	const res = await watchForRedirects(
+		fetch(`${import.meta.env.VITE_API_URL}/auth/change-password`, {
+			method: "PATCH",
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify(body),
+			credentials: "include",
+			mode: "cors",
+		}), { raw: true }
+	);
+
+	return { ok: res.status === 204, body: res.status === 204 ? undefined : await res.json() }
+}
+
 export {
 	fetchAttendance,
 	fetchAttendanceByDate,
@@ -890,4 +907,5 @@ export {
 	getIssues,
 	resolveIssue,
 	updateOwnUserData,
+	changePassword
 };

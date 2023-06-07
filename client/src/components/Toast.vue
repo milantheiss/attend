@@ -79,7 +79,6 @@ export default {
             this.show = true;
             this.$emit("update:show", true);
 
-            console.log("triggered toast");
             this.timeout = setTimeout(() => {
                 this.$emit("update:show", false);
                 this.show = false;

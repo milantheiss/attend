@@ -273,13 +273,13 @@ export default {
     async "attended.starttime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup_id, this.date, this.attended)
+        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
     async "attended.endtime"() {
       //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
       if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup_id, this.date, this.attended)
+        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
   },

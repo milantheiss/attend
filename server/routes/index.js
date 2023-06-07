@@ -6,14 +6,12 @@ const membersRoute = require('./members.route');
 const userRoute = require('./user.route');
 const usersRoute = require('./users.route');
 const attendanceRoute = require('./attendance.route')
-const loginRoute = require('./login.route')
-const logoutRoute = require('./logout.route')
-const authenticationRoute = require('./authentication.route')
 const patchNotesRoute = require("./patchnotes.route")
 const invoiceRoute = require("./invoice.route")
 const notificationRoute = require("./notification.route")
 const departmentsRoute = require('./departments.route');
 const issueRoute = require("./issue.route")
+const authRoute = require("./auth.route")
 
 const router = express.Router();
 
@@ -47,18 +45,6 @@ const defaultRoutes = [
         route: attendanceRoute,
     },
     {
-        path: '/login',
-        route: loginRoute
-    },
-    {
-        path: '/logout',
-        route: logoutRoute
-    },
-    {
-        path: '/authenticate',
-        route: authenticationRoute
-    },
-    {
         path: "/patchNotes",
         route: patchNotesRoute
     },
@@ -77,6 +63,10 @@ const defaultRoutes = [
     {
         path: "/issues",
         route: issueRoute
+    },
+    {
+        path: "/auth",
+        route: authRoute
     }
 ];
 

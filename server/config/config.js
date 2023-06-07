@@ -12,12 +12,14 @@ const envVarsSchema = Joi.object()
         MONGODB_URL: Joi.string().required().description('Mongo DB url'),
         KEY_PATH: Joi.string().required().description('Path to SSL Key'),
         CERT_PATH: Joi.string().required().description('Path to CERT'),
-        SECRET_KEY: Joi.string().required().description('Secret key for JWT'),
         SMTP_HOST: Joi.string().description('server that will send the emails'),
         SMTP_PORT: Joi.number().description('port to connect to the email server'),
         SMTP_USERNAME: Joi.string().description('username for email server'),
         SMTP_PASSWORD: Joi.string().description('password for email server'),
-        EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app')
+        EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+        JWT_SECRET: Joi.string().required().description('JWT secret key'),
+        JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
+        JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
     })
     .unknown();
 
@@ -34,7 +36,6 @@ module.exports = {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     key: envVars.KEY_PATH,
     cert: envVars.CERT_PATH,
-    secret: envVars.SECRET_KEY,
     sameSite: envVars.NODE_ENV === "production" ? 'Lax' : 'None',
     email: {
         smtp: {
@@ -46,5 +47,10 @@ module.exports = {
             },
         },
         from: envVars.EMAIL_FROM,
+    },
+    jwt: {
+        secret: envVars.JWT_SECRET,
+        accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
+        refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
     },
 };

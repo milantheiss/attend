@@ -12,11 +12,7 @@ const xss = require("./middlewares/xss-clean")
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 
-/*
 const { authLimiter } = require('./middlewares/rateLimiter');
-const passport = require('passport');
-const { jwtStrategy } = require('./config/passport');
-*/
 
 const app = express();
 
@@ -43,16 +39,10 @@ app.use(cors({
 // enable cookie parsing
 app.use(cookieParser())
 
-/*
-// jwt authentication
-app.use(passport.initialize());
-passport.use('jwt', jwtStrategy);
-
 // limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
     app.use('/auth', authLimiter);
 }
-*/
 
 // Define routes
 app.use('/', routes);

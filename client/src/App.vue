@@ -130,6 +130,16 @@
 								</router-link>
 							</div>
 						</div>
+						<router-link @click="showMenu = !showMenu" to="/account"
+							class="text-left font-medium md:text-2xl text-xl flex items-center group">
+							Kontoeinstellungen
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+								stroke="currentColor"
+								class="w-6 h-6 ml-2 -translate-x-3 transition duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+								<path stroke-linecap="round" stroke-linejoin="round"
+									d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+							</svg>
+						</router-link>
 						<p @click="async () => { showMenu = !showMenu; await logout() }" to="/logout"
 							class="text-left font-medium md:text-2xl text-xl flex items-center group">
 							Logout

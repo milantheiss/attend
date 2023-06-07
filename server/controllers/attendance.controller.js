@@ -5,17 +5,17 @@ const catchAsync = require('../utils/catchAsync');
 const { hasAccessToGroup, hasStaffAccess } = require('../utils/roleCheck');
 const ApiError = require('../utils/ApiError');
 
-const getAttendance = catchAsync(async (req, res) => {
-  const result = await attendanceService.getAttendance(req.user);
-  logger.debug('GET - all attendance lists')
-  res.status(httpStatus.OK).send(result);
-});
+// const getAttendance = catchAsync(async (req, res) => {
+//   const result = await attendanceService.getAttendance(req.user);
+//   logger.debug('GET - all attendance lists')
+//   res.status(httpStatus.OK).send(result);
+// });
 
-const createAttendance = catchAsync(async (req, res) => {
-  const result = await attendanceService.createAttendance(req.user, req.body);
-  logger.debug('CREATED - new attendance list')
-  res.status(httpStatus.CREATED).send(result);
-});
+// const createAttendance = catchAsync(async (req, res) => {
+//   const result = await attendanceService.createAttendance(req.user, req.body);
+//   logger.debug('CREATED - new attendance list')
+//   res.status(httpStatus.CREATED).send(result);
+// });
 
 const updateTrainingssession = catchAsync(async (req, res) => {
   if (!hasAccessToGroup(req.user, req.params.groupID) && !hasStaffAccess(req.user)) {

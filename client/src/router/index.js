@@ -105,8 +105,9 @@ const router = createRouter({
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
 router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore()
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (await useAuthStore().authenticate()) {
+    if (auth.isAuthenticated()) {
       await useDataStore().getNotifications()
       next();
       return;
@@ -182,8 +183,10 @@ router.beforeEach(async (to, from, next) => {
  * Wenn nicht, wird angefragte Unterseite angezeigt.
  */
 router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore()
   if (to.matched.some((record) => record.meta.guest)) {
-    if (await useAuthStore().authenticate()) {
+
+    if (auth.isAuthenticated()) {
       await useDataStore().getNotifications()
       next("/attendancelist");
       return;

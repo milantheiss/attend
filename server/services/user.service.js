@@ -133,6 +133,10 @@ const resendPassword = async (userID) => {
 	return
 }
 
+const getUserByEmail = async (email) => {
+	return User.findOne({ email });
+};
+
 module.exports = {
 	getUserInfo,
 	getUserById,
@@ -140,5 +144,6 @@ module.exports = {
 	createUser,
 	deleteUser,
 	updateUser,
-	resendPassword
+	resendPassword,
+	getUserByEmail
 };

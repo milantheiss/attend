@@ -57,6 +57,22 @@ const updateSelf = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(result)
 })
 
+const changePassword = catchAsync(async (req, res) => {
+    // Durch die Validation kann body nur Firstname, Lastname & Email enthalten
+    const user = await userService.getUserById(req.user._id)
+
+    if(!user) {
+        return res.status(httpStatus.NOT_FOUND).send({message: "Benutzer nicht gefunden"})
+    }
+    if(!await user.isPasswordMatch(req.body.old)) {
+        return res.status(httpStatus.BAD_REQUEST).send({message: "Altes Passwort falsch!"})
+    }
+
+    user.password = req.body.new
+    await user.save()
+    res.status(httpStatus.NO_CONTENT).send()
+})
+
 module.exports = {
     getUsers,
     getUserById,
@@ -64,6 +80,7 @@ module.exports = {
     updateUser,
     deleteUser,
     resendPassword,
-    updateSelf
+    updateSelf,
+    changePassword
 }
 
