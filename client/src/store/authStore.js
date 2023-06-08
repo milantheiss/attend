@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('authStore', {
   actions: {
     async logIn(user_credentials) {
       
-      let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      let res = (await fetch(`https://api.milantheiss.de/auth/login`, {
         method: 'POST',
         body: JSON.stringify(user_credentials),
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
