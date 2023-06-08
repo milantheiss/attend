@@ -4,19 +4,11 @@ import Cookies from "js-cookie";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    //Enthält firstname, lastname, _id, lengthAccessibleGroups & username 
+    //Enthält firstname, lastname, _id, lengthAccessibleGroups & email 
     user: null,
     authenticated: false
   }),
   actions: {
-    // async Register({dispatch}, form) {
-    //   await axios.post('register', form)
-    //   let UserForm = new FormData()
-    //   UserForm.append('username', form.username)
-    //   UserForm.append('password', form.password)
-    //   await dispatch('LogIn', UserForm)
-    // },
-
     async logIn(user_credentials) {
       let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
@@ -26,6 +18,10 @@ export const useAuthStore = defineStore('authStore', {
         mode: 'cors'
       }));
 
+      if (res.status === 401) {
+        throw new Error('Wrong email or password')
+      }
+      
       res = await res.json()
 
       this.user = res.user

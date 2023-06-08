@@ -10,8 +10,6 @@ const updateUser = {
     firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
     lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
-    //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen bestehen und muss zwischen 3 und 20 Zeichen lang sein
-    username: Joi.string().pattern(/^[a-zA-Z- ]+$/).min(3).max(20),
     //
     email: Joi.string().email(),
     //String als ObjectId
@@ -29,9 +27,6 @@ const createUser = {
     firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
     lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
-    //Datum als String im Format YYYY-MM-DD sein
-    username: Joi.string().pattern(/^[a-zA-Z- ]+$/).required(),
-    //
     email: Joi.string().email().required(),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
     roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")).required()
@@ -72,8 +67,6 @@ const updateSelf = {
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).strip(),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
     roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")).strip(),
-    //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen bestehen und muss zwischen 3 und 20 Zeichen lang sein
-    username: Joi.string().strip(),
     //Array aus ObjectIds
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
   })

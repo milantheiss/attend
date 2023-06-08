@@ -118,17 +118,13 @@ const submitInvoice = catchAsync(async (req, res) => {
 });
 
 const getAllAssignedInvoices = catchAsync(async (req, res) => {
-	if (hasTrainerRole(req.user) || hasAssistantRole(req.user)) {
-		const invoices = await Invoice.find({ assignedTo: req.user._id, $or: [{ status: "pending" }, { status: "reopened" }] });
+	const invoices = await Invoice.find({ assignedTo: req.user._id, $or: [{ status: "pending" }, { status: "reopened" }] });
 
-		if (invoices === null || typeof invoices === "undefined") {
-			throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
-		}
-
-		res.status(httpStatus.OK).send(await invoices);
-	} else {
-		throw new ApiError(httpStatus.UNAUTHORIZED, "User is not authorized to get assigned invoices");
+	if (invoices === null || typeof invoices === "undefined") {
+		throw new ApiError(httpStatus.BAD_REQUEST, "No invoices found");
 	}
+
+	res.status(httpStatus.OK).send(await invoices);
 });
 
 const getInvoiceByID = catchAsync(async (req, res) => {

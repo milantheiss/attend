@@ -196,7 +196,6 @@ const addMultipleTrainer = {
     //WARNING Alle anderen Felder werden entfernt
     firstname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).strip(),
     lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).strip(),
-    username: Joi.string().strip(),
     email: Joi.string().email().strip(),
     password: Joi.string().strip(),
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),

@@ -36,14 +36,6 @@
           </svg>
         </div>
 
-        <!-- Password neu senden -->
-        <!-- <div class="w-full flex items-center justify-end gap-4 mt-4">
-          <button "
-            class="flex justify-center items-center text-standard-gradient-2 outline outline-2 outline-standard-gradient-2 drop-shadow-md rounded-[20px] px-3.5 md:px-7 py-2.5 ">
-            <p class="font-medium font-base md:text-lg">Password ändern</p>
-          </button>
-        </div> -->
-
         <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
 
 
@@ -53,7 +45,7 @@
       </div>
     </div>
 
-    <ModalDialog :show="showNewPassword" @onClose="close" :hasSubheader="false">
+    <ModalDialog :show="showNewPassword" @onClose="close" :hasSubheader="false" :hasFooter="false">
       <template #header>
         <div class="w-full flex items-center justify-between gap-4">
           <p class="text-xl md:text-2xl font-medium">Password ändern</p>
@@ -61,29 +53,25 @@
         </div>
       </template>
       <template #content>
-        <div class="flex flex-col gap-4">
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="oldPassword">Altes Passwort:</label>
-            <TextInput name="oldPassword" v-model="password.old" placeholder="Altes Passwort" class="md:w-96" type="password"></TextInput>
-          </div>
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="newPassword">Neues Passwort:</label>
-            <TextInput name="newPassword" v-model="password.new" placeholder="Neues Passwort" type="password"
-              :showError="error.cause.passwordInput" class="md:w-96"></TextInput>
-          </div>
-          <div class="w-full flex items-center justify-between gap-4">
-            <label for="repeatPassword">Wiederholen:</label>
-            <TextInput name="repeatPassword" v-model="password.repeat" placeholder="Wiederholen" type="password"
-              :showError="error.cause.passwordInput" class="md:w-96"></TextInput>
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="w-full flex flex-col gap-4">
-          <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
-
-          <StandardButton @click="changePassword" class="w-full">Ändern</StandardButton>
-        </div>
+        <form @submit.prevent="changePassword" class="flex flex-col gap-4">    
+            <div class="w-full flex items-center justify-between gap-4">
+              <label for="oldPassword">Altes Passwort:</label>
+              <TextInput name="oldPassword" v-model="password.old" placeholder="Altes Passwort" class="md:w-96"
+                type="password"></TextInput>
+            </div>
+            <div class="w-full flex items-center justify-between gap-4">
+              <label for="newPassword">Neues Passwort:</label>
+              <TextInput name="newPassword" v-model="password.new" placeholder="Neues Passwort" type="password"
+                :showError="error.cause.passwordInput" class="md:w-96"></TextInput>
+            </div>
+            <div class="w-full flex items-center justify-between gap-4">
+              <label for="repeatPassword">Wiederholen:</label>
+              <TextInput name="repeatPassword" v-model="password.repeat" placeholder="Wiederholen" type="password"
+                :showError="error.cause.passwordInput" class="md:w-96"></TextInput>
+            </div>
+            <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
+            <StandardButton @click="changePassword" class="w-full" type="submit">Ändern</StandardButton>
+        </form>
       </template>
     </ModalDialog>
   </div>
@@ -194,6 +182,9 @@ export default {
         if (!res.ok) {
           this.error.message = res.body.message
           this.error.show = true
+        } else {
+          this.$refs.toast.trigger(3000, "success", "Passwort geändert.")
+          this.close()
         }
       }
     },

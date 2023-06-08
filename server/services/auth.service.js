@@ -5,7 +5,7 @@ const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 
 /**
- * Login with username and password
+ * Login with email and password
  * @param {string} email
  * @param {string} password
  * @returns {Promise<User>}

@@ -35,13 +35,9 @@ const createUser = async (userBody) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
 	}
 
-	if (await User.isUsernameTaken(userBody.username)) {
-		throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
-	}
-
 	const password = nanoid.nanoid(10);
 
-	sendAccountDetails(userBody.email, { firstname: userBody.firstname, lastname: userBody.lastname, username: userBody.username, email: userBody.email, password: password })
+	sendAccountDetails(userBody.email, { firstname: userBody.firstname, lastname: userBody.lastname, email: userBody.email, password: password })
 
 	userBody.password = password;
 
@@ -57,10 +53,6 @@ const updateUser = async (userID, updateBody) => {
 
 	if (updateBody.email && (await User.isEmailTaken(updateBody.email, userID))) {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-	}
-
-	if (updateBody.username && (await User.isUsernameTaken(updateBody.username, userID))) {
-		throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
 	}
 
 	if (updateBody.accessible_groups !== undefined) {
@@ -126,7 +118,7 @@ const resendPassword = async (userID) => {
 
 	const password = nanoid.nanoid(10);
 
-	sendAccountDetails(user.email, { firstname: user.firstname, lastname: user.lastname, username: user.username, email: user.email, password: password })
+	sendAccountDetails(user.email, { firstname: user.firstname, lastname: user.lastname, email: user.email, password: password })
 
 	user.password = password;
 	await user.save();

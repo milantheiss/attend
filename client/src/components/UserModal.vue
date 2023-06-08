@@ -9,13 +9,6 @@
         <template #content>
             <div class="flex flex-col justify-center items-center gap-4">
 
-                <!--Username des Benutzers-->
-                <div class="w-full flex items-center justify-between gap-4">
-                    <label for="username">Benutzername:</label>
-                    <TextInput name="username" v-model="user.username" placeholder="Benutzername"
-                        :showError="error.cause.usernameInput" class="md:w-96"></TextInput>
-                </div>
-
                 <!--Vorname des Benutzers-->
                 <div class="w-full flex items-center justify-between gap-4">
                     <label for="firstname">Vorname:</label>
@@ -172,7 +165,6 @@ export default {
             user: {
                 firstname: '',
                 lastname: '',
-                username: '',
                 email: '',
                 roles: []
             },
@@ -189,8 +181,7 @@ export default {
                 cause: {
                     firstnameInput: false,
                     lastnameInput: false,
-                    emailInput: false,
-                    usernameInput: false
+                    emailInput: false
                 }
             },
             show: false,
@@ -213,7 +204,7 @@ export default {
 
         close() {
             //Müssen für type=new resetet werden
-            this.user = { firstname: '', lastname: '', username: '', email: '', roles: [] }
+            this.user = { firstname: '', lastname: '', email: '', roles: [] }
             this.role = { admin: false, staff: false, head: false, trainer: false, assistant: false }
 
             //Muss auf false gesetzt werden, da sonst beim nächsten Öffnen des Modal der Löschen Button falsch angezeigt wird
@@ -279,8 +270,7 @@ export default {
                 cause: {
                     firstnameInput: false,
                     lastnameInput: false,
-                    emailInput: false,
-                    usernameInput: false
+                    emailInput: false
                 }
             }
         },
@@ -297,11 +287,6 @@ export default {
                 this.error.message = 'Bitte gebe einen Nachnamen ein.'
                 this.error.show = true
                 this.error.cause.lastnameInput = true
-            }
-            if (inputs.username.trim().length === 0 || !inputs.username.match(/^[a-zA-Z0-9-]+$/)) {
-                this.error.message = 'Bitte gebe einen Benutzernamen ein.'
-                this.error.show = true
-                this.error.cause.usernameInput = true
             }
             if (inputs.email.trim().length < 3 || inputs.email.trim().length > 20 || !inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
                 this.error.message = 'Bitte gebe einen gültigen E-Mail ein.'

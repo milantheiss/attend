@@ -88,6 +88,14 @@ const routes = [
     path: "/account",
     component: () => import("../views/AccountView.vue"),
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/server-down",
+    component: () => import("../views/ServerDownView.vue")
+  },
+  {
+    path: "/:notFound",
+    component: () => import("../views/NotFoundView.vue")
   }
 ]
 
