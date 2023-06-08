@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('authStore', {
   }),
   actions: {
     async logIn(user_credentials) {
+      
       let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
         body: JSON.stringify(user_credentials),

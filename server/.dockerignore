@@ -1,3 +1,10 @@
 node_modules
 npm-debug.log
 .git
+cert.pem
+csr.pem
+key.pem
+test.js
+usercontroller.js
+passwordgernerator.js
+usercontroller.js
