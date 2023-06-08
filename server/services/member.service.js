@@ -32,14 +32,15 @@ const updateMember = async (id, memberBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Member not found')
     }
 
-    if (!_.isEqual(memberBody.groups, member.groups)) {
+    //Info Object ID Array muss stringifiziert werden, da sonst die Vergleiche nicht funktionieren
+    if (!_.isEqual(memberBody.groups, member.groups.map(id => id.toString()))) {
         //Remove Member from Group
-        const removedGroups = member.groups.filter(group => !memberBody.groups.includes(group))
+        const removedGroups = member.groups.filter(group => !memberBody.groups.includes(group.toString()))
         for (groupId of removedGroups) {
             await groupService.removeMember(groupId, member._id)
         }
         //Add Member to Group
-        const newGroups = memberBody.groups.filter(group => !member.groups.includes(group))
+        const newGroups = memberBody.groups.filter(group => !member.groups.map(id => id.toString()).includes(group))
         for (groupId of newGroups) {
             await groupService.addMember(groupId, member._id)
         }

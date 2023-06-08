@@ -15,7 +15,7 @@ const updateUser = {
     //String als ObjectId
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
-    roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")),
+    roles: Joi.array().items(Joi.string().valid("admin", "developer", "staff", "head", "trainer", "assistant")),
     //Array aus ObjectIds
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/))
   })
@@ -29,7 +29,7 @@ const createUser = {
     lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/).required(),
     email: Joi.string().email().required(),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
-    roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")).required()
+    roles: Joi.array().items(Joi.string().valid("admin", "developer", "staff", "head", "trainer", "assistant")).required()
   })
 };
 
@@ -66,7 +66,7 @@ const updateSelf = {
     //String als ObjectId
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).strip(),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
-    roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")).strip(),
+    roles: Joi.array().items(Joi.string().valid("admin", "developer", "staff", "head", "trainer", "assistant")).strip(),
     //Array aus ObjectIds
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
   })

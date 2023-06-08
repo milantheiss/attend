@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const httpStatus = require("http-status");
 const { User, Notification, Department } = require("../models");
 const ApiError = require("../utils/ApiError");
@@ -55,15 +56,18 @@ const updateUser = async (userID, updateBody) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
 	}
 
+
 	if (updateBody.accessible_groups !== undefined) {
-		if (!_.isEqual(user.accessible_groups, updateBody.accessible_groups)) {
+		//Info Object ID Array muss stringifiziert werden, da sonst die Vergleiche nicht funktionieren
+		if (!_.isEqual(user.accessible_groups.map(id => id.toString()), updateBody.accessible_groups)) {
+			console.log(user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group.toString())));
 			//Remove Member from Group
-			const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group))
+			const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group.toString()))
 			for (groupId of removedGroups) {
 				await groupService.removeTrainer(groupId, user._id)
 			}
 			//Add Member to Group
-			const newGroups = updateBody.accessible_groups.filter(group => !user.accessible_groups.includes(group))
+			const newGroups = updateBody.accessible_groups.filter(group => !user.accessible_groups.map(id => id.toString()).includes(group))
 			for (groupId of newGroups) {
 				await groupService.addTrainer(groupId, { id: user._id, role: user.roles.includes("trainer") ? "trainer" : "assistant" })
 			}

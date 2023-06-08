@@ -34,16 +34,6 @@ const userSchema = mongoose.Schema(
             // },
             private: true, // used by the toJSON plugin
         },
-        refresh_tokens: {
-            type: [
-                {
-                    secret: {
-                        type: String
-                    }
-                }
-            ],
-            private: true
-        },
         accessible_groups: {
             type: [mongoose.Types.ObjectId]
         },

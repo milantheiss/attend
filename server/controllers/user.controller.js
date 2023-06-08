@@ -1,5 +1,3 @@
-const logger = require('../config/logger')
-const User = require('../models/group.model')
 const {userService} = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');

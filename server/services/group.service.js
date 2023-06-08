@@ -9,9 +9,15 @@ async function getTrainersOfGroup(group) {
     const trainerData = await User.find({ _id: { $in: group.trainers.map(e => e.userId) } }, { firstname: 1, lastname: 1, _id: 1 })
     return (await Promise.all(group.trainers.map(async (trainer) => {
         const t = trainerData.find(e => e._id.equals(trainer.userId))
-        trainer._doc.firstname = t.firstname;
-        trainer._doc.lastname = t.lastname;
-        trainer._doc._id = t._id;
+        try {
+            trainer._doc.firstname = t.firstname;
+            trainer._doc.lastname = t.lastname;
+            trainer._doc._id = t._id;
+        } catch (e) {
+            console.log(e);
+            console.log(group.trainers);
+            console.log(group._id);
+        }
 
         return trainer;
     }))).sort((a, b) => a._doc.lastname.localeCompare(b._doc.lastname));
@@ -21,10 +27,16 @@ async function getParticipantsOfGroup(group) {
     const membersData = await Member.find({ _id: { $in: group.participants.map(e => e.memberId) } }, { firstname: 1, lastname: 1, birthday: 1, _id: 1 })
     return (await Promise.all(group.participants.map(async (participant) => {
         const member = membersData.find(e => e._id.equals(participant.memberId))
-        participant._doc.firstname = member.firstname;
-        participant._doc.lastname = member.lastname;
-        participant._doc.birthday = member.birthday;
-        participant._doc._id = member._id;
+        try {
+            participant._doc.firstname = member.firstname;
+            participant._doc.lastname = member.lastname;
+            participant._doc.birthday = member.birthday;
+            participant._doc._id = member._id;
+        } catch (e) {
+            console.log(e);
+            console.log(group.participants);
+            console.log(group._id);
+        }
         return participant;
     }))).sort((a, b) => a._doc.lastname.localeCompare(b._doc.lastname))
 }
