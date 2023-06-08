@@ -27,12 +27,13 @@ export const useAuthStore = defineStore('authStore', {
       }));
 
       res = await res.json()
-      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog
 
       this.user = res.user
     },
 
     async logOut() {
+      const data = useDataStore()
+
       await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -41,6 +42,8 @@ export const useAuthStore = defineStore('authStore', {
       });
 
       this.user = undefined
+      data.notifications = []
+      data.invoiceData = {}
     },
 
     isAuthenticated() {

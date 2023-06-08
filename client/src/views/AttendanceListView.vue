@@ -35,12 +35,14 @@
       <div v-show="showTimesBox" class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col gap-3">
         <div class="flex justify-between items-center gap-4">
           <p class="text-light-gray w-fit">Beginn: </p>
-          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.starttime" min="00:00" :max="attended.endtime"
-            :show-error="attended.starttime === null || attended.starttime === ''"></TimeInput>
+          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.starttime" min="00:00"
+            :max="attended.endtime" :show-error="attended.starttime === null || attended.starttime === ''"
+            @change="onTimeChanged()"></TimeInput>
         </div>
         <div class="flex justify-between items-center gap-4">
           <p class="text-light-gray w-fit">Ende: </p>
-          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.endtime" :min="attended.starttime" max="23:59"
+          <TimeInput class="text-right text-lg md:text-xl font-medium" v-model="attended.endtime"
+            @change="onTimeChanged()" :min="attended.starttime" max="23:59"
             :show-error="attended.endtime === null || attended.endtime === ''">
           </TimeInput>
         </div>
@@ -69,7 +71,8 @@
 
     <div>
       <!--TrainerBox-->
-      <CollapsibleContainer ref="trainerBox" class="rounded-xl px-3.5 md:px-7 " v-if="typeof selectedGroup !== 'undefined'"
+      <CollapsibleContainer ref="trainerBox" class="rounded-xl px-3.5 md:px-7 "
+        v-if="typeof selectedGroup !== 'undefined'"
         :class="{ 'transition-all ease-in-out duration-[150ms] bg-transparent text-black': !trainerBox.showContent, 'transition-all ease-in-out duration-[150ms] drop-shadow-md bg-white px-3.5 md:px-7 py-4': trainerBox.showContent }">
         <template #header>
           <p class="font-bold text-xl md:text-2xl">Trainer</p>
@@ -142,6 +145,7 @@ export default {
     CheckboxInput
   },
   methods: {
+
     /**
      * Zieht beim aufrufen die Attendance List der in @see SelectList ausgewählten Gruppe für das im @see DatePicker ausgewählte Datum vom Server. 
      * Wenn eine Attendance List erfolgreich gezogen wurde, wird sie in 'attended' abgespeichert und von @see AttendanceListComponent gerendert.
@@ -155,7 +159,8 @@ export default {
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
-          if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+
+          if (this.attended.starttime === undefined || this.attended.starttime === null || this.attended.endtime === undefined || this.attended.endtime === null) {
             this.showTimesBox = true
           }
         }
@@ -169,10 +174,11 @@ export default {
      */
     async attendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo.memberId == id)).attended = newVal
-      this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
 
-      if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+      if (this.attended.starttime === undefined || this.attended.starttime === null || this.attended.endtime === undefined || this.attended.endtime === null) {
         this.showTimesBox = true
+      } else {
+        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
 
@@ -181,7 +187,7 @@ export default {
       trainer.attended = !trainer.attended
       this.attended.totalHours = this.totalHours
 
-      if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+      if (this.attended.starttime === undefined || this.attended.starttime === null || this.attended.endtime === undefined || this.attended.endtime === null) {
         this.showTimesBox = true
       } else {
         await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
@@ -213,6 +219,12 @@ export default {
         }
       }
       return count > 0 ? count : "Keine"
+    },
+
+    async onTimeChanged() {
+      if (this.attended.participants.some(foo => foo.attended)) {
+        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
+      }
     }
   },
   async created() {
@@ -230,7 +242,7 @@ export default {
     } else {
       this.groups = res.body
     }
- 
+
     const groupId = this.$route.query.groupId
     const date = this.$route.query.date
 
@@ -247,7 +259,7 @@ export default {
         this.date = new Date(date)
         this.attended = await res
 
-        if (this.attended.totalHours === null || this.attended.startingTime === null || this.attended.endingTime === null) {
+        if (this.attended.totalHours === null || this.attended.starttime === null || this.attended.endtime === null) {
           this.showTimesBox = true
         }
 
@@ -269,19 +281,7 @@ export default {
       }
 
       document.title = this.selectedGroup.name + ' - Attend'
-    },
-    async "attended.starttime"() {
-      //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
-      if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
-      }
-    },
-    async "attended.endtime"() {
-      //Trainingssession wird geupdatet, damit Zeit abgespeichert wird.
-      if (this.attended.participants.some(foo => foo.attended)) {
-        this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
-      }
-    },
+    }
   },
   computed: {
     totalHours() {

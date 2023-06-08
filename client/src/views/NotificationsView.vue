@@ -172,7 +172,7 @@ export default {
                     this.localNotifications.push(oldNotification)
                 } else {
                     this.localNotifications.push({
-                        id: notification._id,
+                        _id: notification._id,
                         show: false,
                         selected: false
                     })

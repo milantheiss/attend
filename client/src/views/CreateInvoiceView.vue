@@ -62,7 +62,7 @@
                         </template>
                         <template #content>
                             <div class="h-fit max-h-[55vh] overflow-y-auto block">
-                                <table class="table-auto w-full text-left">
+                                <table class="table-auto w-full text-left" v-if="getSortedTrainingssessionlist(group.trainingssessions).length > 0">
                                     <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
                                         <tr >
                                             <th class="font-medium w-fit cursor-pointer" @click="onClickOnDate()">
@@ -71,14 +71,14 @@
                                                     Datum
                                                 </span>
                                             </th>
-                                            <th class="w-[80px] md:w-[100px] px-3 md:px-4 pb-2.5 font-medium cursor-pointer"
+                                            <th class="w-[80px] md:w-[100px] px-3 md:px-4 font-medium cursor-pointer"
                                                 @click="onClickOnLength()">
                                                 <span class="flex items-center gap-1">
                                                     <SortIcon :index="indexSortButtonLength"></SortIcon>
                                                     Länge
                                                 </span>
                                             </th>
-                                            <th class="hidden ty:table-cell pb-2.5 font-medium w-full"></th>
+                                            <th class="hidden ty:table-cell font-medium w-full"></th>
                                         </tr>
                                     </thead>
                                     <tbody class="overscroll-y-scroll">
@@ -112,6 +112,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <p v-if="getSortedTrainingssessionlist(group.trainingssessions).length === 0" class="truncate text-light-gray text-center">Keine Trainingsstunden im gewählten Zeitraum</p>
                         </template>
                     </CollapsibleContainer>
                 </div>
@@ -446,12 +447,10 @@ export default {
     },
     async created() {
         const res = await fetchGroups()
-        this.groups = (res).map(val => {
-            return {
-                name: val.name,
-                _id: val._id
-            }
-        })
+        console.log(res);
+        if(res.ok) {
+            this.groups = res.body
+        }
 
         document.title = 'Erstelle eine Abrechnung - Attend'
         this.dataStore.viewname = "Abrechnung erstellen"

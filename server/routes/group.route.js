@@ -10,15 +10,14 @@ const router = express.Router();
 
 router
     .route('/')
-    //WARNING Noch nicht implementiert mit id aus Body
     // .patch(verifyToken, validate(groupValidation.updateGroup), groupController.updateGroup)
     .post(verifyToken, validate(groupValidation.createGroup), groupController.createGroup)
 
 router
     .route('/:groupID')
-    //TODO Query String hinzufügen um nur bestimmte Felder zu bekommen
     .get(verifyToken, validate(groupValidation.getGroupById), groupController.getGroupById)
     .patch(verifyToken, validate(groupValidation.updateGroup), groupController.updateGroup)
+    .delete(verifyToken, validate(groupValidation.deleteGroup), groupController.deleteGroup)
 
 router
     .route("/:groupID/multipleMembers")

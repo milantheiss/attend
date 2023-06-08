@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Member, Issue} = require('../models');
+const { Member, Issue } = require('../models');
 const ApiError = require('../utils/ApiError');
 const groupService = require('./group.service');
 const attendanceService = require('./attendance.service');
@@ -32,7 +32,7 @@ const updateMember = async (id, memberBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Member not found')
     }
 
-    if (_.isEqual(memberBody.groups, member.groups)) {
+    if (!_.isEqual(memberBody.groups, member.groups)) {
         //Remove Member from Group
         const removedGroups = member.groups.filter(group => !memberBody.groups.includes(group))
         for (groupId of removedGroups) {
@@ -44,6 +44,8 @@ const updateMember = async (id, memberBody) => {
             await groupService.addMember(groupId, member._id)
         }
     }
+
+    delete memberBody.groups
 
     Object.assign(member, memberBody)
 

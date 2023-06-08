@@ -19,9 +19,7 @@ const updateUser = {
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
     roles: Joi.array().items(Joi.string().valid("admin", "staff", "head", "trainer", "assistant")),
     //Array aus ObjectIds
-    accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
-    //WARNING: readPatchnotes wird entfernt
-    readPatchnotes: Joi.boolean().strip()
+    accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/))
   })
 };
 
@@ -69,7 +67,7 @@ const updateSelf = {
     lastname: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s]+$/),
     //
     email: Joi.string().email(),
-    //WARNING: readPatchnotes wird entfernt
+    //WARNING: Rest wird entfernt
     //String als ObjectId
     _id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).strip(),
     //Array aus Strings Kann "admin", "staff", "head", "trainer" & "assistant" enthalten
@@ -78,7 +76,6 @@ const updateSelf = {
     username: Joi.string().strip(),
     //Array aus ObjectIds
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
-    readPatchnotes: Joi.boolean().strip()
   })
 };
 

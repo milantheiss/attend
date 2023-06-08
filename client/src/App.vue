@@ -24,7 +24,6 @@
 					<h2 class="font-semibold text-xl sm:text-2xl md:text-3xl truncate mx-2">{{ dataStore.viewname }}</h2>
 
 					<!--Profile Avatar-->
-					<!--TODO Custom Avatar jenach User-->
 
 					<router-link @click="showMenu = false" to="/notifications" class="relative">
 						<div class="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold"
@@ -158,25 +157,6 @@
 			</nav>
 		</div>
 
-		<!-- Patch Notes Dialog -->
-		<div v-if="dataStore.showPatchNotesDialog">
-			<ModalDialog :show="showPatchNotes">
-				<template #header>
-					<div v-html="patchNotes.title"></div>
-				</template>
-				<template #subheader>
-					<p>{{ new Date(patchNotes.date).toLocaleDateString() }}</p>
-				</template>
-				<template #content>
-					<div v-html="patchNotes.text"></div>
-				</template>
-				<template #footer><button @click="dataStore.readPatchNotes()"
-						class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-6 ty:px-10 sm:px-12 py-1.5 rounded-xl drop-shadow-md">
-						<p class="font-medium text-base md:text-lg">Gelesen</p>
-					</button></template>
-			</ModalDialog>
-		</div>
-
 		<!--Seiten Inhalte: Router reguliert, welche Seite angezeigt wird.-->
 		<router-view class="font-normal md:max-w-medium-width mx-auto" v-slot="{ Component }">
 			<transition enter-active-class="transition ease-in-out duration-[200ms] delay-[240ms]"
@@ -192,29 +172,21 @@
 <script>
 import { useAuthStore } from "./store/authStore";
 import { useDataStore } from "./store/dataStore";
-import { getLastPatchNotes } from "@/util/fetchOperations";
 import ModalDialog from "./components/ModalDialog.vue";
-import { ref } from "vue";
 
 export default {
 	setup() {
 		document.title = "Attend";
 		const dataStore = useDataStore();
 		const auth = useAuthStore();
-		const showPatchNotes = ref(dataStore.showPatchNotesDialog);
 		return {
 			dataStore,
-			auth,
-			showPatchNotes,
+			auth
 		};
 	},
 	data() {
 		return {
-			showMenu: false,
-			patchNotes: {
-				title: "Patchnotes",
-				text: "Was wurde geändert.",
-			},
+			showMenu: false
 		};
 	},
 	methods: {
@@ -223,14 +195,6 @@ export default {
 			console.log("Logged out");
 			this.$router.push('/login')
 		}
-	},
-	watch: {
-		async "dataStore.showPatchNotesDialog"(newVal) {
-			if (newVal) {
-				this.patchNotes = await getLastPatchNotes();
-			}
-			this.showPatchNotes = newVal;
-		},
 	},
 	components: { ModalDialog },
 };

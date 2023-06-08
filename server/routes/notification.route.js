@@ -1,6 +1,8 @@
 const express = require("express");
 const { notificationController } = require("../controllers");
 const verifyToken = require("../middlewares/auth");
+const validate = require("../middlewares/validate");
+const notificationValidation = require("../validations/notification.validation");
 
 const router = express.Router();
 
@@ -9,24 +11,24 @@ const router = express.Router();
 router.route("/").get(verifyToken, notificationController.getNotifications); 
 
 //In Query Parameter wird die ID der Notification übergeben (?id=...)
-router.route("/delete").delete(verifyToken, notificationController.deleteNotificationById); 
+router.route("/delete").delete(verifyToken, validate(notificationValidation.deleteNotificationById), notificationController.deleteNotificationById); 
 
 //In Query Parameter werden die IDs der Notifications übergeben (?ids[]=...&ids[]=...)
-router.route("/deleteMany").delete(verifyToken, notificationController.deleteManyNotifications);
+router.route("/deleteMany").delete(verifyToken, validate(notificationValidation.deleteManyNotifications), notificationController.deleteManyNotifications);
 
 router.route("/deleteAll").delete(verifyToken, notificationController.deleteAllNotificationsOfUser); 
 
 //In Query Parameter wird die ID der Notification übergeben (?id=...)
-router.route("/read").get(verifyToken, notificationController.markNotificationAsRead); 
+router.route("/read").get(verifyToken, validate(notificationValidation.markNotificationAsRead), notificationController.markNotificationAsRead); 
 
-router.route("/readMany").get(verifyToken, notificationController.markManyNotificationsAsRead)
+router.route("/readMany").get(verifyToken, validate(notificationValidation.markNotificationAsRead), notificationController.markManyNotificationsAsRead)
 
 router.route("/readAll").get(verifyToken, notificationController.markAllNotificationsOfUserAsRead);  
 
 //In Query Parameter wird die ID der Notification übergeben (?id=...)
-router.route("/unread").get(verifyToken, notificationController.markNotificationAsUnread); 
+router.route("/unread").get(verifyToken, validate(notificationValidation.markNotificationAsUnread), notificationController.markNotificationAsUnread); 
 
-router.route("/unreadAll").get(verifyToken, notificationController.markAllNotificationsOfUserAsUnread); 
+router.route("/unreadAll").get(verifyToken, validate(notificationValidation.markManyNotificationsAsUnread), notificationController.markAllNotificationsOfUserAsUnread); 
 
 router.route("/:notificationID").get(verifyToken, notificationController.getNotificationById); 
 

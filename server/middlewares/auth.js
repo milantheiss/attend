@@ -15,13 +15,8 @@ const verifyToken = async (req, res, next) => {
     if (!access_token) {
       //Wenn ein Refresh Token vorhanden ist
       if (refresh_token) {
-
-        console.log("Refresh Token vorhanden");
-
         //Refresh Token wird überprüft
         refresh_token = await tokenService.verifyToken(refresh_token)
-
-        console.log(refresh_token);
 
         //Wenn der Refresh Token gültig ist, wird ein neuer Access Token generiert
         const accessTokenExpires = new Date().getTime() + config.jwt.accessExpirationMinutes * 60 * 1000;

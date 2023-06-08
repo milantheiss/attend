@@ -132,7 +132,7 @@ async function fetchGroups() {
 		}), { raw: true }
 	);
 
-	return { ok: res.status === 201, status: res.status, body: res.status === 204 ? undefined : await res.json() }
+	return { ok: res.ok, status: res.status, body: res.status === 204 ? undefined : await res.json() }
 }
 
 async function getAllGroups() {
@@ -599,27 +599,6 @@ async function getAllMembers() {
 
 
 
-//INFO Fetch Operations zu /patchNotes
-
-/**
- * Fetches the last patch notes from the API
- * @returns {Object} {patchNotes: String, version: String, date: Date, text: String, title: String}
- */
-async function getLastPatchNotes() {
-	return (
-		await fetch([import.meta.env.VITE_API_URL, "patchNotes"].join("/"), {
-			method: "GET",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			credentials: "include",
-			mode: "cors",
-		})
-	).json();
-}
-
-
-
-
-
 //INFO Fetch Operations zu /notification
 
 async function getNotifications() {
@@ -868,7 +847,6 @@ export {
 	getGroupName,
 	updateParticipantInGroup,
 	removeParticipantFromGroup,
-	getLastPatchNotes,
 	fetchDataForNewInvoice,
 	sendInvoice,
 	getNotifications,

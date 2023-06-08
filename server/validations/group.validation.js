@@ -200,7 +200,6 @@ const addMultipleTrainer = {
     email: Joi.string().email().strip(),
     password: Joi.string().strip(),
     accessible_groups: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).strip(),
-    readPatchnotes: Joi.boolean().strip(),
     roles: Joi.array().strip(),
     headerData: Joi.object().strip(),
   })
@@ -229,6 +228,13 @@ const createAndAddMember = {
   })
 };
 
+const deleteGroup = {
+  params: Joi.object().keys({
+    //String als ObjectId
+    groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+  })
+};
+
 module.exports = {
   addMember,
   createGroup,
@@ -241,5 +247,6 @@ module.exports = {
   updateTrainer,
   addMultipleMembers,
   addMultipleTrainer,
-  createAndAddMember
+  createAndAddMember,
+  deleteGroup
 };

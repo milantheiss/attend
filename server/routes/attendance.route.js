@@ -1,6 +1,8 @@
 const express = require('express');
 const { attendanceController } = require('../controllers')
 const verifyToken = require('../middlewares/auth');
+const { attendanceValidation } = require('../validations');
+const validate = require('../middlewares/validate');
 
 const router = express.Router();
 
@@ -9,22 +11,20 @@ const router = express.Router();
 //     .get(verifyToken, attendanceController.getAttendance)
 //     .post(verifyToken, attendanceController.createAttendance)
 
-//TODO Verifizierung einbauen
-
 router
     .route('/byGroupID/:groupID')
-    .get(verifyToken, attendanceController.getAttendanceByGroup)
-    .patch(verifyToken, attendanceController.addTrainingssession)
+    .get(verifyToken, validate(attendanceValidation.getAttendanceByGroup), attendanceController.getAttendanceByGroup)
+    // .patch(verifyToken, attendanceController.addTrainingssession)
 
 router
     .route('/byGroupID/:groupID/:date')
-    .get(verifyToken, attendanceController.getTrainingssession)
-    .patch(verifyToken, attendanceController.updateTrainingssession)
+    .get(verifyToken, validate(attendanceValidation.getTrainingssession), attendanceController.getTrainingssession)
+    .patch(verifyToken, validate(attendanceValidation.updateTrainingssession), attendanceController.updateTrainingssession)
     // .delete(verifyToken, attendanceController.deleteTrainingssession)
 
 router
     .route('/getFormattedList/:groupID/:startdate/:enddate')
-    .get(verifyToken, attendanceController.getFormattedList)
+    .get(verifyToken, validate(attendanceValidation.getFormattedList), attendanceController.getFormattedList)
 
 module.exports = router;
 

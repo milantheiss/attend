@@ -36,6 +36,7 @@ async function getParticipantsOfGroup(participants) {
 }
 
 /**
+ * WARNING Wird nicht genutzt
  * Get all attendance lists.
  * @returns {Promise<[Attendance]>}
  */
@@ -71,9 +72,7 @@ const getTrainingssession = async (groupID, date) => {
     const attendance = await getAttendanceByGroup(groupID)
 
     //Falls es noch gar keine Attendance gibt, 
-    try {
-        session = attendance.trainingssessions.find(element => element.date.toJSON() === new Date(date).toJSON())
-    } catch { }
+    session = attendance.trainingssessions.find(element => element.date.toJSON() === new Date(date).toJSON())
 
     if (typeof session === 'undefined' && session == null) {
         //Get Trainingssession schickt nur den Body zurück. Erstellt aber keine neue Trainingssession in DB
@@ -180,15 +179,13 @@ const getAttendanceByGroup = async (groupID) => {
  * @param {Object} attendanceBody
  * @returns {Promise<Attendance>}
  */
-const createAttendance = async (user, attendanceBody) => {
-    if (hasAdminRole(user)) {
-        return Attendance.create(attendanceBody)
-    } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "The user is not permitted to create a new attendance list")
-    }
+const createAttendance = async (user, groupID) => {
+    return Attendance.create({
+        group: new mongoose.Types.ObjectId(groupID),
+        trainingssessions: []
+    })
 };
 
-//INFO Über diesen API Endpoint dürfen nicht Namen etc geändert werden Code so anpassen, dass nur update vom boolean möglich ist
 /**
  * Update a trainings session. Wird nicht beim hinzufügen von neuen Member benutzt.
  * @param groupID
@@ -197,50 +194,47 @@ const createAttendance = async (user, attendanceBody) => {
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (groupID, date, sessionBody) => {
-    if (!sessionBody.date || !sessionBody.participants || !sessionBody.trainers) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "The body is missing required fields")
+    //Wenn alle Teilnehmer nicht anwesend sind, wird die Trainingssession gelöscht
+    if (!sessionBody.participants.some(p => p.attended)) {
+        await deleteTrainingssession(groupID, date)
+        return await getTrainingssession(groupID, date)
     }
 
-    if (!await runGarbageCollector(groupID, new Date(date), sessionBody)) {
-        const session = await getTrainingssession(groupID, new Date(date))
+    //Wenn mindestens ein Teilnehmer anwesend war
 
-        //Gleicht updated SessionBody mit session in DB ab
-        //SessionBody wird nicht direkt in DB übertrage, damit keine anderen Werte, außer attended verändert werden können.
-        sessionBody.participants.forEach(participant => {
-            const temp = session.participants.find(foo => foo.memberId == participant.memberId)
-            //Es werden nur Teilnehmer, die in der DB existieren geupdatet. Um neue Participant hinzuzufügen, muss er erst hinzugefügt werden.
-            if (typeof temp !== 'undefined') {
-                temp.attended = participant.attended
-            }
-        })
+    const attendance = await getAttendanceByGroup(groupID)
 
-        sessionBody.trainers.forEach(trainer => {
-            const temp = session.trainers.find(foo => foo.userId == trainer.userId)
-            //Es werden nur Trainer, die in der DB existieren geupdatet. Um neue Trainer hinzuzufügen, muss er erst hinzugefügt werden.
-            if (typeof temp !== 'undefined') {
-                temp.attended = trainer.attended
-            }
-        })
-
-        session.starttime = sessionBody.starttime
-        session.endtime = sessionBody.endtime
-
-        let updatedSession
-        //Wenn eine ganz neue Trainingssession erstellt werden muss
-        if (typeof session._id === 'undefined') {
-            updatedSession = (await Attendance.findOneAndUpdate({ group: groupID }, { $addToSet: { trainingssessions: session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
-        } else {
-            updatedSession = (await Attendance.findOneAndUpdate({ group: groupID, 'trainingssessions.date': date }, { '$set': { 'trainingssessions.$': session } }, { new: true })).trainingssessions.find(value => value.date.toJSON() === new Date(date).toJSON())
+    sessionBody.trainers = sessionBody.trainers.map(trainer => {
+        return {
+            attended: trainer.attended,
+            userId: trainer.userId,
+            _id: trainer.userId
         }
+    })
 
-        updatedSession.trainers = await getTrainersOfGroup(updatedSession.trainers)
+    sessionBody.participants = sessionBody.participants.map(participant => {
+        return {
+            attended: participant.attended,
+            memberId: participant.memberId,
+            _id: participant.memberId
+        }
+    })
 
-        updatedSession.participants = await getParticipantsOfGroup(updatedSession.participants)
-
-        return updatedSession
+    //Wenn die Trainingssession noch nicht existiert, wird sie erstellt
+    if (!attendance.trainingssessions.some(e => e.date.toJSON() === new Date(date).toJSON())) {
+        attendance.trainingssessions.push(sessionBody)
     } else {
-        return await getTrainingssession(groupID, new Date(date))
+        attendance._doc.trainingssessions = attendance.trainingssessions.map(e => {
+            if (e.date.toJSON() === new Date(date).toJSON()) {
+                return sessionBody
+            }
+            return e
+        })
     }
+
+    await attendance.save()
+
+    return await getTrainingssession(groupID, date)
 };
 
 /**
@@ -251,20 +245,12 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
  * @param {*} sessionBody 
  * @returns {Boolean} true if trainingssession was deleted
  */
-const runGarbageCollector = async (groupID, date, sessionBody = undefined) => {
-    if (typeof sessionBody === 'undefined') {
-        sessionBody = await getTrainingssession(groupID, date)
-    }
+const runGarbageCollector = async (groupID) => {
+    const attendance = await getAttendanceByGroup(groupID)
 
-    //Garbage Collector nicht von Trainern abhängig, da Training stattfinden kann, ohne dass die eingetragenen Trainer anwesend sind
-    //Jedoch nicht ohne Kinder
-    if (!sessionBody.participants.some(participant => participant.attended === true)) {
-        logger.debug('Garbage Collector - Trainingssession: Deleted a trainingssession')
-        await deleteTrainingssession(groupID, date)
-        return true
-    } else {
-        return false
-    }
+    attendance.trainingssessions = attendance.trainingssessions.filter(session => session.participants.some(p => p.attended))
+
+    await attendance.save()
 }
 
 /**
@@ -273,7 +259,12 @@ const runGarbageCollector = async (groupID, date, sessionBody = undefined) => {
  * @returns {Promise<Attendance>}
  */
 const deleteTrainingssession = async (groupID, date) => {
-    return await Attendance.findOneAndUpdate({ group: groupID, }, { '$pull': { 'trainingssessions': { 'date': date } } })
+    const attendance = await getAttendanceByGroup(groupID)
+    attendance.trainingssessions = attendance.trainingssessions.filter(e => e.date.toJSON() !== new Date(date).toJSON())
+
+    await attendance.save()
+
+    return attendance
 };
 
 /**
@@ -366,7 +357,8 @@ const removeMemberFromAttendanceList = async (groupID, memberID) => {
         session.participants = session.participants.filter(participant => !participant.memberId.equals(memberID))
     })
 
-    //TODO Implement Garbage Collector
+    //Run Garbage Collector
+    attendance.trainingssessions = attendance.trainingssessions.filter(session => session.participants.some(p => p.attended))
 
     await attendance.save()
 }
@@ -397,7 +389,7 @@ const updateMemberIdOfParticipant = async (groupID, newMemberID, oldMemberID) =>
 
             session.participants = session.participants.filter(participant => !participant.memberId.equals(oldMemberID))
 
-            console.log(session.participants.find(participant => participant.memberId.equals(newMemberID)));
+            session.participants.find(participant => participant.memberId.equals(newMemberID));
         } else if (session.participants.some(participant => participant.memberId.equals(oldMemberID))) {
             session.participants.forEach(participant => {
                 if (participant.memberId.equals(oldMemberID)) {

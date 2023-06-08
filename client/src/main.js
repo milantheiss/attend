@@ -9,8 +9,6 @@ import './assets/tailwind.css'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-import VueCookies from 'vue3-cookies'
-
 const resolveMarkdown = {
     install(app) {
         app.config.globalProperties.$resolveMarkdown = (content) => {
@@ -22,4 +20,4 @@ const resolveMarkdown = {
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-createApp(App).use(pinia).use(router).use(VueCookies).use(resolveMarkdown).mount("#app");
+createApp(App).use(pinia).use(router).use(resolveMarkdown).mount("#app");

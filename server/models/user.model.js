@@ -63,10 +63,6 @@ const userSchema = mongoose.Schema(
         roles: {
             type: Array
         },
-        readPatchnotes: {
-            type: Boolean,
-            default: true
-        },
         headerData: {
             //Die Daten, werden im Header der Abrechnung genutzt
             type: {

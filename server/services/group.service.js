@@ -3,6 +3,7 @@ const { Group, Attendance, Member, User, Department } = require('../models');
 const ApiError = require('../utils/ApiError');
 const attendanceService = require('./attendance.service');
 const _ = require('lodash');
+const mongoose = require('mongoose');
 
 async function getTrainersOfGroup(group) {
     const trainerData = await User.find({ _id: { $in: group.trainers.map(e => e.userId) } }, { firstname: 1, lastname: 1, _id: 1 })
@@ -188,7 +189,10 @@ const updateParticipantInTrainingssessions = async (groupID, memberID, newFirstt
     let list = await Attendance.findOne({ group: groupID });
 
     if (typeof list === "undefined" || list === null) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Attendance not found')
+        list = await Attendance.create({
+            group: new mongoose.Types.ObjectId(groupID),
+            trainingssessions: []
+        })
     }
 
     newFirsttraining = new Date(newFirsttraining)
@@ -418,6 +422,22 @@ const updateMemberIdOfParticipant = async (groupID, newMemberId, oldMemberId) =>
     return await group.save()
 }
 
+const deleteGroup = async (groupID) => {
+    await Attendance.findOneAndDelete({ 'group': groupID })
+    const members = await Member.find({ groups: groupID })
+    await Promise.all(members.map(async (m) => {
+        m.groups = m.groups.filter(e => !e.equals(groupID))
+        await m.save()
+    }))
+
+    const trainers = await User.find({ accessible_groups: groupID })
+    await Promise.all(trainers.map(async (t) => {
+        t.accessible_groups = t.accessible_groups.filter(e => !e.equals(groupID))
+        await t.save()
+    }))
+    return await Group.findByIdAndDelete(groupID)
+}
+
 module.exports = {
     getGroupById,
     getGroups,
@@ -433,5 +453,6 @@ module.exports = {
     updateTrainer,
     addMultipleMembers,
     addMultipleTrainer,
-    updateMemberIdOfParticipant
+    updateMemberIdOfParticipant,
+    deleteGroup
 };

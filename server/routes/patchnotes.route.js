@@ -1,20 +1,23 @@
 const express = require('express');
 const { dataController } = require('../controllers')
 const verifyToken = require('../middlewares/auth');
+const validate = require('../middlewares/validate');
+const Joi = require('joi');
 
 const router = express.Router();
+
+const patchNotes = {
+    body: Joi.object().keys({
+        title: Joi.string().required(),
+        message: Joi.string().required()
+    })
+};
 
 /**
  * Braucht kein Access Controll
  */
 router
     .route('/')
-    //INFO Everybody can access last patchnotes
-    .get(dataController.getLastPatchNotes)
-    .post(verifyToken, dataController.addNewPatchNote)
+    .post(verifyToken, validate(patchNotes), dataController.sendPatchnotes)
 
-router
-    .route("/markAsRead")
-    .post(verifyToken, dataController.markPatchnotesAsRead)
-    
 module.exports = router;

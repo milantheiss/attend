@@ -43,7 +43,7 @@ export default {
             if (this.sortAlphabetically) {
                 list = this._sortAlphabetically(list)
             }
-            return list.map(val => val = { text: val, checked: this.default })
+            return list.map(val => val = { text: val, checked: this.formattedList.find(v => v.text === val)?.checked ?? this.default })
         }
     },
     watch: {

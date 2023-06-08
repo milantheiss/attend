@@ -33,8 +33,7 @@ const login = catchAsync(async (req, res) => {
             lengthAccessibleGroups: user.accessible_groups.length,
             roles: user.roles,
             email: user.email
-        },
-        showPatchNotesDialog: !user.readPatchnotes,
+        }
     };
 
     logger.debug("Successfull Login");

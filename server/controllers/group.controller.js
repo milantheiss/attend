@@ -33,6 +33,7 @@ const createGroup = catchAsync(async (req, res) => {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
     const result = await groupService.createGroup(req.body);
+    await groupService.createAttendance(result._id)
     res.status(httpStatus.CREATED).send(result)
 });
 
@@ -146,6 +147,15 @@ const addMultipleTrainer = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(result)
 })
 
+const deleteGroup = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user)) {
+        return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to delete this group" })
+    }
+
+    const result = await groupService.deleteGroup(req.params.groupID)
+    res.status(httpStatus.OK).send(result)
+})
+
 module.exports = {
     getAssignedGroups,
     getGroups,
@@ -161,6 +171,7 @@ module.exports = {
     updateTrainer,
     addMultipleMembers,
     addMultipleTrainer,
-    createAndAddMember
+    createAndAddMember,
+    deleteGroup
 }
 

@@ -1,6 +1,5 @@
 module.exports.attendanceService = require('./attendance.service')
 module.exports.authService = require("./auth.service")
-module.exports.dataService = require('./data.service')
 module.exports.departmentService = require("./department.service")
 module.exports.emailService = require("./email.service")
 module.exports.groupService = require('./group.service')

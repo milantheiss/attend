@@ -26,11 +26,11 @@ const updateTrainingssession = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(result);
 });
 
-const deleteAttendance = catchAsync(async (req, res) => {
-  const result = await attendanceService.deleteAttendance(req.user, req.params.attendanceID);
-  logger.debug(`DELETE - attendance list by id: ${req.params.attendanceID}`)
-  res.status(httpStatus.OK).send(result);
-});
+// const deleteAttendance = catchAsync(async (req, res) => {
+//   const result = await attendanceService.deleteAttendance(req.user, req.params.attendanceID);
+//   logger.debug(`DELETE - attendance list by id: ${req.params.attendanceID}`)
+//   res.status(httpStatus.OK).send(result);
+// });
 
 const getTrainingssession = catchAsync(async (req, res) => {
   if (!hasAccessToGroup(req.user, req.params.groupID) && !hasStaffAccess(req.user)) {
@@ -50,20 +50,20 @@ const getAttendanceByGroup = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(result);
 });
 
-const addTrainingssession = catchAsync(async (req, res) => {
-  const result = await attendanceService.addTrainingssession(req.user, req.params.groupID, req.body);
-  logger.debug(`CREATED - new trainings session for group ${req.params.groupID}`)
-  res.status(httpStatus.OK).send(result);
-});
+// const addTrainingssession = catchAsync(async (req, res) => {
+//   const result = await attendanceService.addTrainingssession(req.user, req.params.groupID, req.body);
+//   logger.debug(`CREATED - new trainings session for group ${req.params.groupID}`)
+//   res.status(httpStatus.OK).send(result);
+// });
 
-const deleteTrainingssession = catchAsync(async (req, res) => {
-  if (!hasAccessToGroup(req.user, req.params.groupID) && !hasStaffAccess(req.user)) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'You do not have access to this group');
-  }
-  const result = await attendanceService.deleteTrainingssession(req.params.groupID, req.params.date);
-  logger.debug(`DELETE - trainings session on: ${req.params.date}`)
-  res.status(httpStatus.OK).send(result);
-});
+// const deleteTrainingssession = catchAsync(async (req, res) => {
+//   if (!hasAccessToGroup(req.user, req.params.groupID) && !hasStaffAccess(req.user)) {
+//     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have access to this group');
+//   }
+//   const result = await attendanceService.deleteTrainingssession(req.params.groupID, req.params.date);
+//   logger.debug(`DELETE - trainings session on: ${req.params.date}`)
+//   res.status(httpStatus.OK).send(result);
+// });
 
 const getFormattedList = catchAsync(async (req, res) => {
   if (!hasAccessToGroup(req.user, req.params.groupID) && !hasStaffAccess(req.user)) {
@@ -75,14 +75,14 @@ const getFormattedList = catchAsync(async (req, res) => {
 })
 
 module.exports = {
-  getAttendance,
-  createAttendance,
+  // getAttendance,
+  // createAttendance,
   updateTrainingssession,
-  deleteAttendance,
+  // deleteAttendance,
   getTrainingssession,
   getAttendanceByGroup,
-  addTrainingssession,
-  deleteTrainingssession,
+  // addTrainingssession,
+  // deleteTrainingssession,
   getFormattedList
 }
 

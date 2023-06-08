@@ -1,4 +1,4 @@
-const { Notification } = require("../models");
+const { Notification, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const { hasAdminRole } = require("../utils/roleCheck");
@@ -8,7 +8,6 @@ const { hasAdminRole } = require("../utils/roleCheck");
  * @returns {Promise<[Notification]>}
  */
 const addNewNotification = async (body) => {
-	//WARNING No access control here
 	body.date = body.date || new Date();
 	const notification = await Notification.create(body);
 
@@ -30,7 +29,9 @@ const addRecipients = async (notificationID, userID) => {
  */
 const removeRecipient = async (notificationID, userID) => {
 	const notification = await Notification.findById(notificationID);
-	notification.recipients = notification.recipients.filter((recipient) => recipient.userID !== userID);
+
+	notification.recipients = notification.recipients.filter((recipient) => !recipient.userID.equals(userID));
+
 	return notification.save();
 };
 
@@ -120,8 +121,8 @@ const markNotificationAsRead = async (notificationID, userID) => {
  */
 const markManyNotificationsAsRead = async (notificationIDs, userID) => {
 	return Notification.updateMany(
-		{_id: {$in: notificationIDs}, recipients: {$elemMatch: {userID: userID}}},
-		{$set: {"recipients.$.read": true}}
+		{ _id: { $in: notificationIDs }, recipients: { $elemMatch: { userID: userID } } },
+		{ $set: { "recipients.$.read": true } }
 	)
 };
 
@@ -156,6 +157,20 @@ const markAllNotificationsOfUserAsUnread = async (userID) => {
 	return Notification.updateMany({ recipients: { $elemMatch: { userID: userID } } }, { $set: { "recipients.$.read": false } }, { new: true });
 };
 
+const sendNotificationToAllUsers = async (body) => {
+	const users = await User.find({ deactivated: { $ne: true } });
+
+	Object.assign(body, {
+		recipients: users.map((user) => ({
+			userID: user._id,
+			read: false,
+			_id: user._id
+		}))
+	});
+
+	return Notification.create(body);
+}
+
 module.exports = {
 	addNewNotification,
 	addRecipients,
@@ -172,4 +187,5 @@ module.exports = {
 	markNotificationAsUnread,
 	markAllNotificationsOfUserAsUnread,
 	markManyNotificationsAsRead,
+	sendNotificationToAllUsers,
 };

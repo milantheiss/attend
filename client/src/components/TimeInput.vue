@@ -6,7 +6,7 @@
         focus:ring-0 focus:border-standard-gradient-1
         bg-inherit text-left'
         :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
-        type='time' :name="name" v-model="input" :max='max' :min='min' />
+        type='time' :name="name" v-model="input" :max='max' :min='min' @change="$emit('change')"/>
 </template>
 
 <script>
@@ -24,7 +24,7 @@ export default {
         max: String,
         min: String
     },
-    emits: ['update:modelValue', 'onChange', 'on'],
+    emits: ['update:modelValue', 'onChange', 'on', 'change'],
     watch: {
         input(newVal, oldVal) {
             //WARNING ES ist kein Midnight Wraparound möglich

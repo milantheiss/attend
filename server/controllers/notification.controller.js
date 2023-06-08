@@ -2,15 +2,15 @@ const logger = require("../config/logger");
 const { notificationService } = require("../services");
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
-const { hasAdminRole } = require("../utils/roleCheck");
+const { hasAdminRole, hasDeveloperRole } = require("../utils/roleCheck");
 
 const getNotifications = catchAsync(async (req, res) => {
 	const notificationIDs = req.query.ids || null;
-	
+
 	if (notificationIDs) {
 		//Wenn notificationIDs übergeben wurden, werden diese abgefragt
 		const notifications = await notificationService.getNotificationsByIds(notificationIDs);
-		
+
 		if (!notifications) {
 			//Wenn keine Notifications gefunden wurden, wird ein Fehler zurückgegeben
 			logger.debug("No notifications found");
@@ -53,39 +53,34 @@ const getNotificationById = catchAsync(async (req, res) => {
 });
 
 const deleteNotificationById = catchAsync(async (req, res) => {
-	const notificationID = req.query.id || null;
+	const notificationID = req.query.id
 
-	if (!notificationID) {
-		//Wenn keine NotificationID übergeben wird, wird ein Fehler zurückgegeben
-		logger.debug("No notificationID provided");
-		return res.status(httpStatus.BAD_REQUEST).send("No notificationID provided");
+	let notification = await notificationService.getNotificationById(notificationID);
+	
+	if (!notification) {
+		//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
+		logger.debug("No notification found");
+		return res.status(httpStatus.NOT_FOUND).send("No notification found");
+	} else if (!notification.recipients.some((recipient) => recipient.userID.equals(req.user._id))) {
+		//User darf nur Notifications löschen, die er empfangen hat
+		//Admins haben über diese Methode keinen Zugriff auf Notifications, die sie nicht empfangen haben
+		//TODO: Admins Methode erstellen, worüber Notifications gelöscht werden können, die sie nicht empfangen haben, wenn sie die NotificationID kennen
+		logger.debug("User does not have access to this notification");
+		return res.status(httpStatus.FORBIDDEN).send("User does not have access to this notification");
+	} else if (notification.recipients.length > 1) {
+		//Wenn die Notification noch an andere User gesendet wird, wird der User nur aus der Liste der Empfänger entfernt
+		notification = await notificationService.removeRecipient(notificationID, req.user._id);
 	} else {
-		let notification = await notificationService.getNotificationById(notificationID);
-		if (!notification) {
-			//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
-			logger.debug("No notification found");
-			return res.status(httpStatus.NOT_FOUND).send("No notification found");
-		} else if (!notification.recipients.some((recipient) => recipient.userID.equals(req.user._id))) {
-			//User darf nur Notifications löschen, die er empfangen hat
-			//Admins haben über diese Methode keinen Zugriff auf Notifications, die sie nicht empfangen haben
-			//TODO: Admins Methode erstellen, worüber Notifications gelöscht werden können, die sie nicht empfangen haben, wenn sie die NotificationID kennen
-			logger.debug("User does not have access to this notification");
-			return res.status(httpStatus.FORBIDDEN).send("User does not have access to this notification");
-		} else if (notification.recipients.length > 1) {
-			//Wenn die Notification noch an andere User gesendet wird, wird der User nur aus der Liste der Empfänger entfernt
-			notification = await notificationService.removeRecipient(notificationID, req.user._id);
-		} else {
-			//Wenn die Notification nur noch an den User gesendet wird, wird sie gelöscht
-			notification = await notificationService.deleteNotificationById(notificationID);
-		}
-
-		if (!notification) {
-			//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
-			logger.debug("No notification found");
-			return res.status(httpStatus.NOT_FOUND).send("No notification found");
-		}
-		return res.send(notification); //Die Notification wird zurückgegeben
+		//Wenn die Notification nur noch an den User gesendet wird, wird sie gelöscht
+		notification = await notificationService.deleteNotificationById(notificationID);
 	}
+
+	if (!notification) {
+		//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
+		logger.debug("No notification found");
+		return res.status(httpStatus.NOT_FOUND).send("No notification found");
+	}
+	return res.send(notification); //Die Notification wird zurückgegeben
 });
 
 const deleteManyNotifications = catchAsync(async (req, res) => {
@@ -233,9 +228,16 @@ const changeDate = catchAsync(async (req, res) => {
 		if (!notification) {
 			//Wenn die Notification nicht gefunden wird, wird ein Fehler zurückgegeben
 			logger.debug("No notification found");
-			return res.status(httpStatus.NOT_FOUND).send("No notification found");		}
+			return res.status(httpStatus.NOT_FOUND).send("No notification found");
+		}
 		return res.send(notification);
 	}
+});
+
+const sendNotificationToAllUsers = catchAsync(async (req, res) => {
+	if (!hasAdminRole(req.user) && !hasDeveloperRole) return res.status(httpStatus.FORBIDDEN).send("User is not allowed to send a notification to all users")
+	const notification = await notificationService.sendNotificationToAllUsers(req.body);
+	res.status(httpStatus.OK).send(notification);
 });
 
 module.exports = {
@@ -250,4 +252,5 @@ module.exports = {
 	deleteManyNotifications,
 	markManyNotificationsAsRead,
 	changeDate,
+	sendNotificationToAllUsers
 };
