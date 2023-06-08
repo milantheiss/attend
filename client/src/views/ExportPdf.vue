@@ -1,7 +1,7 @@
 <template>
-    <div class="relative container">
+    <div class="container mx-auto">
         <!--Export Settings-->
-        <div class="bg-white px-6 py-5 rounded-lg drop-shadow-md">
+        <div class="bg-white px-6 py-5 rounded-xl drop-shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-gray-700 font-normal md:font-light text-base md:text-lg ">Gruppe:</p>
                 <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
@@ -29,7 +29,7 @@
             <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
 
             <button @click="exportPDF"
-                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-lg drop-shadow-md"
+                class="flex items-center mx-auto text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-8 md:px-9 py-2.5 rounded-2xl drop-shadow-md"
                 :class="error.show ? 'mt-4' : 'mt-8'">
                 <p class="font-medium font-base md:text-lg">Exportieren</p>
             </button>
@@ -39,8 +39,8 @@
 </template>
   
 <script>
-import SelectList from "@/components/SelectList";
-import { createListe } from "@/util/generatePdf"
+import SelectList from "@/components/SelectList.vue";
+import { createList } from "@/util/generatePdf"
 import { fetchAttendanceByDateRange, fetchGroups } from '@/util/fetchOperations'
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -85,13 +85,13 @@ export default {
          */
         async exportPDF() {
             if (!this.hasAnError()) {
-                const attendance = await fetchAttendanceByDateRange(this.selectedGroup.id, new Date(this.startdate), new Date(this.enddate))
+                const attendance = await fetchAttendanceByDateRange(this.selectedGroup._id, new Date(this.startdate), new Date(this.enddate))
                 if (attendance.dates.length === 0) {
                     this.error.show = true
                     this.error.cause.timespanFaulty = true
                     this.error.message = 'Es wurden keine Teilnehmerlisten in der gewählten Zeitspanne gefunden!'
                 } else {
-                    await createListe(this.selectedGroup, attendance, this.filename, this.startdate, this.enddate)
+                    await createList(this.selectedGroup, attendance, this.startdate, this.enddate, {filename: this.filename})
                 }
             }
         },

@@ -1,7 +1,6 @@
 {
-  "name": "server-template",
+  "name": "attend-app-backend",
   "version": "1.0.0",
-  "description": "Express.js template",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
@@ -11,20 +10,28 @@
   },
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.1.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "express": "^4.16.3",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0",
     "fs": "^0.0.1-security",
     "http-status": "^1.5.2",
     "https": "^1.0.0",
-    "joi": "^17.6.0",
+    "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.4.6",
-    "morgan": "^1.10.0",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.8.3",
+    "mongoose-sequence": "^5.3.1",
+    "nanoid": "^3.3.6",
+    "nodemailer": "^6.9.3",
     "prompt-sync": "^4.2.0",
-    "winston": "^3.7.2"
+    "winston": "^3.7.2",
+    "xss-clean": "^0.1.4",
+    "xss-filters": "^1.2.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.20",

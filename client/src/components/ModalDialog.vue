@@ -4,26 +4,25 @@
             enter-to-class="opacity-100" leave-active-class="transition ease-in duration-150 transform"
             leave-from-class="opacity-100" leave-to-class="opacity-0">
             <!--Backdrop-->
-            <div ref="modal-backdrop" class="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50"
-                v-if="showModal">
+            <div ref="modal-backdrop" class="fixed z-30 inset-0 overflow-y-auto bg-black bg-opacity-50" v-if="showModal">
                 <!--Elementfenster-->
-                <div class="flex items-start justify-center min-h-screen pt-8 md:pt-24 text-center">
-                    <div class="w-5/6 md:max-w-medium-width p-5 bg-white rounded-lg overflow-hidden drop-shadow-md text-black"
+                <div class="flex pt-[104px] md:pt-[128px] mx-3.5 md:mx-7">
+                    <div class="container mx-auto flex flex-col gap-4 w-full md:max-w-medium-width px-3.5 md:px-7 py-4 bg-white rounded-xl drop-shadow-md text-lg md:text-xl"
                         role="dialog" ref="modal" aria-modal="true" aria-labelledby="modal-headline">
                         <!--Header-->
-                        <div class="text-left font-bold text-xl md:text-2xl text-gray-700">
+                        <div class="text-left font-bold" v-show="hasHeader">
                             <slot name="header"></slot>
                         </div>
                         <!--Subheader-->
-                        <div class="text-left font-normal text-base md:text-lg text-gray-500">
+                        <div class="text-left font-normal" v-show="hasSubheader">
                             <slot name="subheader"></slot>
                         </div>
                         <!--Content-->
-                        <div class="text-left text-base md:text-lg text-black my-4">
+                        <div class="text-left" v-show="hasContent">
                             <slot name="content"></slot>
                         </div>
                         <!--Footer-->
-                        <div class="text-left font-semibold text-base md:text-lg text-black">
+                        <div class="text-left font-semibold mt-4" v-show="hasFooter">
                             <slot name="footer"></slot>
                         </div>
                     </div>
@@ -33,45 +32,75 @@
     </teleport>
 </template>
 
-<script>
-import { ref, watch } from 'vue';
+<script setup>
+import { ref, watch, onMounted } from 'vue';
 import useClickOutside from '@/util/useClickOutside';
 
-export default {
-    name: 'ModalDialog',
-    setup(props) {
-        const modal = ref(null);
-        const { onClickOutside } = useClickOutside();
-        const showModal = ref(false);
+const modal = ref(null);
+const { onClickOutside } = useClickOutside();
+const showModal = ref(false);
 
-        function closeModal() {
-            showModal.value = false;
-        }
-
-        onClickOutside(modal, () => {
-            if (showModal.value === true) {
-                closeModal();
-            }
-        });
-
-
-        watch(
-            () => props.show,
-            show => {
-                showModal.value = show;
-            },
-        );
-
-        return {
-            showModal,
-            modal
-        };
+// eslint-disable-next-line no-undef
+const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false,
     },
-    props: {
-        show: {
-            type: Boolean,
-            default: false,
-        },
+    hasHeader: {
+        type: Boolean,
+        default: true,
+    },
+    hasSubheader: {
+        type: Boolean,
+        default: true,
+    },
+    hasContent: {
+        type: Boolean,
+        default: true,
+    },
+    hasFooter: {
+        type: Boolean,
+        default: true,
+    },
+    disableClickOutside: {
+        type: Boolean,
+        default: false,
     }
-};
+});
+
+// eslint-disable-next-line no-undef
+const emit = defineEmits(['onOpen', 'onClose', 'onClickOutside']);
+
+function closeModal() {
+    showModal.value = false;
+}
+
+onClickOutside(modal, () => {
+    if (showModal.value === true && !props.disableClickOutside) {
+        closeModal();
+        emit('onClickOutside');
+    }
+});
+
+onMounted(() => {
+    showModal.value = props.show;
+});
+
+watch(
+    () => props.show,
+    newVal => {
+        showModal.value = newVal;
+    }
+);
+
+watch(
+    showModal,
+    newVal => {
+        if(newVal) {
+            emit('onOpen')
+        } else if(!newVal) {
+            emit('onClose')
+        }
+    }
+)
 </script>

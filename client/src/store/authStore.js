@@ -1,65 +1,56 @@
 import { defineStore } from "pinia";
 import { useDataStore } from "./dataStore";
+import Cookies from "js-cookie";
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    //Enthält Name, ID etc. 
-    //Warning Wird im Moment nicht genutzt.
+    //Enthält firstname, lastname, _id, lengthAccessibleGroups & email 
     user: null,
     authenticated: false
   }),
   actions: {
-    // async Register({dispatch}, form) {
-    //   await axios.post('register', form)
-    //   let UserForm = new FormData()
-    //   UserForm.append('username', form.username)
-    //   UserForm.append('password', form.password)
-    //   await dispatch('LogIn', UserForm)
-    // },
-  
     async logIn(user_credentials) {
-      let res = (await fetch([process.env.VUE_APP_API_URL, "login"].join('/'), {
+      let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
         body: JSON.stringify(user_credentials),
-        headers: {'Content-type': 'application/json; charset=UTF-8'},
+        headers: { 'Content-type': 'application/json; charset=UTF-8' },
         credentials: 'include',
         mode: 'cors'
       }));
-  
-      this.authenticated = res.status === 200
+
+      if (res.status === 401) {
+        throw new Error('Wrong email or password')
+      }
+      
       res = await res.json()
-      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog
-  
-     this.user = res.user
-    },
-  
-    async logOut() {
-      //let user = null;
-      const res = await fetch([process.env.VUE_APP_API_URL, "logout"].join('/'), {
-        method: 'POST',
-        headers: {'Content-type': 'application/json; charset=UTF-8'},
-        credentials: 'include',
-        mode: 'cors'
-      })
-      this.authenticated = !res.status === 200
-      this.user = undefined
+
+      this.user = res.user
     },
 
-    async authenticate(){
-      let res = (await fetch([process.env.VUE_APP_API_URL, 'authenticate'].join('/'), {
+    async logOut() {
+      const data = useDataStore()
+
+      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
         credentials: 'include',
         mode: 'cors'
-      }))
+      });
 
-      this.authenticated = res.status === 200
+      this.user = undefined
+      data.notifications = []
+      data.invoiceData = {}
+    },
 
-      res = await res.json()
-      this.user = res.user
-      useDataStore().showPatchNotesDialog = res.showPatchNotesDialog  
-
-      return this.authenticated
+    isAuthenticated() {
+      //Refresh & Access Token sind htttOnly Cookies. Damit kann man sie nicht mit JavaScript auslesen.
+      //Um festzustellen, ob ein Cookie existiert & die Session authentifiziert ist, wird testweise ein Cookie mit dem Namen "refresh_token" gesetzt.
+      //Wenn bereits ein Cookie mit dem Namen "refresh_token" existiert, dann kann er nicht gesetzt werden und wenn man den Cookie zieht, ist er undefined.
+      Cookies.set("refresh_token", "test", { expires: 0.0006 })
+      const bool = Cookies.get("refresh_token") === undefined
+      this.authenticated = bool
+      return bool
     }
-  }
+  },
+  persist: true
 })

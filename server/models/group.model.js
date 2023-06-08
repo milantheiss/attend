@@ -12,36 +12,26 @@ const groupSchema = mongoose.Schema(
         participants: {
             type: [
                 {
-                    firstname: {
-                        type: String,
-                        required: true,
-                        trim: true
-                    },
-                    lastname: {
-                        type: String,
-                        required: true,
-                        trim: true
-                    },
-                    birthday: {
-                        type: Date,
+                    memberId: {
+                        type: mongoose.Types.ObjectId,
                         required: true
                     },
                     firsttraining: {
                         type: Date,
                         required: true
-                    },
-                    openIssue: {
-                        type: mongoose.Types.ObjectId,
-                        required: false
                     }
                 }
             ],
             required: false
         },
-        trainer: {
+        trainers: {
             type: [
                 {
-                    name: {
+                    userId: {
+                        type: mongoose.Types.ObjectId,
+                        required: true
+                    },
+                    role: {
                         type: String,
                         required: true,
                         trim: true
@@ -49,18 +39,6 @@ const groupSchema = mongoose.Schema(
                 }
             ],
             required: true
-        },
-        assistent: {
-            type: [
-                {
-                    name: {
-                        type: String,
-                        required: true,
-                        trim: true
-                    }
-                }
-            ],
-            required: false
         },
         times: {
             type: [
@@ -81,7 +59,8 @@ const groupSchema = mongoose.Schema(
                         trim: true
                     }
                 }
-            ]
+            ],
+            required: true
         },
         venue: {
             type: String,
@@ -89,13 +68,8 @@ const groupSchema = mongoose.Schema(
             trim: true
         },
         department: {
-            type: {
-                name: {
-                    type: String,
-                    required: true,
-                    trim: true
-                }
-            },
+            type: mongoose.Types.ObjectId,
+            required: true
         }
     }
 );

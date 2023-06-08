@@ -5,13 +5,8 @@ const { toJSON, paginate } = require('./plugins')
 const attendanceSchema = mongoose.Schema(
     {
         group: {
-            type: {
-                name: {
-                    type: String,
-                    required: false
-                }
-            },
-            required: false
+            type: mongoose.Types.ObjectId,
+            required: true
         },
         trainingssessions: {
             type: [
@@ -20,20 +15,40 @@ const attendanceSchema = mongoose.Schema(
                         type: Date,
                         required: true
                     },
+                    starttime: {
+                        type: String,
+                        required: true
+                    },
+                    endtime: {
+                        type: String,
+                        required: true
+                    },
                     participants: {
                         type: [
                             {
-                                firstname: {
-                                    type: String,
+                                memberId: {
+                                    type: mongoose.Types.ObjectId,
                                     required: true
-                                },
-                                lastname: {
-                                    type: String,
-                                    required: false
                                 },
                                 attended: {
                                     type: Boolean,
+                                    required: true,
+                                    default: false
+                                }
+                            }
+                        ]
+                    },
+                    trainers: {
+                        type: [
+                            {
+                                userId: {
+                                    type: mongoose.Types.ObjectId,
                                     required: true
+                                },
+                                attended: {
+                                    type: Boolean,
+                                    required: true,
+                                    default: true
                                 }
                             }
                         ]

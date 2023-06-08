@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { authenticationService } = require("../services");
+const { tokenService, userService } = require("../services");
 
 const config = require('../config/config');
 const logger = require("../config/logger");
@@ -8,111 +8,66 @@ const ApiError = require("../utils/ApiError");
 
 const verifyToken = async (req, res, next) => {
   let access_token = req.cookies.access_token;
-  const refresh_token = req.cookies.refresh_token;
+  let refresh_token = req.cookies.refresh_token;
 
-  if (!access_token) {
-    if (refresh_token) {
-      access_token = await getNewToken(req, res, refresh_token)
-    } else {
-      //TODO Hier auch auto redirect
-      return res.clearCookie('access_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).clearCookie('refresh_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
-      //throw new ApiError(httpStatus.UNAUTHORIZED, "A token is required for authentication")
+  try {
+    //Wenn kein Access Token vorhanden ist
+    if (!access_token) {
+      //Wenn ein Refresh Token vorhanden ist
+      if (refresh_token) {
+        //Refresh Token wird überprüft
+        refresh_token = await tokenService.verifyToken(refresh_token)
+
+        //Wenn der Refresh Token gültig ist, wird ein neuer Access Token generiert
+        const accessTokenExpires = new Date().getTime() + config.jwt.accessExpirationMinutes * 60 * 1000;
+        access_token = await tokenService.generateToken(refresh_token.user, accessTokenExpires, "access")
+
+      //Neuer Access Token wird an res als Cookie gehängt
+        res.cookie("access_token", access_token, {
+          expires: new Date(Date.now() + 15 * 60 * 1000),
+          secure: true,
+          httpOnly: true,
+          sameSite: config.sameSite,
+        })
+      } else {
+        clearCookie(res)
+        return res.status(httpStatus.UNAUTHORIZED).send('Logout')
+      }
     }
+  } catch (err) {
+    logger.error(err.toString())
+    clearCookie(res)
+    return res.status(httpStatus.UNAUTHORIZED).send('Logout')
   }
 
   try {
     if (typeof access_token !== 'undefined') {
-      const decrypt = jwt.verify(access_token, config.secret);
-      req.user = await authenticationService.getUserById(decrypt.user_id)
+      const decrypt = jwt.verify(access_token, config.jwt.secret);
+      req.user = await userService.getUserById(decrypt.sub)
       return next();
     }
     else {
-      return res.clearCookie('access_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).clearCookie('refresh_token', {
-        secure: true,
-        httpOnly: true,
-        sameSite: config.sameSite
-      }).status(httpStatus.UNAUTHORIZED).send({ redirect: '/logout' })
+      clearCookie(res)
+      return res.status(httpStatus.UNAUTHORIZED).send('Logout')
     }
   } catch (err) {
     logger.error(err.toString())
-    return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
+    clearCookie(res)
+    return res.status(httpStatus.UNAUTHORIZED).send('Logout')
   }
 };
 
-const getNewToken = async (req, res, old_refresh_token) => {
-  const decoded = jwt.decode(old_refresh_token)
-
-  const secret = await authenticationService.getRefreshTokenSecret(decoded.user_id, decoded.token_id)
-
-  if (typeof secret === 'undefined') {
-    res.clearCookie('access_token', {
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    }).clearCookie('refresh_token', {
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    }).status(403).send({ redirect: '/logout' })
-    //TODO Auto redirect 
-    return undefined
-  }
-
-  try {
-    const decrypt = jwt.verify(old_refresh_token, secret)
-
-    const access_token = jwt.sign(
-      { user_id: decrypt.user_id, username: decrypt.username },
-      config.secret,
-      {
-        expiresIn: "15min",
-      }
-    );
-
-    await authenticationService.deleteRefreshToken(decrypt.user_id, decrypt.token_id)
-
-    const new_secret = require('crypto').randomBytes(256).toString('base64')
-    await authenticationService.addRefreshToken(decrypt.user_id, { secret: new_secret, _id: decrypt.token_id })
-
-    // Create refresh token
-    const refresh_token = jwt.sign(
-      { user_id: decrypt.user_id, username: decrypt.username, token_id: decrypt.token_id },
-      new_secret,
-      {
-        expiresIn: "7d",
-      }
-    );
-
-    res.cookie('access_token', access_token, {
-      expires: new Date(Date.now() + 600000),
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    }).cookie('refresh_token', refresh_token, {
-      expires: new Date(Date.now() + 604800000),
-      secure: true,
-      httpOnly: true,
-      sameSite: config.sameSite
-    })
-
-    return access_token
-  } catch (err) {
-    logger.error(err.toString())
-    return undefined
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Token is invalid")
-  }
+//Helper function, damit der Code lesbarer ist
+const clearCookie = (res) => {
+  res.clearCookie('access_token', {
+    secure: true,
+    httpOnly: true,
+    sameSite: config.sameSite
+  }).clearCookie('refresh_token', {
+    secure: true,
+    httpOnly: true,
+    sameSite: config.sameSite
+  })
 }
 
 module.exports = verifyToken;

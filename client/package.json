@@ -1,39 +1,38 @@
 {
   "name": "attend-app",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "author": "Milan Theiss <milan.theiss@gmx.net> (https://github.com/milantheiss)",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite --host",
+    "build": "vite build",
+    "serve": "vite preview",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
   },
   "dependencies": {
-    "@heroicons/vue": "^2.0.12",
-    "autoprefixer": "^10.4.12",
-    "core-js": "^3.8.3",
-    "dotenv": "^16.0.1",
+    "autoprefixer": "^10.4.13",
+    "dotenv": "^16.0.3",
+    "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
-    "pinia": "^2.0.23",
+    "lodash": "^4.17.21",
+    "marked": "^4.2.12",
+    "pinia": "^2.0.28",
+    "pinia-plugin-persistedstate": "^3.1.0",
     "postcss": "^8.4.18",
-    "register-service-worker": "^1.7.2",
     "tailwindcss": "^3",
-    "vue": "^3.2.13",
-    "vue-cookies": "^1.8.1",
-    "vue-router": "^4.0.3"
+    "vite-plugin-pwa": "^0.16.3",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6",
+    "workbox-precaching": "^7.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.20.7",
     "@babel/eslint-parser": "^7.12.16",
     "@tailwindcss/forms": "^0.5.3",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-plugin-pwa": "~5.0.0",
-    "@vue/cli-plugin-router": "^5.0.4",
-    "@vue/cli-service": "~5.0.8",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3",
-    "vue-cli-plugin-pinia": "~0.2.1",
-    "vue-cli-plugin-tailwind": "~3.0.0"
+    "@vitejs/plugin-vue": "^4.0.0",
+    "eslint": "^8.31.0",
+    "eslint-plugin-vue": "^8.7.1",
+    "vite": "^4.0.3",
+    "vite-plugin-mkcert": "^1.11.0"
   }
 }

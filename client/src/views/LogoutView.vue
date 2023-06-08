@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="container w-full mx-auto">
     <!--Einfache Nachricht. Sollte nur für ein Bruchteil einer Sekunde sichtbar sein.-->
-    <p>Logging you off...</p>
+    <p class="mx-3.5 md:mx-7 font-medium">Logging you off...</p>
   </div>
 </template>
 
 <script>
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/authStore.js';
 export default {
   name: "LogoutView",
   setup() {
@@ -18,11 +18,12 @@ export default {
   methods: {
     async logout() {
       await this.auth.logOut();
+      console.log("Logged out");
       this.$router.push('/login')
     }
   },
-  created() {
-    this.logout()
+  async mounted() {
+    await this.logout()
   }
 };
 </script>

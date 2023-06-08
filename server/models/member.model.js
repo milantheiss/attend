@@ -26,6 +26,10 @@ const memberSchema = mongoose.Schema(
         groups: {
             type: [mongoose.Types.ObjectId],
             required: false
+        },
+        openIssues: {
+            type: [mongoose.Types.ObjectId],
+            required: false
         }
     }
 );
