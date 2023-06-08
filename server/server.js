@@ -6,7 +6,6 @@ const https = require('https')
 const fs = require('fs')
 
 let server;
-//config.mongoose.url
 
 mongoose.set('strictQuery', true);
 
