@@ -47,12 +47,14 @@ const login = catchAsync(async (req, res) => {
             secure: true,
             httpOnly: true,
             sameSite: config.sameSite,
+            domain: config.origin
         })
         .cookie("refresh_token", tokens.refresh, {
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             secure: true,
             httpOnly: true,
             sameSite: config.sameSite,
+            domain: config.origin
         })
         .status(httpStatus.OK)
         .send(response);

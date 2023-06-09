@@ -36,7 +36,7 @@ module.exports = {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     key: envVars.KEY_PATH,
     cert: envVars.CERT_PATH,
-    sameSite: envVars.NODE_ENV === "production" ? 'Lax' : 'None',
+    sameSite: envVars.NODE_ENV === "production" ? 'Strict' : 'None',
     email: {
         smtp: {
             host: envVars.SMTP_HOST,
