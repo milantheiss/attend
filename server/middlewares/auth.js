@@ -22,12 +22,13 @@ const verifyToken = async (req, res, next) => {
         const accessTokenExpires = new Date().getTime() + config.jwt.accessExpirationMinutes * 60 * 1000;
         access_token = await tokenService.generateToken(refresh_token.user, accessTokenExpires, "access")
 
-      //Neuer Access Token wird an res als Cookie gehängt
+        //Neuer Access Token wird an res als Cookie gehängt
         res.cookie("access_token", access_token, {
           expires: new Date(Date.now() + 15 * 60 * 1000),
           secure: true,
           httpOnly: true,
           sameSite: config.sameSite,
+          domain: config.domain
         })
       } else {
         clearCookie(res)

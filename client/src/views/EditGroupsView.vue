@@ -62,6 +62,7 @@
         </template>
 
         <template #content>
+          
           <div class="h-fit max-h-[55vh] overflow-y-auto block">
             <table class="table-auto w-full text-left">
 

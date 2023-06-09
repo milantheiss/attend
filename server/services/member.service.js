@@ -117,8 +117,6 @@ const removeIssueFromMember = async (memberId, issueId) => {
     const member = await Member.findById(memberId)
     member.openIssues = member.openIssues.filter(issue => !issue.equals(issueId))
 
-    console.log(memberId, issueId, member.openIssues);
-
     return await member.save()
 }
 

@@ -449,6 +449,12 @@ export default {
                 this.error.cause.noGroups = true
             } else {
                 this.groups = res.body
+                if (this.groups.length === 1) {
+                    this.selectedGroup = {
+                        _id: this.groups[0]._id,
+                        name: this.groups[0].name
+                    }
+                }
             }
         }
     },

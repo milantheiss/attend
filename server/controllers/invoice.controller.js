@@ -40,10 +40,13 @@ const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 
 	//Hinzufügen --> Get User Info
 
+	const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1 });
+
 	dataset.submittedBy = {
 		userId: req.user._id,
 		firstname: req.user.firstname,
 		lastname: req.user.lastname,
+		headerData: submitter.headerData ?? {}
 	};
 
 	await res.status(httpStatus.OK).send(await dataset);
@@ -69,12 +72,17 @@ const submitInvoice = catchAsync(async (req, res) => {
 
 			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1 });
 
+			
 			invoice.submittedBy = {
-				userId: req.user._id,
+				...invoice.submittedBy,
 				firstname: submitter.firstname,
-				lastname: submitter.lastname,
-				headerData: submitter.headerData
+				lastname: submitter.lastname
 			};
+			
+			//Speichert HeaderData in User ab
+			submitter.headerData = invoice.submittedBy.headerData;
+			await submitter.save();
+
 			invoice.dateOfLastChange = new Date();
 
 			for (group of invoice.groups) {
@@ -99,7 +107,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 				recipients: departmentHeadIDs.map((val) => {
 					return { userID: val, read: false };
 				}),
-				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/review-invoice?id=${invoice._id})`,
+				message: `Bitte überprüfe die [Abrechnung #${invoice.invoiceNumber}](https://${config.domain}/review-invoice?id=${invoice._id})`,
 				type: "invoice",
 				data: { invoiceID: invoice._id },
 			});
@@ -197,7 +205,7 @@ const approveInvoice = catchAsync(async (req, res) => {
 			priority: "normal",
 			from: req.user._id,
 			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
-			message: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung genehmigt. Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id})`,
+			message: `${req.user.firstname} ${req.user.lastname} hat deine Abrechnung genehmigt. Du kannst die Abrechnung dir hier herunterladen: [Abrechnung #${invoice.invoiceNumber}](https://${config.domain}/download-invoice?id=${invoice._id})`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});
@@ -241,7 +249,7 @@ const rejectInvoice = catchAsync(async (req, res) => {
 			priority: "normal",
 			from: req.user._id,
 			recipients: [{ userID: invoice.submittedBy.userId, read: false }],
-			message: `${req.user.firstname} ${req.user.lastname} hat deine [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id}) abgelehnt`,
+			message: `${req.user.firstname} ${req.user.lastname} hat deine [Abrechnung #${invoice.invoiceNumber}](https://${config.domain}/download-invoice?id=${invoice._id}) abgelehnt`,
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});
@@ -268,7 +276,7 @@ const reopenInvoice = catchAsync(async (req, res) => {
 
 		await addNewNotification({
 			title: `Abrechnung #${invoice.invoiceNumber} wieder geöffnet`,
-			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](${config.origin}/download-invoice?id=${invoice._id}) wieder geöffnet`,
+			message: `${req.user.firstName} ${req.user.lastName} hat die [Abrechnung #${invoice.invoiceNumber}](https://${config.domain}/download-invoice?id=${invoice._id}) wieder geöffnet`,
 			from: req.user._id,
 			recipients: [{ userID: invoice.assignedTo, read: false }],
 			type: "invoice",

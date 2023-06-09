@@ -66,9 +66,7 @@ export default {
       const user = this.form
       try {
         await this.auth.logIn(user);
-        console.log("Login successful");
         this.$router.push("/attendancelist");
-        console.log("Navigated to attendancelist");
         this.showError = false
       } catch (error) {
         console.error(error)

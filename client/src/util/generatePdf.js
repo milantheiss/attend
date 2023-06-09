@@ -17,6 +17,8 @@ let _submittedBy;
 let _department;
 let _dateOfReceipt;
 
+let logoImage;
+
 const tableTopMargin = 10;
 
 class AttendanceListPdf {
@@ -39,7 +41,7 @@ class AttendanceListPdf {
       .text("Teilnehmerliste", 20, posNextLine)
       .setFontSize(12)
       .text(`Vom ${_startdate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })} bis ${_enddate.toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" })}`, 180, posNextLine)
-      .addImage("./public/img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 97, 10, 75, 75);
+      .addImage(logoImage, "PNG", doc.internal.pageSize.getWidth() - 97, 10, 75, 75);
   }
 
   static generateGroupInfo(doc, group) {
@@ -51,9 +53,7 @@ class AttendanceListPdf {
     }
 
     let trainer = "";
-
-    console.log(group.trainers);
-
+    
     for (const obj of group.trainers.filter((val) => val.role === "trainer")) {
       trainer = trainer + obj.firstname + " " + obj.lastname + " ";
     }
@@ -208,7 +208,7 @@ class InvoicePdf {
       .setFontSize(20)
       .setFont("helvetica", "bold")
       .text(`Abrechnung`, 40, posNextLine)
-      .addImage("./public/img/logo.png", "PNG", doc.internal.pageSize.getWidth() - 109, 10, 75, 75);
+      .addImage(logoImage, "PNG", doc.internal.pageSize.getWidth() - 109, 10, 75, 75);
 
     posNextLine += 25;
 
@@ -429,6 +429,8 @@ async function createList(group, attendanceList, options) {
  * @param {Object} dataset Dataset, dass vom Backend generiert wird
  */
 async function createInvoice(filename, dataset) {
+  logoImage = await getLogoImage();
+
   filename = filename ?? `Abrechnung_${dataset.submittedBy.lastname}_${dataset.submittedBy.firstname}_${new Date(dataset.dateOfReceipt).toJSON().split("T")[0]}`
 
   let doc = new jsPDF({ unit: "pt", compress: true });
@@ -595,6 +597,10 @@ function totalHours(invoice) {
   })
 
   return tHours
+}
+
+async function getLogoImage() {
+  return  await (await fetch("https://gist.githubusercontent.com/milantheiss/344e1a2ccaca514d3e4facc5e6b25b99/raw/logo")).text()
 }
 
 export { createList, createInvoice, downloadInvoice };

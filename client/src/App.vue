@@ -49,7 +49,7 @@
 					enter-from-class="-translate-y-4 opacity-0" enter-to-class="translate-y-0 opacity-100"
 					leave-active-class="transition ease-in-out duration-300" leave-from-class="translate-y-0 opacity-100"
 					leave-to-class="-translate-y-4 opacity-0">
-					<div class="flex flex-col gap-2" v-show="showMenu">
+					<div class="flex flex-col gap-2 cursor-pointer" v-show="showMenu">
 						<router-link @click="showMenu = !showMenu" to="/attendancelist"
 							class="text-left font-medium md:text-2xl text-xl flex items-center group"
 							v-show="auth.user?.lengthAccessibleGroups > 0">

@@ -8,7 +8,6 @@ const envVarsSchema = Joi.object()
     .keys({
         NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
         PORT: Joi.number().default(3000),
-        ORIGIN_URL: Joi.string().required().description('Origin url for CORS'),
         MONGODB_URL: Joi.string().required().description('Mongo DB url'),
         KEY_PATH: Joi.string().required().description('Path to SSL Key'),
         CERT_PATH: Joi.string().required().description('Path to CERT'),
@@ -20,6 +19,7 @@ const envVarsSchema = Joi.object()
         JWT_SECRET: Joi.string().required().description('JWT secret key'),
         JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
         JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
+        DOMAIN: Joi.string().required().description('Domain of the app for cookies'),
     })
     .unknown();
 
@@ -32,11 +32,11 @@ if (error) {
 module.exports = {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
-    origin: envVars.ORIGIN_URL,
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     key: envVars.KEY_PATH,
     cert: envVars.CERT_PATH,
-    sameSite: envVars.NODE_ENV === "production" ? 'Strict' : 'None',
+    sameSite: 'Strict',
+    domain: envVars.DOMAIN,
     email: {
         smtp: {
             host: envVars.SMTP_HOST,

@@ -26,7 +26,7 @@ const sendEmail = async (to, subject, text) => {
 
 const sendAccountDetails = async (to, details) => {
     const subject = 'Account Details';
-    const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://milantheiss.de/bll`;
+    const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://milantheiss.de`;
     await sendEmail(to, subject, text);
 }
 

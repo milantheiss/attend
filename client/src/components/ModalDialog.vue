@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, defineExpose } from 'vue';
 import useClickOutside from '@/util/useClickOutside';
 
 const modal = ref(null);
@@ -71,6 +71,8 @@ const props = defineProps({
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['onOpen', 'onClose', 'onClickOutside']);
 
+defineExpose({open, close})
+
 function closeModal() {
     showModal.value = false;
 }
@@ -96,11 +98,19 @@ watch(
 watch(
     showModal,
     newVal => {
-        if(newVal) {
+        if (newVal) {
             emit('onOpen')
-        } else if(!newVal) {
+        } else if (!newVal) {
             emit('onClose')
         }
     }
 )
+
+function open() {
+    showModal.value = true;
+}
+
+function close() {
+    closeModal()
+}
 </script>

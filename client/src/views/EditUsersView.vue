@@ -53,9 +53,7 @@
 
       </div>
 
-      <!-- Box mit allen Benutzern -->
-
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col w-full">
         <!-- INFO Muss in zwei Divs aufgeteilt sein, ansonsten scrollt Tabelle durch Header durch und kann über Header gesehen werden -->
         <div class="h-fit max-h-[60vh] overflow-y-auto block">
           <table class="table-auto w-full">

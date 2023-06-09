@@ -163,94 +163,96 @@
           </StandardButton>
         </div>
 
-        <div class="h-fit max-h-[55vh] overflow-y-auto block w-full bg-white p-3.5 md:p-7 rounded-xl">
-          <table class="table-auto w-full text-left">
+        <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col w-full">
+          <div class="h-fit max-h-[60vh] overflow-y-auto block">
+            <table class="table-auto text-left">
 
-            <thead class="sticky top-0 border-b border-[#D1D5DB]">
-              <tr>
+              <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                <tr>
 
-                <th scope="col" class="pb-2.5 font-medium"
-                  @click="() => { if (participantSort.key === 'lastname') participantSort.index.lastname = (participantSort.index.lastname + 1) % 2; participantSort.key = 'lastname' }">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="participantSort.index.lastname"></SortIcon>
-                    Name
-                  </span>
-                </th>
+                  <th scope="col" class="pb-2.5 font-medium"
+                    @click="() => { if (participantSort.key === 'lastname') participantSort.index.lastname = (participantSort.index.lastname + 1) % 2; participantSort.key = 'lastname' }">
+                    <span class="flex items-center gap-1">
+                      <SortIcon :index="participantSort.index.lastname"></SortIcon>
+                      Name
+                    </span>
+                  </th>
 
-                <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
-                  @click="() => { if (participantSort.key === 'firstname') participantSort.index.firstname = (participantSort.index.firstname + 1) % 2; participantSort.key = 'firstname' }">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="participantSort.index.firstname"></SortIcon>
-                    Vorname
-                  </span>
-                </th>
+                  <th scope="col" class="px-3 md:px-4 pb-2.5 font-medium"
+                    @click="() => { if (participantSort.key === 'firstname') participantSort.index.firstname = (participantSort.index.firstname + 1) % 2; participantSort.key = 'firstname' }">
+                    <span class="flex items-center gap-1">
+                      <SortIcon :index="participantSort.index.firstname"></SortIcon>
+                      Vorname
+                    </span>
+                  </th>
 
-                <!-- Geburtstag -->
+                  <!-- Geburtstag -->
 
-                <!-- Wird ausgeblendet, wenn Screen zuklein -->
-                <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
-                  @click="() => { if (participantSort.key === 'birthday') participantSort.index.birthday = (participantSort.index.birthday + 1) % 2; participantSort.key = 'birthday' }">
-                  <!-- Wird abgekürzt, wenn Screen kleiner als md -->
-                  <span class="hidden md:flex items-center gap-1 ">
-                    <SortIcon :index="participantSort.index.birthday"></SortIcon>
-                    Geburtstag
-                  </span>
-                  <span class="flex md:hidden items-center gap-1 ">
-                    <SortIcon :index="participantSort.index.birthday"></SortIcon>
-                    Geb.
-                  </span>
-                </th>
+                  <!-- Wird ausgeblendet, wenn Screen zuklein -->
+                  <th scope="col" class="hidden sm:table-cell pb-2.5 font-medium"
+                    @click="() => { if (participantSort.key === 'birthday') participantSort.index.birthday = (participantSort.index.birthday + 1) % 2; participantSort.key = 'birthday' }">
+                    <!-- Wird abgekürzt, wenn Screen kleiner als md -->
+                    <span class="hidden md:flex items-center gap-1 ">
+                      <SortIcon :index="participantSort.index.birthday"></SortIcon>
+                      Geburtstag
+                    </span>
+                    <span class="flex md:hidden items-center gap-1 ">
+                      <SortIcon :index="participantSort.index.birthday"></SortIcon>
+                      Geb.
+                    </span>
+                  </th>
 
-                <!-- Spalte für Pfeil -->
-                <th scope="col" class="pb-2.5 font-medium w-full"></th>
+                  <!-- Spalte für Pfeil -->
+                  <th scope="col" class="pb-2.5 font-medium w-full"></th>
 
-              </tr>
-            </thead>
+                </tr>
+              </thead>
 
-            <tbody class="overscroll-y-scroll">
-              <!-- Je eine Reihe pro Teilnehmer -->
-              <tr v-for="participant in group.participants" :key="participant._id"
-                @click="openEditParticipant(participant._id)"
-                class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+              <tbody class="overscroll-y-scroll">
+                <!-- Je eine Reihe pro Teilnehmer -->
+                <tr v-for="participant in group.participants" :key="participant._id"
+                  @click="openEditParticipant(participant._id)"
+                  class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
 
-                <!-- Nachname -->
+                  <!-- Nachname -->
 
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p>{{ participant.lastname }}</p>
-                </td>
+                  <td class="py-2.5 group-last:pt-2.5 group-last:pb-0">
+                    <p>{{ participant.lastname }}</p>
+                  </td>
 
-                <!-- Vorname -->
+                  <!-- Vorname -->
 
-                <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p>{{ participant.firstname }}</p>
-                </td>
+                  <td class="px-3 md:px-4 py-2.5 group-last:pt-2.5 group-last:pb-0">
+                    <p>{{ participant.firstname }}</p>
+                  </td>
 
-                <!-- Geburtstag -->
+                  <!-- Geburtstag -->
 
-                <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
-                  <p class="text-light-gray">{{
-                    new Date(participant.birthday).toLocaleDateString('de-DE', {
-                      year: '2-digit', month:
-                        '2-digit', day: '2-digit'
-                    })
-                  }}</p>
-                </td>
+                  <td class="hidden sm:table-cell py-2.5 group-last:pt-2.5 group-last:pb-0">
+                    <p class="text-light-gray">{{
+                      new Date(participant.birthday).toLocaleDateString('de-DE', {
+                        year: '2-digit', month:
+                          '2-digit', day: '2-digit'
+                      })
+                    }}</p>
+                  </td>
 
-                <!-- Pfeil nach rechts -->
+                  <!-- Pfeil nach rechts -->
 
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                  </svg>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- Wird angezeigt, wenn keine Teilnehmer der Gruppe zugeteilt sind -->
-          <p v-show="typeof this.group.participants === 'undefined' || this.group.participants?.length === 0"
-            class="font-medium text-gray-500 text-center pt-2.5">Keine Teilnehmer gefunden</p>
+                  <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                      stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Wird angezeigt, wenn keine Teilnehmer der Gruppe zugeteilt sind -->
+            <p v-show="typeof this.group.participants === 'undefined' || this.group.participants?.length === 0"
+              class="font-medium text-gray-500 text-center pt-2.5">Keine Teilnehmer gefunden</p>
+          </div>
         </div>
       </div>
 
@@ -267,69 +269,72 @@
           </StandardButton>
         </div>
 
-        <div class="h-fit max-h-[55vh] overflow-y-auto block w-full bg-white p-3.5 md:p-7 rounded-xl">
-          <table class="table-fixed w-full text-left">
+        <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col w-full">
+          <div class="h-fit max-h-[60vh] overflow-y-auto block">
+            <table class="table-auto text-left">
 
-            <thead class="sticky top-0 border-b border-[#D1D5DB]">
-              <tr>
+              <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
+                <tr>
 
-                <th scope="col" class="pb-2.5 font-medium w-[120px] sm:w-[240px]"
-                  @click="() => { if (trainerSort.key === 'lastname') trainerSort.index.lastname = (trainerSort.index.lastname + 1) % 2; trainerSort.key = 'lastname' }">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="trainerSort.index.lastname"></SortIcon>
-                    Name
-                  </span>
-                </th>
+                  <th scope="col" class="pb-2.5 font-medium w-[120px] sm:w-[240px]"
+                    @click="() => { if (trainerSort.key === 'lastname') trainerSort.index.lastname = (trainerSort.index.lastname + 1) % 2; trainerSort.key = 'lastname' }">
+                    <span class="flex items-center gap-1">
+                      <SortIcon :index="trainerSort.index.lastname"></SortIcon>
+                      Name
+                    </span>
+                  </th>
 
-                <th scope="col" class="pb-2.5 font-medium w-[130px]"
-                  @click="() => { if (trainerSort.key === 'role') trainerSort.index.role = (trainerSort.index.role + 1) % 2; trainerSort.key = 'role' }">
-                  <span class="flex items-center gap-1">
-                    <SortIcon :index="trainerSort.index.role"></SortIcon>
-                    Rolle
-                  </span>
-                </th>
+                  <th scope="col" class="pb-2.5 font-medium w-[130px]"
+                    @click="() => { if (trainerSort.key === 'role') trainerSort.index.role = (trainerSort.index.role + 1) % 2; trainerSort.key = 'role' }">
+                    <span class="flex items-center gap-1">
+                      <SortIcon :index="trainerSort.index.role"></SortIcon>
+                      Rolle
+                    </span>
+                  </th>
 
-                <!-- Spalte für Pfeil Icon -->
-                <th scope="col" class="pb-2.5 font-medium w-full"></th>
-              </tr>
-            </thead>
+                  <!-- Spalte für Pfeil Icon -->
+                  <th scope="col" class="pb-2.5 font-medium w-full"></th>
+                </tr>
+              </thead>
 
-            <tbody class="overscroll-y-scroll">
-              <!-- Eine Reihe pro Trainer -->
-              <tr v-for="(trainer) in group.trainers" :key="trainer._id"
-                class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
+              <tbody class="overscroll-y-scroll">
+                <!-- Eine Reihe pro Trainer -->
+                <tr v-for="(trainer) in group.trainers" :key="trainer._id"
+                  class="border-b border-[#E5E7EB] last:border-0 cursor-pointer group">
 
-                <!-- Name -->
+                  <!-- Name -->
 
-                <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0  w-[120px] md:w-[150px]">
-                  <p class="text-ellipsis overflow-hidden">{{ trainer.firstname }} {{ trainer.lastname }}</p>
-                </td>
+                  <td class="truncate py-2.5 group-last:pt-2.5 group-last:pb-0  w-[120px] md:w-[150px]">
+                    <p class="text-ellipsis overflow-hidden">{{ trainer.firstname }} {{ trainer.lastname }}</p>
+                  </td>
 
-                <!-- Rolle -->
-                <td class="px-2.5 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[130px]">
-                  <select v-model="trainer.role" @click.stop="" @change="updateTrainerRole(trainer)"
-                    class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 py-[4px] rounded-xl bg-[#D1D5DB] font-medium text-base md:text-lg">
-                    <option value="trainer" class="bg-white">Trainer</option>
-                    <option value="assistant" class="bg-white">Assistent</option>
-                  </select>
-                </td>
+                  <!-- Rolle -->
+                  <td class="px-2.5 py-2.5 group-last:pt-2.5 group-last:pb-0 w-[130px]">
+                    <select v-model="trainer.role" @click.stop="" @change="updateTrainerRole(trainer)"
+                      class="w-fit focus:ring-0 focus:border-standard-gradient-1 border-0 py-[4px] rounded-xl bg-[#D1D5DB] font-medium text-base md:text-lg">
+                      <option value="trainer" class="bg-white">Trainer</option>
+                      <option value="assistant" class="bg-white">Assistent</option>
+                    </select>
+                  </td>
 
-                <!-- - Icon -->
-                <!-- Click entfernt User -->
-                <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end"
-                  @click="removeTrainer(trainer._id)">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                    stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto text-delete-gradient-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <!-- - Icon -->
+                  <!-- Click entfernt User -->
+                  <td class="py-2.5 group-last:pt-2.5 group-last:pb-0 w-full justify-items-end"
+                    @click="removeTrainer(trainer._id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                      stroke="currentColor" class="w-7 md:w-8 h-7 md:h-8 ml-auto text-delete-gradient-1">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-          <!-- Wird angezeigt, wenn kein Trainer der Gruppe zugeteilt ist -->
-          <p v-show="typeof this.group.trainers === 'undefined' || this.group.trainers?.length === 0"
-            class="font-medium text-gray-500 text-center pt-2.5">Keine Trainer gefunden</p>
+            <!-- Wird angezeigt, wenn kein Trainer der Gruppe zugeteilt ist -->
+            <p v-show="typeof this.group.trainers === 'undefined' || this.group.trainers?.length === 0"
+              class="font-medium text-gray-500 text-center pt-2.5">Keine Trainer gefunden</p>
+          </div>
         </div>
       </div>
     </div>

@@ -31,10 +31,19 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-app.use(cors({
-    credentials: true,
-    origin: config.origin
-}));
+if (config.env === 'production') {
+    app.use(cors({
+        credentials: true,
+        origin: `https://${config.domain}`
+    }));
+}
+
+if (config.env === 'development') {
+    app.use(cors({
+        credentials: true,
+        origin: `https://${config.domain}:8080`
+    }));
+}
 
 // enable cookie parsing
 app.use(cookieParser())

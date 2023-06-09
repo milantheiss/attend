@@ -60,7 +60,6 @@ const updateUser = async (userID, updateBody) => {
 	if (updateBody.accessible_groups !== undefined) {
 		//Info Object ID Array muss stringifiziert werden, da sonst die Vergleiche nicht funktionieren
 		if (!_.isEqual(user.accessible_groups.map(id => id.toString()), updateBody.accessible_groups)) {
-			console.log(user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group.toString())));
 			//Remove Member from Group
 			const removedGroups = user.accessible_groups.filter(group => !updateBody.accessible_groups.includes(group.toString()))
 			for (groupId of removedGroups) {

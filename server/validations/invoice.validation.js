@@ -48,7 +48,17 @@ const submitInvoice = {
         submittedBy: Joi.object().keys({
             userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
             firstname: Joi.string().required(),
-            lastname: Joi.string().required()
+            lastname: Joi.string().required(),
+            headerData: Joi.object().keys({
+                trainerId: Joi.string().required(),
+                isTrainer: Joi.boolean().required(),
+                hasLicense: Joi.boolean().required(),
+                specialAgreement: Joi.boolean().required(),
+                hasContract: Joi.boolean().required(),
+                hasAgreedToCodeForChildrenWelfare: Joi.boolean().required(),
+                hasSubmittedCriminalRecordCertificate: Joi.boolean().required(),
+                _id: Joi.string().strip()
+            }).required(),
         }).required()
     })
 }

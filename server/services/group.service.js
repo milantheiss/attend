@@ -163,8 +163,6 @@ const addMember = async (groupID, memberID, firsttraining) => {
 
     group.participants.push({ firsttraining: firsttraining, memberId: memberID })
 
-    console.log(firsttraining);
-
     await updateParticipantInTrainingssessions(groupID, memberID, firsttraining)
 
     await group.save()
@@ -418,8 +416,6 @@ const updateMemberIdOfParticipant = async (groupID, newMemberId, oldMemberId) =>
         const merge = group.participants.find(e => e.memberId.equals(oldMemberId))
 
         keep.firsttraining = keep.firsttraining < merge.firsttraining ? keep.firsttraining : merge.firsttraining
-
-        console.log(keep.firsttraining, merge.firsttraining);
 
         group.participants = group.participants.filter(e => !e.memberId.equals(oldMemberId))
     } else {

@@ -63,10 +63,6 @@
     <div>
       <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
         @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
-      <span class="flex justify-center items-center">
-        <p v-show="typeof this.attended.participants === 'undefined'"
-          class="text-xl md:text-2xl font-medium text-light-gray">Keine Gruppe ausgewählt!</p>
-      </span>
     </div>
 
     <div>
@@ -241,6 +237,9 @@ export default {
       this.groups = []
     } else {
       this.groups = res.body
+      if (this.groups.length === 1) {
+        this.selectedGroup = this.groups[0]
+      }
     }
 
     const groupId = this.$route.query.groupId

@@ -2,7 +2,7 @@
     <div>
         <div class="container mx-auto mb-20">
             <!--Abrechnungsanzeige-->
-            <div v-if="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
+            <div v-show="dataStore.invoiceData.groups?.some(val => val.trainingssessions.length > 0) && !status.show">
 
                 <!--TODO Add ÜL Nummer Prompt-->
                 <!--TODO ÜL Info-->
@@ -12,7 +12,8 @@
                     <div class="flex justify-between items-baseline">
                         <p class="text-light-gray font-normal">Antragsteller: </p>
                         <p class="font-medium text-right">
-                            {{ dataStore.invoiceData.submittedBy.firstname }} {{ dataStore.invoiceData.submittedBy.lastname
+                            {{ dataStore.invoiceData.submittedBy?.firstname }} {{
+                                dataStore.invoiceData.submittedBy?.lastname
                             }}
                         </p>
                     </div>
@@ -20,7 +21,7 @@
                     <div class="flex justify-between items-baseline">
                         <p class="text-light-gray font-normal">Abteilung: </p>
                         <p class="font-medium text-right">{{
-                            dataStore.invoiceData.department.name
+                            dataStore.invoiceData.department?.name
                         }}</p>
                     </div>
 
@@ -28,14 +29,14 @@
                         <p class="text-light-gray font-normal">Abrechnungszeitraum: </p>
                         <p class="font-normal text-right">
                             <span class="font-medium">{{
-                                new Date(dataStore.invoiceData.startdate).toLocaleDateString("de-DE", {
+                                new Date(dataStore.invoiceData?.startdate).toLocaleDateString("de-DE", {
                                     year: "numeric",
                                     month: "2-digit", day: "2-digit"
                                 })
                             }}</span>
                             bis
                             <span class="font-medium">{{
-                                new Date(dataStore.invoiceData.enddate).toLocaleDateString("de-DE", {
+                                new Date(dataStore.invoiceData?.enddate).toLocaleDateString("de-DE", {
                                     year: "numeric",
                                     month: "2-digit", day: "2-digit"
                                 })
@@ -45,6 +46,15 @@
                     <div class="flex justify-between items-baseline">
                         <p class="text-light-gray font-normal">Stundenanzahl gesamt: </p>
                         <p class="font-medium text-right">{{ convertToReadableTime(totalHours) }}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center" @click="$refs.headerDataModal.open()">
+                        <p class="font-normal">Abrechnungskopf</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                            stroke="currentColor" class="w-7 h-7 ml-auto">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                        </svg>
                     </div>
                 </div>
 
@@ -62,9 +72,10 @@
                         </template>
                         <template #content>
                             <div class="h-fit max-h-[55vh] overflow-y-auto block">
-                                <table class="table-auto w-full text-left" v-if="getSortedTrainingssessionlist(group.trainingssessions).length > 0">
+                                <table class="table-auto w-full text-left"
+                                    v-if="getSortedTrainingssessionlist(group.trainingssessions).length > 0">
                                     <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
-                                        <tr >
+                                        <tr>
                                             <th class="font-medium w-fit cursor-pointer" @click="onClickOnDate()">
                                                 <span class="flex items-center gap-1">
                                                     <SortIconDate :index="indexSortButtonDate"></SortIconDate>
@@ -112,17 +123,19 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p v-if="getSortedTrainingssessionlist(group.trainingssessions).length === 0" class="truncate text-light-gray text-center">Keine Trainingsstunden im gewählten Zeitraum</p>
+                            <p v-if="getSortedTrainingssessionlist(group.trainingssessions).length === 0"
+                                class="truncate text-light-gray text-center">Keine Trainingsstunden im gewählten Zeitraum
+                            </p>
                         </template>
                     </CollapsibleContainer>
                 </div>
 
                 <!--Bestätigungsfeld-->
-                <div >
+                <div>
                     <ErrorMessage :message="error.message" :show="error.show" class="mt-4"></ErrorMessage>
                     <div class="flex justify-between items-center gap-7">
                         <button @click="cancel"
-                            class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5"
+                            class="flex items-center text-light-gray outline outline-2 outline-light-gray rounded-2xl px-3.5 md:px-7 py-3.5 ml-0.5"
                             :class="error.show ? 'mt-4' : ''">
                             <p class="font-medium font-base md:text-lg">Abbrechen</p>
                         </button>
@@ -148,7 +161,7 @@
                             <p class="text-light-gray">Gruppe:</p>
                         </template>
                         <template #content>
-                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)" 
+                            <CheckboxList ref="checkboxList" :list="this.groups.map(val => val.name)"
                                 :sortAlphabetically="true" :default="true">
                             </CheckboxList>
                         </template>
@@ -222,6 +235,79 @@
                 </button>
             </template>
         </ModalDialog>
+
+        <ModalDialog ref="headerDataModal" :has-footer="false">
+            <template #header>
+                <p class="text-xl md:text-2xl">Abrechnungskopf</p>
+            </template>
+            <template #subheader>
+                <p class="text-light-gray text-base md:text-lg whitespace-pre-wrap">Diese Informationen
+                    werden
+                    in den Kopf der Abrechnung gedruckt.</p>
+                <p class="text-delete-gradient-1 text-base md:text-lg whitespace-pre-wrap"
+                    v-if="Object.keys(dataStore.invoiceData.submittedBy.headerData).length === 0">Bitte
+                    ergänze
+                    die
+                    Informationen. Du findest sie im oberen Teil deiner letzten Abrechnung</p>
+            </template>
+            <template #content>
+                <form @submit.prevent="$refs.headerDataModal.close()" class="w-full flex flex-col gap-2">
+                    <!-- ÜL Nr -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">ÜL-Nr: </p>
+                        <TextInput name="ulnr" v-model="dataStore.invoiceData.submittedBy.headerData.trainerId"
+                            placeholder="ÜL-Nr" :showError="error.cause.headerData" class="md:w-96"></TextInput>
+                    </div>
+                    <!-- ÜL Helfer -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">ÜL-Helfer/ÜL-Assistent(TGO): </p>
+                        <CheckboxInput v-model="headerDataProxy.isAssistant">
+                        </CheckboxInput>
+                    </div>
+                    <!-- ÜL Selbstständig -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Selbstständiger ÜL ohne Lizenz: </p>
+                        <CheckboxInput v-model="headerDataProxy.isTrainerWithoutLicense">
+                        </CheckboxInput>
+                    </div>
+                    <!-- ÜL mit Lizenz -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">ÜL mit Lizenz: </p>
+                        <CheckboxInput v-model="headerDataProxy.isTrainerWithLicense">
+                        </CheckboxInput>
+                    </div>
+                    <!-- Sondervereinbarung -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Sondervereinbarung: </p>
+                        <CheckboxInput v-model="dataStore.invoiceData.submittedBy.headerData.specialAgreement">
+                        </CheckboxInput>
+                    </div>
+                    <!-- ÜL Vertrag -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">ÜL-Vertrag vorhanden: </p>
+                        <CheckboxInput v-model="dataStore.invoiceData.submittedBy.headerData.hasContract">
+                        </CheckboxInput>
+                    </div>
+                    <!-- Ehrenkodex Kindeswohl -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Ehrenkodex Kindeswohl: </p>
+                        <CheckboxInput
+                            v-model="dataStore.invoiceData.submittedBy.headerData.hasAgreedToCodeForChildrenWelfare">
+                        </CheckboxInput>
+                    </div>
+                    <!-- Erweitertes Führungszeugnis -->
+                    <div class="flex justify-between items-baseline">
+                        <p class="text-light-gray font-normal">Erweitertes Führungszeugnis: </p>
+                        <CheckboxInput
+                            v-model="dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate">
+                        </CheckboxInput>
+                    </div>
+                    <ErrorMessage :message="error.message" :show="error.show"></ErrorMessage>
+                    <StandardButton @click="$refs.headerDataModal.close()" class="mt-4" type="submit">Schliessen
+                    </StandardButton>
+                </form>
+            </template>
+        </ModalDialog>
     </div>
 </template>
 
@@ -238,18 +324,18 @@ import CheckboxInput from "@/components/CheckboxInput.vue";
 import ModalDialog from '@/components/ModalDialog.vue';
 import SortIconDate from '@/components/SortIconDate.vue';
 import SortIcon from '@/components/SortIcon.vue';
+import TextInput from "@/components/TextInput.vue";
+import StandardButton from "@/components/StandardButton.vue";
 
 export default {
     name: "CreateInvoice",
     setup() {
         const dataStore = useDataStore()
-        const showCollapsibleContainer = ref(true);
         const groupCards = ref([]);
 
         return {
             groupCards,
-            dataStore,
-            showCollapsibleContainer
+            dataStore
         }
     },
     data() {
@@ -279,6 +365,11 @@ export default {
             sortMode: "date_asceding",
             indexSortButtonDate: 0,
             indexSortButtonLength: 0,
+            headerDataProxy: {
+                isAssistant: true,
+                isTrainerWithoutLicense: false,
+                isTrainerWithLicense: false
+            }
         }
     },
     components: {
@@ -289,7 +380,9 @@ export default {
         CheckboxInput,
         ModalDialog,
         SortIconDate,
-        SortIcon
+        SortIcon,
+        TextInput,
+        StandardButton
     },
     methods: {
         async getInvoiceData(startdate, enddate) {
@@ -310,6 +403,16 @@ export default {
                 this.dataStore.invoiceData = {}
             } else {
                 this.showPullDataModal = false
+
+                this.headerDataProxy = {
+                    isAssistant: !this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
+                    isTrainerWithoutLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
+                    isTrainerWithLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && this.dataStore.invoiceData.submittedBy.headerData.hasLicense
+                }
+
+                if (Object.keys(this.dataStore.invoiceData.submittedBy.headerData).length === 0) {
+                    this.$refs.headerDataModal.open()
+                }
             }
         },
 
@@ -345,6 +448,8 @@ export default {
                 this.error.show = true;
                 return
             }
+
+            if (!this.isHeaderDataComplete()) return
 
             //Status wird angezeigt
             this.status.show = true
@@ -444,11 +549,36 @@ export default {
             this.indexSortButtonLength = (this.indexSortButtonLength + 1) % sortModes.length
             this.sortMode = sortModes[this.indexSortButtonLength]
         },
+
+        isHeaderDataComplete() {
+            if (this.dataStore.invoiceData.submittedBy.headerData.trainerId.trim().length === 0) {
+                this.error.message = "Bitte gib deine ÜL-Nr an!"
+                this.error.show = true
+                this.$refs.headerDataModal.open()
+                return false
+            }
+
+            if (!this.headerDataProxy.isAssistant && !this.headerDataProxy.isTrainerWithoutLicense && !this.headerDataProxy.isTrainerWithLicense) {
+                this.error.message = "Bitte gib an, ob du ÜL-Helfer, selbstständiger ÜL ohne Lizenz oder ÜL mit Lizenz bist!"
+                this.error.show = true
+                this.$refs.headerDataModal.open()
+                return false
+            }
+
+            this.dataStore.invoiceData.submittedBy.headerData.isTrainer = this.dataStore.invoiceData.submittedBy.headerData.isTrainer ?? false
+            this.dataStore.invoiceData.submittedBy.headerData.hasLicense = this.dataStore.invoiceData.submittedBy.headerData.hasLicense ?? false
+            this.dataStore.invoiceData.submittedBy.headerData.specialAgreement = this.dataStore.invoiceData.submittedBy.headerData.specialAgreement ?? false
+            this.dataStore.invoiceData.submittedBy.headerData.hasContract = this.dataStore.invoiceData.submittedBy.headerData.hasContract ?? false
+            this.dataStore.invoiceData.submittedBy.headerData.hasAgreedToCodeForChildrenWelfare = this.dataStore.invoiceData.submittedBy.headerData.hasAgreedToCodeForChildrenWelfare ?? false
+            this.dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate = this.dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate ?? false
+
+            return true
+        }
     },
     async created() {
         const res = await fetchGroups()
-        console.log(res);
-        if(res.ok) {
+
+        if (res.ok) {
             this.groups = res.body
         }
 
@@ -491,6 +621,35 @@ export default {
                 return this.dataStore.invoiceData.groups.map(() => false)
             }
         }
+    },
+    watch: {
+        headerDataProxy: {
+            handler() {
+                const isTrainer = !this.headerDataProxy.isAssistant && this.headerDataProxy.isTrainerWithoutLicense || this.headerDataProxy.isTrainerWithLicense
+                const hasLicense = this.headerDataProxy.isTrainerWithLicense
+                this.dataStore.invoiceData.submittedBy.headerData.isTrainer = isTrainer
+                this.dataStore.invoiceData.submittedBy.headerData.hasLicense = hasLicense
+            },
+            deep: true
+        },
+        "headerDataProxy.isAssistant"(val) {
+            if (val) {
+                this.headerDataProxy.isTrainerWithoutLicense = false
+                this.headerDataProxy.isTrainerWithLicense = false
+            }
+        },
+        "headerDataProxy.isTrainerWithoutLicense"(val) {
+            if (val) {
+                this.headerDataProxy.isAssistant = false
+                this.headerDataProxy.isTrainerWithLicense = false
+            }
+        },
+        "headerDataProxy.isTrainerWithLicense"(val) {
+            if (val) {
+                this.headerDataProxy.isAssistant = false
+                this.headerDataProxy.isTrainerWithoutLicense = false
+            }
+        },
     }
 };
 </script>

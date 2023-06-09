@@ -98,7 +98,7 @@ const resolveIssue = async (id, actionCommand) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Action not found')
     }
     await action.function(issue)
-    console.log(action);
+    
     return {}
 }
 

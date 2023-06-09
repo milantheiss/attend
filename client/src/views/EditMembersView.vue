@@ -54,9 +54,9 @@
 
       <!-- Box mit allen Mitglieder -->
 
-      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col">
+      <div class="bg-white px-3.5 md:px-7 py-4 rounded-xl drop-shadow-md flex flex-col w-full">
         <div class="h-fit max-h-[60vh] overflow-y-auto block">
-          <table class="table-auto w-full text-left">
+          <table class="table-auto text-left">
 
             <!-- Tabellen Header ist sticky -->
             <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">

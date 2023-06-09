@@ -8,7 +8,7 @@ primary_region = "ams"
 
 [env]
   NODE_ENV = "production"
-  ORIGIN_URL = "https://milantheiss.de"
+  DOMAIN = "milantheiss.de"
 
 [build]
   dockerfile = "Dockerfile"

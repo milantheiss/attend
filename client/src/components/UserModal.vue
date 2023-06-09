@@ -288,7 +288,7 @@ export default {
                 this.error.show = true
                 this.error.cause.lastnameInput = true
             }
-            if (inputs.email.trim().length < 3 || inputs.email.trim().length > 20 || !inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+            if (!inputs.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
                 this.error.message = 'Bitte gebe einen gültigen E-Mail ein.'
                 this.error.show = true
                 this.error.cause.emailInput = true
