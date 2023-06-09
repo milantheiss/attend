@@ -10,8 +10,9 @@ export const useAuthStore = defineStore('authStore', {
   }),
   actions: {
     async logIn(user_credentials) {
-      
-      let res = (await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      console.log("API URL", import.meta.env.VITE_API_URL);
+
+      let res = (await fetch(`https://api.milantheiss.de/auth/login`, {
         method: 'POST',
         body: JSON.stringify(user_credentials),
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -19,11 +20,15 @@ export const useAuthStore = defineStore('authStore', {
         mode: 'cors'
       }));
 
+      console.log("res", res);
+
       if (res.status === 401) {
         throw new Error('Wrong email or password')
       }
       
       res = await res.json()
+
+      console.log("JSON Res", res);
 
       this.user = res.user
     },
