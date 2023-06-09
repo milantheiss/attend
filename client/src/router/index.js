@@ -116,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     console.log("requiresAuth");
-    if (auth.isAuthenticated()) {
+    if (auth.authenticated) {
       await useDataStore().getNotifications()
       next();
       return;
@@ -195,7 +195,7 @@ router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   if (to.matched.some((record) => record.meta.guest)) {
 
-    if (auth.isAuthenticated()) {
+    if (auth.authenticated) {
       await useDataStore().getNotifications()
       next("/attendancelist");
       return;

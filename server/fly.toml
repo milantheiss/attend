@@ -7,7 +7,8 @@ app = "attend-app"
 primary_region = "ams"
 
 [env]
-ORIGIN_URL = "https://milantheiss.de"
+  NODE_ENV = "production"
+  ORIGIN_URL = "https://milantheiss.de"
 
 [build]
   dockerfile = "Dockerfile"

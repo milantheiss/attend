@@ -28,6 +28,8 @@ export const useAuthStore = defineStore('authStore', {
       
       res = await res.json()
 
+      this.authenticated = true
+
       console.log("JSON Res", res);
 
       this.user = res.user
@@ -42,6 +44,8 @@ export const useAuthStore = defineStore('authStore', {
         credentials: 'include',
         mode: 'cors'
       });
+
+      this.authenticated = false
 
       this.user = undefined
       data.notifications = []
