@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between px-3.5 md:px-7 gap-8">
       <!--Auswahlelement, um Gruppe auszuwählen-->
       <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" :options="this.groups"
-        class="font-bold text-2xl md:text-3xl" />
+        @change="onSelectedGroupChanged" class="font-bold text-2xl md:text-3xl" />
 
       <!--Toggelt zwischen TimesBox anzeigen und nicht anzeigen-->
       <button @click="showTimesBox = !showTimesBox"
@@ -75,9 +75,6 @@
         </template>
         <template #content>
           <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0">
-            <!--TODO Vielleicht nicht große Karte sondern nur Name und Checkbox-->
-            <!--TODO Animation fixen-->
-            <!--TODO Spacing zwischen Attandence List und TrainerBox fixen-->
             <!--Card list -> Trainer opt out-->
             <div @click="onTrainerAttendanceChange(trainer.userId)"
               class="text-black rounded-xl font-normal text-xl hover:cursor-pointer select-none"
@@ -221,6 +218,20 @@ export default {
       if (this.attended.participants.some(foo => foo.attended)) {
         this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
+    },
+
+    //Muss über @change Event und Methode ausgeführt werden, da über watcher die Methode auch bei einem Call mit Query Parametern getriggert werden würde.
+    onSelectedGroupChanged() {
+      //Wochentage werden an Datepicker übergeben, damit man über Buttons zum nächsten Training springen kann.
+      this.$refs.datePicker.weekdays = this.getWeekdays(this.selectedGroup)
+
+      //Darf manchmal nicht ausgeführt werden, da dies einen Date Change triggert und die aktuellste Trainingssession geladen wird. --> Z.B. bei Attendance Pull über Query Parameter
+      if (!this.blockSelectedGroupWatcher) {
+        //Aktualisiert Date
+        this.$refs.datePicker.newGroupSelected()
+      }
+
+      document.title = this.selectedGroup.name + ' - Attend'
     }
   },
   async created() {
@@ -239,6 +250,7 @@ export default {
       this.groups = res.body
       if (this.groups.length === 1) {
         this.selectedGroup = this.groups[0]
+        this.onSelectedGroupChanged()
       }
     }
 
@@ -267,21 +279,7 @@ export default {
       }
     }
   },
-  watch: {
-    //Wenn eine neue Gruppe ausgewählt wird,...
-    selectedGroup() {
-      //Wochentage werden an Datepicker übergeben, damit man über Buttons zum nächsten Training springen kann.
-      this.$refs.datePicker.weekdays = this.getWeekdays(this.selectedGroup)
 
-      //Darf manchmal nicht ausgeführt werden, da dies einen Date Change triggert und die aktuellste Trainingssession geladen wird. --> Z.B. bei Attendance Pull über Query Parameter
-      if (!this.blockSelectedGroupWatcher) {
-        //Aktualisiert Date
-        this.$refs.datePicker.newGroupSelected()
-      }
-
-      document.title = this.selectedGroup.name + ' - Attend'
-    }
-  },
   computed: {
     totalHours() {
       if (this.attended.starttime && this.attended.endtime) {

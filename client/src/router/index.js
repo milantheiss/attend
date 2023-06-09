@@ -115,7 +115,6 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    console.log("requiresAuth");
     if (auth.authenticated) {
       await useDataStore().getNotifications()
       next();

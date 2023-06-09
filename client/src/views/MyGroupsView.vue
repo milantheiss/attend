@@ -5,8 +5,8 @@
             <!--Auswahlelement, um Gruppe auszuwählen-->
             <!-- Wird angezeigt, wenn noch keine Gruppe ausgewählt wurde -->
             <div class="flex justify-center items-center w-full" v-if="group === undefined">
-                <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe"
-                    :options="this.groups.map(g => { return { _id: g._id, name: g.name } })"
+                <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" @change="onSelectedGroupChanged"
+                    :options="this.groups"
                     class="font-bold text-2xl md:text-3xl mx-3.5 md:mx-7" />
             </div>
 
@@ -63,7 +63,7 @@
                                     <!--Zeiten-->
 
                                     <tr class="border-b border-[#E5E7EB] last:border-0 group"
-                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b] - sorter[a])"
+                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b.day] - sorter[a.day])"
                                         :key="index">
 
                                         <!--Selector Day-->
@@ -442,34 +442,13 @@ export default {
             }
         },
 
-        async getGroups() {
-            const res = await fetchGroups()
-            if (!res.ok && res.status === 204) {
-                // this.groups = []
-                this.error.cause.noGroups = true
-            } else {
-                this.groups = res.body
-                if (this.groups.length === 1) {
-                    this.selectedGroup = {
-                        _id: this.groups[0]._id,
-                        name: this.groups[0].name
-                    }
-                }
-            }
+        async onSelectedGroupChanged() {
+            this.group = await fetchGroup(this.selectedGroup._id)
+            this.resetError()
         }
     },
 
     watch: {
-        selectedGroup: {
-            async handler(newVal) {
-                if (typeof newVal !== 'undefined') {
-                    this.group = await fetchGroup(newVal._id)
-                    this.resetError()
-                }
-            },
-            deep: true
-        },
-
 
         sort: {
             handler() {
@@ -488,7 +467,20 @@ export default {
     },
 
     async mounted() {
-        await this.getGroups()
+        const res = await fetchGroups()
+        if (!res.ok && res.status === 204) {
+            // this.groups = []
+            this.error.cause.noGroups = true
+        } else {
+            this.groups = res.body.map(g => { return { _id: g._id, name: g.name } })
+            if (this.groups.length === 1) {
+                this.selectedGroup = {
+                    _id: this.groups[0]._id,
+                    name: this.groups[0].name
+                }
+                this.onSelectedGroupChanged()
+            }
+        }
     },
 
     computed: {

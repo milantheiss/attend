@@ -251,52 +251,54 @@
                     Informationen. Du findest sie im oberen Teil deiner letzten Abrechnung</p>
             </template>
             <template #content>
-                <form @submit.prevent="$refs.headerDataModal.close()" class="w-full flex flex-col gap-2">
+                <form @submit.prevent="$refs.headerDataModal.close()" class="w-full flex flex-col gap-4">
                     <!-- ÜL Nr -->
-                    <div class="flex justify-between items-baseline">
+                    <div class="flex justify-between items-center">
                         <p class="text-light-gray font-normal">ÜL-Nr: </p>
                         <TextInput name="ulnr" v-model="dataStore.invoiceData.submittedBy.headerData.trainerId"
-                            placeholder="ÜL-Nr" :showError="error.cause.headerData" class="md:w-96"></TextInput>
+                            placeholder="ÜL-Nr" :showError="error.cause.trainerId" class="md:w-96"></TextInput>
                     </div>
-                    <!-- ÜL Helfer -->
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">ÜL-Helfer/ÜL-Assistent(TGO): </p>
-                        <CheckboxInput v-model="headerDataProxy.isAssistant">
-                        </CheckboxInput>
-                    </div>
-                    <!-- ÜL Selbstständig -->
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">Selbstständiger ÜL ohne Lizenz: </p>
-                        <CheckboxInput v-model="headerDataProxy.isTrainerWithoutLicense">
-                        </CheckboxInput>
-                    </div>
-                    <!-- ÜL mit Lizenz -->
-                    <div class="flex justify-between items-baseline">
-                        <p class="text-light-gray font-normal">ÜL mit Lizenz: </p>
-                        <CheckboxInput v-model="headerDataProxy.isTrainerWithLicense">
-                        </CheckboxInput>
-                    </div>
+                    <span class="w-full flex flex-col gap-4" :class="{'outline outline-3 outline-special-red outline-offset-[6px] rounded-lg gap-2': error.cause.headerData}">
+                        <!-- ÜL Helfer -->
+                        <div class="flex justify-between items-center">
+                            <p class="text-light-gray font-normal">ÜL-Helfer/ÜL-Assistent(TGO): </p>
+                            <CheckboxInput v-model="headerDataProxy.isAssistant">
+                            </CheckboxInput>
+                        </div>
+                        <!-- ÜL Selbstständig -->
+                        <div class="flex justify-between items-center">
+                            <p class="text-light-gray font-normal">Selbstständiger ÜL ohne Lizenz: </p>
+                            <CheckboxInput v-model="headerDataProxy.isTrainerWithoutLicense">
+                            </CheckboxInput>
+                        </div>
+                        <!-- ÜL mit Lizenz -->
+                        <div class="flex justify-between items-center">
+                            <p class="text-light-gray font-normal">ÜL mit Lizenz: </p>
+                            <CheckboxInput v-model="headerDataProxy.isTrainerWithLicense">
+                            </CheckboxInput>
+                        </div>
+                    </span>
                     <!-- Sondervereinbarung -->
-                    <div class="flex justify-between items-baseline">
+                    <div class="flex justify-between items-center">
                         <p class="text-light-gray font-normal">Sondervereinbarung: </p>
                         <CheckboxInput v-model="dataStore.invoiceData.submittedBy.headerData.specialAgreement">
                         </CheckboxInput>
                     </div>
                     <!-- ÜL Vertrag -->
-                    <div class="flex justify-between items-baseline">
+                    <div class="flex justify-between items-center">
                         <p class="text-light-gray font-normal">ÜL-Vertrag vorhanden: </p>
                         <CheckboxInput v-model="dataStore.invoiceData.submittedBy.headerData.hasContract">
                         </CheckboxInput>
                     </div>
                     <!-- Ehrenkodex Kindeswohl -->
-                    <div class="flex justify-between items-baseline">
+                    <div class="flex justify-between items-center">
                         <p class="text-light-gray font-normal">Ehrenkodex Kindeswohl: </p>
                         <CheckboxInput
                             v-model="dataStore.invoiceData.submittedBy.headerData.hasAgreedToCodeForChildrenWelfare">
                         </CheckboxInput>
                     </div>
                     <!-- Erweitertes Führungszeugnis -->
-                    <div class="flex justify-between items-baseline">
+                    <div class="flex justify-between items-center">
                         <p class="text-light-gray font-normal">Erweitertes Führungszeugnis: </p>
                         <CheckboxInput
                             v-model="dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate">
@@ -349,7 +351,9 @@ export default {
                 show: false,
                 cause: {
                     groupInput: false,
-                    noData: false
+                    noData: false,
+                    trainerId: false,
+                    headerData: false
                 }
             },
             status: {
@@ -366,7 +370,7 @@ export default {
             indexSortButtonDate: 0,
             indexSortButtonLength: 0,
             headerDataProxy: {
-                isAssistant: true,
+                isAssistant: false,
                 isTrainerWithoutLicense: false,
                 isTrainerWithLicense: false
             }
@@ -404,14 +408,16 @@ export default {
             } else {
                 this.showPullDataModal = false
 
-                this.headerDataProxy = {
-                    isAssistant: !this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
-                    isTrainerWithoutLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
-                    isTrainerWithLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && this.dataStore.invoiceData.submittedBy.headerData.hasLicense
-                }
-
+                //Wenn noch keine Header Daten vorhanden sind, wird das Modal geöffnet
                 if (Object.keys(this.dataStore.invoiceData.submittedBy.headerData).length === 0) {
                     this.$refs.headerDataModal.open()
+                } else {
+                    //Ansonsten werden die Header Daten in den Proxy geschrieben, damit sie bearbeitet werden können
+                    this.headerDataProxy = {
+                        isAssistant: !this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
+                        isTrainerWithoutLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && !this.dataStore.invoiceData.submittedBy.headerData.hasLicense,
+                        isTrainerWithLicense: this.dataStore.invoiceData.submittedBy.headerData.isTrainer && this.dataStore.invoiceData.submittedBy.headerData.hasLicense
+                    }
                 }
             }
         },
@@ -551,7 +557,10 @@ export default {
         },
 
         isHeaderDataComplete() {
-            if (this.dataStore.invoiceData.submittedBy.headerData.trainerId.trim().length === 0) {
+            this.resetError()
+
+            if (this.dataStore.invoiceData.submittedBy.headerData.trainerId === undefined || this.dataStore.invoiceData.submittedBy.headerData.trainerId?.trim().length === 0) {
+                this.error.cause.trainerId = true
                 this.error.message = "Bitte gib deine ÜL-Nr an!"
                 this.error.show = true
                 this.$refs.headerDataModal.open()
@@ -559,6 +568,7 @@ export default {
             }
 
             if (!this.headerDataProxy.isAssistant && !this.headerDataProxy.isTrainerWithoutLicense && !this.headerDataProxy.isTrainerWithLicense) {
+                this.error.cause.headerData = true
                 this.error.message = "Bitte gib an, ob du ÜL-Helfer, selbstständiger ÜL ohne Lizenz oder ÜL mit Lizenz bist!"
                 this.error.show = true
                 this.$refs.headerDataModal.open()
@@ -573,6 +583,19 @@ export default {
             this.dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate = this.dataStore.invoiceData.submittedBy.headerData.hasSubmittedCriminalRecordCertificate ?? false
 
             return true
+        },
+
+        resetError(){
+            this.error = {
+                message: "Fehler",
+                show: false,
+                cause: {
+                    groupInput: false,
+                    noData: false,
+                    trainerId: false,
+                    headerData: false
+                }
+            }
         }
     },
     async created() {

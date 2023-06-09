@@ -6,7 +6,7 @@
                         focus:ring-0 focus:border-standard-gradient-1
                         bg-inherit"
     :class="showError ? 'border-2 rounded-lg border-special-red' : 'border-0 border-b-2 border-[#9ea3ae] rounded-none'"
-    style="background-position: right 0.1rem center;padding-right: 1.9rem;">
+    style="background-position: right 0.1rem center;padding-right: 1.9rem;" @change="$emit('change', selected)">
     <option disabled :value="defaultValue" hidden>{{ defaultValue }}</option>
     <option v-for="element in computedOptions" :key="element._id" :value="element">
       {{ element.name }}
@@ -22,7 +22,7 @@ export default {
       selected: this.defaultValue
     };
   },
-  emits: ['update:modelValue', 'onChange', 'on'],
+  emits: ['update:modelValue', 'onChange', 'on', 'change'],
   props: {
     modelValue: Object,
     defaultValue: {

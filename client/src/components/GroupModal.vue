@@ -47,7 +47,7 @@
                                 <tbody>
                                     <!-- Bereits eingetragene Zeiten -->
                                     <tr class="border-b border-[#E5E7EB] last:border-0 group"
-                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b] - sorter[a])"
+                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b.day] - sorter[a.day])"
                                         :key="index">
 
                                         <!-- Trainingstag -->
