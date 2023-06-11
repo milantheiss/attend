@@ -179,9 +179,9 @@ const getAttendanceByGroup = async (groupID) => {
  * @param {Object} attendanceBody
  * @returns {Promise<Attendance>}
  */
-const createAttendance = async (user, groupID) => {
+const createAttendance = async (groupID) => {
     return Attendance.create({
-        group: new mongoose.Types.ObjectId(groupID),
+        group: groupID,
         trainingssessions: []
     })
 };

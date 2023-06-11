@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
+const ApiError = require('../utils/ApiError');
+const httpStatus = require('http-status');
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -19,15 +21,20 @@ if (config.env !== 'test') {
  * @returns {Promise}
  */
 const sendEmail = async (to, subject, text) => {
-  const msg = { from: config.email.from, to, subject, text };
-  console.log(msg);
-  await transport.sendMail(msg);
+  try {
+    const msg = { from: config.email.from, to, subject, text };
+    console.log(msg);
+    await transport.sendMail(msg);
+  } catch (error) {
+    console.error(error);
+    // throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Email konnte nicht versendet werden. Bitte überprüfe deine Angaben.")
+  }
 };
 
 const sendAccountDetails = async (to, details) => {
-    const subject = 'Account Details';
-    const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://milantheiss.de`;
-    await sendEmail(to, subject, text);
+  const subject = 'Account Details';
+  const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://milantheiss.de`;
+  return await sendEmail(to, subject, text);
 }
 
 /**

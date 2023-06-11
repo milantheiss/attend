@@ -1,7 +1,7 @@
 const logger = require('../config/logger')
 const Group = require('../models/group.model')
 const Issue = require('../models/issue.model')
-const { groupService, memberService } = require('../services')
+const { groupService, memberService, attendanceService } = require('../services')
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const _ = require('lodash');
@@ -33,7 +33,7 @@ const createGroup = catchAsync(async (req, res) => {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
     const result = await groupService.createGroup(req.body);
-    await groupService.createAttendance(result._id)
+    await attendanceService.createAttendance(result._id)
     res.status(httpStatus.CREATED).send(result)
 });
 

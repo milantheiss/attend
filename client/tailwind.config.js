@@ -23,9 +23,10 @@ module.exports = {
         'delete-gradient-1': '#DE2C2C',
         'delete-gradient-2': '#D83535',
         'background-graywhite': '#E8EBED',
-        'dark-grey': '#i',
+        'dark-gray': '#464646',
         'special-red': '#FF1F28',
         "light-gray": "#6B7280",
+        "almost-black": "#111827",
       },
       fontFamily:{
         'ubuntu': ['Ubuntu', 'sans-serif']

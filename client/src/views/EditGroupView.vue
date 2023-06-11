@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container mx-auto flex flex-col gap-8 mb-20 text-[#111827]">
+    <div class="container mx-auto flex flex-col gap-8 mb-20 text-almost-black">
 
       <!-- Group Info -->
 
@@ -53,12 +53,12 @@
                   <!--Zeiten-->
 
                   <tr class="border-b border-[#E5E7EB] last:border-0 group"
-                    v-for="(time, index) in group.times.sort((a, b) => sorter[b] - sorter[a])" :key="index">
+                    v-for="(time, index) in group.times" :key="index">
 
                     <!--Selector Day-->
 
                     <td>
-                      <DaySelect v-model="time.day"></DaySelect>
+                      <DaySelect v-model="time.day" @change="validateTime(time)"></DaySelect>
                     </td>
 
                     <!-- Start- und Endzeit -->
@@ -92,7 +92,7 @@
                     <!--Selector Day-->
 
                     <td class="pt-2 ">
-                      <DaySelect v-model="tempTime.day"></DaySelect>
+                      <DaySelect v-model="tempTime.day" @change="tempTimeChange()"></DaySelect>
                     </td>
 
                     <!-- Wenn Screen zu klein wird, werden die Start- und Endzeit als Stapel angezeigt. -->
@@ -341,17 +341,17 @@
 
     <!-- Edit Teilnehmer -->
 
-    <ParticipantModal ref="editParticipantModal" type="edit" access="staff" :groupID="group._id" @onClose="close">
+    <ParticipantModal ref="editParticipantModal" type="edit" access="staff" :groupID="group?._id" @onClose="close">
     </ParticipantModal>
 
     <!-- Add Teilnehmer -->
 
-    <ParticipantModal ref="addParticipantModal" type="add" access="staff" :groupID="group._id"
-      :groupParticipants="group.participants" @on-close="close"></ParticipantModal>
+    <ParticipantModal ref="addParticipantModal" type="add" access="staff" :groupID="group?._id"
+      :groupParticipants="group?.participants" @on-close="close"></ParticipantModal>
 
     <!-- Add Trainer -->
 
-    <NewTrainerModal ref="addTrainerModal" :groupID="group._id" :groupTrainers="group.trainers" @onClose="close">
+    <NewTrainerModal ref="addTrainerModal" :groupID="group?._id" :groupTrainers="group?.trainers" @onClose="close">
     </NewTrainerModal>
   </div>
 </template>
@@ -552,6 +552,8 @@ export default {
           time.starttime = time.endtime
           time.endtime = temp
         }
+
+        this.group.times = this.group.times.sort((a, b) => this.sorter[a.day] - this.sorter[b.day])
       }
     },
 

@@ -2,14 +2,14 @@
     <ModalDialog :show="show" :hasSubheader="false" @onClose="close">
 
         <template #header>
-            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'edit'">Bearbeiten</p>
-            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'add'">Teilnehmer hinzufügen</p>
+            <p class="text-xl md:text-2xl text-almost-black" v-if="type === 'edit'">Bearbeiten</p>
+            <p class="text-xl md:text-2xl text-almost-black" v-if="type === 'add'">Teilnehmer hinzufügen</p>
         </template>
 
         <template #content>
 
             <!-- Wird angezeigt, wenn type=edit oder type=new & access=trainer (Trainer kann nicht auf alle Mitglieder zugreifen) -->
-            <div class="flex flex-col justify-center items-center gap-4 text-[#111827]"
+            <div class="flex flex-col justify-center items-center gap-4 text-almost-black"
                 v-if="type === 'edit' || (type === 'add' && access === 'trainer')">
 
                 <!--Vorname des Teilnehmers-->
@@ -77,7 +77,7 @@
             </div>
 
             <!-- Wird angezeigt wenn type=new & access=staff -> Nur staff kann auf alle Participant zugreifen (Datenschutz) -->
-            <div class="flex flex-col gap-4 text-[#111827]" v-if="type === 'add' && access === 'staff'">
+            <div class="flex flex-col gap-4 text-almost-black" v-if="type === 'add' && access === 'staff'">
 
                 <!-- Search Bar -->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -113,7 +113,7 @@
 
                         <div class="w-fit h-fit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                                stroke="currentColor" class="w-7 h-7 text-[#111827]"
+                                stroke="currentColor" class="w-7 h-7 text-almost-black"
                                 v-show="selectedMembers.some(m => m._id === participant._id) || groupParticipants.some(p => p.memberId === participant._id)">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                             </svg>

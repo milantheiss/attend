@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-3.5 md:mx-7 font-ubuntu text-[#111827] md:text-xl text-lg">
+	<div class="mx-3.5 md:mx-7 font-ubuntu text-almost-black md:text-xl text-lg">
 
 		<!--Navbar: Wird angezeigt, wenn Session Authenticated-->
 		<div class="sticky top-0 w-full bg-background-graywhite z-30 mx-auto pt-6 md:pt-12 pb-6">

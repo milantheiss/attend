@@ -38,7 +38,7 @@ const createUser = async (userBody) => {
 
 	const password = nanoid.nanoid(10);
 
-	sendAccountDetails(userBody.email, { firstname: userBody.firstname, lastname: userBody.lastname, email: userBody.email, password: password })
+	await sendAccountDetails(userBody.email, { firstname: userBody.firstname, lastname: userBody.lastname, email: userBody.email, password: password })
 
 	userBody.password = password;
 

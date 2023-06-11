@@ -2,11 +2,11 @@
     <ModalDialog :show="show" :hasSubheader="false" @onClose="close">
 
         <template #header>
-            <p class="text-xl md:text-2xl text-[#111827]">Neue Gruppe</p>
+            <p class="text-xl md:text-2xl text-almost-black">Neue Gruppe</p>
         </template>
 
         <template #content>
-            <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
+            <div class="flex flex-col justify-center items-center gap-4 text-almost-black">
 
                 <!-- Gruppenbezeichnung -->
                 <div class="w-full flex items-center justify-between gap-4">
@@ -47,12 +47,12 @@
                                 <tbody>
                                     <!-- Bereits eingetragene Zeiten -->
                                     <tr class="border-b border-[#E5E7EB] last:border-0 group"
-                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b.day] - sorter[a.day])"
+                                        v-for="(time, index) in group.times"
                                         :key="index">
 
                                         <!-- Trainingstag -->
                                         <td class="py-2 group-last:pt-2 group-last:pb-0">
-                                            <DaySelect v-model="time.day"></DaySelect>
+                                            <DaySelect v-model="time.day" @change="validateTime(time)"></DaySelect>
                                         </td>
 
                                         <!-- Start- und Endzeit -->
@@ -87,7 +87,7 @@
                                     <!-- NewTime Row, zum hinzufügen von neuen Zeiten -->
                                     <tr v-show="showNewTime">
                                         <td class="pt-2 ">
-                                            <DaySelect v-model="tempTime.day"></DaySelect>
+                                            <DaySelect v-model="tempTime.day" @change="tempTimeChange()"></DaySelect>
                                         </td>
                                         <td class="pt-2 px-2.5">
                                             <!--Time Selector-->
@@ -308,6 +308,7 @@ export default {
                     time.starttime = time.endtime
                     time.endtime = temp
                 }
+                this.group.times.sort((a, b) => this.sorter[a.day] - this.sorter[b.day])
             }
         },
 

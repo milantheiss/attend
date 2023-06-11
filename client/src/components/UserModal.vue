@@ -205,7 +205,7 @@ export default {
         close() {
             //Müssen für type=new resetet werden
             this.user = { firstname: '', lastname: '', email: '', roles: [] }
-            this.role = { admin: false, staff: false, head: false, trainer: false, assistant: false }
+            this.roles = { admin: false, staff: false, head: false, trainer: false, assistant: false }
 
             //Muss auf false gesetzt werden, da sonst beim nächsten Öffnen des Modal der Löschen Button falsch angezeigt wird
             this.showDeleteButton = false

@@ -1,6 +1,6 @@
 <template>
     <!--Selector Day-->
-    <select v-model="day" class="block md:hidden" :class="style">
+    <select v-model="day" class="block md:hidden" :class="style" @change="$emit('change')">
         <option value="Montag">Mo.</option>
         <option value="Dienstag">Di.</option>
         <option value="Mittwoch">Mi.</option>
@@ -9,7 +9,7 @@
         <option value="Samstag">Sa.</option>
         <option value="Sonntag">So.</option>
     </select>
-    <select v-model="day" class="hidden md:block" :class="style">
+    <select v-model="day" class="hidden md:block" :class="style" @change="$emit('change')">
         <option value="Montag">Montag</option>
         <option value="Dienstag">Dienstag</option>
         <option value="Mittwoch">Mittwoch</option>
@@ -40,7 +40,8 @@ export default {
         day(value) {
             this.$emit('update:modelValue', value);
         }
-    }
+    },
+    emits: ['change', 'update:modelValue']
 }
 </script>
 <style scoped>

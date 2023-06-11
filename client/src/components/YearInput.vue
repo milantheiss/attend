@@ -1,7 +1,7 @@
 <template>
     <input class='block
         text-lg md:text-xl
-        focus:ring-0 focus:border-dark-grey
+        focus:ring-0 focus:border-dark-gray
         w-[49px] md:w-[54px]
         bg-inherit text-left
         focus:border-standard-gradient-1'

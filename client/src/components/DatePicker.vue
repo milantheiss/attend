@@ -53,13 +53,12 @@ export default {
           this._updateDate(this.getFormattedDate(new Date()));
         }
         else {
-
           this.date = new Date()
           this.getLastDate();
         }
         
         if (this.date === oldDate) {
-          this.$emit("update:modelValue", new Date());
+          this.$emit("update:modelValue", new Date(this.date));
           this.$emit("onChange");
         }
       }

@@ -122,10 +122,9 @@ export default {
     return {
       groups: [],
       selectedGroup: undefined,
-      date: new Date(),
+      date: undefined,
       showTimesBox: false,
       attended: Object,
-      blockSelectedGroupWatcher: false,
       pullingByQueryString: false
     }
   },
@@ -224,12 +223,8 @@ export default {
     onSelectedGroupChanged() {
       //Wochentage werden an Datepicker übergeben, damit man über Buttons zum nächsten Training springen kann.
       this.$refs.datePicker.weekdays = this.getWeekdays(this.selectedGroup)
-
-      //Darf manchmal nicht ausgeführt werden, da dies einen Date Change triggert und die aktuellste Trainingssession geladen wird. --> Z.B. bei Attendance Pull über Query Parameter
-      if (!this.blockSelectedGroupWatcher) {
-        //Aktualisiert Date
-        this.$refs.datePicker.newGroupSelected()
-      }
+      //Aktualisiert Date
+      this.$refs.datePicker.newGroupSelected()
 
       document.title = this.selectedGroup.name + ' - Attend'
     }
@@ -264,7 +259,6 @@ export default {
         // Sollte nicht mehr erreicht werden
         console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
       } else {
-        this.blockSelectedGroupWatcher = true
         this.pullingByQueryString = true
         this.selectedGroup = this.groups.find(foo => foo._id == groupId)
         this.date = new Date(date)
@@ -273,10 +267,10 @@ export default {
         if (this.attended.totalHours === null || this.attended.starttime === null || this.attended.endtime === null) {
           this.showTimesBox = true
         }
-
-        this.blockSelectedGroupWatcher = false
         this.pullingByQueryString = false
       }
+    } else {
+      this.date = new Date()
     }
   },
 

@@ -2,12 +2,12 @@
     <ModalDialog :show="show" :hasSubheader="false" @onClose="close">
 
         <template #header>
-            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'edit'">Bearbeiten</p>
-            <p class="text-xl md:text-2xl text-[#111827]" v-if="type === 'new'">Neues Mitglied</p>
+            <p class="text-xl md:text-2xl text-almost-black" v-if="type === 'edit'">Bearbeiten</p>
+            <p class="text-xl md:text-2xl text-almost-black" v-if="type === 'new'">Neues Mitglied</p>
         </template>
 
         <template #content>
-            <div class="flex flex-col justify-center items-center gap-4 text-[#111827]">
+            <div class="flex flex-col justify-center items-center gap-4 text-almost-black">
 
                 <!--Vorname des Teilnehmers-->
                 <div class="w-full flex items-center justify-between gap-4">

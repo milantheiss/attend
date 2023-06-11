@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container mx-auto flex flex-col gap-8 mb-20 text-[#111827]" v-if="!error.cause.noGroups">
+        <div class="container mx-auto flex flex-col gap-8 mb-20 text-almost-black" v-if="!error.cause.noGroups">
 
             <!--Auswahlelement, um Gruppe auszuwählen-->
             <!-- Wird angezeigt, wenn noch keine Gruppe ausgewählt wurde -->
@@ -63,13 +63,13 @@
                                     <!--Zeiten-->
 
                                     <tr class="border-b border-[#E5E7EB] last:border-0 group"
-                                        v-for="(time, index) in group.times.sort((a, b) => sorter[b.day] - sorter[a.day])"
+                                        v-for="(time, index) in group.times"
                                         :key="index">
 
                                         <!--Selector Day-->
 
                                         <td>
-                                            <DaySelect v-model="time.day"></DaySelect>
+                                            <DaySelect v-model="time.day" @change="validateTime(time)"></DaySelect>
                                         </td>
 
                                         <!-- Start- und Endzeit -->
@@ -105,7 +105,7 @@
                                         <!--Selector Day-->
 
                                         <td class="pt-2 ">
-                                            <DaySelect v-model="tempTime.day"></DaySelect>
+                                            <DaySelect v-model="tempTime.day" @change="tempTimeChange()"></DaySelect>
                                         </td>
 
                                         <!-- Wenn Screen zu klein wird, werden die Start- und Endzeit als Stapel angezeigt. -->
@@ -273,7 +273,7 @@
             </div>
         </div>
         <div class="mx-auto flex flex-col items-center gap-4 mt-8" v-if="error.cause.noGroups">
-            <span class="flex items-center gap-2 text-[#111827]">
+            <span class="flex items-center gap-2 text-almost-black">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -422,6 +422,8 @@ export default {
                     time.starttime = time.endtime
                     time.endtime = temp
                 }
+
+                this.group.times.sort((a, b) => this.sorter[b.day] - this.sorter[a.day])
             }
         },
 
