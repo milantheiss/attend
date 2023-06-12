@@ -197,8 +197,8 @@ export default {
             if (res.status === 200 && await res.text() === "Invoice approved") {
                 this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
-                await createInvoice(this.filename, this.invoice)
                 this.$router.push({ path: "/invoices" })
+                await createInvoice(this.filename, this.invoice)
             }
         },
         convertToReadableTime(timeNumberic) {
