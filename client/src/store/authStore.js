@@ -18,11 +18,12 @@ export const useAuthStore = defineStore('authStore', {
         mode: 'cors'
       }));
 
+      if (res.status !== 200) {
+        throw (await res.json()).message
+      }
+      
       res = await res.json()
 
-      if (res.code !== 200) {
-        throw res.message
-      }
 
       this.authenticated = true
 
