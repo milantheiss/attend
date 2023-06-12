@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('authStore', {
         mode: 'cors'
       }));
 
-      if (res.status === 401) {
+      if (res.status !== 200) {
         throw new Error('Wrong email or password')
       }
       

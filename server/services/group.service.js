@@ -52,7 +52,6 @@ async function getDepartmentOfGroup(group) {
  * @returns {Promise<[Group]>}
  */
 const getGroups = async () => {
-    //admin hat Zugriff auf alle Gruppen
     let groups = await Group.find({})
 
     for (let i = 0; i < groups.length; i++) {
