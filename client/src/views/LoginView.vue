@@ -73,10 +73,8 @@ export default {
         console.error(error)
         if (error === "User is deactivated") {
           this.errorMessage = "Dieser Account ist deaktiviert"
-        } else if (error === "Incorrect email or password") {
-          this.errorMessage = "E-Mail oder Passwort falsch"
         } else {
-          this.errorMessage = "Ein Fehler ist aufgetreten"
+          this.errorMessage = "E-Mail oder Passwort falsch"
         }
         this.showError = true
       }
