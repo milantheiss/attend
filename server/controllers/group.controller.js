@@ -70,9 +70,10 @@ const addMember = catchAsync(async (req, res) => {
 })
 
 const createAndAddMember = catchAsync(async (req, res) => {
-    if (!hasStaffAccess(req.user) || !hasAccessToGroup(req.user, req.params.groupID)) {
+    if (!hasStaffAccess(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
+
     const member = await memberService.createMember(_.pick(req.body, ['firstname', 'lastname', 'birthday']))
 
     if (member._doc.openIssues.length === 0) {

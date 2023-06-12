@@ -14,10 +14,18 @@ export const useDataStore = defineStore('dateStore', {
       const res = await getNotifications()
       this.notifications = res
     },
-    getCountOfUnreadNotifications() {
+    reset() {
+      this.viewname = ''
+      this.invoiceData = {}
+      this.notifications = []
+    }
+  },
+  getters: {
+    getCountOfUnreadNotifications: (state) => {
       const auth = useAuthStore()
-      if(auth.user === null || typeof auth.user === "undefined") return 0
-      return this.notifications.filter(notification => !notification.recipients.find((r) => r.userID === auth.user?._id).read).length
+      if (auth.user === null || typeof auth.user === "undefined") return 0
+
+      return state.notifications?.filter(notification => !notification.recipients.find((r) => r.userID === auth.user?._id).read).length
     }
   }
 })

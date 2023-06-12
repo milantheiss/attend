@@ -68,14 +68,11 @@ const login = catchAsync(async (req, res) => {
  */
 const logout = catchAsync(async (req, res) => {
     try {
-        //TODO Im Frontend implementieren
         const refresh_token = req.cookies.refresh_token;
 
-        if (!refresh_token) {
-            return res.status(httpStatus.BAD_REQUEST).send("No refresh token given");
+        if (refresh_token) {
+            await authService.logout(refresh_token);
         }
-
-        await authService.logout(refresh_token);
 
         return res
             .clearCookie("access_token", {

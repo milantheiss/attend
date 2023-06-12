@@ -12,7 +12,8 @@ async function watchForRedirects(res, { raw = false } = {}) {
 		console.log("Error while fetching: ", err);
 		router.push("/server-down")
 	})
-	if (res.status === 401 && await (await res).text() === "Logout") {
+
+	if ((await res).status === 401 && await (await res).text() === "Logout") {
 		console.log("Server responded with 401, redirecting to logout");
 		await useAuthStore().logOut();
 		console.log("Logged out");

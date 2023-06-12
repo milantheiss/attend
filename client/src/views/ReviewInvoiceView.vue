@@ -198,6 +198,12 @@ export default {
                 this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
                 this.$router.push({ path: "/invoices" })
+
+                this.invoice.reviewer = {
+                    firstname: this.authStore.user.firstname,
+                    lastname: this.authStore.user.lastname
+                }
+                
                 await createInvoice(this.filename, this.invoice)
             }
         },

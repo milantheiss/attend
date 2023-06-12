@@ -5,7 +5,7 @@
             <!--Auswahlelement, um Gruppe auszuwählen-->
             <!-- Wird angezeigt, wenn noch keine Gruppe ausgewählt wurde -->
             <div class="flex justify-center items-center w-full" v-if="group === undefined">
-                <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" @change="onSelectedGroupChanged"
+                <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" @change="onSelectedGroupChanged()"
                     :options="this.groups"
                     class="font-bold text-2xl md:text-3xl mx-3.5 md:mx-7" />
             </div>
@@ -20,7 +20,7 @@
 
                 <div class="w-full flex items-center justify-between gap-4">
                     <label for="name" class="">Gruppe:</label>
-                    <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe"
+                    <SelectList v-model="selectedGroup" defaultValue="Wähle eine Gruppe" @change="onSelectedGroupChanged()"
                         :options="this.groups.map(g => { return { _id: g._id, name: g.name } })" class="font-medium" />
                 </div>
 
@@ -445,6 +445,7 @@ export default {
         },
 
         async onSelectedGroupChanged() {
+            console.log('Change');
             this.group = await fetchGroup(this.selectedGroup._id)
             this.resetError()
         }

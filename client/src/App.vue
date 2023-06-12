@@ -27,8 +27,8 @@
 
 					<router-link @click="showMenu = false" to="/notifications" class="relative">
 						<div class="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 bg-delete-gradient-1 rounded-full flex justify-center items-center text-center shadow-lg text-white text-sm font-bold"
-							v-if="dataStore.getCountOfUnreadNotifications() > 0">
-							{{ dataStore.getCountOfUnreadNotifications() }}
+							v-if="dataStore.getCountOfUnreadNotifications > 0">
+							{{ dataStore.getCountOfUnreadNotifications }}
 						</div>
 						<div
 							class="rounded-full bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 z-0 drop-shadow-md">
@@ -192,7 +192,6 @@ export default {
 	methods: {
 		async logout() {
 			await this.auth.logOut();
-			console.log("Logged out");
 			this.$router.push('/login')
 		}
 	},

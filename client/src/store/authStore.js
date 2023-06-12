@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('authStore', {
       if (res.status !== 200) {
         throw (await res.json()).message
       }
-      
+
       res = await res.json()
 
 
@@ -31,6 +31,7 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async logOut() {
+
       const data = useDataStore()
 
       await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
@@ -43,8 +44,8 @@ export const useAuthStore = defineStore('authStore', {
       this.authenticated = false
 
       this.user = undefined
-      data.notifications = []
-      data.invoiceData = {}
+
+      data.reset()
     },
 
     isAuthenticated() {
