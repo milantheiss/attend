@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const { toJSON, paginate } = require('./plugins');
 const bcrypt = require('bcrypt');
+const ApiError = require('../utils/ApiError');
+const httpStatus = require('http-status');
 
 const userSchema = mongoose.Schema(
     {
@@ -89,7 +91,7 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
 userSchema.methods.isPasswordMatch = async function (password) {
     const user = this;
     if (user.deactivated) {
-        throw new ApiError(401, 'User is deactivated')
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'User is deactivated')
     }
     return bcrypt.compare(password, user.password);
 };

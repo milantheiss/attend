@@ -25,7 +25,7 @@
           </svg>
           <TextInput type="password" name="password" v-model="form.password" placeholder="Passwort"></TextInput>
         </div>
-        <ErrorMessage :message="'E-Mail oder Passwort ist falsch!'" :show="showError" class="text-lg md:text-xl" />
+        <ErrorMessage :message="errorMessage" :show="showError" class="text-lg md:text-xl" />
         <div class="mt-2">
           <button type="submit"
             class="w-full text-white bg-gradient-to-br from-standard-gradient-1 to-standard-gradient-2 px-3.5 md:px-7 py-3.5 rounded-2xl drop-shadow-md font-medium text-xl">Login</button>
@@ -58,7 +58,8 @@ export default {
         email: "",
         password: "",
       },
-      showError: false
+      showError: false,
+      errorMessage: ""
     };
   },
   methods: {
@@ -70,6 +71,13 @@ export default {
         this.showError = false
       } catch (error) {
         console.error(error)
+        if (error === "User is deactivated") {
+          this.errorMessage = "Dieser Account ist deaktiviert"
+        } else if (error === "Incorrect email or password") {
+          this.errorMessage = "E-Mail oder Passwort falsch"
+        } else {
+          this.errorMessage = "Ein Fehler ist aufgetreten"
+        }
         this.showError = true
       }
     },

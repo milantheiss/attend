@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('authStore', {
       }));
 
       if (res.status !== 200) {
-        throw new Error('Wrong email or password')
+        throw new Error(res.message)
       }
       
       res = await res.json()
