@@ -71,6 +71,8 @@ export default {
             console.error("No ID provided");
             this.$router.back()
         }
+        
+        this.$router.back()
 
         await this.downloadInvoice(id)
 
@@ -78,7 +80,6 @@ export default {
             console.error(this.invoice.message);
         }
 
-        this.$router.back()
     }
 }
 </script>
