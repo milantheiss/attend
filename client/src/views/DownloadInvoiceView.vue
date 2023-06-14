@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto flex flex-col gap-4 items-center justify-center">
-        <p class="text-light-gray text-center">Wenn du nicht zurück geleitet wirst, nutze Zurück Button</p>
+        <p class="text-light-gray text-center">Wenn du nicht zurück geleitet wirst, nutze den Zurück Button</p>
         <StandardButton @click="$router.back()">Zurück</StandardButton>
     </div>
 </template>

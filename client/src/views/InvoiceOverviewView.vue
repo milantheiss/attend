@@ -29,7 +29,7 @@
             </template>
             <template #content>
                 <!--Invoice Tabelle-->
-                <div class="h-fit max-h-[25vh] overflow-y-auto block">
+                <div class="h-fit max-h-[55vh] overflow-y-auto block">
                     <table class="table-auto w-full text-left">
                         <thead class="sticky top-0 border-b border-[#D1D5DB] bg-white">
                             <tr>
