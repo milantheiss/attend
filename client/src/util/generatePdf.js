@@ -558,7 +558,6 @@ async function createInvoice(filename, dataset) {
   }
 
   doc.save(filename);
-  return true
 }
 
 //INFO Aufteilung Koordinaten erst Horizontale Verschiebung (x) dann Vertikale (y)
