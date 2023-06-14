@@ -75,6 +75,8 @@ export default {
             console.error("No ID provided");
             this.$router.back()
         }
+        
+        this.$router.back()
 
         await this.downloadInvoice(id)
 
