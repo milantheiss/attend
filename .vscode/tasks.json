@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "client: start",
+        "detail": "vite --host",
+        "type": "npm",
+        "script": "dev",
+        "path": "client",
+        "problemMatcher": [],
+        "isBackground": true
+      },
+      {
+        "label": "server: start",
+        "detail": "nodemon server.js",
+        "type": "npm",
+        "script": "dev",
+        "path": "server",
+        "problemMatcher": [],
+        "isBackground": true
+      },
+      {
+        "label": "envoirement: start",
+        "dependsOn": [
+          "server: start",
+          "client: start"
+        ],
+        "isBackground": true
+      }
+    ]
+  }
