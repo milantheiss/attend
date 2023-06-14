@@ -6,6 +6,7 @@
                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
         </svg>
         <p class="ml-4 text-xl font-medium">Bitte warten...</p>
+        <StandardButton @click="$router.back()">Zurück</StandardButton>
     </div>
 </template>
 
@@ -13,6 +14,7 @@
 import { createInvoice } from "@/util/generatePdf"
 import { getInvoiceById } from '@/util/fetchOperations'
 import { useDataStore } from "@/store/dataStore";
+import StandardButton from '@/components/StandardButton.vue';
 
 export default {
     name: "DownloadInvoice",
@@ -37,7 +39,9 @@ export default {
 
             this.filename = `Abrechnung_${this.invoice.submittedBy.lastname}_${this.invoice.submittedBy.firstname}_${new Date(this.invoice.dateOfReceipt).toJSON().split("T")[0]}`
 
-            await createInvoice(this.filename, this.invoice)
+            if (await createInvoice(this.filename, this.invoice)) {
+                this.$router.back()
+            }
         },
         calcTime(startingTime, endingTime) {
             //Formatiert Zeit vom Format 18:45 in 18,75
@@ -79,6 +83,7 @@ export default {
         }
 
         this.$router.back()
-    }
+    },
+    components: { StandardButton }
 }
 </script>

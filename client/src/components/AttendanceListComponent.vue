@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-4">
     <AttendanceListItem v-for="participant in this.participantArr" :key="participant.memberId" :participant="participant"
-      @onAttendedChange="(id, bool) => $emit('onAttendedChange', id, bool)" />
+      @onAttendedChange="(id, bool) => $emit('onAttendanceChange', id, bool)" />
     <span class="flex justify-center items-center w-full">
       <p v-show="participantArr.length === 0" class="text-xl md:text-2xl font-medium text-light-gray mx-auto">Liste ist leer
       </p>
@@ -19,7 +19,7 @@ export default {
       participantArr: Object
     }
   },
-  emits: ['onAttendedChange'],
+  emits: ['onAttendanceChange'],
   props: {
     participants: Array,
     sortByFirstName: {

@@ -488,7 +488,7 @@ export default {
 
     computed: {
         timeInputStyle() {
-            const standard = "font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3"
+            const standard = "font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3 w-[93px] md:w-[128px]"
             return this.error.cause.timesInput ? standard + ' border-2 rounded-lg border-special-red' : standard
         }
     }

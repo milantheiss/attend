@@ -96,7 +96,7 @@
                     </td>
 
                     <!-- Wenn Screen zu klein wird, werden die Start- und Endzeit als Stapel angezeigt. -->
-                    <td class="pt-2 px-2.5">
+                    <td class="pt-2 px-2.5  flex flex-col gap-2 sm:table-cell">
                       <!--Time Selector-->
                       <input :class="timeInputStyle" type='time' v-model="tempTime.starttime" min='00:00'
                         :max='tempTime.endtime' @change="tempTimeChange()" />
@@ -613,7 +613,7 @@ export default {
   },
   computed: {
     timeInputStyle() {
-      const standard = "font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3"
+      const standard = "font-medium focus:ring-0 focus:border-standard-gradient-1 border-2 border-[#9ea3ae] rounded-2xl text-lg px-1 md:px-3 w-[93px] md:w-[128px]"
 
       return this.error.cause.timesInput ? standard + ' border-2 rounded-lg border-special-red' : standard
     }

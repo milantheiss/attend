@@ -162,9 +162,9 @@ export default {
             showToolbar: false,
             spin: false,
             //Möglich: date_ascending, date_descending, weekday, length_ascending & length_descending
-            //Standard: date_descending
+            //Standard: date_ascending
             //Wenn ein anderer Wert als die hier aufgeführten übergeben wird, wird der Standardwert verwendet
-            sortMode: "length_descending",
+            sortMode: "date_ascending",
             indexSortButtonDate: 0,
             indexSortButtonLength: 0,
         }

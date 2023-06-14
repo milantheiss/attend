@@ -460,6 +460,7 @@ async function createInvoice(filename, dataset) {
           trainingssession.totalHours = endtimeNumeric - starttimeNumeric > 0 && starttimeNumeric > 0 ? endtimeNumeric - starttimeNumeric : 0;
         }
       })
+      group.trainingssessions.sort((a, b) => new Date(a.date) - new Date(b.date))
       return group.trainingssessions
     }).flat()
 
@@ -557,6 +558,7 @@ async function createInvoice(filename, dataset) {
   }
 
   doc.save(filename);
+  return true
 }
 
 //INFO Aufteilung Koordinaten erst Horizontale Verschiebung (x) dann Vertikale (y)

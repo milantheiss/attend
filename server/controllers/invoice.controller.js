@@ -86,7 +86,7 @@ const submitInvoice = catchAsync(async (req, res) => {
 			invoice.dateOfLastChange = new Date();
 
 			for (group of invoice.groups) {
-				group.trainingssessions.sort((a, b) => a - b);
+				group.trainingssessions.sort((a, b) => new Date(a.date) - new Date(b.date));
 				group.attendanceList = await attendanceService.getFormattedListForAttendanceListPDF(group._id, invoice.startdate, invoice.enddate);
 				group.department = invoice.department;
 			}

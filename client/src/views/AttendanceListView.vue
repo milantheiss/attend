@@ -59,35 +59,29 @@
     </div>
 
     <!--Liste aller Teilnehmer: Wird geupdatet, wenn neue Attendance List gepullt wird.-->
-    <!--Wenn keine Attendance List geladen ist, wird "Bitte wähle eine Gruppe angezeigt."-->
-    <div>
-      <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
-        @onAttendedChange="(id, bool) => attendanceChange(id, bool)"></AttendanceListComponent>
-    </div>
+    <AttendanceListComponent :participants="this.attended.participants" :sortByLastName="true"
+      @onAttendanceChange="(id, bool) => onAttendanceChange(id, bool)"></AttendanceListComponent>
 
-    <div>
-      <!--TrainerBox-->
-      <CollapsibleContainer ref="trainerBox" class="rounded-xl px-3.5 md:px-7 "
-        v-if="typeof selectedGroup !== 'undefined'"
-        :class="{ 'transition-all ease-in-out duration-[150ms] bg-transparent text-black': !trainerBox.showContent, 'transition-all ease-in-out duration-[150ms] drop-shadow-md bg-white px-3.5 md:px-7 py-4': trainerBox.showContent }">
-        <template #header>
-          <p class="font-bold text-xl md:text-2xl">Trainer</p>
-        </template>
-        <template #content>
-          <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0">
-            <!--Card list -> Trainer opt out-->
-            <div @click="onTrainerAttendanceChange(trainer.userId)"
-              class="text-black rounded-xl font-normal text-xl hover:cursor-pointer select-none"
-              :class="{ '': !trainerBox.showContent }">
-              <span class="flex items-center justify-between">
-                <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
-                <CheckboxInput v-model="trainer.attended"></CheckboxInput>
-              </span>
-            </div>
+    <!--TrainerBox-->
+    <CollapsibleContainer ref="trainerBox" class="rounded-xl px-3.5 md:px-7 " v-if="typeof selectedGroup !== 'undefined'"
+      :class="{ 'transition-all ease-in-out duration-[150ms] bg-transparent text-black': !trainerBox.showContent, 'transition-all ease-in-out duration-[150ms] drop-shadow-md bg-white px-3.5 md:px-7 py-4': trainerBox.showContent }">
+      <template #header>
+        <p class="font-bold text-xl md:text-2xl">Trainer</p>
+      </template>
+      <template #content>
+        <div v-for="(trainer) in this.attended.trainers" :key="trainer.userId" class="mb-4 last:mb-0">
+          <!--Card list -> Trainer opt out-->
+          <div @click="onTrainerAttendanceChange(trainer.userId)"
+            class="text-black rounded-xl font-normal text-xl hover:cursor-pointer select-none"
+            :class="{ '': !trainerBox.showContent }">
+            <span class="flex items-center justify-between">
+              <h3>{{ trainer.lastname }}, {{ trainer.firstname }}</h3>
+              <CheckboxInput v-model="trainer.attended"></CheckboxInput>
+            </span>
           </div>
-        </template>
-      </CollapsibleContainer>
-    </div>
+        </div>
+      </template>
+    </CollapsibleContainer>
 
     <div v-if="(typeof this.attended.participants !== 'undefined' && this.attended.participants.length > 0)"
       class="flex justify-center items-center">
@@ -160,11 +154,11 @@ export default {
     },
 
     /**
-     * Wird von @see AttendanceListComponent getriggert. Updatet die Attendance List auf dem Client und schickt die veränderte Trainingssession zum Server.
+     * Wird von @see AttendanceListComponent aufgerufen. Updatet die Attendance List auf dem Client und schickt die veränderte Trainingssession zum Server.
      * @param {String} id ID des Teilnehmers
      * @param {Boolean} newVal Ob der Teilnehmer teilgenommen hat.
      */
-    async attendanceChange(id, newVal) {
+    async onAttendanceChange(id, newVal) {
       (this.attended.participants.find(foo => foo.memberId == id)).attended = newVal
 
       if (this.attended.starttime === undefined || this.attended.starttime === null || this.attended.endtime === undefined || this.attended.endtime === null) {
@@ -269,8 +263,6 @@ export default {
         }
         this.pullingByQueryString = false
       }
-    } else {
-      this.date = new Date()
     }
   },
 
