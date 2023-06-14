@@ -76,8 +76,6 @@ export default {
             this.$router.back()
         }
         
-        this.$router.back()
-
         await this.downloadInvoice(id)
 
         if (typeof this.invoice.code !== "undefined") {
