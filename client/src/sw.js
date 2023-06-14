@@ -5,7 +5,7 @@ self.addEventListener("message", (event) => {
 });
 
 //Fix für automatische Aktualisierung auf iOS
-const version = "V1.0.0"
+const version = "V1.0.1"
 const staticCacheName = version + "_pwa-static";
 const dynamicCacheName = version + "_pwa-dynamic";
 

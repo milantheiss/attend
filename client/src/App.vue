@@ -151,7 +151,7 @@
 
 						</p>
 						<p class="text-center font-light text-base md:text-lg mx-auto">Erstellt von Milan Theiß - Version
-							1.0.0</p>
+							1.0.1</p>
 					</div>
 				</transition>
 			</nav>
