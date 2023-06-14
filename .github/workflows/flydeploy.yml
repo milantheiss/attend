@@ -20,3 +20,15 @@ jobs:
         working-directory: server
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          NODE_ENV: production
+          PORT: 8080
+          DOMAIN: ${{ secrets.ATTEND_DOMAIN }}
+          MONGODB_URL: ${{ secrets.ATTEND_MONGODB_URL }}
+          JWT_SECRET: ${{ secrets.ATTEND_JWT_SECRET }}
+          JWT_ACCESS_EXPIRATION_MINUTES: 15
+          JWT_REFRESH_EXPIRATION_DAYS: 7
+          SMTP_HOST: ${{ secrets.ATTEND_SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.ATTEND_SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.ATTEND_SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.ATTEND_SMTP_PASSWORD }}
+          EMAIL_FROM: noreply@milantheiss.de
