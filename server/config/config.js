@@ -7,18 +7,18 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const envVarsSchema = Joi.object()
     .keys({
         NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
-        PORT: Joi.number().default(3000),
+        PORT: Joi.number().default(8080),
         MONGODB_URL: Joi.string().required().description('Mongo DB url'),
-        KEY_PATH: Joi.string().required().description('Path to SSL Key'),
-        CERT_PATH: Joi.string().required().description('Path to CERT'),
-        SMTP_HOST: Joi.string().description('server that will send the emails'),
-        SMTP_PORT: Joi.number().description('port to connect to the email server'),
-        SMTP_USERNAME: Joi.string().description('username for email server'),
-        SMTP_PASSWORD: Joi.string().description('password for email server'),
+        KEY_PATH: Joi.string().description('Path to SSL Key'),
+        CERT_PATH: Joi.string().description('Path to CERT'),
+        SMTP_HOST: Joi.string().required().description('server that will send the emails'),
+        SMTP_PORT: Joi.number().required().description('port to connect to the email server'),
+        SMTP_USERNAME: Joi.string().required().description('username for email server'),
+        SMTP_PASSWORD: Joi.string().required().description('password for email server'),
         EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
         JWT_SECRET: Joi.string().required().description('JWT secret key'),
-        JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
-        JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
+        JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(15).description('minutes after which access tokens expire'),
+        JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(7).description('days after which refresh tokens expire'),
         DOMAIN: Joi.string().required().description('Domain of the app for cookies'),
     })
     .unknown();
