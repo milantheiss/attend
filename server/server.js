@@ -62,5 +62,3 @@ process.on('SIGTERM', () => {
         server.close();
     }
 });
-
-//TEST
