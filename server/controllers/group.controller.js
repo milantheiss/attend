@@ -15,7 +15,7 @@ const getGroups = catchAsync(async (req, res) => {
 });
 
 const getAssignedGroups = catchAsync(async (req, res) => {
-    if (!hasStaffAccess(req.user) && !hasTrainerRole(req.user)) {
+    if (!hasStaffAccess(req.user) && !hasTrainerRole(req.user) && !hasAssistantRole(req.user)) {
         return res.status(httpStatus.FORBIDDEN).send({ message: "You don't have access to this group" })
     }
     res.status(httpStatus.OK).send(await groupService.getAssignedGroups(req.user))
