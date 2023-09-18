@@ -5,7 +5,7 @@ const { groupService, memberService, attendanceService } = require('../services'
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const _ = require('lodash');
-const { hasStaffAccess, hasTrainerRole, hasAccessToGroup } = require('../utils/roleCheck');
+const { hasStaffAccess, hasTrainerRole, hasAssistantRole, hasAccessToGroup } = require('../utils/roleCheck');
 
 const getGroups = catchAsync(async (req, res) => {
     if (!hasStaffAccess(req.user)) {
