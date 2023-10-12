@@ -167,6 +167,7 @@ export default {
         this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
+    //sfdag
 
     async onTrainerAttendanceChange(id) {
       const trainer = this.attended.trainers.find(foo => foo.userId == id)
