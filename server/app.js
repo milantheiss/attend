@@ -34,7 +34,7 @@ app.use(compression());
 if (config.env === 'production') {
     app.use(cors({
         credentials: true,
-        origin: [`https://${config.domain}`, `https://www.${config.domain}`, `https://attend.www.${config.domain}`, , `https://attend.${config.domain}`]
+        origin: [`https://${config.domain}`, `https://www.${config.domain}`, `https://www.attend.${config.domain}`, , `https://attend.${config.domain}`]
     }));
 }
 
