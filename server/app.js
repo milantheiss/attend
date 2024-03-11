@@ -34,14 +34,14 @@ app.use(compression());
 if (config.env === 'production') {
     app.use(cors({
         credentials: true,
-        origin: `https://${config.domain}`
+        origin: [`https://${config.domain}`, `https://www.${config.domain}`, `https://attend.www.${config.domain}`, , `https://attend.${config.domain}`]
     }));
 }
 
 if (config.env === 'development') {
     app.use(cors({
         credentials: true,
-        origin: `https://${config.domain}:8080`
+        origin: [`https://${config.domain}:8080`]
     }));
 }
 
