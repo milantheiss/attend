@@ -145,6 +145,7 @@ export default {
           console.error("Etwas ist schief gelaufen. Dies hätte nicht passieren sollen. --> pullAttendance")
         } else {
           this.attended = await res
+          this.attended.participants = this.attended.participants.filter((participant) => typeof participant.firstname !== 'undefined' && typeof participant.lastname !== 'undefined')
 
           if (this.attended.starttime === undefined || this.attended.starttime === null || this.attended.endtime === undefined || this.attended.endtime === null) {
             this.showTimesBox = true
@@ -167,7 +168,6 @@ export default {
         this.attended = await updateTrainingssession(this.selectedGroup._id, this.date, this.attended)
       }
     },
-    //sfdag
 
     async onTrainerAttendanceChange(id) {
       const trainer = this.attended.trainers.find(foo => foo.userId == id)
@@ -240,6 +240,7 @@ export default {
       this.groups = res.body
       if (this.groups.length === 1) {
         this.selectedGroup = this.groups[0]
+        this.selectedGroup.participants = this.selectedGroup.participants.filter((participant) => typeof participant.firstname !== 'undefined' && typeof participant.lastname !== 'undefined')
         this.onSelectedGroupChanged()
       }
     }
@@ -258,6 +259,8 @@ export default {
         this.selectedGroup = this.groups.find(foo => foo._id == groupId)
         this.date = new Date(date)
         this.attended = await res
+
+        this.attended.participants = this.attended.participants.filter((participant) => typeof participant.firstname !== 'undefined' && typeof participant.lastname !== 'undefined')
 
         if (this.attended.totalHours === null || this.attended.starttime === null || this.attended.endtime === null) {
           this.showTimesBox = true

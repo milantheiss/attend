@@ -32,6 +32,7 @@ async function getParticipantsOfGroup(participants) {
         }
         return participant;
     }));
+    participants = participants.filter(participant => typeof participant._doc.firstname !== "undefined" && typeof participant._doc.lastname !== "undefined")
     return participants
 }
 
@@ -132,6 +133,8 @@ const getTrainingssession = async (groupID, date) => {
             }
             return participant;
         }));
+
+        sessionBody.participants = sessionBody.participants.filter(participant => typeof participant.firstname !== "undefined" && typeof participant.lastname !== "undefined")
 
         sessionBody.trainers = await Promise.all(sessionBody.trainers.map(async (trainer) => {
             const res = await User.findOne({ _id: trainer.userId }, { firstname: 1, lastname: 1, _id: 1 })
