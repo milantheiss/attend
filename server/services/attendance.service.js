@@ -197,6 +197,11 @@ const createAttendance = async (groupID) => {
  * @returns {Promise<Attendance>}
  */
 const updateTrainingssession = async (groupID, date, sessionBody) => {
+    const compareDates = (a, b) => {
+        if (!(a instanceof Date) || !(b instanceof Date)) a = new Date(a), b = new Date(b)
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+    }
+
     //Wenn alle Teilnehmer nicht anwesend sind, wird die Trainingssession gelöscht
     if (!sessionBody.participants.some(p => p.attended)) {
         await deleteTrainingssession(groupID, date)
@@ -224,11 +229,13 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
     })
 
     //Wenn die Trainingssession noch nicht existiert, wird sie erstellt
-    if (!attendance.trainingssessions.some(e => e.date.toJSON() === new Date(date).toJSON())) {
+    if (!attendance.trainingssessions.some(e => compareDates(e.date, new Date(sessionBody.date)))) {
+        sessionBody.date = new Date(sessionBody.date)
         attendance.trainingssessions.push(sessionBody)
     } else {
         attendance._doc.trainingssessions = attendance.trainingssessions.map(e => {
-            if (e.date.toJSON() === new Date(date).toJSON()) {
+            if (compareDates(e.date, new Date(sessionBody.date))) {
+                sessionBody.date = e.date;
                 return sessionBody
             }
             return e
