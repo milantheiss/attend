@@ -16,7 +16,6 @@ function hasAccessToGroup(user, groupID = undefined) {
     return hasAdminRole(user) || user.accessible_groups.includes(groupID)
 }
 
-
 function hasAdminRole(user){
     return user.roles.includes(admin)
 }

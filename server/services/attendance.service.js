@@ -247,6 +247,28 @@ const updateTrainingssession = async (groupID, date, sessionBody) => {
     return await getTrainingssession(groupID, date)
 };
 
+const removeDuplicates = async () => {
+    const getDateString = (date) => {
+        return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+    }
+
+    const attendances = await Attendance.find({})
+
+    attendances.forEach(attendance => {
+        const dates = new Set()
+        attendance.trainingssessions.forEach(session => {
+            if (dates.has(getDateString(session.date))) {
+                attendance.trainingssessions.splice(attendance.trainingssessions.indexOf(session), 1)
+            } else {
+                dates.add(getDateString(session.date))
+            }
+        })
+        attendance.save()
+    })
+    return;
+}
+
+
 /**
  * Checks for the given trainingssession. If list is empty, the trainingssession will be deleted
  * @param {*} user 
@@ -426,5 +448,6 @@ module.exports = {
     getFormattedListForAttendanceListPDF,
     removeMemberFromAttendanceList,
     removeTrainerFromAttendanceList,
-    updateMemberIdOfParticipant
+    updateMemberIdOfParticipant,
+    removeDuplicates
 };

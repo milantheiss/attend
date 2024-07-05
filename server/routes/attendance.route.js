@@ -14,17 +14,20 @@ const router = express.Router();
 router
     .route('/byGroupID/:groupID')
     .get(verifyToken, validate(attendanceValidation.getAttendanceByGroup), attendanceController.getAttendanceByGroup)
-    // .patch(verifyToken, attendanceController.addTrainingssession)
+// .patch(verifyToken, attendanceController.addTrainingssession)
 
 router
     .route('/byGroupID/:groupID/:date')
     .get(verifyToken, validate(attendanceValidation.getTrainingssession), attendanceController.getTrainingssession)
     .patch(verifyToken, validate(attendanceValidation.updateTrainingssession), attendanceController.updateTrainingssession)
-    // .delete(verifyToken, attendanceController.deleteTrainingssession)
+// .delete(verifyToken, attendanceController.deleteTrainingssession)
 
 router
     .route('/getFormattedList/:groupID/:startdate/:enddate')
     .get(verifyToken, validate(attendanceValidation.getFormattedList), attendanceController.getFormattedList)
+
+router.route("/removeDuplicates")
+    .post(verifyToken, attendanceController.removeDuplicates);
 
 module.exports = router;
 

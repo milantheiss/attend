@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const logger = require('../config/logger')
 const { attendanceService } = require('../services')
 const catchAsync = require('../utils/catchAsync');
-const { hasAccessToGroup, hasStaffAccess } = require('../utils/roleCheck');
+const { hasAccessToGroup, hasStaffAccess, hasAdminRole } = require('../utils/roleCheck');
 const ApiError = require('../utils/ApiError');
 
 // const getAttendance = catchAsync(async (req, res) => {
@@ -74,15 +74,20 @@ const getFormattedList = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(result)
 })
 
+const removeDuplicates = catchAsync(async (req, res) => {
+  if (!hasAdminRole(req.user)) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'You are not allowed to remove duplicates');
+  }
+  await attendanceService.removeDuplicates();
+  logger.info(`Removed duplicates from attendance list`)
+  res.status(httpStatus.OK).send("Success");
+});
+
 module.exports = {
-  // getAttendance,
-  // createAttendance,
   updateTrainingssession,
-  // deleteAttendance,
   getTrainingssession,
   getAttendanceByGroup,
-  // addTrainingssession,
-  // deleteTrainingssession,
-  getFormattedList
+  getFormattedList,
+  removeDuplicates
 }
 
