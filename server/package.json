@@ -18,22 +18,24 @@
     "express": "^4.18.2",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.7.0",
+    "fs": "^0.0.1-security",
     "http-status": "^1.5.2",
     "https": "^1.0.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
+    "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
+    "mkcert": "^3.2.0",
     "mongoose": "^6.12.6",
     "mongoose-sequence": "^5.3.1",
     "nanoid": "^3.3.6",
-    "winston": "^3.7.2",
     "nodemailer": "^6.9.9",
-    "xss-filters": "^1.2.7",
-    "fs": "^0.0.1-security"
+    "winston": "^3.7.2",
+    "xss-filters": "^1.2.7"
   },
   "devDependencies": {
-    "prompt-sync": "^4.2.0",
-    "nodemon": "^2.0.20",
-    "prettier": "^2.0.5"
+    "nodemon": "^2.0.22",
+    "prettier": "^2.0.5",
+    "prompt-sync": "^4.2.0"
   }
 }

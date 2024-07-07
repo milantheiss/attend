@@ -3,6 +3,7 @@ const config = require('../config/config');
 const logger = require('../config/logger');
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
+const { createInvoice } = require("../utils/generatePdf")
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -20,10 +21,9 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, attachments = [], cc = "") => {
   try {
-    const msg = { from: config.email.from, to, subject, text };
-    console.log(msg);
+    const msg = { from: config.email.from, to, subject, text, attachments, cc };
     await transport.sendMail(msg);
   } catch (error) {
     console.error(error);
@@ -69,10 +69,31 @@ If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
+/**
+ * Sends invoice approval mail
+ * @param {string} to Mail address of reviewer
+ * @param {string} cc Mail address of submitter
+ * @param {Object} invoice Invoice object
+ * @returns {Promise}
+ */
+const sendInvoiceApprovalEmail = async (to, cc, invoice) => {
+  const subject = `Abrechnung ${invoice.invoiceNumber} von ${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} - ${new Date().toLocaleDateString('de-DE', { year: "numeric", month: "numeric", day: "numeric" })}`;
+  const text = `Abrechnung ${invoice.invoiceNumber} von ${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} wurde genehmigt.`;
+  const attachments = [
+    {
+      filename: `Abrechnung_${invoice.submittedBy.lastname}_${invoice.submittedBy.firstname}_${new Date(invoice.dateOfReceipt).toJSON().split("T")[0]}`,
+      content: await createInvoice(invoice),
+      contentType: 'application/pdf'
+    }
+  ];
+  await sendEmail(to, subject, text, attachments=attachments);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
-  sendAccountDetails
+  sendAccountDetails,
+  sendInvoiceApprovalEmail
 };
