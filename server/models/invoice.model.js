@@ -87,6 +87,10 @@ const invoiceSchema = mongoose.Schema(
         dateOfLastChange: {
             type: Date,
             required: false
+        },
+        invoiceNumber: {
+            type: Number,
+            required: false
         }
     }
 );

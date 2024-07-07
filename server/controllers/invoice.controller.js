@@ -8,6 +8,7 @@ const { Department, Invoice, User, Notification } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole, hasDepartmentHeadRole } = require("../utils/roleCheck");
 const config = require("../config/config");
+const { sendInvoiceApprovalEmail } = require("../services/email.service");
 
 const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 	let dataset = {
@@ -72,13 +73,13 @@ const submitInvoice = catchAsync(async (req, res) => {
 
 			const submitter = await User.findById(req.user._id, { firstname: 1, lastname: 1, headerData: 1 });
 
-			
+
 			invoice.submittedBy = {
 				...invoice.submittedBy,
 				firstname: submitter.firstname,
 				lastname: submitter.lastname
 			};
-			
+
 			//Speichert HeaderData in User ab
 			submitter.headerData = invoice.submittedBy.headerData;
 			await submitter.save();
@@ -209,6 +210,11 @@ const approveInvoice = catchAsync(async (req, res) => {
 			type: "invoice",
 			data: { invoiceID: invoice._id },
 		});
+
+		const reviewerMail = (await User.findById(reviewer.userId, { email: 1 })).email;
+		const submitterMail = (await User.findById(invoice.submittedBy.userId, { email: 1 })).email;
+
+		await sendInvoiceApprovalEmail(reviewerMail, submitterMail, invoice);
 
 		await res.status(httpStatus.OK).send("Invoice approved");
 	} else {
