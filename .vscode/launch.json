@@ -14,7 +14,7 @@
 				"/*": "*",
 				"/./~/*": "${webRoot}/node_modules/*"
 			},
-			"runtimeArgs": ["--auto-ssl-client-auth"]
+			"runtimeArgs": ["--ignore-certificate-errors"]
 			// "preLaunchTask": "envoirement: start"
 		}
 	]
