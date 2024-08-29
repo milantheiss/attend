@@ -4,6 +4,7 @@ const app = require('./app')
 const config = require('./config/config');
 const https = require('https')
 const fs = require('fs')
+const { createCA, createCert } = require("mkcert");
 
 let server;
 
@@ -21,16 +22,35 @@ if (config.env === 'production') {
 }
 
 if (config.env === 'development') {
-    mongoose.connect(config.url, { dbName: 'data' }).then(() => {
-        logger.info(`Connected to MongoDB at ${new Date().toLocaleString()}`);
-        server = https.createServer({
-            key: fs.readFileSync(config.key),
-            cert: fs.readFileSync(config.cert),
-        }, app)
-            .listen(config.port, () => {
-                logger.info(`Listening to port ${config.port}`);
-            });
-    });
+
+    const mkcert = async () => {
+        const ca = await createCA({
+            organization: "milantheiss",
+            countryCode: "DE",
+            state: "Hessia",
+            locality: "Dieburg",
+            validity: 365
+        });
+
+        const cert = await createCert({
+            ca: { key: ca.key, cert: ca.cert },
+            domains: ["127.0.0.1", "localhost", "192.168.178.130"],
+            validity: 365
+        });
+
+
+        mongoose.connect(config.url, { dbName: 'data' }).then(() => {
+            logger.info(`Connected to MongoDB at ${new Date().toLocaleString()}`);
+            server = https.createServer({
+                key: cert.key,
+                cert: cert.cert,
+            }, app)
+                .listen(config.port, () => {
+                    logger.info(`Listening to port ${config.port}`);
+                });
+        });
+    }
+    mkcert();
 }
 
 const exitHandler = () => {
