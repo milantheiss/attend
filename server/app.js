@@ -18,10 +18,13 @@ const app = express();
 
 
 // parse json request body
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ type: 'application/json', limit: '1mb' }));
 
 // parse urlencoded request body
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
 
 // sanitize request data
 app.use(xss());
