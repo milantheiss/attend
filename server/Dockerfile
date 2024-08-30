@@ -1,14 +1,16 @@
 FROM node:alpine
 
-RUN apt-get update
-RUN apt-get install -y locales
+# Installiere die notwendigen Pakete
+RUN apk add --no-cache \
+    libc6-compat \
+    tzdata \
+    && apk add --no-cache --virtual .build-deps \
+    musl-locales musl-locales-lang
 
-RUN sed -i '/de_DE.UTF-8/s/^# //g' /etc/locale.gen && \
-    locale-gen
-
-ENV LANG de_DE.UTF-8  
-ENV LANGUAGE de_DE:de  
-ENV LC_ALL de_DE.UTF-8     
+# Setze die Umgebungsvariablen für UTF-8
+ENV LANG=de_DE.UTF-8
+ENV LANGUAGE=de_DE.UTF-8
+ENV LC_ALL=de_DE.UTF-8
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
