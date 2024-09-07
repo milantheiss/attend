@@ -12,6 +12,7 @@ const notificationRoute = require("./notification.route")
 const departmentsRoute = require('./departments.route');
 const issueRoute = require("./issue.route")
 const authRoute = require("./auth.route")
+const testRoute = require('./test.route');
 
 const router = express.Router();
 
@@ -67,6 +68,10 @@ const defaultRoutes = [
     {
         path: "/auth",
         route: authRoute
+    },
+    {
+        path: "/test",
+        route: testRoute
     }
 ];
 
