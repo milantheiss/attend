@@ -37,7 +37,6 @@ const getTrainingssession = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have access to this group');
   }
   const result = await attendanceService.getTrainingssession(req.params.groupID, new Date(req.params.date));
-  console.log(result)
   logger.debug(`GET - attendance list of group ${req.params.groupID} on date ${req.params.date}`)
   res.status(httpStatus.OK).setHeader('Content-Type', 'application/json; charset=utf-8').send(result);
 });
