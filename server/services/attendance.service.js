@@ -467,8 +467,8 @@ const getStats = async (groupid, startdate, enddate, formate = "json") => {
     })
 
     if(formate === "csv") {
-        const fields = ['firstname', 'lastname', 'attendance']
-        const csv = [fields, ...res.map(e => [e.firstname, e.lastname, e.attendance])].map(e => e.join(",")).join("\n")
+        const fields = ['lastname', 'firstname', 'attendance']
+        const csv = [fields, ...res.map(e => [e.lastname, e.firstname, e.attendance])].map(e => e.join(",")).join("\n")
         return csv
     }
 
