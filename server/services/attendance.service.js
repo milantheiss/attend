@@ -434,6 +434,47 @@ const updateMemberIdOfParticipant = async (groupID, newMemberID, oldMemberID) =>
     return await attendance.save()
 }
 
+const getStats = async (groupid, startdate, enddate, formate = "json") => {
+    const attendance = await getAttendanceByGroup(groupid);
+
+    const stats = attendance.trainingssessions.reduce((_stats, session) => {
+        if (session.date >= new Date(startdate) && session.date <= new Date(enddate)) {
+            session.participants.forEach(participant => {
+                if (participant.attended) {
+                    if (_stats.has(participant.memberId.toString())) {
+                        _stats.set(participant.memberId.toString(), _stats.get(participant.memberId.toString()) + 1)
+                    } else {
+                        _stats.set(participant.memberId.toString(), 1)
+                    }
+                }
+            })
+        }
+        return _stats
+    }, new Map())
+
+
+    const members = await Member.find({ _id: { $in: Array.from(stats.keys()) } }, { _id: 1, firstname: 1, lastname: 1 })
+
+    console.log(stats);
+    
+
+    const res = members.map(member => {
+        return {
+            firstname: member.firstname,
+            lastname: member.lastname,
+            attendance: stats.get(member._id.toString())
+        }
+    })
+
+    if(formate === "csv") {
+        const fields = ['firstname', 'lastname', 'attendance']
+        const csv = [fields, ...res.map(e => [e.firstname, e.lastname, e.attendance])].map(e => e.join(",")).join("\n")
+        return csv
+    }
+
+    return res
+}
+
 
 module.exports = {
     getAttendance,
@@ -449,5 +490,6 @@ module.exports = {
     removeMemberFromAttendanceList,
     removeTrainerFromAttendanceList,
     updateMemberIdOfParticipant,
-    removeDuplicates
+    removeDuplicates,
+    getStats
 };

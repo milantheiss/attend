@@ -69,10 +69,21 @@ const getFormattedList = {
   })
 };
 
+const getStats = {
+  query: Joi.object().keys({
+    //String als ObjectId
+    groupid: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+    startdate: Joi.string().max(10).truncate().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
+    enddate: Joi.string().max(10).truncate().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).required(),
+    formate: Joi.string().valid('json', 'csv').default('json')
+  })
+}
+
 
 module.exports = {
   updateTrainingssession,
   getAttendanceByGroup,
   getTrainingssession,
-  getFormattedList
+  getFormattedList,
+  getStats
 };

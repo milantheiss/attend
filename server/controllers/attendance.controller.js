@@ -2,8 +2,9 @@ const httpStatus = require('http-status');
 const logger = require('../config/logger')
 const { attendanceService } = require('../services')
 const catchAsync = require('../utils/catchAsync');
-const { hasAccessToGroup, hasStaffAccess, hasAdminRole } = require('../utils/roleCheck');
+const { hasAccessToGroup, hasStaffAccess, hasAdminRole, hasDepartmentHeadRole } = require('../utils/roleCheck');
 const ApiError = require('../utils/ApiError');
+const { get } = require('https');
 
 // const getAttendance = catchAsync(async (req, res) => {
 //   const result = await attendanceService.getAttendance(req.user);
@@ -83,11 +84,21 @@ const removeDuplicates = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send("Success");
 });
 
+const getStats = catchAsync(async (req, res) => {
+  if (!hasStaffAccess(req.user) && !hasDepartmentHeadRole(req.user) && !hasAccessToGroup(req.user, req.query.groupid)) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'You do not have access to stats');
+  }
+  const result = await attendanceService.getStats(req.query.groupid, req.query.startdate, req.query.enddate, req.query.formate);
+
+  res.status(httpStatus.OK).send(result)
+})
+
 module.exports = {
   updateTrainingssession,
   getTrainingssession,
   getAttendanceByGroup,
   getFormattedList,
-  removeDuplicates
+  removeDuplicates,
+  getStats
 }
 

@@ -29,5 +29,8 @@ router
 router.route("/removeDuplicates")
     .post(verifyToken, attendanceController.removeDuplicates);
 
+router.route("/stats")
+    .get(verifyToken, validate(attendanceValidation.getStats), attendanceController.getStats);
+
 module.exports = router;
 

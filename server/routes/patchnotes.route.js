@@ -14,7 +14,7 @@ const patchNotes = {
 };
 
 /**
- * Braucht kein Access Controll
+ * Braucht kein Access Control
  */
 router
     .route('/')
