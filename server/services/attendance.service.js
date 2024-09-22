@@ -437,42 +437,69 @@ const updateMemberIdOfParticipant = async (groupID, newMemberID, oldMemberID) =>
 const getStats = async (groupid, startdate, enddate, formate = "json") => {
     const attendance = await getAttendanceByGroup(groupid);
 
-    const stats = attendance.trainingssessions.reduce((_stats, session) => {
+    let totalSessions = 0;
+    const statsParticipants = new Map();
+    const statsTrainers = new Map();
+
+    attendance.trainingssessions.forEach((session) => {
         if (session.date >= new Date(startdate) && session.date <= new Date(enddate)) {
             session.participants.forEach(participant => {
                 if (participant.attended) {
-                    if (_stats.has(participant.memberId.toString())) {
-                        _stats.set(participant.memberId.toString(), _stats.get(participant.memberId.toString()) + 1)
+                    if (statsParticipants.has(participant.memberId.toString())) {
+                        statsParticipants.set(participant.memberId.toString(), statsParticipants.get(participant.memberId.toString()) + 1)
                     } else {
-                        _stats.set(participant.memberId.toString(), 1)
+                        statsParticipants.set(participant.memberId.toString(), 1)
                     }
                 }
             })
-        }
-        return _stats
-    }, new Map())
+            session.trainers.forEach(trainer => {
+                if (trainer.attended) {
+                    if (statsTrainers.has(trainer.userId.toString())) {
+                        statsTrainers.set(trainer.userId.toString(), statsTrainers.get(trainer.userId.toString()) + 1)
+                    } else {
+                        statsTrainers.set(trainer.userId.toString(), 1)
+                    }
+                }
+            })
 
-
-    const members = await Member.find({ _id: { $in: Array.from(stats.keys()) } }, { _id: 1, firstname: 1, lastname: 1 })
-
-    console.log(stats);
-    
-
-    const res = members.map(member => {
-        return {
-            firstname: member.firstname,
-            lastname: member.lastname,
-            attendance: stats.get(member._id.toString())
+            totalSessions++
         }
     })
 
-    if(formate === "csv") {
+
+    const members = await Member.find({ _id: { $in: Array.from(statsParticipants.keys()) } }, { _id: 1, firstname: 1, lastname: 1 })
+    const trainers = await User.find({ _id: { $in: Array.from(statsTrainers.keys()) } }, { _id: 1, firstname: 1, lastname: 1 })
+
+    const resMembers = members.map(member => {
+        return {
+            firstname: member.firstname,
+            lastname: member.lastname,
+            attendance: statsParticipants.get(member._id.toString())
+        }
+    })
+
+    const resTrainers = trainers.map(trainer => {
+        return {
+            firstname: trainer.firstname,
+            lastname: trainer.lastname,
+            attendance: statsTrainers.get(trainer._id.toString())
+        }
+    })
+
+    if (formate === "csv") {
         const fields = ['lastname', 'firstname', 'attendance']
-        const csv = [fields, ...res.map(e => [e.lastname, e.firstname, e.attendance])].map(e => e.join(",")).join("\n")
+        let csv = [fields, ...resMembers.map(e => [e.lastname, e.firstname, e.attendance])].map(e => e.join(",")).join("\n")
+        csv += "\n\n"
+        csv += resTrainers.map(e => [e.lastname, e.firstname, e.attendance]).map(e => e.join(",")).join("\n")
+        csv += "\n\n" + `Total Sessions,${totalSessions}`
         return csv
     }
 
-    return res
+    return {
+        totalSessions: totalSessions,
+        members: resMembers,
+        trainers: resTrainers
+    }
 }
 
 
