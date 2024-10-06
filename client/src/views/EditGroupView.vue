@@ -157,7 +157,7 @@
         <!-- Header -->
 
         <div class="flex gap-4 items-center justify-between w-full px-3.5 md:px-7">
-          <p class="font-medium text-xl md:text-2xl">Teilnehmer</p>
+          <p class="font-medium text-xl md:text-2xl">{{group.participants.length}} Teilnehmer</p>
           <StandardButton @click="$refs.addParticipantModal.open()">
             <p class="font-medium font-base md:text-lg">Hinzufügen</p>
           </StandardButton>
