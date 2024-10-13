@@ -445,6 +445,19 @@ const deleteGroup = async (groupID) => {
     return await Group.findByIdAndDelete(groupID)
 }
 
+const exportParticipants = async (groupid, formate = "json") => {
+    const group = await getGroupById(groupid);
+
+
+    if (formate === "csv") {
+        const fields = ['lastname', 'firstname', 'birthday']
+        let csv = [fields, ...group.participants.map(e => [e._doc.lastname, e._doc.firstname, e._doc.birthday.toJSON().substring(0, 10)])].map(e => e.join(",")).join("\n")
+        return csv
+    }
+
+    return group.participants
+}
+
 module.exports = {
     getGroupById,
     getGroups,
@@ -461,5 +474,6 @@ module.exports = {
     addMultipleMembers,
     addMultipleTrainer,
     updateMemberIdOfParticipant,
-    deleteGroup
+    deleteGroup,
+    exportParticipants
 };

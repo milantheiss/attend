@@ -23,6 +23,10 @@ router
     .route("/:groupID/multipleMembers")
     .post(verifyToken, validate(groupValidation.addMultipleMembers), groupController.addMultipleMembers)
 
+    router
+    .route("/:groupID/exportParticipants")  
+    .get(verifyToken, validate(groupValidation.getData), groupController.exportParticipants)
+
 router
     .route('/:groupID/member')
     .post(verifyToken, validate(groupValidation.createAndAddMember), groupController.createAndAddMember)

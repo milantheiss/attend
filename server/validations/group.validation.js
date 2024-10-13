@@ -234,6 +234,15 @@ const deleteGroup = {
   })
 };
 
+const getData = {
+  params: Joi.object().keys({
+    groupID: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+  }),
+  query: Joi.object().keys({
+    formate: Joi.string().valid('json', 'csv').default('json')
+  })
+}
+
 module.exports = {
   addMember,
   createGroup,
@@ -247,5 +256,6 @@ module.exports = {
   addMultipleMembers,
   addMultipleTrainer,
   createAndAddMember,
-  deleteGroup
+  deleteGroup,
+  getData
 };

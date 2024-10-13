@@ -157,6 +157,15 @@ const deleteGroup = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(result)
 })
 
+const exportParticipants = catchAsync(async (req, res) => {
+    if (!hasStaffAccess(req.user) && !hasDepartmentHeadRole(req.user) && !hasAccessToGroup(req.user, req.params.groupID)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'You do not have access to stats');
+    }
+    const result = await groupService.exportParticipants(req.params.groupID, req.query.formate);
+  
+    res.status(httpStatus.OK).send(result)
+  })
+
 module.exports = {
     getAssignedGroups,
     getGroups,
@@ -173,6 +182,7 @@ module.exports = {
     addMultipleMembers,
     addMultipleTrainer,
     createAndAddMember,
-    deleteGroup
+    deleteGroup,
+    exportParticipants
 }
 
