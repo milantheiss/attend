@@ -478,6 +478,8 @@ const getStats = async (groupid, startdate, enddate, formate = "json") => {
         }
     })
 
+    resMembers.sort((a, b) => a.lastname.localeCompare(b.lastname))
+
     const resTrainers = trainers.map(trainer => {
         return {
             firstname: trainer.firstname,
@@ -485,6 +487,8 @@ const getStats = async (groupid, startdate, enddate, formate = "json") => {
             attendance: statsTrainers.get(trainer._id.toString())
         }
     })
+
+    resTrainers.sort((a, b) => a.lastname.localeCompare(b.lastname))
 
     if (formate === "csv") {
         const fields = ['lastname', 'firstname', 'attendance']

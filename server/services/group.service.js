@@ -448,6 +448,8 @@ const deleteGroup = async (groupID) => {
 const exportParticipants = async (groupid, formate = "json") => {
     const group = await getGroupById(groupid);
 
+    group.participants.sort((a, b) => a._doc.lastname.localeCompare(b._doc.lastname))
+
 
     if (formate === "csv") {
         const fields = ['lastname', 'firstname', 'birthday']
