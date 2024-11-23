@@ -3,6 +3,7 @@ const config = require('../config/config');
 const logger = require('../config/logger');
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
+const { createInvoice } = require("../utils/generatePdf")
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -20,10 +21,9 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, attachments = [], cc = "") => {
   try {
-    const msg = { from: config.email.from, to, subject, text };
-    console.log(msg);
+    const msg = { from: { name: "Noreply Attend", address: "noreply@milantheiss.de" }, to, subject, text, attachments, cc };
     await transport.sendMail(msg);
   } catch (error) {
     console.error(error);
@@ -32,8 +32,8 @@ const sendEmail = async (to, subject, text) => {
 };
 
 const sendAccountDetails = async (to, details) => {
-  const subject = 'Account Details';
-  const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://milantheiss.de`;
+  const subject = 'Account Details - Append App';
+  const text = `Hallo ${details.firstname} ${details.lastname},\nHier sind deine Zugangsdaten:\nEmail: ${details.email}\nPasswort: ${details.password}\nhttps://attend.milantheiss.de`;
   return await sendEmail(to, subject, text);
 }
 
@@ -69,10 +69,46 @@ If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
+/**
+ * Sends invoice notification mail
+ * @param {string} to Mail address of reviewer
+ * @param {Object} invoice Invoice object
+ * @returns {Promise}
+ */
+const sendInvoiceNotificationMail = async (to, invoice) => {
+  const subject = `Neue Abrechnung von ${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} - ${new Date().toLocaleDateString('de-DE', { year: "numeric", month: "numeric", day: "numeric" })}`;
+  const text = `${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} hat eine neue Abrechnung erstellt.\nBitte überprüfe die Abrechnung: https://${config.domain}/review-invoice?id=${invoice._id}`;
+  console.log(to);
+
+  await sendEmail(to, subject, text);
+}
+
+/**
+ * Sends invoice approval mail
+ * @param {string} to Mail address of reviewer
+ * @param {string} cc Mail address of submitter
+ * @param {Object} invoice Invoice object
+ * @returns {Promise}
+ */
+const sendInvoiceApprovalEmail = async (to, cc, invoice) => {
+  const subject = `GENEHMIGT: Abrechnung - ${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} - ${new Date(invoice.dateOfReceipt).toLocaleDateString('de-DE', { year: "numeric", month: "numeric", day: "numeric" })}`;
+  const text = `Abrechnung von ${invoice.submittedBy.firstname} ${invoice.submittedBy.lastname} wurde am ${new Date().toLocaleDateString('de-DE', { year: "numeric", month: "numeric", day: "numeric" })} genehmigt.\nDie Abrechnung findest du im Anhang.`;
+
+  const attachments = [
+    {
+      filename: `Abrechnung_${invoice.submittedBy.lastname}_${invoice.submittedBy.firstname}_${new Date(invoice.dateOfReceipt).toJSON().split("T")[0]}.pdf`,
+      path: await createInvoice(invoice)
+    }
+  ];
+  await sendEmail(to, subject, text, attachments, cc);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
-  sendAccountDetails
+  sendAccountDetails,
+  sendInvoiceApprovalEmail,
+  sendInvoiceNotificationMail,
 };
