@@ -8,7 +8,7 @@ const { Department, Invoice, User, Notification } = require("../models");
 const { addNewNotification } = require("../services/notification.service");
 const { hasTrainerRole, hasAssistantRole, hasDepartmentHeadRole } = require("../utils/roleCheck");
 const config = require("../config/config");
-const { sendInvoiceApprovalEmail } = require("../services/email.service");
+const { sendInvoiceApprovalEmail, sendInvoiceNotificationMail } = require("../services/email.service");
 
 const getDatasetForNewInvoice = catchAsync(async (req, res) => {
 	let dataset = {
@@ -61,6 +61,8 @@ const submitInvoice = catchAsync(async (req, res) => {
 		if (invoice !== null && typeof invoice !== "undefined") {
 			//Check if department head exists
 			const departmentHeadIDs = (await Department.findById(invoice.department._id)).head;
+
+			const departmentHeads = await User.find({ _id: { $in: departmentHeadIDs } }, { email: 1 });
 
 			if (departmentHeadIDs === null || typeof departmentHeadIDs === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "No department head found");
@@ -116,6 +118,8 @@ const submitInvoice = catchAsync(async (req, res) => {
 			if (notification === null || typeof notification === "undefined") {
 				throw new ApiError(httpStatus.BAD_REQUEST, "Notification could not be created");
 			}
+		
+			await sendInvoiceNotificationMail(departmentHeads.map(dH => dH.email), invoice);
 
 			await res.status(httpStatus.OK).send("Invoice submitted");
 		} else {
@@ -211,7 +215,7 @@ const approveInvoice = catchAsync(async (req, res) => {
 			data: { invoiceID: invoice._id },
 		});
 
-		const reviewerMail = (await User.findById(reviewer.userId, { email: 1 })).email;
+		const reviewerMail = (await User.findById(req.user._id, { email: 1 })).email;
 		const submitterMail = (await User.findById(invoice.submittedBy.userId, { email: 1 })).email;
 
 		await sendInvoiceApprovalEmail(reviewerMail, submitterMail, invoice);

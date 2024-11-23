@@ -1,5 +1,5 @@
 /* eslint-disable no-constant-condition */
-const { jsPDF } =  require("jspdf");
+const { jsPDF } = require("jspdf");
 
 //INFO Buchstaben in Helvetica & Font Size 10 haben ca. eine Zeichenhöhe 7.3 pt
 
@@ -427,10 +427,8 @@ async function createList(group, attendanceList, options) {
  *
  * @param {Object} dataset Dataset, dass vom Backend generiert wird
  */
-async function createInvoice(filename, dataset) {
+async function createInvoice(dataset) {
   logoImage = await getLogoImage();
-
-  filename = filename ?? `Abrechnung_${dataset.submittedBy.lastname}_${dataset.submittedBy.firstname}_${new Date(dataset.dateOfReceipt).toJSON().split("T")[0]}`
 
   let doc = new jsPDF({ unit: "pt", compress: true });
 
@@ -556,7 +554,7 @@ async function createInvoice(filename, dataset) {
     InvoicePdf.generateFooter(doc);
   }
 
-  return doc.output(filename);
+  return doc.output("datauristring");
 }
 
 //INFO Aufteilung Koordinaten erst Horizontale Verschiebung (x) dann Vertikale (y)
@@ -578,6 +576,10 @@ function calcTime(startingTime, endingTime) {
 }
 
 async function getLogoImage() {
-  return  await (await fetch("https://gist.githubusercontent.com/milantheiss/344e1a2ccaca514d3e4facc5e6b25b99/raw/logo")).text()
+  return await (await fetch("https://gist.githubusercontent.com/milantheiss/344e1a2ccaca514d3e4facc5e6b25b99/raw/logo")).text()
 }
 
+
+module.exports = {
+  createInvoice,
+}
