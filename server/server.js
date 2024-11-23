@@ -27,8 +27,11 @@ if (config.env === 'development') {
         const ca = await createCA({
             organization: "milantheiss",
             countryCode: "DE",
+<<<<<<< HEAD
             state: "Hessia",
             locality: "Dieburg",
+=======
+>>>>>>> origin/Feature-Invoice-Approval-Mail
             validity: 365
         });
 
