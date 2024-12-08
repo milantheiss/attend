@@ -510,7 +510,7 @@ export default {
     validateInputs() {
       this.resetError()
 
-      if (this.group.name.trim().length === 0 || !this.group.name.match(/^[a-zA-ZäöüÄÖÜß-\s]+$/)) {
+      if (this.group.name.trim().length === 0 || !this.group.name.match(/^[a-zA-ZäöüÄÖÜß0-9-&+\/.,\s]+$/)) {
         this.error.message = 'Bitte gebe einen gültigen Namen ein.'
         this.error.show = true
         this.error.cause.nameInput = true
