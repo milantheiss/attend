@@ -80,7 +80,7 @@ const addMultipleMembers = {
 const createGroup = {
   body: Joi.object().keys({
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s/.,0-9]+$/).required(),
+    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß0-9-&+\/.,\s]+$/).required(),
     //Array aus ObjectIds Not required
     times: Joi.array().items(Joi.object().keys({
       //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
@@ -104,7 +104,7 @@ const updateGroup = {
   }),
   body: Joi.object().keys({
     //String darf nur aus Groß- & Kleinbuchstaben, Bindestrichen und Leerzeichen bestehen
-    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß-\s/.,0-9]+$/),
+    name: Joi.string().pattern(/^[a-zA-ZäöüÄÖÜß0-9-&+\/.,\s]+$/),
     //Array aus ObjectIds Not required
     times: Joi.array().items(Joi.object().keys({
       //Darf Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag oder Sonntag sein
