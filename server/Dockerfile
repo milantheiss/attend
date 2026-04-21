@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:20-alpine
 
 # Installiere die notwendigen Pakete
 RUN apk add --no-cache \
